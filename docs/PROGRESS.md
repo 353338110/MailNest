@@ -72,6 +72,25 @@
 - 不记录密码、授权码、Token 或认证响应。
 - 增加连接测试结果模型测试。
 
+### PR #9：本地草稿
+
+链接：https://github.com/353338110/MailNest/pull/待创建
+
+状态：待创建，base 为 `codex/progress-tracking`
+
+已完成内容：
+
+- 新增本地草稿数据库表。
+- 新增 `DraftRepository` 管理草稿保存、读取、监听和删除。
+- 新增写邮件页，可创建和编辑本地草稿。
+- 写邮件页支持内容变更后的自动保存。
+- 写邮件页支持手动保存草稿。
+- 写邮件页支持删除草稿并二次确认。
+- 新增草稿列表页和首页草稿箱入口。
+- 草稿列表页、写邮件页均保留正常返回路径。
+- 暂不同步 IMAP Drafts 文件夹。
+- 暂不实现 Gmail/Outlook 草稿。
+
 ## 已验证
 
 最近一次验证命令：
@@ -131,11 +150,6 @@ flutter test
 
 ### 草稿
 
-- 本地草稿。
-- 自动保存草稿。
-- 手动保存草稿。
-- 删除草稿。
-- 编辑草稿。
 - 发送草稿。
 
 ### 配置导入导出
@@ -210,7 +224,7 @@ flutter test
 6. `codex/attachments-cache`：附件列表、下载、缓存和打开。
 7. `codex/composer-smtp-send`：写邮件和 SMTP 发信。
 8. `codex/reply-forward`：回复、回复全部、转发。
-9. `codex/drafts`：本地草稿。
+9. `codex/drafts`：本地草稿。（已创建）
 10. `codex/sent-records`：发送记录和 Sent 文件夹保存。
 11. `codex/backup-export`：加密配置导出。
 12. `codex/backup-import`：配置导入和冲突处理。

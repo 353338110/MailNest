@@ -59,5 +59,43 @@
     }
   },
   "passwordRequiredForConnectionTest": "Enter a password or app password before testing.",
-  "unknownError": "Unknown error"
+  "unknownError": "Unknown error",
+  "composeMail": "Compose",
+  "drafts": "Drafts",
+  "editDraft": "Edit draft",
+  "saveDraft": "Save draft",
+  "draftSaved": "Draft saved.",
+  "savingDraft": "Saving draft...",
+  "draftAutosaveReady": "Autosave is ready.",
+  "draftLastSaved": "Last saved at {time}",
+  "@draftLastSaved": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteDraft": "Delete draft",
+  "deleteDraftTitle": "Delete draft?",
+  "deleteDraftMessage": "Delete this local draft from this device?",
+  "draftDeleted": "Draft deleted.",
+  "draftNotFound": "Draft not found.",
+  "emptyDraft": "Write something before saving a draft.",
+  "fromAccount": "From account",
+  "noAccountSelected": "No account selected",
+  "toRecipients": "To",
+  "ccRecipients": "Cc",
+  "bccRecipients": "Bcc",
+  "subject": "Subject",
+  "messageBody": "Message",
+  "noDraftsYet": "No drafts yet.",
+  "untitledDraft": "Untitled draft",
+  "toLine": "To: {recipients}",
+  "@toLine": {
+    "placeholders": {
+      "recipients": {
+        "type": "String"
+      }
+    }
+  }
 }

@@ -152,6 +152,82 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get unknownError => '未知错误';
+
+  @override
+  String get composeMail => '写邮件';
+
+  @override
+  String get drafts => '草稿箱';
+
+  @override
+  String get editDraft => '编辑草稿';
+
+  @override
+  String get saveDraft => '保存草稿';
+
+  @override
+  String get draftSaved => '草稿已保存。';
+
+  @override
+  String get savingDraft => '正在保存草稿...';
+
+  @override
+  String get draftAutosaveReady => '自动保存已就绪。';
+
+  @override
+  String draftLastSaved(String time) {
+    return '上次保存于 $time';
+  }
+
+  @override
+  String get deleteDraft => '删除草稿';
+
+  @override
+  String get deleteDraftTitle => '删除草稿？';
+
+  @override
+  String get deleteDraftMessage => '要从此设备删除这封本地草稿吗？';
+
+  @override
+  String get draftDeleted => '草稿已删除。';
+
+  @override
+  String get draftNotFound => '未找到草稿。';
+
+  @override
+  String get emptyDraft => '请先填写内容再保存草稿。';
+
+  @override
+  String get fromAccount => '发件账号';
+
+  @override
+  String get noAccountSelected => '未选择账号';
+
+  @override
+  String get toRecipients => '收件人';
+
+  @override
+  String get ccRecipients => '抄送';
+
+  @override
+  String get bccRecipients => '密送';
+
+  @override
+  String get subject => '主题';
+
+  @override
+  String get messageBody => '正文';
+
+  @override
+  String get noDraftsYet => '还没有草稿。';
+
+  @override
+  String get untitledDraft => '无主题草稿';
+
+  @override
+  String toLine(String recipients) {
+    return '收件人：$recipients';
+  }
 }
 
 /// The translations for Chinese, as used in China (`zh_CN`).

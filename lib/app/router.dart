@@ -1,6 +1,8 @@
 import 'package:go_router/go_router.dart';
 
 import '../features/accounts/pages/add_account_page.dart';
+import '../features/drafts/pages/compose_mail_page.dart';
+import '../features/drafts/pages/drafts_page.dart';
 import '../features/home/pages/home_page.dart';
 import '../features/onboarding/pages/onboarding_page.dart';
 import '../features/settings/pages/settings_page.dart';
@@ -19,6 +21,16 @@ final appRouter = GoRouter(
       path: '/accounts/:accountId/edit',
       builder: (context, state) =>
           AddAccountPage(accountId: state.pathParameters['accountId']),
+    ),
+    GoRoute(
+      path: '/compose',
+      builder: (context, state) => const ComposeMailPage(),
+    ),
+    GoRoute(path: '/drafts', builder: (context, state) => const DraftsPage()),
+    GoRoute(
+      path: '/drafts/:draftId/edit',
+      builder: (context, state) =>
+          ComposeMailPage(draftId: state.pathParameters['draftId']),
     ),
     GoRoute(
       path: '/settings',

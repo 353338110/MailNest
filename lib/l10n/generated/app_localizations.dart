@@ -397,6 +397,150 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Unknown error'**
   String get unknownError;
+
+  /// No description provided for @composeMail.
+  ///
+  /// In en, this message translates to:
+  /// **'Compose'**
+  String get composeMail;
+
+  /// No description provided for @drafts.
+  ///
+  /// In en, this message translates to:
+  /// **'Drafts'**
+  String get drafts;
+
+  /// No description provided for @editDraft.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit draft'**
+  String get editDraft;
+
+  /// No description provided for @saveDraft.
+  ///
+  /// In en, this message translates to:
+  /// **'Save draft'**
+  String get saveDraft;
+
+  /// No description provided for @draftSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Draft saved.'**
+  String get draftSaved;
+
+  /// No description provided for @savingDraft.
+  ///
+  /// In en, this message translates to:
+  /// **'Saving draft...'**
+  String get savingDraft;
+
+  /// No description provided for @draftAutosaveReady.
+  ///
+  /// In en, this message translates to:
+  /// **'Autosave is ready.'**
+  String get draftAutosaveReady;
+
+  /// No description provided for @draftLastSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Last saved at {time}'**
+  String draftLastSaved(String time);
+
+  /// No description provided for @deleteDraft.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete draft'**
+  String get deleteDraft;
+
+  /// No description provided for @deleteDraftTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete draft?'**
+  String get deleteDraftTitle;
+
+  /// No description provided for @deleteDraftMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this local draft from this device?'**
+  String get deleteDraftMessage;
+
+  /// No description provided for @draftDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Draft deleted.'**
+  String get draftDeleted;
+
+  /// No description provided for @draftNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Draft not found.'**
+  String get draftNotFound;
+
+  /// No description provided for @emptyDraft.
+  ///
+  /// In en, this message translates to:
+  /// **'Write something before saving a draft.'**
+  String get emptyDraft;
+
+  /// No description provided for @fromAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'From account'**
+  String get fromAccount;
+
+  /// No description provided for @noAccountSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'No account selected'**
+  String get noAccountSelected;
+
+  /// No description provided for @toRecipients.
+  ///
+  /// In en, this message translates to:
+  /// **'To'**
+  String get toRecipients;
+
+  /// No description provided for @ccRecipients.
+  ///
+  /// In en, this message translates to:
+  /// **'Cc'**
+  String get ccRecipients;
+
+  /// No description provided for @bccRecipients.
+  ///
+  /// In en, this message translates to:
+  /// **'Bcc'**
+  String get bccRecipients;
+
+  /// No description provided for @subject.
+  ///
+  /// In en, this message translates to:
+  /// **'Subject'**
+  String get subject;
+
+  /// No description provided for @messageBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Message'**
+  String get messageBody;
+
+  /// No description provided for @noDraftsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No drafts yet.'**
+  String get noDraftsYet;
+
+  /// No description provided for @untitledDraft.
+  ///
+  /// In en, this message translates to:
+  /// **'Untitled draft'**
+  String get untitledDraft;
+
+  /// No description provided for @toLine.
+  ///
+  /// In en, this message translates to:
+  /// **'To: {recipients}'**
+  String toLine(String recipients);
 }
 
 class _AppLocalizationsDelegate

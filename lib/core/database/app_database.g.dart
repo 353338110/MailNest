@@ -1299,11 +1299,576 @@ class AppSettingsCompanion extends UpdateCompanion<AppSetting> {
   }
 }
 
+class $DraftMessagesTable extends DraftMessages
+    with TableInfo<$DraftMessagesTable, DraftMessage> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $DraftMessagesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _accountIdMeta = const VerificationMeta(
+    'accountId',
+  );
+  @override
+  late final GeneratedColumn<String> accountId = GeneratedColumn<String>(
+    'account_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _toRecipientsMeta = const VerificationMeta(
+    'toRecipients',
+  );
+  @override
+  late final GeneratedColumn<String> toRecipients = GeneratedColumn<String>(
+    'to_recipients',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _ccRecipientsMeta = const VerificationMeta(
+    'ccRecipients',
+  );
+  @override
+  late final GeneratedColumn<String> ccRecipients = GeneratedColumn<String>(
+    'cc_recipients',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _bccRecipientsMeta = const VerificationMeta(
+    'bccRecipients',
+  );
+  @override
+  late final GeneratedColumn<String> bccRecipients = GeneratedColumn<String>(
+    'bcc_recipients',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _subjectMeta = const VerificationMeta(
+    'subject',
+  );
+  @override
+  late final GeneratedColumn<String> subject = GeneratedColumn<String>(
+    'subject',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _bodyMeta = const VerificationMeta('body');
+  @override
+  late final GeneratedColumn<String> body = GeneratedColumn<String>(
+    'body',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    accountId,
+    toRecipients,
+    ccRecipients,
+    bccRecipients,
+    subject,
+    body,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'draft_messages';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<DraftMessage> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('account_id')) {
+      context.handle(
+        _accountIdMeta,
+        accountId.isAcceptableOrUnknown(data['account_id']!, _accountIdMeta),
+      );
+    }
+    if (data.containsKey('to_recipients')) {
+      context.handle(
+        _toRecipientsMeta,
+        toRecipients.isAcceptableOrUnknown(
+          data['to_recipients']!,
+          _toRecipientsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('cc_recipients')) {
+      context.handle(
+        _ccRecipientsMeta,
+        ccRecipients.isAcceptableOrUnknown(
+          data['cc_recipients']!,
+          _ccRecipientsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('bcc_recipients')) {
+      context.handle(
+        _bccRecipientsMeta,
+        bccRecipients.isAcceptableOrUnknown(
+          data['bcc_recipients']!,
+          _bccRecipientsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('subject')) {
+      context.handle(
+        _subjectMeta,
+        subject.isAcceptableOrUnknown(data['subject']!, _subjectMeta),
+      );
+    }
+    if (data.containsKey('body')) {
+      context.handle(
+        _bodyMeta,
+        body.isAcceptableOrUnknown(data['body']!, _bodyMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  DraftMessage map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return DraftMessage(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      accountId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}account_id'],
+      ),
+      toRecipients: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}to_recipients'],
+      )!,
+      ccRecipients: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}cc_recipients'],
+      )!,
+      bccRecipients: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}bcc_recipients'],
+      )!,
+      subject: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}subject'],
+      )!,
+      body: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}body'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $DraftMessagesTable createAlias(String alias) {
+    return $DraftMessagesTable(attachedDatabase, alias);
+  }
+}
+
+class DraftMessage extends DataClass implements Insertable<DraftMessage> {
+  final String id;
+  final String? accountId;
+  final String toRecipients;
+  final String ccRecipients;
+  final String bccRecipients;
+  final String subject;
+  final String body;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const DraftMessage({
+    required this.id,
+    this.accountId,
+    required this.toRecipients,
+    required this.ccRecipients,
+    required this.bccRecipients,
+    required this.subject,
+    required this.body,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    if (!nullToAbsent || accountId != null) {
+      map['account_id'] = Variable<String>(accountId);
+    }
+    map['to_recipients'] = Variable<String>(toRecipients);
+    map['cc_recipients'] = Variable<String>(ccRecipients);
+    map['bcc_recipients'] = Variable<String>(bccRecipients);
+    map['subject'] = Variable<String>(subject);
+    map['body'] = Variable<String>(body);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  DraftMessagesCompanion toCompanion(bool nullToAbsent) {
+    return DraftMessagesCompanion(
+      id: Value(id),
+      accountId: accountId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(accountId),
+      toRecipients: Value(toRecipients),
+      ccRecipients: Value(ccRecipients),
+      bccRecipients: Value(bccRecipients),
+      subject: Value(subject),
+      body: Value(body),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory DraftMessage.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return DraftMessage(
+      id: serializer.fromJson<String>(json['id']),
+      accountId: serializer.fromJson<String?>(json['accountId']),
+      toRecipients: serializer.fromJson<String>(json['toRecipients']),
+      ccRecipients: serializer.fromJson<String>(json['ccRecipients']),
+      bccRecipients: serializer.fromJson<String>(json['bccRecipients']),
+      subject: serializer.fromJson<String>(json['subject']),
+      body: serializer.fromJson<String>(json['body']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'accountId': serializer.toJson<String?>(accountId),
+      'toRecipients': serializer.toJson<String>(toRecipients),
+      'ccRecipients': serializer.toJson<String>(ccRecipients),
+      'bccRecipients': serializer.toJson<String>(bccRecipients),
+      'subject': serializer.toJson<String>(subject),
+      'body': serializer.toJson<String>(body),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  DraftMessage copyWith({
+    String? id,
+    Value<String?> accountId = const Value.absent(),
+    String? toRecipients,
+    String? ccRecipients,
+    String? bccRecipients,
+    String? subject,
+    String? body,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) => DraftMessage(
+    id: id ?? this.id,
+    accountId: accountId.present ? accountId.value : this.accountId,
+    toRecipients: toRecipients ?? this.toRecipients,
+    ccRecipients: ccRecipients ?? this.ccRecipients,
+    bccRecipients: bccRecipients ?? this.bccRecipients,
+    subject: subject ?? this.subject,
+    body: body ?? this.body,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  DraftMessage copyWithCompanion(DraftMessagesCompanion data) {
+    return DraftMessage(
+      id: data.id.present ? data.id.value : this.id,
+      accountId: data.accountId.present ? data.accountId.value : this.accountId,
+      toRecipients: data.toRecipients.present
+          ? data.toRecipients.value
+          : this.toRecipients,
+      ccRecipients: data.ccRecipients.present
+          ? data.ccRecipients.value
+          : this.ccRecipients,
+      bccRecipients: data.bccRecipients.present
+          ? data.bccRecipients.value
+          : this.bccRecipients,
+      subject: data.subject.present ? data.subject.value : this.subject,
+      body: data.body.present ? data.body.value : this.body,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DraftMessage(')
+          ..write('id: $id, ')
+          ..write('accountId: $accountId, ')
+          ..write('toRecipients: $toRecipients, ')
+          ..write('ccRecipients: $ccRecipients, ')
+          ..write('bccRecipients: $bccRecipients, ')
+          ..write('subject: $subject, ')
+          ..write('body: $body, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    accountId,
+    toRecipients,
+    ccRecipients,
+    bccRecipients,
+    subject,
+    body,
+    createdAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is DraftMessage &&
+          other.id == this.id &&
+          other.accountId == this.accountId &&
+          other.toRecipients == this.toRecipients &&
+          other.ccRecipients == this.ccRecipients &&
+          other.bccRecipients == this.bccRecipients &&
+          other.subject == this.subject &&
+          other.body == this.body &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class DraftMessagesCompanion extends UpdateCompanion<DraftMessage> {
+  final Value<String> id;
+  final Value<String?> accountId;
+  final Value<String> toRecipients;
+  final Value<String> ccRecipients;
+  final Value<String> bccRecipients;
+  final Value<String> subject;
+  final Value<String> body;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<int> rowid;
+  const DraftMessagesCompanion({
+    this.id = const Value.absent(),
+    this.accountId = const Value.absent(),
+    this.toRecipients = const Value.absent(),
+    this.ccRecipients = const Value.absent(),
+    this.bccRecipients = const Value.absent(),
+    this.subject = const Value.absent(),
+    this.body = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  DraftMessagesCompanion.insert({
+    required String id,
+    this.accountId = const Value.absent(),
+    this.toRecipients = const Value.absent(),
+    this.ccRecipients = const Value.absent(),
+    this.bccRecipients = const Value.absent(),
+    this.subject = const Value.absent(),
+    this.body = const Value.absent(),
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<DraftMessage> custom({
+    Expression<String>? id,
+    Expression<String>? accountId,
+    Expression<String>? toRecipients,
+    Expression<String>? ccRecipients,
+    Expression<String>? bccRecipients,
+    Expression<String>? subject,
+    Expression<String>? body,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (accountId != null) 'account_id': accountId,
+      if (toRecipients != null) 'to_recipients': toRecipients,
+      if (ccRecipients != null) 'cc_recipients': ccRecipients,
+      if (bccRecipients != null) 'bcc_recipients': bccRecipients,
+      if (subject != null) 'subject': subject,
+      if (body != null) 'body': body,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  DraftMessagesCompanion copyWith({
+    Value<String>? id,
+    Value<String?>? accountId,
+    Value<String>? toRecipients,
+    Value<String>? ccRecipients,
+    Value<String>? bccRecipients,
+    Value<String>? subject,
+    Value<String>? body,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return DraftMessagesCompanion(
+      id: id ?? this.id,
+      accountId: accountId ?? this.accountId,
+      toRecipients: toRecipients ?? this.toRecipients,
+      ccRecipients: ccRecipients ?? this.ccRecipients,
+      bccRecipients: bccRecipients ?? this.bccRecipients,
+      subject: subject ?? this.subject,
+      body: body ?? this.body,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (accountId.present) {
+      map['account_id'] = Variable<String>(accountId.value);
+    }
+    if (toRecipients.present) {
+      map['to_recipients'] = Variable<String>(toRecipients.value);
+    }
+    if (ccRecipients.present) {
+      map['cc_recipients'] = Variable<String>(ccRecipients.value);
+    }
+    if (bccRecipients.present) {
+      map['bcc_recipients'] = Variable<String>(bccRecipients.value);
+    }
+    if (subject.present) {
+      map['subject'] = Variable<String>(subject.value);
+    }
+    if (body.present) {
+      map['body'] = Variable<String>(body.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DraftMessagesCompanion(')
+          ..write('id: $id, ')
+          ..write('accountId: $accountId, ')
+          ..write('toRecipients: $toRecipients, ')
+          ..write('ccRecipients: $ccRecipients, ')
+          ..write('bccRecipients: $bccRecipients, ')
+          ..write('subject: $subject, ')
+          ..write('body: $body, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $EmailAccountsTable emailAccounts = $EmailAccountsTable(this);
   late final $AppSettingsTable appSettings = $AppSettingsTable(this);
+  late final $DraftMessagesTable draftMessages = $DraftMessagesTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -1311,6 +1876,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   List<DatabaseSchemaEntity> get allSchemaEntities => [
     emailAccounts,
     appSettings,
+    draftMessages,
   ];
 }
 
@@ -1937,6 +2503,288 @@ typedef $$AppSettingsTableProcessedTableManager =
       AppSetting,
       PrefetchHooks Function()
     >;
+typedef $$DraftMessagesTableCreateCompanionBuilder =
+    DraftMessagesCompanion Function({
+      required String id,
+      Value<String?> accountId,
+      Value<String> toRecipients,
+      Value<String> ccRecipients,
+      Value<String> bccRecipients,
+      Value<String> subject,
+      Value<String> body,
+      required DateTime createdAt,
+      required DateTime updatedAt,
+      Value<int> rowid,
+    });
+typedef $$DraftMessagesTableUpdateCompanionBuilder =
+    DraftMessagesCompanion Function({
+      Value<String> id,
+      Value<String?> accountId,
+      Value<String> toRecipients,
+      Value<String> ccRecipients,
+      Value<String> bccRecipients,
+      Value<String> subject,
+      Value<String> body,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<int> rowid,
+    });
+
+class $$DraftMessagesTableFilterComposer
+    extends Composer<_$AppDatabase, $DraftMessagesTable> {
+  $$DraftMessagesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get accountId => $composableBuilder(
+    column: $table.accountId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get toRecipients => $composableBuilder(
+    column: $table.toRecipients,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get ccRecipients => $composableBuilder(
+    column: $table.ccRecipients,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get bccRecipients => $composableBuilder(
+    column: $table.bccRecipients,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get subject => $composableBuilder(
+    column: $table.subject,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get body => $composableBuilder(
+    column: $table.body,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$DraftMessagesTableOrderingComposer
+    extends Composer<_$AppDatabase, $DraftMessagesTable> {
+  $$DraftMessagesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get accountId => $composableBuilder(
+    column: $table.accountId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get toRecipients => $composableBuilder(
+    column: $table.toRecipients,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get ccRecipients => $composableBuilder(
+    column: $table.ccRecipients,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get bccRecipients => $composableBuilder(
+    column: $table.bccRecipients,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get subject => $composableBuilder(
+    column: $table.subject,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get body => $composableBuilder(
+    column: $table.body,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$DraftMessagesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $DraftMessagesTable> {
+  $$DraftMessagesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get accountId =>
+      $composableBuilder(column: $table.accountId, builder: (column) => column);
+
+  GeneratedColumn<String> get toRecipients => $composableBuilder(
+    column: $table.toRecipients,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get ccRecipients => $composableBuilder(
+    column: $table.ccRecipients,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get bccRecipients => $composableBuilder(
+    column: $table.bccRecipients,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get subject =>
+      $composableBuilder(column: $table.subject, builder: (column) => column);
+
+  GeneratedColumn<String> get body =>
+      $composableBuilder(column: $table.body, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$DraftMessagesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $DraftMessagesTable,
+          DraftMessage,
+          $$DraftMessagesTableFilterComposer,
+          $$DraftMessagesTableOrderingComposer,
+          $$DraftMessagesTableAnnotationComposer,
+          $$DraftMessagesTableCreateCompanionBuilder,
+          $$DraftMessagesTableUpdateCompanionBuilder,
+          (
+            DraftMessage,
+            BaseReferences<_$AppDatabase, $DraftMessagesTable, DraftMessage>,
+          ),
+          DraftMessage,
+          PrefetchHooks Function()
+        > {
+  $$DraftMessagesTableTableManager(_$AppDatabase db, $DraftMessagesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$DraftMessagesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$DraftMessagesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$DraftMessagesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String?> accountId = const Value.absent(),
+                Value<String> toRecipients = const Value.absent(),
+                Value<String> ccRecipients = const Value.absent(),
+                Value<String> bccRecipients = const Value.absent(),
+                Value<String> subject = const Value.absent(),
+                Value<String> body = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => DraftMessagesCompanion(
+                id: id,
+                accountId: accountId,
+                toRecipients: toRecipients,
+                ccRecipients: ccRecipients,
+                bccRecipients: bccRecipients,
+                subject: subject,
+                body: body,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                Value<String?> accountId = const Value.absent(),
+                Value<String> toRecipients = const Value.absent(),
+                Value<String> ccRecipients = const Value.absent(),
+                Value<String> bccRecipients = const Value.absent(),
+                Value<String> subject = const Value.absent(),
+                Value<String> body = const Value.absent(),
+                required DateTime createdAt,
+                required DateTime updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => DraftMessagesCompanion.insert(
+                id: id,
+                accountId: accountId,
+                toRecipients: toRecipients,
+                ccRecipients: ccRecipients,
+                bccRecipients: bccRecipients,
+                subject: subject,
+                body: body,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$DraftMessagesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $DraftMessagesTable,
+      DraftMessage,
+      $$DraftMessagesTableFilterComposer,
+      $$DraftMessagesTableOrderingComposer,
+      $$DraftMessagesTableAnnotationComposer,
+      $$DraftMessagesTableCreateCompanionBuilder,
+      $$DraftMessagesTableUpdateCompanionBuilder,
+      (
+        DraftMessage,
+        BaseReferences<_$AppDatabase, $DraftMessagesTable, DraftMessage>,
+      ),
+      DraftMessage,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -1945,4 +2793,6 @@ class $AppDatabaseManager {
       $$EmailAccountsTableTableManager(_db, _db.emailAccounts);
   $$AppSettingsTableTableManager get appSettings =>
       $$AppSettingsTableTableManager(_db, _db.appSettings);
+  $$DraftMessagesTableTableManager get draftMessages =>
+      $$DraftMessagesTableTableManager(_db, _db.draftMessages);
 }

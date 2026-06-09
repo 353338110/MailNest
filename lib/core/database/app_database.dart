@@ -36,13 +36,42 @@ class AppSettings extends Table {
   Set<Column<Object>> get primaryKey => {key};
 }
 
-@DriftDatabase(tables: [EmailAccounts, AppSettings])
+class DraftMessages extends Table {
+  TextColumn get id => text()();
+  TextColumn get accountId => text().nullable()();
+  TextColumn get toRecipients => text().withDefault(const Constant(''))();
+  TextColumn get ccRecipients => text().withDefault(const Constant(''))();
+  TextColumn get bccRecipients => text().withDefault(const Constant(''))();
+  TextColumn get subject => text().withDefault(const Constant(''))();
+  TextColumn get body => text().withDefault(const Constant(''))();
+  DateTimeColumn get createdAt => dateTime()();
+  DateTimeColumn get updatedAt => dateTime()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DriftDatabase(tables: [EmailAccounts, AppSettings, DraftMessages])
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor])
     : super(executor ?? driftDatabase(name: 'mailnest'));
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
+
+  @override
+  MigrationStrategy get migration {
+    return MigrationStrategy(
+      onCreate: (migrator) async {
+        await migrator.createAll();
+      },
+      onUpgrade: (migrator, from, to) async {
+        if (from < 2) {
+          await migrator.createTable(draftMessages);
+        }
+      },
+    );
+  }
 
   Future<List<EmailAccount>> watchableAccountsSnapshot() {
     return (select(
@@ -77,5 +106,27 @@ class AppDatabase extends _$AppDatabase {
 
   Future<void> deleteAccount(String id) {
     return (delete(emailAccounts)..where((table) => table.id.equals(id))).go();
+  }
+
+  Stream<List<DraftMessage>> watchDrafts() {
+    return (select(draftMessages)..orderBy([
+          (table) => OrderingTerm.desc(table.updatedAt),
+          (table) => OrderingTerm.desc(table.id),
+        ]))
+        .watch();
+  }
+
+  Future<DraftMessage?> getDraft(String id) {
+    return (select(
+      draftMessages,
+    )..where((table) => table.id.equals(id))).getSingleOrNull();
+  }
+
+  Future<void> saveDraft(DraftMessagesCompanion draft) {
+    return into(draftMessages).insertOnConflictUpdate(draft);
+  }
+
+  Future<void> deleteDraft(String id) {
+    return (delete(draftMessages)..where((table) => table.id.equals(id))).go();
   }
 }
