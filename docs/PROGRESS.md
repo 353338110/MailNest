@@ -18,6 +18,8 @@
 - PR #3：普通 IMAP/SMTP 连接测试，已合并。
 - PR #4：多平台构建 CI，已合并。
 - PR #5：加密配置导出，已合并。
+- PR #9：Dependabot，`actions/checkout` 4 -> 6，已合并。
+- PR #10：Dependabot，`drift_flutter` 0.2.8 -> 0.3.0，已合并。
 
 ### 邮箱列表、同步与详情
 
@@ -142,8 +144,7 @@ flutter test
 
 ## 开放 PR
 
-- PR #9：Dependabot，`actions/checkout` 4 -> 6，待验证和合并。
-- PR #10：Dependabot，`drift_flutter` 0.2.8 -> 0.3.0，待验证和合并。
+- 当前无开放 PR。
 
 ## 注意事项
 
