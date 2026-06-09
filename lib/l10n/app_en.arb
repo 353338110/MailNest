@@ -158,5 +158,44 @@
         "type": "String"
       }
     }
+  },
+  "sentMessages": "Sent",
+  "noSentMessagesYet": "No sent messages yet.",
+  "sentToRecipients": "To: {recipients}",
+  "@sentToRecipients": {
+    "placeholders": {
+      "recipients": {
+        "type": "String"
+      }
+    }
+  },
+  "chooseSentFolder": "Choose Sent folder",
+  "sentFolderOnlyLocalRecord": "Only the local sent record is saved for this message.",
+  "sentFolderSavePending": "Saving to Sent",
+  "sentFolderSaved": "Saved to {folderName}",
+  "@sentFolderSaved": {
+    "placeholders": {
+      "folderName": {
+        "type": "String"
+      }
+    }
+  },
+  "sentFolderSelectionRequired": "Choose a Sent folder",
+  "sentFolderSaveFailed": "Sent folder save failed",
+  "sentFolderAppendSucceeded": "Saved to {folderName}.",
+  "@sentFolderAppendSucceeded": {
+    "placeholders": {
+      "folderName": {
+        "type": "String"
+      }
+    }
+  },
+  "sentFolderAppendFailed": "Could not save to Sent: {reason}",
+  "@sentFolderAppendFailed": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
   }
 }

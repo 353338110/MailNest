@@ -739,6 +739,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'To: {recipients}'**
   String toLine(String recipients);
+
+  /// No description provided for @sentMessages.
+  ///
+  /// In en, this message translates to:
+  /// **'Sent'**
+  String get sentMessages;
+
+  /// No description provided for @noSentMessagesYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No sent messages yet.'**
+  String get noSentMessagesYet;
+
+  /// No description provided for @sentToRecipients.
+  ///
+  /// In en, this message translates to:
+  /// **'To: {recipients}'**
+  String sentToRecipients(String recipients);
+
+  /// No description provided for @chooseSentFolder.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose Sent folder'**
+  String get chooseSentFolder;
+
+  /// No description provided for @sentFolderOnlyLocalRecord.
+  ///
+  /// In en, this message translates to:
+  /// **'Only the local sent record is saved for this message.'**
+  String get sentFolderOnlyLocalRecord;
+
+  /// No description provided for @sentFolderSavePending.
+  ///
+  /// In en, this message translates to:
+  /// **'Saving to Sent'**
+  String get sentFolderSavePending;
+
+  /// No description provided for @sentFolderSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved to {folderName}'**
+  String sentFolderSaved(String folderName);
+
+  /// No description provided for @sentFolderSelectionRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a Sent folder'**
+  String get sentFolderSelectionRequired;
+
+  /// No description provided for @sentFolderSaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Sent folder save failed'**
+  String get sentFolderSaveFailed;
+
+  /// No description provided for @sentFolderAppendSucceeded.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved to {folderName}.'**
+  String sentFolderAppendSucceeded(String folderName);
+
+  /// No description provided for @sentFolderAppendFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save to Sent: {reason}'**
+  String sentFolderAppendFailed(String reason);
 }
 
 class _AppLocalizationsDelegate

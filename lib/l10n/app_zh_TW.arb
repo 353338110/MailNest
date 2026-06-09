@@ -92,5 +92,16 @@
   "exportingBackup": "正在匯出...",
   "backupExported": "備份已匯出：{fileName}",
   "backupExportedTo": "已保存到 {filePath}",
-  "backupExportFailed": "備份匯出失敗。"
+  "backupExportFailed": "備份匯出失敗。",
+  "sentMessages": "已傳送",
+  "noSentMessagesYet": "尚無已傳送郵件。",
+  "sentToRecipients": "收件人：{recipients}",
+  "chooseSentFolder": "選擇 Sent 資料夾",
+  "sentFolderOnlyLocalRecord": "這封郵件僅儲存了本機傳送記錄。",
+  "sentFolderSavePending": "正在儲存到 Sent",
+  "sentFolderSaved": "已儲存到 {folderName}",
+  "sentFolderSelectionRequired": "請選擇 Sent 資料夾",
+  "sentFolderSaveFailed": "Sent 資料夾儲存失敗",
+  "sentFolderAppendSucceeded": "已儲存到 {folderName}。",
+  "sentFolderAppendFailed": "無法儲存到 Sent：{reason}"
 }

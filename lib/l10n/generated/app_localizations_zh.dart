@@ -337,6 +337,47 @@ class AppLocalizationsZh extends AppLocalizations {
   String toLine(String recipients) {
     return '收件人：$recipients';
   }
+
+  @override
+  String get sentMessages => '已发送';
+
+  @override
+  String get noSentMessagesYet => '还没有已发送邮件。';
+
+  @override
+  String sentToRecipients(String recipients) {
+    return '收件人：$recipients';
+  }
+
+  @override
+  String get chooseSentFolder => '选择 Sent 文件夹';
+
+  @override
+  String get sentFolderOnlyLocalRecord => '这封邮件仅保存了本地发送记录。';
+
+  @override
+  String get sentFolderSavePending => '正在保存到 Sent';
+
+  @override
+  String sentFolderSaved(String folderName) {
+    return '已保存到 $folderName';
+  }
+
+  @override
+  String get sentFolderSelectionRequired => '请选择 Sent 文件夹';
+
+  @override
+  String get sentFolderSaveFailed => 'Sent 文件夹保存失败';
+
+  @override
+  String sentFolderAppendSucceeded(String folderName) {
+    return '已保存到 $folderName。';
+  }
+
+  @override
+  String sentFolderAppendFailed(String reason) {
+    return '无法保存到 Sent：$reason';
+  }
 }
 
 /// The translations for Chinese, as used in China (`zh_CN`).
@@ -596,6 +637,48 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get backupExportFailed => '备份导出失败。';
+
+  @override
+  String get sentMessages => 'Sent';
+
+  @override
+  String get noSentMessagesYet => 'No sent messages yet.';
+
+  @override
+  String sentToRecipients(String recipients) {
+    return 'To: $recipients';
+  }
+
+  @override
+  String get chooseSentFolder => 'Choose Sent folder';
+
+  @override
+  String get sentFolderOnlyLocalRecord =>
+      'Only the local sent record is saved for this message.';
+
+  @override
+  String get sentFolderSavePending => 'Saving to Sent';
+
+  @override
+  String sentFolderSaved(String folderName) {
+    return 'Saved to $folderName';
+  }
+
+  @override
+  String get sentFolderSelectionRequired => 'Choose a Sent folder';
+
+  @override
+  String get sentFolderSaveFailed => 'Sent folder save failed';
+
+  @override
+  String sentFolderAppendSucceeded(String folderName) {
+    return 'Saved to $folderName.';
+  }
+
+  @override
+  String sentFolderAppendFailed(String reason) {
+    return 'Could not save to Sent: $reason';
+  }
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -855,4 +938,45 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get backupExportFailed => '備份匯出失敗。';
+
+  @override
+  String get sentMessages => '已傳送';
+
+  @override
+  String get noSentMessagesYet => '尚無已傳送郵件。';
+
+  @override
+  String sentToRecipients(String recipients) {
+    return '收件人：$recipients';
+  }
+
+  @override
+  String get chooseSentFolder => '選擇 Sent 資料夾';
+
+  @override
+  String get sentFolderOnlyLocalRecord => '這封郵件僅儲存了本機傳送記錄。';
+
+  @override
+  String get sentFolderSavePending => '正在儲存到 Sent';
+
+  @override
+  String sentFolderSaved(String folderName) {
+    return '已儲存到 $folderName';
+  }
+
+  @override
+  String get sentFolderSelectionRequired => '請選擇 Sent 資料夾';
+
+  @override
+  String get sentFolderSaveFailed => 'Sent 資料夾儲存失敗';
+
+  @override
+  String sentFolderAppendSucceeded(String folderName) {
+    return '已儲存到 $folderName。';
+  }
+
+  @override
+  String sentFolderAppendFailed(String reason) {
+    return '無法儲存到 Sent：$reason';
+  }
 }

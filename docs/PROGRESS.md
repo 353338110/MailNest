@@ -112,6 +112,24 @@
 - 增加配置导出 service 测试，覆盖 payload 边界、文件名和密文不含明文账号数据。
 
 
+
+### PR #10：发送记录和 Sent 文件夹保存
+
+链接：https://github.com/353338110/MailNest/pull/11
+
+状态：已创建，CI 待验证，待合并到 `main`
+
+已完成内容：
+
+- 新增本地发送记录 Drift 表和 repository。
+- SMTP 发信成功后可保存本地发送记录。
+- 新增 Sent 文件夹 IMAP APPEND 支持和失败状态记录。
+- 无法保存到远端 Sent 时保留本地记录并展示状态。
+- 首页新增已发送入口，页面可正常返回。
+- 新增发送记录列表页，支持加载、空状态和错误状态。
+- 不实现 Gmail/Outlook API 已发送同步。
+- 增加发送记录 service 测试。
+
 ### PR #9：本地草稿
 
 链接：https://github.com/353338110/MailNest/pull/7
@@ -217,8 +235,7 @@ flutter test
 - 回复、回复全部、转发。
 - 添加收件人、抄送、密送。
 - 添加/删除附件。
-- 本地发送记录。
-- 尝试 IMAP APPEND 保存到 Sent 文件夹。
+- 发送记录与远端 Sent 状态接入真实发信流程。
 
 ### 草稿
 

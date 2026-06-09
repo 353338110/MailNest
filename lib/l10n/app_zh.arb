@@ -116,5 +116,16 @@
   "messageBody": "正文",
   "noDraftsYet": "还没有草稿。",
   "untitledDraft": "无主题草稿",
-  "toLine": "收件人：{recipients}"
+  "toLine": "收件人：{recipients}",
+  "sentMessages": "已发送",
+  "noSentMessagesYet": "还没有已发送邮件。",
+  "sentToRecipients": "收件人：{recipients}",
+  "chooseSentFolder": "选择 Sent 文件夹",
+  "sentFolderOnlyLocalRecord": "这封邮件仅保存了本地发送记录。",
+  "sentFolderSavePending": "正在保存到 Sent",
+  "sentFolderSaved": "已保存到 {folderName}",
+  "sentFolderSelectionRequired": "请选择 Sent 文件夹",
+  "sentFolderSaveFailed": "Sent 文件夹保存失败",
+  "sentFolderAppendSucceeded": "已保存到 {folderName}。",
+  "sentFolderAppendFailed": "无法保存到 Sent：{reason}"
 }

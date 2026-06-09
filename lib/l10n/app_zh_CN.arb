@@ -92,5 +92,58 @@
   "exportingBackup": "正在导出...",
   "backupExported": "备份已导出：{fileName}",
   "backupExportedTo": "已保存到 {filePath}",
-  "backupExportFailed": "备份导出失败。"
+  "backupExportFailed": "备份导出失败。",
+  "@deleteAccountMessage": {
+    "placeholders": {
+      "emailAddress": {
+        "type": "String"
+      }
+    }
+  },
+  "@connectionTestFailed": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "sentMessages": "Sent",
+  "noSentMessagesYet": "No sent messages yet.",
+  "sentToRecipients": "To: {recipients}",
+  "@sentToRecipients": {
+    "placeholders": {
+      "recipients": {
+        "type": "String"
+      }
+    }
+  },
+  "chooseSentFolder": "Choose Sent folder",
+  "sentFolderOnlyLocalRecord": "Only the local sent record is saved for this message.",
+  "sentFolderSavePending": "Saving to Sent",
+  "sentFolderSaved": "Saved to {folderName}",
+  "@sentFolderSaved": {
+    "placeholders": {
+      "folderName": {
+        "type": "String"
+      }
+    }
+  },
+  "sentFolderSelectionRequired": "Choose a Sent folder",
+  "sentFolderSaveFailed": "Sent folder save failed",
+  "sentFolderAppendSucceeded": "Saved to {folderName}.",
+  "@sentFolderAppendSucceeded": {
+    "placeholders": {
+      "folderName": {
+        "type": "String"
+      }
+    }
+  },
+  "sentFolderAppendFailed": "Could not save to Sent: {reason}",
+  "@sentFolderAppendFailed": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  }
 }

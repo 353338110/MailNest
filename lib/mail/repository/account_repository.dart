@@ -18,6 +18,14 @@ class AccountRepository {
 
   Future<EmailAccount?> getAccount(String id) => database.getAccount(id);
 
+  Future<String?> readSecretForAccount(EmailAccount account) {
+    final secretRef = account.secretRef;
+    if (secretRef == null) {
+      return Future.value();
+    }
+    return secureStorage.readSecret(secretRef);
+  }
+
   Future<void> savePasswordAccount({
     required String emailAddress,
     required String username,
