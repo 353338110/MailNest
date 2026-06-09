@@ -507,4 +507,67 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get foldersFutureNotice =>
       'Folder navigation will be available after mail sync is added.';
+
+  @override
+  String get syncMail => 'Sync mail';
+
+  @override
+  String mailSyncFailed(String reason) {
+    return 'Mail sync failed: $reason';
+  }
+
+  @override
+  String get retry => 'Retry';
+
+  @override
+  String get mailboxes => 'Mailboxes';
+
+  @override
+  String get unifiedInbox => 'Unified inbox';
+
+  @override
+  String get filters => 'Filters';
+
+  @override
+  String get unread => 'Unread';
+
+  @override
+  String get starred => 'Starred';
+
+  @override
+  String get trash => 'Trash';
+
+  @override
+  String get account => 'Account';
+
+  @override
+  String get folder => 'Folder';
+
+  @override
+  String get fullMessageBodiesFutureNotice =>
+      'Full message bodies will appear in a later PR.';
+
+  @override
+  String get noMessageSelected => 'No message selected';
+
+  @override
+  String get messageContentsPlaceholder =>
+      'Message contents will appear here on wide desktop windows.';
+
+  @override
+  String get accountMailbox => 'Account mailbox';
+
+  @override
+  String get allMessages => 'All';
+
+  @override
+  String mailMessageCount(int count) {
+    return '$count messages';
+  }
+
+  @override
+  String get noMessagesMatchFilter => 'No messages match this filter.';
+
+  @override
+  String get noMessages => 'No messages.';
 }

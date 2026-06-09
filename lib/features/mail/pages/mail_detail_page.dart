@@ -16,6 +16,7 @@ class MailDetailPage extends StatelessWidget {
     return MailDetail(
       header: MailHeader(
         id: 'preview-message',
+        uid: 1,
         subject: 'Translation UI preview',
         sender: 'alex@example.com',
         receivedAt: DateTime(2026, 6, 9, 9, 30),

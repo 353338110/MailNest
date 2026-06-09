@@ -10,6 +10,14 @@ import 'package:mailnest_app/core/database/database_providers.dart';
 import 'package:mailnest_app/core/secure_storage/secure_storage_service.dart';
 import 'package:mailnest_app/mail/repository/account_repository.dart';
 import 'package:mailnest_app/mail/repository/account_repository_provider.dart';
+import 'package:mailnest_app/mail/repository/mail_sync_repository.dart';
+import 'package:mailnest_app/mail/repository/mail_sync_repository_provider.dart';
+import 'package:mailnest_app/mail/models/mail_detail.dart';
+import 'package:mailnest_app/mail/models/mail_folder.dart';
+import 'package:mailnest_app/mail/models/mail_header.dart';
+import 'package:mailnest_app/mail/models/outgoing_message.dart';
+import 'package:mailnest_app/mail/models/sync_cursor.dart';
+import 'package:mailnest_app/mail/provider/mail_provider.dart';
 
 void main() {
   testWidgets('shows onboarding entry point', (tester) async {
@@ -39,7 +47,7 @@ void main() {
 
       expect(find.text('Mailboxes'), findsOneWidget);
       expect(find.text('Unified inbox'), findsWidgets);
-      expect(find.text('Message detail'), findsOneWidget);
+      expect(find.text('No message selected'), findsOneWidget);
     });
 
     testWidgets('uses two panes on medium desktop windows', (tester) async {
@@ -67,7 +75,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Mailboxes'), findsOneWidget);
-      expect(find.text('Message detail'), findsOneWidget);
+      expect(find.text('No message selected'), findsOneWidget);
     });
 
     testWidgets('keeps app bar secondary pages returnable', (tester) async {
@@ -138,6 +146,9 @@ extension on WidgetTester {
           overrides: [
             appDatabaseProvider.overrideWithValue(database),
             accountRepositoryProvider.overrideWithValue(repository),
+            mailSyncRepositoryProvider.overrideWithValue(
+              _FakeMailSyncRepository(database),
+            ),
           ],
           child: const MailNestApp(),
         ),
@@ -207,4 +218,63 @@ class _FakeAccountRepository extends AccountRepository {
   Future<EmailAccount?> getAccount(String id) async {
     return id == account.id ? account : null;
   }
+}
+
+class _FakeMailSyncRepository extends MailSyncRepository {
+  _FakeMailSyncRepository(AppDatabase database)
+    : super(database: database, imapProvider: const _NoopMailProvider());
+
+  @override
+  Stream<List<LocalMailMessage>> watchRecentHeaders() {
+    return Stream.value(const <LocalMailMessage>[]);
+  }
+
+  @override
+  Future<void> syncRecentHeaders() async {}
+}
+
+class _NoopMailProvider implements MailProvider {
+  const _NoopMailProvider();
+
+  @override
+  Future<List<MailFolder>> listFolders(String accountId) async {
+    return const <MailFolder>[];
+  }
+
+  @override
+  Future<List<MailHeader>> syncHeaders({
+    required String accountId,
+    required String folderId,
+    required SyncCursor cursor,
+  }) async {
+    return const <MailHeader>[];
+  }
+
+  @override
+  Future<MailDetail> fetchMessageDetail({
+    required String accountId,
+    required String folderId,
+    required String messageLocalId,
+  }) {
+    throw UnsupportedError('Widget tests do not fetch message detail.');
+  }
+
+  @override
+  Future<void> sendMessage({
+    required String accountId,
+    required OutgoingMessage message,
+  }) async {}
+
+  @override
+  Future<void> markAsRead({
+    required String accountId,
+    required String messageId,
+    required bool isRead,
+  }) async {}
+
+  @override
+  Future<void> deleteMessage({
+    required String accountId,
+    required String messageId,
+  }) async {}
 }

@@ -108,6 +108,23 @@
 - Gmail 账号保存为 OAuth 账号，不实现 Gmail 邮件列表、详情或发信。
 - 补充 OAuth token 和账号 token ref 测试。
 
+
+### PR #2：最近 30 天邮件头同步和邮件列表真实数据
+
+链接：https://github.com/353338110/MailNest/pull/15
+
+状态：已创建，CI 待验证，待合并到 `main`
+
+已完成内容：
+
+- 新增邮件同步 repository，按启用账号同步最近邮件头。
+- 普通 IMAP 账号支持按文件夹拉取邮件头、UID、Message-ID、日期、发件人、收件人、主题、摘要、已读、星标和附件标记。
+- 本地保存同步游标，便于后续增量同步扩展。
+- 首页邮件列表优先展示真实本地邮件头数据，并保留加载、错误、空状态。
+- 首页新增手动同步入口，可在同步失败后重试。
+- 不实现完整正文、附件下载、发信、Gmail/Outlook 邮件同步。
+- 增加邮件同步 repository 和邮箱列表真实数据测试。
+
 ### PR #4：邮箱视图导航
 
 链接：https://github.com/353338110/MailNest/pull/6
@@ -265,9 +282,7 @@ flutter test
 
 - IMAP 文件夹列表同步。
 - 本地保存文件夹列表。
-- 最近 30 天邮件头同步。
-- 增量同步游标。
-- 邮件列表真实数据展示。
+- 真实同步状态持久化和更完整的增量同步游标。
 - 统一收件箱接入真实数据源。
 - 按账号查看真实邮件。
 - 按文件夹查看真实邮件。
@@ -356,32 +371,31 @@ flutter test
 建议按以下顺序继续，每项一个 PR：
 
 1. `codex/mail-folder-sync`：IMAP 文件夹列表同步和本地保存。
-2. `codex/mail-header-sync`：最近 30 天邮件头同步和邮件列表真实数据。
-3. `codex/mail-detail-mime`：邮件详情、正文拉取、MIME 解析。
-4. `codex/html-rendering-privacy`：HTML 渲染、远程图片拦截、外部链接处理。
-5. `codex/attachments-cache`：附件列表、下载、缓存和打开。
-6. `codex/composer-smtp-send`：写邮件和 SMTP 发信。
-7. `codex/reply-forward`：回复、回复全部、转发。
-8. `codex/drafts`：本地草稿。
-9. `codex/sent-records`：发送记录和 Sent 文件夹保存。
-10. `codex/backup-import`：配置导入和冲突处理。
-11. `codex/desktop-layout`：桌面三栏和响应式布局完善。
-12. `codex/mobile-navigation`：移动端 Drawer/NavigationDrawer。
+2. `codex/mail-detail-mime`：邮件详情、正文拉取、MIME 解析。
+3. `codex/html-rendering-privacy`：HTML 渲染、远程图片拦截、外部链接处理。
+4. `codex/attachments-cache`：附件列表、下载、缓存和打开。
+5. `codex/composer-smtp-send`：写邮件和 SMTP 发信。
+6. `codex/reply-forward`：回复、回复全部、转发。
+7. `codex/drafts`：本地草稿。
+8. `codex/sent-records`：发送记录和 Sent 文件夹保存。
+9. `codex/backup-import`：配置导入和冲突处理。
+10. `codex/desktop-layout`：桌面三栏和响应式布局完善。
+11. `codex/mobile-navigation`：移动端 Drawer/NavigationDrawer。
 <<<<<<< HEAD
-13. `codex/gmail-oauth`：Gmail OAuth。
-14. `codex/gmail-mail-provider`：Gmail 邮件列表、详情和发信。
-15. `codex/outlook-oauth`：Outlook OAuth。
-16. `codex/outlook-mail-provider`：Outlook 邮件列表、详情和发信。
-17. `codex/translation-ui`：邮件详情和写信翻译 UI。已创建 PR #17。
-18. `codex/translation-provider`：真实翻译服务和隐私确认。
-19. `codex/release-workflow`：发布流程和 tag 自动化。
-=======
+12. `codex/gmail-oauth`：Gmail OAuth。
 13. `codex/gmail-mail-provider`：Gmail 邮件列表、详情和发信。
 14. `codex/outlook-oauth`：Outlook OAuth。
 15. `codex/outlook-mail-provider`：Outlook 邮件列表、详情和发信。
-16. `codex/translation-ui`：邮件详情和写信翻译 UI。
+16. `codex/translation-ui`：邮件详情和写信翻译 UI。已创建 PR #17。
 17. `codex/translation-provider`：真实翻译服务和隐私确认。
 18. `codex/release-workflow`：发布流程和 tag 自动化。
+=======
+19. `codex/gmail-mail-provider`：Gmail 邮件列表、详情和发信。
+20. `codex/outlook-oauth`：Outlook OAuth。
+21. `codex/outlook-mail-provider`：Outlook 邮件列表、详情和发信。
+22. `codex/translation-ui`：邮件详情和写信翻译 UI。
+23. `codex/translation-provider`：真实翻译服务和隐私确认。
+24. `codex/release-workflow`：发布流程和 tag 自动化。
 >>>>>>> origin/main
 
 ## 注意事项

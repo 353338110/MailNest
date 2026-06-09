@@ -190,5 +190,38 @@
   "accounts": "账号",
   "composeEmail": "写邮件",
   "composeFutureNotice": "写邮件功能将在后续版本提供。",
-  "foldersFutureNotice": "邮件同步加入后将支持文件夹导航。"
+  "foldersFutureNotice": "邮件同步加入后将支持文件夹导航。",
+  "syncMail": "同步邮件",
+  "mailSyncFailed": "邮件同步失败：{reason}",
+  "@mailSyncFailed": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "retry": "重试",
+  "mailboxes": "邮箱",
+  "unifiedInbox": "统一收件箱",
+  "filters": "筛选",
+  "unread": "未读",
+  "starred": "星标",
+  "trash": "废纸篓",
+  "account": "账号",
+  "folder": "文件夹",
+  "fullMessageBodiesFutureNotice": "完整邮件正文将在后续 PR 中显示。",
+  "noMessageSelected": "未选择邮件",
+  "messageContentsPlaceholder": "邮件内容会显示在宽屏桌面的这里。",
+  "accountMailbox": "账号邮箱",
+  "allMessages": "全部",
+  "mailMessageCount": "{count} 封邮件",
+  "@mailMessageCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noMessagesMatchFilter": "没有符合此筛选条件的邮件。",
+  "noMessages": "没有邮件。"
 }

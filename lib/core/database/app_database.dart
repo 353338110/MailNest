@@ -97,6 +97,19 @@ class LocalMailMessages extends Table {
   ];
 }
 
+@DataClassName('MailSyncCursorEntry')
+class MailSyncCursors extends Table {
+  TextColumn get id => text()();
+  TextColumn get accountId => text()();
+  TextColumn get folderName => text()();
+  IntColumn get lastUid => integer().nullable()();
+  TextColumn get pageToken => text().nullable()();
+  DateTimeColumn get syncedAt => dateTime()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
 @DriftDatabase(
   tables: [
     EmailAccounts,
@@ -104,6 +117,7 @@ class LocalMailMessages extends Table {
     DraftMessages,
     SentMessages,
     LocalMailMessages,
+    MailSyncCursors,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -111,7 +125,7 @@ class AppDatabase extends _$AppDatabase {
     : super(executor ?? driftDatabase(name: 'mailnest'));
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -125,6 +139,9 @@ class AppDatabase extends _$AppDatabase {
         await migrator.createTable(sentMessages);
         await migrator.createTable(localMailMessages);
         await _createLocalSearchObjects();
+      }
+      if (from < 3) {
+        await migrator.createTable(mailSyncCursors);
       }
     },
   );
@@ -231,6 +248,34 @@ class AppDatabase extends _$AppDatabase {
         updatedAt: Value(updatedAt),
       ),
     );
+  }
+
+  Stream<List<LocalMailMessage>> watchLocalMailMessages() {
+    return (select(
+      localMailMessages,
+    )..orderBy([(table) => OrderingTerm.desc(table.receivedAt)])).watch();
+  }
+
+  Future<void> saveLocalMailMessages(
+    List<LocalMailMessagesCompanion> messages,
+  ) {
+    return batch((batch) {
+      batch.insertAllOnConflictUpdate(localMailMessages, messages);
+    });
+  }
+
+  Future<MailSyncCursorEntry?> getMailSyncCursor({
+    required String accountId,
+    required String folderName,
+  }) {
+    final id = mailSyncCursorId(accountId: accountId, folderName: folderName);
+    return (select(
+      mailSyncCursors,
+    )..where((table) => table.id.equals(id))).getSingleOrNull();
+  }
+
+  Future<void> saveMailSyncCursor(MailSyncCursorsCompanion cursor) {
+    return into(mailSyncCursors).insertOnConflictUpdate(cursor);
   }
 
   Future<List<LocalMailSearchResult>> searchLocalMail(String rawQuery) async {
@@ -409,6 +454,13 @@ class AppDatabase extends _$AppDatabase {
       return null;
     }
     return escapedTokens.join(' ');
+  }
+
+  static String mailSyncCursorId({
+    required String accountId,
+    required String folderName,
+  }) {
+    return '$accountId:${folderName.toLowerCase()}';
   }
 }
 

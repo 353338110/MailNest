@@ -1021,6 +1021,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Folder navigation will be available after mail sync is added.'**
   String get foldersFutureNotice;
+
+  /// No description provided for @syncMail.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync mail'**
+  String get syncMail;
+
+  /// No description provided for @mailSyncFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Mail sync failed: {reason}'**
+  String mailSyncFailed(String reason);
+
+  /// No description provided for @retry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get retry;
+
+  /// No description provided for @mailboxes.
+  ///
+  /// In en, this message translates to:
+  /// **'Mailboxes'**
+  String get mailboxes;
+
+  /// No description provided for @unifiedInbox.
+  ///
+  /// In en, this message translates to:
+  /// **'Unified inbox'**
+  String get unifiedInbox;
+
+  /// No description provided for @filters.
+  ///
+  /// In en, this message translates to:
+  /// **'Filters'**
+  String get filters;
+
+  /// No description provided for @unread.
+  ///
+  /// In en, this message translates to:
+  /// **'Unread'**
+  String get unread;
+
+  /// No description provided for @starred.
+  ///
+  /// In en, this message translates to:
+  /// **'Starred'**
+  String get starred;
+
+  /// No description provided for @trash.
+  ///
+  /// In en, this message translates to:
+  /// **'Trash'**
+  String get trash;
+
+  /// No description provided for @account.
+  ///
+  /// In en, this message translates to:
+  /// **'Account'**
+  String get account;
+
+  /// No description provided for @folder.
+  ///
+  /// In en, this message translates to:
+  /// **'Folder'**
+  String get folder;
+
+  /// No description provided for @fullMessageBodiesFutureNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Full message bodies will appear in a later PR.'**
+  String get fullMessageBodiesFutureNotice;
+
+  /// No description provided for @noMessageSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'No message selected'**
+  String get noMessageSelected;
+
+  /// No description provided for @messageContentsPlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Message contents will appear here on wide desktop windows.'**
+  String get messageContentsPlaceholder;
+
+  /// No description provided for @accountMailbox.
+  ///
+  /// In en, this message translates to:
+  /// **'Account mailbox'**
+  String get accountMailbox;
+
+  /// No description provided for @allMessages.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get allMessages;
+
+  /// No description provided for @mailMessageCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} messages'**
+  String mailMessageCount(int count);
+
+  /// No description provided for @noMessagesMatchFilter.
+  ///
+  /// In en, this message translates to:
+  /// **'No messages match this filter.'**
+  String get noMessagesMatchFilter;
+
+  /// No description provided for @noMessages.
+  ///
+  /// In en, this message translates to:
+  /// **'No messages.'**
+  String get noMessages;
 }
 
 class _AppLocalizationsDelegate

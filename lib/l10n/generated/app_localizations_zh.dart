@@ -491,6 +491,67 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get foldersFutureNotice => '邮件同步加入后将支持文件夹导航。';
+
+  @override
+  String get syncMail => '同步邮件';
+
+  @override
+  String mailSyncFailed(String reason) {
+    return '邮件同步失败：$reason';
+  }
+
+  @override
+  String get retry => '重试';
+
+  @override
+  String get mailboxes => '邮箱';
+
+  @override
+  String get unifiedInbox => '统一收件箱';
+
+  @override
+  String get filters => '筛选';
+
+  @override
+  String get unread => '未读';
+
+  @override
+  String get starred => '星标';
+
+  @override
+  String get trash => '废纸篓';
+
+  @override
+  String get account => '账号';
+
+  @override
+  String get folder => '文件夹';
+
+  @override
+  String get fullMessageBodiesFutureNotice => '完整邮件正文将在后续 PR 中显示。';
+
+  @override
+  String get noMessageSelected => '未选择邮件';
+
+  @override
+  String get messageContentsPlaceholder => '邮件内容会显示在宽屏桌面的这里。';
+
+  @override
+  String get accountMailbox => '账号邮箱';
+
+  @override
+  String get allMessages => '全部';
+
+  @override
+  String mailMessageCount(int count) {
+    return '$count 封邮件';
+  }
+
+  @override
+  String get noMessagesMatchFilter => '没有符合此筛选条件的邮件。';
+
+  @override
+  String get noMessages => '没有邮件。';
 }
 
 /// The translations for Chinese, as used in China (`zh_CN`).
@@ -911,6 +972,67 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get foldersFutureNotice => '邮件同步加入后将支持文件夹导航。';
+
+  @override
+  String get syncMail => '同步邮件';
+
+  @override
+  String mailSyncFailed(String reason) {
+    return '邮件同步失败：$reason';
+  }
+
+  @override
+  String get retry => '重试';
+
+  @override
+  String get mailboxes => '邮箱';
+
+  @override
+  String get unifiedInbox => '统一收件箱';
+
+  @override
+  String get filters => '筛选';
+
+  @override
+  String get unread => '未读';
+
+  @override
+  String get starred => '星标';
+
+  @override
+  String get trash => '废纸篓';
+
+  @override
+  String get account => '账号';
+
+  @override
+  String get folder => '文件夹';
+
+  @override
+  String get fullMessageBodiesFutureNotice => '完整邮件正文将在后续 PR 中显示。';
+
+  @override
+  String get noMessageSelected => '未选择邮件';
+
+  @override
+  String get messageContentsPlaceholder => '邮件内容会显示在宽屏桌面的这里。';
+
+  @override
+  String get accountMailbox => '账号邮箱';
+
+  @override
+  String get allMessages => '全部';
+
+  @override
+  String mailMessageCount(int count) {
+    return '$count 封邮件';
+  }
+
+  @override
+  String get noMessagesMatchFilter => '没有符合此筛选条件的邮件。';
+
+  @override
+  String get noMessages => '没有邮件。';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -1330,4 +1452,65 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get foldersFutureNotice => '加入郵件同步後將支援資料夾導覽。';
+
+  @override
+  String get syncMail => '同步邮件';
+
+  @override
+  String mailSyncFailed(String reason) {
+    return '邮件同步失败：$reason';
+  }
+
+  @override
+  String get retry => '重试';
+
+  @override
+  String get mailboxes => '信箱';
+
+  @override
+  String get unifiedInbox => '統一收件匣';
+
+  @override
+  String get filters => '篩選';
+
+  @override
+  String get unread => '未讀';
+
+  @override
+  String get starred => '星標';
+
+  @override
+  String get trash => '垃圾桶';
+
+  @override
+  String get account => '帳號';
+
+  @override
+  String get folder => '資料夾';
+
+  @override
+  String get fullMessageBodiesFutureNotice => '完整郵件正文將在後續 PR 中顯示。';
+
+  @override
+  String get noMessageSelected => '未選擇郵件';
+
+  @override
+  String get messageContentsPlaceholder => '郵件內容會顯示在寬螢幕桌面的這裡。';
+
+  @override
+  String get accountMailbox => '帳號信箱';
+
+  @override
+  String get allMessages => '全部';
+
+  @override
+  String mailMessageCount(int count) {
+    return '$count 封郵件';
+  }
+
+  @override
+  String get noMessagesMatchFilter => '沒有符合此篩選條件的郵件。';
+
+  @override
+  String get noMessages => '沒有郵件。';
 }

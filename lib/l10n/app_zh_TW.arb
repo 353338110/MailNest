@@ -148,5 +148,38 @@
   "accounts": "帳號",
   "composeEmail": "寫郵件",
   "composeFutureNotice": "寫郵件功能將在後續版本提供。",
-  "foldersFutureNotice": "加入郵件同步後將支援資料夾導覽。"
+  "foldersFutureNotice": "加入郵件同步後將支援資料夾導覽。",
+  "syncMail": "同步邮件",
+  "mailSyncFailed": "邮件同步失败：{reason}",
+  "@mailSyncFailed": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "retry": "重试",
+  "mailboxes": "信箱",
+  "unifiedInbox": "統一收件匣",
+  "filters": "篩選",
+  "unread": "未讀",
+  "starred": "星標",
+  "trash": "垃圾桶",
+  "account": "帳號",
+  "folder": "資料夾",
+  "fullMessageBodiesFutureNotice": "完整郵件正文將在後續 PR 中顯示。",
+  "noMessageSelected": "未選擇郵件",
+  "messageContentsPlaceholder": "郵件內容會顯示在寬螢幕桌面的這裡。",
+  "accountMailbox": "帳號信箱",
+  "allMessages": "全部",
+  "mailMessageCount": "{count} 封郵件",
+  "@mailMessageCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noMessagesMatchFilter": "沒有符合此篩選條件的郵件。",
+  "noMessages": "沒有郵件。"
 }
