@@ -74,9 +74,9 @@
 
 ### PR #9：本地草稿
 
-链接：https://github.com/353338110/MailNest/pull/待创建
+链接：https://github.com/353338110/MailNest/pull/7
 
-状态：待创建，base 为 `codex/progress-tracking`
+状态：已创建，base 为 `codex/progress-tracking`
 
 已完成内容：
 
