@@ -72,6 +72,22 @@
 - 不记录密码、授权码、Token 或认证响应。
 - 增加连接测试结果模型测试。
 
+
+### PR #15：移动端 Drawer/NavigationDrawer
+
+链接：https://github.com/353338110/MailNest/pull/13
+
+状态：已创建，CI 待验证，待合并到 `main`
+
+已完成内容：
+
+- Android/iOS 和窄屏首页使用 NavigationDrawer。
+- Drawer 提供统一收件箱、搜索、写邮件、草稿、已发送、账号和设置入口。
+- Drawer 内二级入口使用保留导航栈跳转，页面可正常返回。
+- 写邮件 FAB 在已有账号时直接进入写邮件页，无账号时保持添加账号入口。
+- 保留桌面宽屏邮箱工作台布局，不改协议逻辑。
+- 增加窄屏 Drawer 相关 widget 测试。
+
 ### PR #16：Gmail OAuth
 
 链接：https://github.com/353338110/MailNest/pull/16
@@ -300,7 +316,6 @@ flutter test
 - 桌面三栏布局。
 - 中等宽度两栏布局。
 - 小窗口退化为移动端导航。
-- 移动端 Drawer 或 NavigationDrawer。
 - 键盘快捷键。
 - 右键菜单。
 - 更完整的返回、取消、确认、加载状态。

@@ -428,4 +428,24 @@ class AppLocalizationsDe extends AppLocalizations {
   String sentFolderAppendFailed(String reason) {
     return 'Could not save to Sent: $reason';
   }
+
+  @override
+  String get inbox => 'Inbox';
+
+  @override
+  String get folders => 'Folders';
+
+  @override
+  String get accounts => 'Accounts';
+
+  @override
+  String get composeEmail => 'Compose email';
+
+  @override
+  String get composeFutureNotice =>
+      'Email composing will be available in a later version.';
+
+  @override
+  String get foldersFutureNotice =>
+      'Folder navigation will be available after mail sync is added.';
 }

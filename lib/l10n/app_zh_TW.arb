@@ -121,5 +121,11 @@
   "sentFolderSelectionRequired": "請選擇 Sent 資料夾",
   "sentFolderSaveFailed": "Sent 資料夾儲存失敗",
   "sentFolderAppendSucceeded": "已儲存到 {folderName}。",
-  "sentFolderAppendFailed": "無法儲存到 Sent：{reason}"
+  "sentFolderAppendFailed": "無法儲存到 Sent：{reason}",
+  "inbox": "收件匣",
+  "folders": "資料夾",
+  "accounts": "帳號",
+  "composeEmail": "寫郵件",
+  "composeFutureNotice": "寫郵件功能將在後續版本提供。",
+  "foldersFutureNotice": "加入郵件同步後將支援資料夾導覽。"
 }

@@ -871,6 +871,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Could not save to Sent: {reason}'**
   String sentFolderAppendFailed(String reason);
+
+  /// No description provided for @inbox.
+  ///
+  /// In en, this message translates to:
+  /// **'Inbox'**
+  String get inbox;
+
+  /// No description provided for @folders.
+  ///
+  /// In en, this message translates to:
+  /// **'Folders'**
+  String get folders;
+
+  /// No description provided for @accounts.
+  ///
+  /// In en, this message translates to:
+  /// **'Accounts'**
+  String get accounts;
+
+  /// No description provided for @composeEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Compose email'**
+  String get composeEmail;
+
+  /// No description provided for @composeFutureNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Email composing will be available in a later version.'**
+  String get composeFutureNotice;
+
+  /// No description provided for @foldersFutureNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Folder navigation will be available after mail sync is added.'**
+  String get foldersFutureNotice;
 }
 
 class _AppLocalizationsDelegate
