@@ -30,6 +30,12 @@ class SettingsPage extends ConsumerWidget {
             subtitle: Text(l10n.translationPrivacyNote),
             onTap: () => context.push('/settings/translation'),
           ),
+          ListTile(
+            leading: const Icon(Icons.backup_outlined),
+            title: Text(l10n.backupAndMigration),
+            subtitle: Text(l10n.backupAndMigrationSubtitle),
+            onTap: () => context.push('/settings/backup'),
+          ),
         ],
       ),
     );

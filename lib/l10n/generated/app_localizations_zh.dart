@@ -154,13 +154,195 @@ class AppLocalizationsZh extends AppLocalizations {
   String get unknownError => '未知错误';
 
   @override
+  String get searchMail => '搜索邮件';
+
+  @override
+  String get searchMailHint => '发件人、收件人、主题、摘要或已缓存正文';
+
+  @override
+  String get clearSearch => '清除搜索';
+
+  @override
+  String get localSearchLocalOnlyNotice =>
+      '搜索只覆盖已同步到本设备的邮件。尚未同步到本地的邮件不会出现在结果中。';
+
+  @override
+  String get searchMailEmptyPrompt => '搜索本地已同步邮件。';
+
+  @override
+  String get searchMailFailed => '搜索失败，请重试。';
+
+  @override
+  String noLocalSearchResults(String query) {
+    return '没有找到“$query”的本地结果。';
+  }
+
+  @override
+  String localSearchResultCount(int count) {
+    return '$count 条本地结果';
+  }
+
+  @override
+  String get noSubject => '（无主题）';
+
+  @override
+  String get backupAndMigration => '备份与迁移';
+
+  @override
+  String get backupAndMigrationSubtitle => '导出加密配置备份。';
+
+  @override
+  String get exportConfiguration => '导出配置';
+
+  @override
+  String get backupExportDescription =>
+      '创建包含账号配置、服务器设置和应用偏好的加密备份。导入功能将在后续版本添加。';
+
+  @override
+  String get backupIncludes => '导出内容';
+
+  @override
+  String get backupIncludesAccounts => '账号配置';
+
+  @override
+  String get backupIncludesServerSettings => 'IMAP 和 SMTP 配置';
+
+  @override
+  String get backupIncludesUserSettings => '用户设置';
+
+  @override
+  String get backupIncludesLanguageSettings => '语言设置';
+
+  @override
+  String get backupIncludesTranslationSettings => '翻译设置';
+
+  @override
+  String get backupExcludes => '默认不导出';
+
+  @override
+  String get backupExcludesMailBodies => '邮件正文';
+
+  @override
+  String get backupExcludesHeaderCache => '邮件头缓存';
+
+  @override
+  String get backupExcludesAttachmentCache => '附件缓存';
+
+  @override
+  String get backupExcludesSearchIndex => '搜索索引';
+
+  @override
+  String get exportPassword => '导出密码';
+
+  @override
+  String get confirmExportPassword => '确认导出密码';
+
+  @override
+  String get exportPasswordsDoNotMatch => '两次输入的密码不一致。';
+
+  @override
+  String get exportPasswordNotSaved => '此密码只用于加密导出文件，MailNest 不会保存。';
+
+  @override
+  String get exportBackup => '导出备份';
+
+  @override
+  String get exportingBackup => '正在导出...';
+
+  @override
+  String backupExported(String fileName) {
+    return '备份已导出：$fileName';
+  }
+
+  @override
+  String backupExportedTo(String filePath) {
+    return '已保存到 $filePath';
+  }
+
+  @override
+  String get backupExportFailed => '备份导出失败。';
+
+  @override
+  String get composeMail => '写邮件';
+
+  @override
+  String get drafts => '草稿箱';
+
+  @override
+  String get editDraft => '编辑草稿';
+
+  @override
+  String get saveDraft => '保存草稿';
+
+  @override
+  String get draftSaved => '草稿已保存。';
+
+  @override
+  String get savingDraft => '正在保存草稿...';
+
+  @override
+  String get draftAutosaveReady => '自动保存已就绪。';
+
+  @override
+  String draftLastSaved(String time) {
+    return '上次保存于 $time';
+  }
+
+  @override
+  String get deleteDraft => '删除草稿';
+
+  @override
+  String get deleteDraftTitle => '删除草稿？';
+
+  @override
+  String get deleteDraftMessage => '要从此设备删除这封本地草稿吗？';
+
+  @override
+  String get draftDeleted => '草稿已删除。';
+
+  @override
+  String get draftNotFound => '未找到草稿。';
+
+  @override
+  String get emptyDraft => '请先填写内容再保存草稿。';
+
+  @override
+  String get fromAccount => '发件账号';
+
+  @override
+  String get noAccountSelected => '未选择账号';
+
+  @override
+  String get toRecipients => '收件人';
+
+  @override
+  String get ccRecipients => '抄送';
+
+  @override
+  String get bccRecipients => '密送';
+
+  @override
+  String get subject => '主题';
+
+  @override
+  String get messageBody => '正文';
+
+  @override
+  String get noDraftsYet => '还没有草稿。';
+
+  @override
+  String get untitledDraft => '无主题草稿';
+
+  @override
+  String toLine(String recipients) {
+    return '收件人：$recipients';
+  }
+
+  @override
   String get sentMessages => '已发送';
 
   @override
   String get noSentMessagesYet => '还没有已发送邮件。';
-
-  @override
-  String get noSubject => '（无主题）';
 
   @override
   String sentToRecipients(String recipients) {
@@ -348,13 +530,119 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get unknownError => '未知错误';
 
   @override
+  String get searchMail => '搜索邮件';
+
+  @override
+  String get searchMailHint => '发件人、收件人、主题、摘要或已缓存正文';
+
+  @override
+  String get clearSearch => '清除搜索';
+
+  @override
+  String get localSearchLocalOnlyNotice =>
+      '搜索只覆盖已同步到本设备的邮件。尚未同步到本地的邮件不会出现在结果中。';
+
+  @override
+  String get searchMailEmptyPrompt => '搜索本地已同步邮件。';
+
+  @override
+  String get searchMailFailed => '搜索失败，请重试。';
+
+  @override
+  String noLocalSearchResults(String query) {
+    return '没有找到“$query”的本地结果。';
+  }
+
+  @override
+  String localSearchResultCount(int count) {
+    return '$count 条本地结果';
+  }
+
+  @override
+  String get noSubject => '（无主题）';
+
+  @override
+  String get backupAndMigration => '备份与迁移';
+
+  @override
+  String get backupAndMigrationSubtitle => '导出加密配置备份。';
+
+  @override
+  String get exportConfiguration => '导出配置';
+
+  @override
+  String get backupExportDescription =>
+      '创建包含账号配置、服务器设置和应用偏好的加密备份。导入功能将在后续版本添加。';
+
+  @override
+  String get backupIncludes => '导出内容';
+
+  @override
+  String get backupIncludesAccounts => '账号配置';
+
+  @override
+  String get backupIncludesServerSettings => 'IMAP 和 SMTP 配置';
+
+  @override
+  String get backupIncludesUserSettings => '用户设置';
+
+  @override
+  String get backupIncludesLanguageSettings => '语言设置';
+
+  @override
+  String get backupIncludesTranslationSettings => '翻译设置';
+
+  @override
+  String get backupExcludes => '默认不导出';
+
+  @override
+  String get backupExcludesMailBodies => '邮件正文';
+
+  @override
+  String get backupExcludesHeaderCache => '邮件头缓存';
+
+  @override
+  String get backupExcludesAttachmentCache => '附件缓存';
+
+  @override
+  String get backupExcludesSearchIndex => '搜索索引';
+
+  @override
+  String get exportPassword => '导出密码';
+
+  @override
+  String get confirmExportPassword => '确认导出密码';
+
+  @override
+  String get exportPasswordsDoNotMatch => '两次输入的密码不一致。';
+
+  @override
+  String get exportPasswordNotSaved => '此密码只用于加密导出文件，MailNest 不会保存。';
+
+  @override
+  String get exportBackup => '导出备份';
+
+  @override
+  String get exportingBackup => '正在导出...';
+
+  @override
+  String backupExported(String fileName) {
+    return '备份已导出：$fileName';
+  }
+
+  @override
+  String backupExportedTo(String filePath) {
+    return '已保存到 $filePath';
+  }
+
+  @override
+  String get backupExportFailed => '备份导出失败。';
+
+  @override
   String get sentMessages => 'Sent';
 
   @override
   String get noSentMessagesYet => 'No sent messages yet.';
-
-  @override
-  String get noSubject => '(No subject)';
 
   @override
   String sentToRecipients(String recipients) {
@@ -543,13 +831,119 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get unknownError => '未知錯誤';
 
   @override
+  String get searchMail => '搜尋郵件';
+
+  @override
+  String get searchMailHint => '寄件人、收件人、主旨、摘要或已快取內文';
+
+  @override
+  String get clearSearch => '清除搜尋';
+
+  @override
+  String get localSearchLocalOnlyNotice =>
+      '搜尋只涵蓋已同步到此裝置的郵件。尚未同步到本機的郵件不會出現在結果中。';
+
+  @override
+  String get searchMailEmptyPrompt => '搜尋本機已同步郵件。';
+
+  @override
+  String get searchMailFailed => '搜尋失敗，請重試。';
+
+  @override
+  String noLocalSearchResults(String query) {
+    return '沒有找到「$query」的本機結果。';
+  }
+
+  @override
+  String localSearchResultCount(int count) {
+    return '$count 筆本機結果';
+  }
+
+  @override
+  String get noSubject => '（無主旨）';
+
+  @override
+  String get backupAndMigration => '備份與遷移';
+
+  @override
+  String get backupAndMigrationSubtitle => '匯出加密設定備份。';
+
+  @override
+  String get exportConfiguration => '匯出設定';
+
+  @override
+  String get backupExportDescription =>
+      '建立包含帳號設定、伺服器設定和應用程式偏好的加密備份。匯入功能將在後續版本加入。';
+
+  @override
+  String get backupIncludes => '匯出內容';
+
+  @override
+  String get backupIncludesAccounts => '帳號設定';
+
+  @override
+  String get backupIncludesServerSettings => 'IMAP 和 SMTP 設定';
+
+  @override
+  String get backupIncludesUserSettings => '使用者設定';
+
+  @override
+  String get backupIncludesLanguageSettings => '語言設定';
+
+  @override
+  String get backupIncludesTranslationSettings => '翻譯設定';
+
+  @override
+  String get backupExcludes => '預設不匯出';
+
+  @override
+  String get backupExcludesMailBodies => '郵件正文';
+
+  @override
+  String get backupExcludesHeaderCache => '郵件標頭快取';
+
+  @override
+  String get backupExcludesAttachmentCache => '附件快取';
+
+  @override
+  String get backupExcludesSearchIndex => '搜尋索引';
+
+  @override
+  String get exportPassword => '匯出密碼';
+
+  @override
+  String get confirmExportPassword => '確認匯出密碼';
+
+  @override
+  String get exportPasswordsDoNotMatch => '兩次輸入的密碼不一致。';
+
+  @override
+  String get exportPasswordNotSaved => '此密碼只用於加密匯出檔案，MailNest 不會保存。';
+
+  @override
+  String get exportBackup => '匯出備份';
+
+  @override
+  String get exportingBackup => '正在匯出...';
+
+  @override
+  String backupExported(String fileName) {
+    return '備份已匯出：$fileName';
+  }
+
+  @override
+  String backupExportedTo(String filePath) {
+    return '已保存到 $filePath';
+  }
+
+  @override
+  String get backupExportFailed => '備份匯出失敗。';
+
+  @override
   String get sentMessages => '已傳送';
 
   @override
   String get noSentMessagesYet => '尚無已傳送郵件。';
-
-  @override
-  String get noSubject => '（無主旨）';
 
   @override
   String sentToRecipients(String recipients) {

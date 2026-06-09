@@ -7,6 +7,7 @@ class MailHeader {
     required this.receivedAt,
     this.preview,
     this.isRead = false,
+    this.isStarred = false,
     this.hasAttachments = false,
   });
 
@@ -16,5 +17,6 @@ class MailHeader {
   final DateTime receivedAt;
   final String? preview;
   final bool isRead;
+  final bool isStarred;
   final bool hasAttachments;
 }
