@@ -163,6 +163,22 @@
 - iOS 构建使用 `--no-codesign`，避免 CI 依赖签名证书。
 - 手动触发 CI 时可按平台选择是否运行重平台构建。
 
+### PR #20：邮件详情和写信翻译 UI
+
+链接：https://github.com/353338110/MailNest/pull/17
+
+状态：已创建，base 为 `main`，待验证后合并
+
+已完成内容：
+
+- 新增邮件详情翻译入口和目标语言选择。
+- 写邮件/草稿页新增翻译当前正文入口。
+- 使用 `MockTranslationService`，不接入真实翻译 API。
+- 支持原文/译文切换、复制译文、写信正文使用译文。
+- 空正文和翻译失败通过弹层内提示展示。
+- 邮件详情页、写邮件页可返回，翻译弹层可取消。
+- 在邮件详情真实数据接入前提供可打开的详情预览路由，后续可通过路由 `extra` 接入真实 `MailDetail`。
+
 ## 已验证
 
 最近一次验证命令：
@@ -254,8 +270,6 @@ flutter test
 
 ### 翻译
 
-- 邮件详情页翻译结果展示。
-- 写邮件页翻译入口。
 - 真实翻译 Provider。
 - 翻译隐私确认流程。
 - 用户自定义 API Key。
@@ -296,7 +310,7 @@ flutter test
 14. `codex/gmail-mail-provider`：Gmail 邮件列表、详情和发信。
 15. `codex/outlook-oauth`：Outlook OAuth。
 16. `codex/outlook-mail-provider`：Outlook 邮件列表、详情和发信。
-17. `codex/translation-ui`：邮件详情和写信翻译 UI。
+17. `codex/translation-ui`：邮件详情和写信翻译 UI。已创建 PR #17。
 18. `codex/translation-provider`：真实翻译服务和隐私确认。
 19. `codex/release-workflow`：发布流程和 tag 自动化。
 

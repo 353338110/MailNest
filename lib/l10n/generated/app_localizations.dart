@@ -164,6 +164,120 @@ abstract class AppLocalizations {
   /// **'The first release only includes translation entry points and a mock service.'**
   String get translationMockOnly;
 
+  /// No description provided for @translate.
+  ///
+  /// In en, this message translates to:
+  /// **'Translate'**
+  String get translate;
+
+  /// No description provided for @targetLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'Target language'**
+  String get targetLanguage;
+
+  /// No description provided for @translationSourceEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'There is no text to translate.'**
+  String get translationSourceEmpty;
+
+  /// No description provided for @translationFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Translation failed: {reason}'**
+  String translationFailed(String reason);
+
+  /// No description provided for @translationCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Translation copied.'**
+  String get translationCopied;
+
+  /// No description provided for @translatedText.
+  ///
+  /// In en, this message translates to:
+  /// **'Translation'**
+  String get translatedText;
+
+  /// No description provided for @originalText.
+  ///
+  /// In en, this message translates to:
+  /// **'Original'**
+  String get originalText;
+
+  /// No description provided for @translateAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Translate again'**
+  String get translateAgain;
+
+  /// No description provided for @copyTranslation.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy translation'**
+  String get copyTranslation;
+
+  /// No description provided for @useTranslation.
+  ///
+  /// In en, this message translates to:
+  /// **'Use translation'**
+  String get useTranslation;
+
+  /// No description provided for @mailDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Mail detail'**
+  String get mailDetail;
+
+  /// No description provided for @from.
+  ///
+  /// In en, this message translates to:
+  /// **'From'**
+  String get from;
+
+  /// No description provided for @received.
+  ///
+  /// In en, this message translates to:
+  /// **'Received'**
+  String get received;
+
+  /// No description provided for @translateMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Translate message'**
+  String get translateMessage;
+
+  /// No description provided for @translateBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Translate body'**
+  String get translateBody;
+
+  /// No description provided for @to.
+  ///
+  /// In en, this message translates to:
+  /// **'To'**
+  String get to;
+
+  /// No description provided for @body.
+  ///
+  /// In en, this message translates to:
+  /// **'Body'**
+  String get body;
+
+  /// No description provided for @send.
+  ///
+  /// In en, this message translates to:
+  /// **'Send'**
+  String get send;
+
+  /// No description provided for @openMailDetailPreview.
+  ///
+  /// In en, this message translates to:
+  /// **'Open mail detail preview'**
+  String get openMailDetailPreview;
+
   /// No description provided for @addEmailAccount.
   ///
   /// In en, this message translates to:

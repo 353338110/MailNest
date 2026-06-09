@@ -5,10 +5,12 @@ import '../features/backup/pages/backup_export_page.dart';
 import '../features/drafts/pages/compose_mail_page.dart';
 import '../features/drafts/pages/drafts_page.dart';
 import '../features/home/pages/home_page.dart';
+import '../features/mail/pages/mail_detail_page.dart';
 import '../features/onboarding/pages/onboarding_page.dart';
 import '../features/search/pages/local_search_page.dart';
 import '../features/settings/pages/settings_page.dart';
 import '../features/translation/pages/translation_settings_page.dart';
+import '../mail/models/mail_detail.dart';
 
 final appRouter = GoRouter(
   initialLocation: '/',
@@ -49,6 +51,13 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/settings/backup',
       builder: (context, state) => const BackupExportPage(),
+    ),
+    GoRoute(
+      path: '/mail/detail',
+      builder: (context, state) {
+        final extra = state.extra;
+        return MailDetailPage(detail: extra is MailDetail ? extra : null);
+      },
     ),
   ],
 );

@@ -33,6 +33,65 @@ class AppLocalizationsZh extends AppLocalizations {
   String get translationMockOnly => '第一版只包含翻译入口和 Mock 服务。';
 
   @override
+  String get translate => '翻译';
+
+  @override
+  String get targetLanguage => '目标语言';
+
+  @override
+  String get translationSourceEmpty => '没有可翻译的文本。';
+
+  @override
+  String translationFailed(String reason) {
+    return '翻译失败：$reason';
+  }
+
+  @override
+  String get translationCopied => '译文已复制。';
+
+  @override
+  String get translatedText => '译文';
+
+  @override
+  String get originalText => '原文';
+
+  @override
+  String get translateAgain => '重新翻译';
+
+  @override
+  String get copyTranslation => '复制译文';
+
+  @override
+  String get useTranslation => '使用译文';
+
+  @override
+  String get mailDetail => '邮件详情';
+
+  @override
+  String get from => '发件人';
+
+  @override
+  String get received => '接收时间';
+
+  @override
+  String get translateMessage => '翻译邮件';
+
+  @override
+  String get translateBody => '翻译正文';
+
+  @override
+  String get to => '收件人';
+
+  @override
+  String get body => '正文';
+
+  @override
+  String get send => '发送';
+
+  @override
+  String get openMailDetailPreview => '打开邮件详情预览';
+
+  @override
   String get addEmailAccount => '添加邮箱账号';
 
   @override
@@ -368,6 +427,65 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get translationMockOnly => '第一版只包含翻译入口和 Mock 服务。';
 
   @override
+  String get translate => '翻译';
+
+  @override
+  String get targetLanguage => '目标语言';
+
+  @override
+  String get translationSourceEmpty => '没有可翻译的文本。';
+
+  @override
+  String translationFailed(String reason) {
+    return '翻译失败：$reason';
+  }
+
+  @override
+  String get translationCopied => '译文已复制。';
+
+  @override
+  String get translatedText => '译文';
+
+  @override
+  String get originalText => '原文';
+
+  @override
+  String get translateAgain => '重新翻译';
+
+  @override
+  String get copyTranslation => '复制译文';
+
+  @override
+  String get useTranslation => '使用译文';
+
+  @override
+  String get mailDetail => '邮件详情';
+
+  @override
+  String get from => '发件人';
+
+  @override
+  String get received => '接收时间';
+
+  @override
+  String get translateMessage => '翻译邮件';
+
+  @override
+  String get translateBody => '翻译正文';
+
+  @override
+  String get to => '收件人';
+
+  @override
+  String get body => '正文';
+
+  @override
+  String get send => '发送';
+
+  @override
+  String get openMailDetailPreview => '打开邮件详情预览';
+
+  @override
   String get addEmailAccount => '添加邮箱账号';
 
   @override
@@ -596,6 +714,12 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get backupExportFailed => '备份导出失败。';
+
+  @override
+  String get composeMail => '写邮件';
+
+  @override
+  String get subject => '主题';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -625,6 +749,65 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get translationMockOnly => '第一版只包含翻譯入口和 Mock 服務。';
+
+  @override
+  String get translate => '翻譯';
+
+  @override
+  String get targetLanguage => '目標語言';
+
+  @override
+  String get translationSourceEmpty => '沒有可翻譯的文字。';
+
+  @override
+  String translationFailed(String reason) {
+    return '翻譯失敗：$reason';
+  }
+
+  @override
+  String get translationCopied => '譯文已複製。';
+
+  @override
+  String get translatedText => '譯文';
+
+  @override
+  String get originalText => '原文';
+
+  @override
+  String get translateAgain => '重新翻譯';
+
+  @override
+  String get copyTranslation => '複製譯文';
+
+  @override
+  String get useTranslation => '使用譯文';
+
+  @override
+  String get mailDetail => '郵件詳情';
+
+  @override
+  String get from => '寄件者';
+
+  @override
+  String get received => '接收時間';
+
+  @override
+  String get translateMessage => '翻譯郵件';
+
+  @override
+  String get translateBody => '翻譯正文';
+
+  @override
+  String get to => '收件者';
+
+  @override
+  String get body => '正文';
+
+  @override
+  String get send => '傳送';
+
+  @override
+  String get openMailDetailPreview => '開啟郵件詳情預覽';
 
   @override
   String get addEmailAccount => '新增信箱帳號';
@@ -855,4 +1038,10 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get backupExportFailed => '備份匯出失敗。';
+
+  @override
+  String get composeMail => '寫郵件';
+
+  @override
+  String get subject => '主旨';
 }

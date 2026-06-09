@@ -750,6 +750,12 @@ class _EmptyState extends StatelessWidget {
               icon: const Icon(Icons.add),
               label: Text(l10n.addEmailAccount),
             ),
+            const SizedBox(height: AppSpacing.small),
+            OutlinedButton.icon(
+              onPressed: () => context.push('/mail/detail'),
+              icon: const Icon(Icons.article_outlined),
+              label: Text(l10n.openMailDetailPreview),
+            ),
           ],
         ),
       ),
