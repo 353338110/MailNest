@@ -94,6 +94,47 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get customMail => '自定义邮箱';
+
+  @override
+  String get editAccount => '编辑账号';
+
+  @override
+  String get updateAccount => '更新账号';
+
+  @override
+  String get accountUpdated => '账号已更新。';
+
+  @override
+  String get accountNotFound => '未找到账号。';
+
+  @override
+  String get accountActions => '账号操作';
+
+  @override
+  String get enableAccount => '启用账号';
+
+  @override
+  String get disableAccount => '停用账号';
+
+  @override
+  String get deleteAccount => '删除账号';
+
+  @override
+  String get deleteAccountTitle => '删除账号？';
+
+  @override
+  String deleteAccountMessage(String emailAddress) {
+    return '要从此设备删除 $emailAddress 吗？保存的密钥也会一并移除。';
+  }
+
+  @override
+  String get accountDeleted => '账号已删除。';
+
+  @override
+  String get cancel => '取消';
+
+  @override
+  String get leavePasswordUnchanged => '新密码或授权码（留空则保持不变）';
 }
 
 /// The translations for Chinese, as used in China (`zh_CN`).
@@ -186,6 +227,47 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get customMail => '自定义邮箱';
+
+  @override
+  String get editAccount => '编辑账号';
+
+  @override
+  String get updateAccount => '更新账号';
+
+  @override
+  String get accountUpdated => '账号已更新。';
+
+  @override
+  String get accountNotFound => '未找到账号。';
+
+  @override
+  String get accountActions => '账号操作';
+
+  @override
+  String get enableAccount => '启用账号';
+
+  @override
+  String get disableAccount => '停用账号';
+
+  @override
+  String get deleteAccount => '删除账号';
+
+  @override
+  String get deleteAccountTitle => '删除账号？';
+
+  @override
+  String deleteAccountMessage(String emailAddress) {
+    return '要从此设备删除 $emailAddress 吗？保存的密钥也会一并移除。';
+  }
+
+  @override
+  String get accountDeleted => '账号已删除。';
+
+  @override
+  String get cancel => '取消';
+
+  @override
+  String get leavePasswordUnchanged => '新密码或授权码（留空则保持不变）';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -278,4 +360,45 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get customMail => '自訂信箱';
+
+  @override
+  String get editAccount => '編輯帳號';
+
+  @override
+  String get updateAccount => '更新帳號';
+
+  @override
+  String get accountUpdated => '帳號已更新。';
+
+  @override
+  String get accountNotFound => '找不到帳號。';
+
+  @override
+  String get accountActions => '帳號操作';
+
+  @override
+  String get enableAccount => '啟用帳號';
+
+  @override
+  String get disableAccount => '停用帳號';
+
+  @override
+  String get deleteAccount => '刪除帳號';
+
+  @override
+  String get deleteAccountTitle => '刪除帳號？';
+
+  @override
+  String deleteAccountMessage(String emailAddress) {
+    return '要從此裝置刪除 $emailAddress 嗎？儲存的密鑰也會一併移除。';
+  }
+
+  @override
+  String get accountDeleted => '帳號已刪除。';
+
+  @override
+  String get cancel => '取消';
+
+  @override
+  String get leavePasswordUnchanged => '新密碼或授權碼（留空則保持不變）';
 }

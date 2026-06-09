@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/theme/app_spacing.dart';
+import '../../../core/database/app_database.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../../mail/repository/account_repository_provider.dart';
 import '../controllers/mail_config_detector.dart';
@@ -9,7 +10,9 @@ import '../models/email_provider_type.dart';
 import '../models/mail_server_config.dart';
 
 class AddAccountPage extends ConsumerStatefulWidget {
-  const AddAccountPage({super.key});
+  const AddAccountPage({super.key, this.accountId});
+
+  final String? accountId;
 
   @override
   ConsumerState<AddAccountPage> createState() => _AddAccountPageState();
@@ -32,6 +35,16 @@ class _AddAccountPageState extends ConsumerState<AddAccountPage> {
   String _smtpSecurity = 'starttls';
   bool _smtpStartTls = true;
   bool _isSaving = false;
+  bool _isLoading = false;
+  EmailAccount? _editingAccount;
+
+  bool get _isEditing => widget.accountId != null;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAccountForEdit();
+  }
 
   @override
   void dispose() {
@@ -51,84 +64,102 @@ class _AddAccountPageState extends ConsumerState<AddAccountPage> {
     final l10n = AppLocalizations.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.addEmailAccount)),
-      body: ListView(
-        padding: const EdgeInsets.all(AppSpacing.medium),
-        children: [
-          _ProviderShortcuts(onSelected: _selectProvider),
-          const SizedBox(height: AppSpacing.medium),
-          Form(
-            key: _formKey,
-            child: Column(
+      appBar: AppBar(
+        title: Text(_isEditing ? l10n.editAccount : l10n.addEmailAccount),
+      ),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : ListView(
+              padding: const EdgeInsets.all(AppSpacing.medium),
               children: [
-                TextFormField(
-                  controller: _emailController,
-                  decoration: InputDecoration(labelText: l10n.emailAddress),
-                  keyboardType: TextInputType.emailAddress,
-                  validator: _required,
-                  onChanged: _detectFromEmail,
-                ),
-                const SizedBox(height: AppSpacing.medium),
-                TextFormField(
-                  controller: _nameController,
-                  decoration: InputDecoration(labelText: l10n.displayName),
-                ),
-                const SizedBox(height: AppSpacing.medium),
-                TextFormField(
-                  controller: _usernameController,
-                  decoration: InputDecoration(labelText: l10n.username),
-                  validator: _required,
-                ),
-                const SizedBox(height: AppSpacing.medium),
-                TextFormField(
-                  controller: _secretController,
-                  decoration: InputDecoration(
-                    labelText: l10n.passwordOrAppPassword,
+                if (!_isEditing) ...[
+                  _ProviderShortcuts(onSelected: _selectProvider),
+                  const SizedBox(height: AppSpacing.medium),
+                ],
+                Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      TextFormField(
+                        controller: _emailController,
+                        decoration: InputDecoration(
+                          labelText: l10n.emailAddress,
+                        ),
+                        keyboardType: TextInputType.emailAddress,
+                        readOnly: _isEditing,
+                        validator: _required,
+                        onChanged: _isEditing ? null : _detectFromEmail,
+                      ),
+                      const SizedBox(height: AppSpacing.medium),
+                      TextFormField(
+                        controller: _nameController,
+                        decoration: InputDecoration(
+                          labelText: l10n.displayName,
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.medium),
+                      TextFormField(
+                        controller: _usernameController,
+                        decoration: InputDecoration(labelText: l10n.username),
+                        validator: _required,
+                      ),
+                      const SizedBox(height: AppSpacing.medium),
+                      TextFormField(
+                        controller: _secretController,
+                        decoration: InputDecoration(
+                          labelText: _isEditing
+                              ? l10n.leavePasswordUnchanged
+                              : l10n.passwordOrAppPassword,
+                        ),
+                        obscureText: true,
+                        validator: _isEditing ? null : _required,
+                      ),
+                      const SizedBox(height: AppSpacing.large),
+                      _ServerSection(
+                        title: l10n.imapSettings,
+                        hostController: _imapHostController,
+                        portController: _imapPortController,
+                        security: _imapSecurity,
+                        onSecurityChanged: (value) =>
+                            setState(() => _imapSecurity = value),
+                      ),
+                      const SizedBox(height: AppSpacing.large),
+                      _ServerSection(
+                        title: l10n.smtpSettings,
+                        hostController: _smtpHostController,
+                        portController: _smtpPortController,
+                        security: _smtpSecurity,
+                        onSecurityChanged: (value) =>
+                            setState(() => _smtpSecurity = value),
+                      ),
+                      SwitchListTile(
+                        contentPadding: EdgeInsets.zero,
+                        title: Text(l10n.useStartTls),
+                        value: _smtpStartTls,
+                        onChanged: (value) =>
+                            setState(() => _smtpStartTls = value),
+                      ),
+                      const SizedBox(height: AppSpacing.large),
+                      FilledButton.icon(
+                        onPressed: _isSaving ? null : _saveAccount,
+                        icon: _isSaving
+                            ? const SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : const Icon(Icons.save_outlined),
+                        label: Text(
+                          _isEditing ? l10n.updateAccount : l10n.saveAccount,
+                        ),
+                      ),
+                    ],
                   ),
-                  obscureText: true,
-                  validator: _required,
-                ),
-                const SizedBox(height: AppSpacing.large),
-                _ServerSection(
-                  title: l10n.imapSettings,
-                  hostController: _imapHostController,
-                  portController: _imapPortController,
-                  security: _imapSecurity,
-                  onSecurityChanged: (value) =>
-                      setState(() => _imapSecurity = value),
-                ),
-                const SizedBox(height: AppSpacing.large),
-                _ServerSection(
-                  title: l10n.smtpSettings,
-                  hostController: _smtpHostController,
-                  portController: _smtpPortController,
-                  security: _smtpSecurity,
-                  onSecurityChanged: (value) =>
-                      setState(() => _smtpSecurity = value),
-                ),
-                SwitchListTile(
-                  contentPadding: EdgeInsets.zero,
-                  title: Text(l10n.useStartTls),
-                  value: _smtpStartTls,
-                  onChanged: (value) => setState(() => _smtpStartTls = value),
-                ),
-                const SizedBox(height: AppSpacing.large),
-                FilledButton.icon(
-                  onPressed: _isSaving ? null : _saveAccount,
-                  icon: _isSaving
-                      ? const SizedBox(
-                          width: 18,
-                          height: 18,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : const Icon(Icons.save_outlined),
-                  label: Text(l10n.saveAccount),
                 ),
               ],
             ),
-          ),
-        ],
-      ),
     );
   }
 
@@ -136,6 +167,46 @@ class _AddAccountPageState extends ConsumerState<AddAccountPage> {
     return value == null || value.trim().isEmpty
         ? AppLocalizations.of(context).requiredField
         : null;
+  }
+
+  Future<void> _loadAccountForEdit() async {
+    final accountId = widget.accountId;
+    if (accountId == null) {
+      return;
+    }
+
+    setState(() => _isLoading = true);
+    final account = await ref
+        .read(accountRepositoryProvider)
+        .getAccount(accountId);
+    if (!mounted) {
+      return;
+    }
+
+    if (account == null) {
+      setState(() => _isLoading = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppLocalizations.of(context).accountNotFound)),
+      );
+      Navigator.of(context).pop();
+      return;
+    }
+
+    _editingAccount = account;
+    _emailController.text = account.emailAddress;
+    _nameController.text = account.displayName ?? '';
+    _usernameController.text = account.username;
+    _imapHostController.text = account.imapHost;
+    _imapPortController.text = account.imapPort.toString();
+    _smtpHostController.text = account.smtpHost;
+    _smtpPortController.text = account.smtpPort.toString();
+    setState(() {
+      _provider = _providerFromStorageValue(account.provider);
+      _imapSecurity = account.imapSecurity;
+      _smtpSecurity = account.smtpSecurity;
+      _smtpStartTls = account.smtpStartTls;
+      _isLoading = false;
+    });
   }
 
   void _selectProvider(EmailProviderType provider) {
@@ -185,6 +256,12 @@ class _AddAccountPageState extends ConsumerState<AddAccountPage> {
 
     setState(() => _isSaving = true);
     try {
+      final editingAccount = _editingAccount;
+      if (editingAccount != null) {
+        await _updateAccount(editingAccount);
+        return;
+      }
+
       await ref
           .read(accountRepositoryProvider)
           .savePasswordAccount(
@@ -214,6 +291,42 @@ class _AddAccountPageState extends ConsumerState<AddAccountPage> {
         setState(() => _isSaving = false);
       }
     }
+  }
+
+  Future<void> _updateAccount(EmailAccount account) async {
+    await ref
+        .read(accountRepositoryProvider)
+        .updatePasswordAccount(
+          current: account,
+          username: _usernameController.text.trim(),
+          provider: _provider,
+          imapHost: _imapHostController.text.trim(),
+          imapPort: int.parse(_imapPortController.text.trim()),
+          imapSecurity: _imapSecurity,
+          smtpHost: _smtpHostController.text.trim(),
+          smtpPort: int.parse(_smtpPortController.text.trim()),
+          smtpSecurity: _smtpSecurity,
+          smtpStartTls: _smtpStartTls,
+          displayName: _nameController.text.trim().isEmpty
+              ? null
+              : _nameController.text.trim(),
+          newSecret: _secretController.text.trim().isEmpty
+              ? null
+              : _secretController.text,
+        );
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppLocalizations.of(context).accountUpdated)),
+      );
+      Navigator.of(context).pop();
+    }
+  }
+
+  EmailProviderType _providerFromStorageValue(String value) {
+    return EmailProviderType.values.firstWhere(
+      (provider) => provider.storageValue == value,
+      orElse: () => EmailProviderType.custom,
+    );
   }
 
   void _showFutureProviderMessage(EmailProviderType provider) {

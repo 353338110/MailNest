@@ -98,4 +98,46 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get customMail => 'Custom mail';
+
+  @override
+  String get editAccount => 'Edit account';
+
+  @override
+  String get updateAccount => 'Update account';
+
+  @override
+  String get accountUpdated => 'Account updated.';
+
+  @override
+  String get accountNotFound => 'Account not found.';
+
+  @override
+  String get accountActions => 'Account actions';
+
+  @override
+  String get enableAccount => 'Enable account';
+
+  @override
+  String get disableAccount => 'Disable account';
+
+  @override
+  String get deleteAccount => 'Delete account';
+
+  @override
+  String get deleteAccountTitle => 'Delete account?';
+
+  @override
+  String deleteAccountMessage(String emailAddress) {
+    return 'Delete $emailAddress from this device? Its saved secret will also be removed.';
+  }
+
+  @override
+  String get accountDeleted => 'Account deleted.';
+
+  @override
+  String get cancel => 'Cancel';
+
+  @override
+  String get leavePasswordUnchanged =>
+      'New password or app password (leave blank to keep current)';
 }

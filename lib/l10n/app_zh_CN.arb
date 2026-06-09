@@ -27,5 +27,18 @@
   "ok": "确定",
   "qqMail": "QQ 邮箱",
   "neteaseMail": "网易邮箱",
-  "customMail": "自定义邮箱"
+  "customMail": "自定义邮箱",
+  "editAccount": "编辑账号",
+  "updateAccount": "更新账号",
+  "accountUpdated": "账号已更新。",
+  "accountNotFound": "未找到账号。",
+  "accountActions": "账号操作",
+  "enableAccount": "启用账号",
+  "disableAccount": "停用账号",
+  "deleteAccount": "删除账号",
+  "deleteAccountTitle": "删除账号？",
+  "deleteAccountMessage": "要从此设备删除 {emailAddress} 吗？保存的密钥也会一并移除。",
+  "accountDeleted": "账号已删除。",
+  "cancel": "取消",
+  "leavePasswordUnchanged": "新密码或授权码（留空则保持不变）"
 }

@@ -16,6 +16,11 @@ final appRouter = GoRouter(
       builder: (context, state) => const AddAccountPage(),
     ),
     GoRoute(
+      path: '/accounts/:accountId/edit',
+      builder: (context, state) =>
+          AddAccountPage(accountId: state.pathParameters['accountId']),
+    ),
+    GoRoute(
       path: '/settings',
       builder: (context, state) => const SettingsPage(),
     ),

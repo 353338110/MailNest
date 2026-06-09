@@ -27,5 +27,18 @@
   "ok": "OK",
   "qqMail": "QQ Mail",
   "neteaseMail": "NetEase Mail",
-  "customMail": "Custom mail"
+  "customMail": "Custom mail",
+  "editAccount": "Edit account",
+  "updateAccount": "Update account",
+  "accountUpdated": "Account updated.",
+  "accountNotFound": "Account not found.",
+  "accountActions": "Account actions",
+  "enableAccount": "Enable account",
+  "disableAccount": "Disable account",
+  "deleteAccount": "Delete account",
+  "deleteAccountTitle": "Delete account?",
+  "deleteAccountMessage": "Delete {emailAddress} from this device? Its saved secret will also be removed.",
+  "accountDeleted": "Account deleted.",
+  "cancel": "Cancel",
+  "leavePasswordUnchanged": "New password or app password (leave blank to keep current)"
 }

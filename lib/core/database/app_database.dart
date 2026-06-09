@@ -56,8 +56,23 @@ class AppDatabase extends _$AppDatabase {
     )..orderBy([(table) => OrderingTerm.desc(table.createdAt)])).watch();
   }
 
+  Future<EmailAccount?> getAccount(String id) {
+    return (select(
+      emailAccounts,
+    )..where((table) => table.id.equals(id))).getSingleOrNull();
+  }
+
   Future<void> saveAccount(EmailAccountsCompanion account) {
     return into(emailAccounts).insertOnConflictUpdate(account);
+  }
+
+  Future<void> setAccountSyncEnabled(String id, bool enabled) {
+    return (update(emailAccounts)..where((table) => table.id.equals(id))).write(
+      EmailAccountsCompanion(
+        syncEnabled: Value(enabled),
+        updatedAt: Value(DateTime.now()),
+      ),
+    );
   }
 
   Future<void> deleteAccount(String id) {

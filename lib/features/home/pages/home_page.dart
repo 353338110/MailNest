@@ -43,12 +43,15 @@ class HomePage extends ConsumerWidget {
               final account = data[index];
               return Card(
                 child: ListTile(
+                  onTap: () => context.push('/accounts/${account.id}/edit'),
                   leading: const Icon(Icons.alternate_email),
                   title: Text(account.emailAddress),
-                  subtitle: Text('${account.provider} • ${account.imapHost}'),
-                  trailing: account.syncEnabled
-                      ? const Icon(Icons.sync, size: 20)
-                      : const Icon(Icons.sync_disabled, size: 20),
+                  subtitle: Text(
+                    '${account.provider} • ${account.imapHost}',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  trailing: _AccountMenu(account: account),
                 ),
               );
             },
@@ -63,6 +66,121 @@ class HomePage extends ConsumerWidget {
     );
   }
 }
+
+class _AccountMenu extends ConsumerWidget {
+  const _AccountMenu({required this.account});
+
+  final EmailAccount account;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+
+    return PopupMenuButton<_AccountAction>(
+      tooltip: l10n.accountActions,
+      onSelected: (action) => _handleAction(context, ref, action),
+      itemBuilder: (context) => [
+        PopupMenuItem(
+          value: _AccountAction.edit,
+          child: ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.edit_outlined),
+            title: Text(l10n.editAccount),
+          ),
+        ),
+        PopupMenuItem(
+          value: _AccountAction.toggleSync,
+          child: ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: Icon(
+              account.syncEnabled
+                  ? Icons.sync_disabled_outlined
+                  : Icons.sync_outlined,
+            ),
+            title: Text(
+              account.syncEnabled ? l10n.disableAccount : l10n.enableAccount,
+            ),
+          ),
+        ),
+        PopupMenuItem(
+          value: _AccountAction.delete,
+          child: ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.delete_outline),
+            title: Text(l10n.deleteAccount),
+          ),
+        ),
+      ],
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            account.syncEnabled ? Icons.sync : Icons.sync_disabled,
+            size: 20,
+          ),
+          const SizedBox(width: AppSpacing.small),
+          const Icon(Icons.more_vert),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _handleAction(
+    BuildContext context,
+    WidgetRef ref,
+    _AccountAction action,
+  ) async {
+    switch (action) {
+      case _AccountAction.edit:
+        await context.push('/accounts/${account.id}/edit');
+      case _AccountAction.toggleSync:
+        await ref
+            .read(accountRepositoryProvider)
+            .setSyncEnabled(
+              accountId: account.id,
+              enabled: !account.syncEnabled,
+            );
+      case _AccountAction.delete:
+        await _confirmDelete(context, ref);
+    }
+  }
+
+  Future<void> _confirmDelete(BuildContext context, WidgetRef ref) async {
+    final l10n = AppLocalizations.of(context);
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(l10n.deleteAccountTitle),
+          content: Text(l10n.deleteAccountMessage(account.emailAddress)),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text(l10n.cancel),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text(l10n.deleteAccount),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (shouldDelete != true || !context.mounted) {
+      return;
+    }
+
+    await ref.read(accountRepositoryProvider).deleteAccount(account.id);
+    if (context.mounted) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.accountDeleted)));
+    }
+  }
+}
+
+enum _AccountAction { edit, toggleSync, delete }
 
 class _EmptyState extends StatelessWidget {
   const _EmptyState({required this.onAdd});
