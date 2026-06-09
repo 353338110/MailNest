@@ -72,6 +72,22 @@
 - 不记录密码、授权码、Token 或认证响应。
 - 增加连接测试结果模型测试。
 
+### PR #15：移动端 Drawer/NavigationDrawer
+
+链接：待创建
+
+状态：本分支 `codex/mobile-navigation` 待创建 PR
+
+已完成内容：
+
+- Android、iOS 和窄屏启用移动端 `NavigationDrawer`。
+- 首页 AppBar 在移动端提供系统 Drawer 菜单按钮，桌面宽屏保留设置快捷入口。
+- Drawer 清晰展示收件箱、文件夹、账号、添加账号和设置入口。
+- 账号入口可进入账号编辑页，添加账号和设置保持保留导航栈的二级页面返回。
+- 写邮件 FAB 在已有账号时保持右下角易用位置，并在写邮件功能未实现前给出后续版本提示。
+- 未改动桌面三栏逻辑以外的邮件协议功能。
+- 增加窄屏 Drawer 导航 Widget 测试。
+
 ## 已验证
 
 最近一次验证命令：
@@ -182,7 +198,6 @@ flutter test
 - 桌面三栏布局。
 - 中等宽度两栏布局。
 - 小窗口退化为移动端导航。
-- 移动端 Drawer 或 NavigationDrawer。
 - 键盘快捷键。
 - 右键菜单。
 - 更完整的返回、取消、确认、加载状态。
@@ -216,8 +231,7 @@ flutter test
 12. `codex/backup-import`：配置导入和冲突处理。
 13. `codex/local-search`：本地搜索和 FTS。
 14. `codex/desktop-layout`：桌面三栏和响应式布局完善。
-15. `codex/mobile-navigation`：移动端 Drawer/NavigationDrawer。
-16. `codex/gmail-oauth`：Gmail OAuth。
+15. `codex/gmail-oauth`：Gmail OAuth。
 17. `codex/gmail-mail-provider`：Gmail 邮件列表、详情和发信。
 18. `codex/outlook-oauth`：Outlook OAuth。
 19. `codex/outlook-mail-provider`：Outlook 邮件列表、详情和发信。

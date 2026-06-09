@@ -45,5 +45,11 @@
   "connectionTestSucceeded": "IMAP 和 SMTP 连接测试通过。",
   "connectionTestFailed": "连接测试失败：{reason}",
   "passwordRequiredForConnectionTest": "请先输入密码或授权码再测试。",
-  "unknownError": "未知错误"
+  "unknownError": "未知错误",
+  "inbox": "收件箱",
+  "folders": "文件夹",
+  "accounts": "账号",
+  "composeEmail": "写邮件",
+  "composeFutureNotice": "写邮件功能将在后续版本提供。",
+  "foldersFutureNotice": "邮件同步加入后将支持文件夹导航。"
 }

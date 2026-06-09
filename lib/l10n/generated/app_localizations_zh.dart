@@ -152,6 +152,24 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get unknownError => '未知错误';
+
+  @override
+  String get inbox => '收件箱';
+
+  @override
+  String get folders => '文件夹';
+
+  @override
+  String get accounts => '账号';
+
+  @override
+  String get composeEmail => '写邮件';
+
+  @override
+  String get composeFutureNotice => '写邮件功能将在后续版本提供。';
+
+  @override
+  String get foldersFutureNotice => '邮件同步加入后将支持文件夹导航。';
 }
 
 /// The translations for Chinese, as used in China (`zh_CN`).
@@ -302,6 +320,24 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get unknownError => '未知错误';
+
+  @override
+  String get inbox => '收件箱';
+
+  @override
+  String get folders => '文件夹';
+
+  @override
+  String get accounts => '账号';
+
+  @override
+  String get composeEmail => '写邮件';
+
+  @override
+  String get composeFutureNotice => '写邮件功能将在后续版本提供。';
+
+  @override
+  String get foldersFutureNotice => '邮件同步加入后将支持文件夹导航。';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -452,4 +488,22 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get unknownError => '未知錯誤';
+
+  @override
+  String get inbox => '收件匣';
+
+  @override
+  String get folders => '資料夾';
+
+  @override
+  String get accounts => '帳號';
+
+  @override
+  String get composeEmail => '寫郵件';
+
+  @override
+  String get composeFutureNotice => '寫郵件功能將在後續版本提供。';
+
+  @override
+  String get foldersFutureNotice => '加入郵件同步後將支援資料夾導覽。';
 }

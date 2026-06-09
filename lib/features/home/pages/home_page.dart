@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../app/theme/app_spacing.dart';
+import '../../../core/platform/platform_info.dart';
 import '../../../core/database/app_database.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../../mail/repository/account_repository_provider.dart';
@@ -10,59 +11,210 @@ import '../../../mail/repository/account_repository_provider.dart';
 class HomePage extends ConsumerWidget {
   const HomePage({super.key});
 
+  static const _mobileNavigationBreakpoint = 720.0;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final accounts = ref.watch(accountRepositoryProvider).watchAccounts();
+    final platform = const PlatformInfo();
+    final width = MediaQuery.sizeOf(context).width;
+    final useMobileNavigation =
+        !platform.isDesktop || width < _mobileNavigationBreakpoint;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.appTitle),
-        actions: [
-          IconButton(
-            tooltip: l10n.settings,
-            onPressed: () => context.push('/settings'),
-            icon: const Icon(Icons.settings_outlined),
+    return StreamBuilder<List<EmailAccount>>(
+      stream: accounts,
+      builder: (context, snapshot) {
+        final data = snapshot.data ?? const <EmailAccount>[];
+
+        return Scaffold(
+          appBar: AppBar(
+            title: Text(l10n.appTitle),
+            actions: useMobileNavigation
+                ? null
+                : [
+                    IconButton(
+                      tooltip: l10n.settings,
+                      onPressed: () => context.push('/settings'),
+                      icon: const Icon(Icons.settings_outlined),
+                    ),
+                  ],
           ),
-        ],
-      ),
-      body: StreamBuilder<List<EmailAccount>>(
-        stream: accounts,
-        builder: (context, snapshot) {
-          final data = snapshot.data ?? const <EmailAccount>[];
-          if (data.isEmpty) {
-            return _EmptyState(onAdd: () => context.push('/accounts/add'));
-          }
-
-          return ListView.separated(
-            padding: const EdgeInsets.all(AppSpacing.medium),
-            itemCount: data.length,
-            separatorBuilder: (_, _) =>
-                const SizedBox(height: AppSpacing.small),
-            itemBuilder: (context, index) {
-              final account = data[index];
-              return Card(
-                child: ListTile(
-                  onTap: () => context.push('/accounts/${account.id}/edit'),
-                  leading: const Icon(Icons.alternate_email),
-                  title: Text(account.emailAddress),
-                  subtitle: Text(
-                    '${account.provider} • ${account.imapHost}',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  trailing: _AccountMenu(account: account),
+          drawer: useMobileNavigation
+              ? _HomeNavigationDrawer(accounts: data)
+              : null,
+          body: data.isEmpty
+              ? _EmptyState(onAdd: () => context.push('/accounts/add'))
+              : ListView.separated(
+                  padding: const EdgeInsets.all(AppSpacing.medium),
+                  itemCount: data.length,
+                  separatorBuilder: (_, _) =>
+                      const SizedBox(height: AppSpacing.small),
+                  itemBuilder: (context, index) {
+                    final account = data[index];
+                    return Card(
+                      child: ListTile(
+                        onTap: () =>
+                            context.push('/accounts/${account.id}/edit'),
+                        leading: const Icon(Icons.alternate_email),
+                        title: Text(account.emailAddress),
+                        subtitle: Text(
+                          '${account.provider} • ${account.imapHost}',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        trailing: _AccountMenu(account: account),
+                      ),
+                    );
+                  },
                 ),
-              );
-            },
-          );
-        },
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push('/accounts/add'),
+          floatingActionButton: _HomeFab(
+            hasAccounts: data.isNotEmpty,
+            onAddAccount: () => context.push('/accounts/add'),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _HomeNavigationDrawer extends StatelessWidget {
+  const _HomeNavigationDrawer({required this.accounts});
+
+  final List<EmailAccount> accounts;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return NavigationDrawer(
+      selectedIndex: 0,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.medium,
+            AppSpacing.large,
+            AppSpacing.medium,
+            AppSpacing.small,
+          ),
+          child: Text(
+            l10n.appTitle,
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+        ),
+        NavigationDrawerDestination(
+          icon: const Icon(Icons.inbox_outlined),
+          selectedIcon: const Icon(Icons.inbox),
+          label: Text(l10n.inbox),
+        ),
+        NavigationDrawerDestination(
+          icon: const Icon(Icons.folder_outlined),
+          selectedIcon: const Icon(Icons.folder),
+          label: Text(l10n.folders),
+        ),
+        const Divider(),
+        Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.medium,
+            vertical: AppSpacing.small,
+          ),
+          child: Text(
+            l10n.accounts,
+            style: Theme.of(context).textTheme.labelLarge?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ),
+        ListTile(
+          leading: const Icon(Icons.add),
+          title: Text(l10n.addEmailAccount),
+          onTap: () => _closeAndPush(context, '/accounts/add'),
+        ),
+        if (accounts.isEmpty)
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.medium,
+              vertical: AppSpacing.small,
+            ),
+            child: Text(
+              l10n.noAccountsYet,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
+          )
+        else
+          for (final account in accounts)
+            ListTile(
+              leading: Icon(
+                account.syncEnabled
+                    ? Icons.alternate_email
+                    : Icons.sync_disabled_outlined,
+              ),
+              title: Text(
+                account.emailAddress,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              subtitle: Text(
+                account.provider,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              onTap: () =>
+                  _closeAndPush(context, '/accounts/${account.id}/edit'),
+            ),
+        const Divider(),
+        ListTile(
+          leading: const Icon(Icons.settings_outlined),
+          title: Text(l10n.settings),
+          onTap: () => _closeAndPush(context, '/settings'),
+        ),
+      ],
+      onDestinationSelected: (index) {
+        Navigator.of(context).pop();
+        if (index == 1) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(l10n.foldersFutureNotice)));
+        }
+      },
+    );
+  }
+
+  void _closeAndPush(BuildContext context, String location) {
+    Navigator.of(context).pop();
+    context.push(location);
+  }
+}
+
+class _HomeFab extends StatelessWidget {
+  const _HomeFab({required this.hasAccounts, required this.onAddAccount});
+
+  final bool hasAccounts;
+  final VoidCallback onAddAccount;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
+    if (!hasAccounts) {
+      return FloatingActionButton.extended(
+        onPressed: onAddAccount,
         icon: const Icon(Icons.add),
         label: Text(l10n.addEmailAccount),
-      ),
+      );
+    }
+
+    return FloatingActionButton(
+      tooltip: l10n.composeEmail,
+      onPressed: () {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.composeFutureNotice)));
+      },
+      child: const Icon(Icons.edit_outlined),
     );
   }
 }

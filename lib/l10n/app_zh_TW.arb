@@ -45,5 +45,11 @@
   "connectionTestSucceeded": "IMAP 和 SMTP 連線測試通過。",
   "connectionTestFailed": "連線測試失敗：{reason}",
   "passwordRequiredForConnectionTest": "請先輸入密碼或授權碼再測試。",
-  "unknownError": "未知錯誤"
+  "unknownError": "未知錯誤",
+  "inbox": "收件匣",
+  "folders": "資料夾",
+  "accounts": "帳號",
+  "composeEmail": "寫郵件",
+  "composeFutureNotice": "寫郵件功能將在後續版本提供。",
+  "foldersFutureNotice": "加入郵件同步後將支援資料夾導覽。"
 }

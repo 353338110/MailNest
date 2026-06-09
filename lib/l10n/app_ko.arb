@@ -45,5 +45,11 @@
   "connectionTestSucceeded": "IMAP and SMTP connection tests passed.",
   "connectionTestFailed": "Connection test failed: {reason}",
   "passwordRequiredForConnectionTest": "Enter a password or app password before testing.",
-  "unknownError": "Unknown error"
+  "unknownError": "Unknown error",
+  "inbox": "Inbox",
+  "folders": "Folders",
+  "accounts": "Accounts",
+  "composeEmail": "Compose email",
+  "composeFutureNotice": "Email composing will be available in a later version.",
+  "foldersFutureNotice": "Folder navigation will be available after mail sync is added."
 }
