@@ -72,6 +72,24 @@
 - 不记录密码、授权码、Token 或认证响应。
 - 增加连接测试结果模型测试。
 
+### PR #22：多平台构建 CI
+
+链接：待创建
+
+状态：本 PR
+
+已完成内容：
+
+- 保留 PR Check 的 `dart format`、`flutter analyze`、`flutter test` 基础检查。
+- 将 Flutter workflow 切换到 `master` channel，以匹配当前 Dart dev SDK 约束。
+- CI workflow 增加 `workflow_dispatch` 手动触发。
+- CI workflow 增加 Linux、Android、Windows、macOS、iOS 分阶段构建 job。
+- Linux/Android 构建使用 Ubuntu runner。
+- Windows 构建使用 Windows runner。
+- macOS/iOS 构建使用 macOS runner。
+- iOS 构建使用 `--no-codesign`，避免 CI 依赖签名证书。
+- 手动触发 CI 时可按平台选择是否运行重平台构建。
+
 ## 已验证
 
 最近一次验证命令：
@@ -189,12 +207,6 @@ flutter test
 
 ### CI 与发布
 
-- 多平台构建 CI。
-- Linux build。
-- Android build。
-- Windows build。
-- macOS build。
-- iOS build。
 - Release workflow。
 - SemVer tag 发布流程。
 
@@ -223,8 +235,7 @@ flutter test
 19. `codex/outlook-mail-provider`：Outlook 邮件列表、详情和发信。
 20. `codex/translation-ui`：邮件详情和写信翻译 UI。
 21. `codex/translation-provider`：真实翻译服务和隐私确认。
-22. `codex/multiplatform-ci`：多平台构建 CI。
-23. `codex/release-workflow`：发布流程和 tag 自动化。
+22. `codex/release-workflow`：发布流程和 tag 自动化。
 
 ## 注意事项
 
