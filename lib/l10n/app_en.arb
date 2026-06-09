@@ -280,5 +280,9 @@
     }
   },
   "noMessagesMatchFilter": "No messages match this filter.",
-  "noMessages": "No messages."
+  "noMessages": "No messages.",
+  "attachments": "Attachments",
+  "emptyMessageBody": "This message has no readable body.",
+  "htmlShownAsSource": "HTML is shown as source text for now. Remote images are not loaded.",
+  "messageLoadFailed": "Could not load message."
 }

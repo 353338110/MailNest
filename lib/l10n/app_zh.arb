@@ -203,5 +203,9 @@
     }
   },
   "noMessagesMatchFilter": "没有符合此筛选条件的邮件。",
-  "noMessages": "没有邮件。"
+  "noMessages": "没有邮件。",
+  "attachments": "附件",
+  "emptyMessageBody": "这封邮件没有可读正文。",
+  "htmlShownAsSource": "当前以源码文本显示 HTML。不会加载远程图片。",
+  "messageLoadFailed": "无法加载邮件。"
 }

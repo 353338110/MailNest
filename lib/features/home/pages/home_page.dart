@@ -975,6 +975,14 @@ class _MessageTile extends StatelessWidget {
         : const TextStyle(fontWeight: FontWeight.w700);
 
     return ListTile(
+      enabled: _canOpenDetail(header.id),
+      onTap: _canOpenDetail(header.id)
+          ? () => context.push(
+              '/accounts/${Uri.encodeComponent(message.account.id)}'
+              '/folders/${Uri.encodeComponent(message.folder.id)}'
+              '/messages/${Uri.encodeComponent(header.id)}',
+            )
+          : null,
       leading: Icon(
         header.isRead ? Icons.mail_outline : Icons.mark_email_unread_outlined,
       ),
@@ -1014,6 +1022,10 @@ class _MessageTile extends StatelessWidget {
       ),
       trailing: Text(_relativeDate(header.receivedAt)),
     );
+  }
+
+  bool _canOpenDetail(String uid) {
+    return RegExp(r'^\d+$').hasMatch(uid);
   }
 
   String _relativeDate(DateTime dateTime) {

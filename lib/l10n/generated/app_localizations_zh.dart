@@ -552,6 +552,18 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get noMessages => '没有邮件。';
+
+  @override
+  String get attachments => '附件';
+
+  @override
+  String get emptyMessageBody => '这封邮件没有可读正文。';
+
+  @override
+  String get htmlShownAsSource => '当前以源码文本显示 HTML。不会加载远程图片。';
+
+  @override
+  String get messageLoadFailed => '无法加载邮件。';
 }
 
 /// The translations for Chinese, as used in China (`zh_CN`).
@@ -1033,6 +1045,18 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get noMessages => '没有邮件。';
+
+  @override
+  String get attachments => '附件';
+
+  @override
+  String get emptyMessageBody => '这封邮件没有可读正文。';
+
+  @override
+  String get htmlShownAsSource => '当前以源码文本显示 HTML。不会加载远程图片。';
+
+  @override
+  String get messageLoadFailed => '无法加载邮件。';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -1513,4 +1537,16 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get noMessages => '沒有郵件。';
+
+  @override
+  String get attachments => '附件';
+
+  @override
+  String get emptyMessageBody => '這封郵件沒有可讀內文。';
+
+  @override
+  String get htmlShownAsSource => '目前以原始碼文字顯示 HTML。不會載入遠端圖片。';
+
+  @override
+  String get messageLoadFailed => '無法載入郵件。';
 }

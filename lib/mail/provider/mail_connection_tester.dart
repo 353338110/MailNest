@@ -149,6 +149,9 @@ class MailProtocolException implements Exception {
   const MailProtocolException(this.message);
 
   final String message;
+
+  @override
+  String toString() => message;
 }
 
 class ImapFolderInfo {

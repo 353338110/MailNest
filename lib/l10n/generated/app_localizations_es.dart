@@ -570,4 +570,17 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get noMessages => 'No messages.';
+
+  @override
+  String get attachments => 'Attachments';
+
+  @override
+  String get emptyMessageBody => 'This message has no readable body.';
+
+  @override
+  String get htmlShownAsSource =>
+      'HTML is shown as source text for now. Remote images are not loaded.';
+
+  @override
+  String get messageLoadFailed => 'Could not load message.';
 }

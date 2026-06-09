@@ -381,22 +381,12 @@ flutter test
 9. `codex/backup-import`：配置导入和冲突处理。
 10. `codex/desktop-layout`：桌面三栏和响应式布局完善。
 11. `codex/mobile-navigation`：移动端 Drawer/NavigationDrawer。
-<<<<<<< HEAD
-12. `codex/gmail-oauth`：Gmail OAuth。
-13. `codex/gmail-mail-provider`：Gmail 邮件列表、详情和发信。
-14. `codex/outlook-oauth`：Outlook OAuth。
-15. `codex/outlook-mail-provider`：Outlook 邮件列表、详情和发信。
-16. `codex/translation-ui`：邮件详情和写信翻译 UI。已创建 PR #17。
-17. `codex/translation-provider`：真实翻译服务和隐私确认。
-18. `codex/release-workflow`：发布流程和 tag 自动化。
-=======
 19. `codex/gmail-mail-provider`：Gmail 邮件列表、详情和发信。
 20. `codex/outlook-oauth`：Outlook OAuth。
 21. `codex/outlook-mail-provider`：Outlook 邮件列表、详情和发信。
 22. `codex/translation-ui`：邮件详情和写信翻译 UI。
 23. `codex/translation-provider`：真实翻译服务和隐私确认。
 24. `codex/release-workflow`：发布流程和 tag 自动化。
->>>>>>> origin/main
 
 ## 注意事项
 

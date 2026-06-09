@@ -84,6 +84,10 @@ class LocalMailMessages extends Table {
   TextColumn get subject => text()();
   TextColumn get summary => text().nullable()();
   TextColumn get cachedBody => text().nullable()();
+  BoolColumn get cachedBodyIsHtml =>
+      boolean().withDefault(const Constant(false))();
+  TextColumn get rawHeaders => text().nullable()();
+  DateTimeColumn get bodyCachedAt => dateTime().nullable()();
   BoolColumn get isRead => boolean().withDefault(const Constant(false))();
   BoolColumn get isStarred => boolean().withDefault(const Constant(false))();
   BoolColumn get hasAttachments =>
@@ -95,6 +99,20 @@ class LocalMailMessages extends Table {
   List<Set<Column<Object>>> get uniqueKeys => [
     {accountId, folderName, uid},
   ];
+}
+
+class LocalMailAttachments extends Table {
+  TextColumn get id => text()();
+  TextColumn get accountId => text()();
+  TextColumn get folderName => text()();
+  IntColumn get messageUid => integer()();
+  TextColumn get fileName => text()();
+  TextColumn get mimeType => text()();
+  IntColumn get size => integer().nullable()();
+  TextColumn get contentId => text().nullable()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
 }
 
 @DataClassName('MailSyncCursorEntry')
@@ -117,6 +135,7 @@ class MailSyncCursors extends Table {
     DraftMessages,
     SentMessages,
     LocalMailMessages,
+    LocalMailAttachments,
     MailSyncCursors,
   ],
 )
@@ -125,7 +144,7 @@ class AppDatabase extends _$AppDatabase {
     : super(executor ?? driftDatabase(name: 'mailnest'));
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -142,6 +161,21 @@ class AppDatabase extends _$AppDatabase {
       }
       if (from < 3) {
         await migrator.createTable(mailSyncCursors);
+      }
+      if (from < 4) {
+        await migrator.addColumn(
+          localMailMessages,
+          localMailMessages.cachedBodyIsHtml,
+        );
+        await migrator.addColumn(
+          localMailMessages,
+          localMailMessages.rawHeaders,
+        );
+        await migrator.addColumn(
+          localMailMessages,
+          localMailMessages.bodyCachedAt,
+        );
+        await migrator.createTable(localMailAttachments);
       }
     },
   );
@@ -187,6 +221,9 @@ class AppDatabase extends _$AppDatabase {
     return transaction(() async {
       await (delete(
         localMailMessages,
+      )..where((table) => table.accountId.equals(id))).go();
+      await (delete(
+        localMailAttachments,
       )..where((table) => table.accountId.equals(id))).go();
       await (delete(
         sentMessages,
@@ -256,11 +293,63 @@ class AppDatabase extends _$AppDatabase {
     )..orderBy([(table) => OrderingTerm.desc(table.receivedAt)])).watch();
   }
 
+  Future<LocalMailMessage?> getLocalMailMessage({
+    required String accountId,
+    required String folderName,
+    required int uid,
+  }) {
+    return (select(localMailMessages)..where(
+          (table) =>
+              table.accountId.equals(accountId) &
+              table.folderName.equals(folderName) &
+              table.uid.equals(uid),
+        ))
+        .getSingleOrNull();
+  }
+
   Future<void> saveLocalMailMessages(
     List<LocalMailMessagesCompanion> messages,
   ) {
     return batch((batch) {
       batch.insertAllOnConflictUpdate(localMailMessages, messages);
+    });
+  }
+
+  Future<List<LocalMailAttachment>> getLocalMailAttachments({
+    required String accountId,
+    required String folderName,
+    required int uid,
+  }) {
+    return (select(localMailAttachments)
+          ..where(
+            (table) =>
+                table.accountId.equals(accountId) &
+                table.folderName.equals(folderName) &
+                table.messageUid.equals(uid),
+          )
+          ..orderBy([(table) => OrderingTerm.asc(table.fileName)]))
+        .get();
+  }
+
+  Future<void> cacheMailDetail({
+    required LocalMailMessagesCompanion message,
+    required List<LocalMailAttachmentsCompanion> attachments,
+  }) {
+    return transaction(() async {
+      await into(localMailMessages).insertOnConflictUpdate(message);
+      final accountId = message.accountId.value;
+      final folderName = message.folderName.value;
+      final uid = message.uid.value;
+      await (delete(localMailAttachments)..where(
+            (table) =>
+                table.accountId.equals(accountId) &
+                table.folderName.equals(folderName) &
+                table.messageUid.equals(uid),
+          ))
+          .go();
+      for (final attachment in attachments) {
+        await into(localMailAttachments).insertOnConflictUpdate(attachment);
+      }
     });
   }
 

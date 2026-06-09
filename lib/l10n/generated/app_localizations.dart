@@ -1135,6 +1135,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No messages.'**
   String get noMessages;
+
+  /// No description provided for @attachments.
+  ///
+  /// In en, this message translates to:
+  /// **'Attachments'**
+  String get attachments;
+
+  /// No description provided for @emptyMessageBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This message has no readable body.'**
+  String get emptyMessageBody;
+
+  /// No description provided for @htmlShownAsSource.
+  ///
+  /// In en, this message translates to:
+  /// **'HTML is shown as source text for now. Remote images are not loaded.'**
+  String get htmlShownAsSource;
+
+  /// No description provided for @messageLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load message.'**
+  String get messageLoadFailed;
 }
 
 class _AppLocalizationsDelegate

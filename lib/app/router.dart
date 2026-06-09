@@ -46,6 +46,14 @@ final appRouter = GoRouter(
       builder: (context, state) => const SentMessagesPage(),
     ),
     GoRoute(
+      path: '/accounts/:accountId/folders/:folderId/messages/:uid',
+      builder: (context, state) => MailDetailPage(
+        accountId: state.pathParameters['accountId'] ?? '',
+        folderId: state.pathParameters['folderId'] ?? 'inbox',
+        uid: state.pathParameters['uid'] ?? '',
+      ),
+    ),
+    GoRoute(
       path: '/settings',
       builder: (context, state) => const SettingsPage(),
     ),

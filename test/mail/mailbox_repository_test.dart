@@ -119,6 +119,7 @@ LocalMailMessage _message({
     sender: 'sender@example.com',
     recipients: accountId,
     subject: subject,
+    cachedBodyIsHtml: false,
     isRead: isRead,
     isStarred: isStarred,
     hasAttachments: false,

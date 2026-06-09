@@ -181,5 +181,9 @@
     }
   },
   "noMessagesMatchFilter": "沒有符合此篩選條件的郵件。",
-  "noMessages": "沒有郵件。"
+  "noMessages": "沒有郵件。",
+  "attachments": "附件",
+  "emptyMessageBody": "這封郵件沒有可讀內文。",
+  "htmlShownAsSource": "目前以原始碼文字顯示 HTML。不會載入遠端圖片。",
+  "messageLoadFailed": "無法載入郵件。"
 }
