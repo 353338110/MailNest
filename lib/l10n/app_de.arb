@@ -45,5 +45,14 @@
   "connectionTestSucceeded": "IMAP and SMTP connection tests passed.",
   "connectionTestFailed": "Connection test failed: {reason}",
   "passwordRequiredForConnectionTest": "Enter a password or app password before testing.",
-  "unknownError": "Unknown error"
+  "unknownError": "Unknown error",
+  "searchMail": "Search mail",
+  "searchMailHint": "Sender, recipient, subject, summary, or cached body",
+  "clearSearch": "Clear search",
+  "localSearchLocalOnlyNotice": "Search only covers mail already synced to this device. Mail that has not been synced locally will not appear.",
+  "searchMailEmptyPrompt": "Search local synced mail.",
+  "searchMailFailed": "Search failed. Try again.",
+  "noLocalSearchResults": "No local results for “{query}”.",
+  "localSearchResultCount": "{count} local results",
+  "noSubject": "(No subject)"
 }

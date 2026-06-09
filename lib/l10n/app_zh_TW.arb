@@ -45,5 +45,28 @@
   "connectionTestSucceeded": "IMAP 和 SMTP 連線測試通過。",
   "connectionTestFailed": "連線測試失敗：{reason}",
   "passwordRequiredForConnectionTest": "請先輸入密碼或授權碼再測試。",
-  "unknownError": "未知錯誤"
+  "unknownError": "未知錯誤",
+  "searchMail": "搜尋郵件",
+  "searchMailHint": "寄件人、收件人、主旨、摘要或已快取內文",
+  "clearSearch": "清除搜尋",
+  "localSearchLocalOnlyNotice": "搜尋只涵蓋已同步到此裝置的郵件。尚未同步到本機的郵件不會出現在結果中。",
+  "searchMailEmptyPrompt": "搜尋本機已同步郵件。",
+  "searchMailFailed": "搜尋失敗，請重試。",
+  "noLocalSearchResults": "沒有找到「{query}」的本機結果。",
+  "@noLocalSearchResults": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "localSearchResultCount": "{count} 筆本機結果",
+  "@localSearchResultCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noSubject": "（無主旨）"
 }

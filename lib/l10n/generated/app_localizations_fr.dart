@@ -159,4 +159,37 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get unknownError => 'Unknown error';
+
+  @override
+  String get searchMail => 'Search mail';
+
+  @override
+  String get searchMailHint =>
+      'Sender, recipient, subject, summary, or cached body';
+
+  @override
+  String get clearSearch => 'Clear search';
+
+  @override
+  String get localSearchLocalOnlyNotice =>
+      'Search only covers mail already synced to this device. Mail that has not been synced locally will not appear.';
+
+  @override
+  String get searchMailEmptyPrompt => 'Search local synced mail.';
+
+  @override
+  String get searchMailFailed => 'Search failed. Try again.';
+
+  @override
+  String noLocalSearchResults(String query) {
+    return 'No local results for “$query”.';
+  }
+
+  @override
+  String localSearchResultCount(int count) {
+    return '$count local results';
+  }
+
+  @override
+  String get noSubject => '(No subject)';
 }

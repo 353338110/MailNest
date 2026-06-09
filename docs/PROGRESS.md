@@ -72,6 +72,22 @@
 - 不记录密码、授权码、Token 或认证响应。
 - 增加连接测试结果模型测试。
 
+### PR #13：本地搜索和 FTS
+
+链接：待创建
+
+状态：本分支实现中，分支 `codex/local-search`
+
+已完成内容：
+
+- 新增本地邮件缓存表，为后续同步 PR 写入本地邮件数据提供查询目标。
+- 新增 SQLite FTS5 索引，覆盖发件人、收件人、主题、摘要、已缓存正文。
+- 新增本地搜索 repository 和 Drift 查询方法，只查询本机 SQLite 缓存。
+- 首页新增搜索入口，使用保留导航栈的二级页面跳转。
+- 新增搜索结果页，支持返回、输入搜索、清空搜索、加载/空结果/错误状态。
+- 搜索页提示未同步历史邮件时只能搜索本地已同步内容。
+- 不做远程全量搜索。
+
 ## 已验证
 
 最近一次验证命令：
@@ -148,9 +164,7 @@ flutter test
 
 ### 搜索
 
-- 本地搜索。
-- SQLite FTS。
-- 搜索发件人、收件人、主题、摘要、已缓存正文。
+- 远程全量搜索。
 
 ### Gmail
 
@@ -214,7 +228,7 @@ flutter test
 10. `codex/sent-records`：发送记录和 Sent 文件夹保存。
 11. `codex/backup-export`：加密配置导出。
 12. `codex/backup-import`：配置导入和冲突处理。
-13. `codex/local-search`：本地搜索和 FTS。
+13. `codex/local-search`：本地搜索和 FTS。（本分支）
 14. `codex/desktop-layout`：桌面三栏和响应式布局完善。
 15. `codex/mobile-navigation`：移动端 Drawer/NavigationDrawer。
 16. `codex/gmail-oauth`：Gmail OAuth。
