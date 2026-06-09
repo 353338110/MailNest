@@ -11,262 +11,36 @@
 
 ## 已完成
 
-### PR #1：第一阶段项目骨架
+### 第一阶段基础与账号
 
-链接：https://github.com/353338110/MailNest/pull/1
+- PR #1：第一阶段项目骨架，已合并。
+- PR #2：账号新增、编辑、删除、启用/停用，已合并。
+- PR #3：普通 IMAP/SMTP 连接测试，已合并。
+- PR #4：多平台构建 CI，已合并。
+- PR #5：加密配置导出，已合并。
 
-状态：已合并到 `main`
+### 邮箱列表、同步与详情
 
-已完成内容：
+- PR #6：邮箱视图导航，已合并。
+- PR #8：本地搜索和 FTS，已合并。
+- PR #12：桌面三栏和响应式布局，已合并。
+- PR #13：移动端 Drawer/NavigationDrawer，已合并。
+- PR #15：最近 30 天邮件头同步和邮件列表真实数据，已合并。
+- PR #14：邮件详情、按 UID 拉取正文、基础 MIME 解析和附件元信息缓存，已合并。
 
-- 初始化 Flutter 项目 `mailnest_app`。
-- 生成 Android、iOS、Windows、macOS、Linux 平台结构。
-- 明确未生成 Flutter Web 目录。
-- 应用标识调整为 `com.funmaster.mailnest`。
-- 配置 Material Design 3、浅色主题、深色主题。
-- 配置 Riverpod、go_router、Drift、SQLite、SecureStorage。
-- 配置 Flutter 官方 l10n。
-- 创建 11 种语言 ARB 文件，并补充 `zh` fallback。
-- 创建引导页、首页、设置页、翻译设置页、添加邮箱页。
-- 添加 QQ、网易、Gmail、Outlook、自定义邮箱入口。
-- 普通邮箱账号可填写 IMAP/SMTP 配置并保存。
-- 密码、授权码通过 SecureStorage 保存，数据库只保存 `secret_ref`。
-- 创建 `MailProvider`、`OAuthService`、`TranslationService` 抽象。
-- 创建 Gmail/Outlook TODO Provider，不做真实 OAuth。
-- 创建 GitHub Actions、Dependabot、PR 模板、Issue 模板和基础文档。
-- 修正首页到添加账号、设置、翻译设置的导航栈，二级页面可返回。
+### 写信、草稿、发送记录
 
-### PR #2：账号管理 CRUD
+- PR #7：本地草稿，已合并。
+- PR #11：发送记录和 Sent 文件夹保存，已合并。
 
-链接：https://github.com/353338110/MailNest/pull/2
+### OAuth 与翻译入口
 
-状态：已合并到 `main`
-
-已完成内容：
-
-- 账号列表点击可进入编辑页。
-- 新增账号编辑路由 `/accounts/:accountId/edit`。
-- 编辑页复用账号表单，邮箱地址只读。
-- 编辑时密码/授权码可留空，表示保留当前 SecureStorage secret。
-- 首页账号菜单支持编辑、启用/停用、删除。
-- 删除账号前显示确认弹窗。
-- 删除账号时同步删除 SecureStorage 中的 secret/token 引用。
-- 补齐账号操作相关多语言文案。
-
-### PR #3：IMAP/SMTP 连接测试
-
-链接：https://github.com/353338110/MailNest/pull/3
-
-状态：已合并到 `main`
-
-已完成内容：
-
-- 新增 `MailConnectionTester`。
-- 支持 IMAP `LOGIN` 连接测试。
-- 支持 SMTP `AUTH LOGIN` 连接测试。
-- 支持 SSL/TLS 和 STARTTLS。
-- 添加/编辑账号页新增“测试连接”按钮。
-- 新账号测试使用当前输入的密码/授权码。
-- 编辑账号时密码框留空会读取 SecureStorage 中已有 secret 测试。
-- 测试结果通过 snackbar 提示。
-- 不记录密码、授权码、Token 或认证响应。
-- 增加连接测试结果模型测试。
-
-
-### PR #15：移动端 Drawer/NavigationDrawer
-
-链接：https://github.com/353338110/MailNest/pull/13
-
-状态：已创建，CI 待验证，待合并到 `main`
-
-已完成内容：
-
-- Android/iOS 和窄屏首页使用 NavigationDrawer。
-- Drawer 提供统一收件箱、搜索、写邮件、草稿、已发送、账号和设置入口。
-- Drawer 内二级入口使用保留导航栈跳转，页面可正常返回。
-- 写邮件 FAB 在已有账号时直接进入写邮件页，无账号时保持添加账号入口。
-- 保留桌面宽屏邮箱工作台布局，不改协议逻辑。
-- 增加窄屏 Drawer 相关 widget 测试。
-
-### PR #16：Gmail OAuth
-
-链接：https://github.com/353338110/MailNest/pull/16
-
-状态：已创建，待合并
-
-已完成内容：
-
-- 新增 Gmail OAuth 授权流程。
-- 移动端使用系统浏览器和 app link 回调抽象。
-- 桌面端使用短生命周期 localhost loopback callback。
-- Google 登录强制使用系统浏览器，不在 App WebView 输入 Google 密码。
-- 使用 PKCE 授权码流程获取 token。
-- Token JSON 只保存到 SecureStorage。
-- 数据库只保存 `oauth_token_ref`，不保存 token 内容。
-- 支持 token 刷新失败提示重新授权。
-- 支持取消授权、授权超时、重新授权和账号不匹配提示。
-- Gmail 账号保存为 OAuth 账号，不实现 Gmail 邮件列表、详情或发信。
-- 补充 OAuth token 和账号 token ref 测试。
-
-
-### PR #2：最近 30 天邮件头同步和邮件列表真实数据
-
-链接：https://github.com/353338110/MailNest/pull/15
-
-状态：已创建，CI 待验证，待合并到 `main`
-
-已完成内容：
-
-- 新增邮件同步 repository，按启用账号同步最近邮件头。
-- 普通 IMAP 账号支持按文件夹拉取邮件头、UID、Message-ID、日期、发件人、收件人、主题、摘要、已读、星标和附件标记。
-- 本地保存同步游标，便于后续增量同步扩展。
-- 首页邮件列表优先展示真实本地邮件头数据，并保留加载、错误、空状态。
-- 首页新增手动同步入口，可在同步失败后重试。
-- 不实现完整正文、附件下载、发信、Gmail/Outlook 邮件同步。
-- 增加邮件同步 repository 和邮箱列表真实数据测试。
-
-### PR #4：邮箱视图导航
-
-链接：https://github.com/353338110/MailNest/pull/6
-
-状态：已创建，CI 待验证，待合并到 `main`
-
-已完成内容：
-
-- 首页从单纯账号列表改为邮箱工作台。
-- 支持统一收件箱入口。
-- 支持按账号查看本地邮件头列表。
-- 支持按账号下 Inbox、Sent、Drafts、Trash 文件夹查看。
-- 支持未读、星标、已发送、草稿箱、垃圾箱基础筛选。
-- 在真实邮件头同步完成前，使用基于账号的本地轻量邮件头样例驱动视图。
-- 保留账号添加、编辑、启用/停用、删除入口和确认流程。
-- 桌面使用左侧导航加右侧列表布局；移动端保持同页返回路径，不进入无法返回的子页面。
-- 不实现邮件详情正文、附件、发信、远程搜索。
-- 增加邮箱视图过滤 repository 测试。
-
-### PR #5：加密配置导出
-
-链接：https://github.com/353338110/MailNest/pull/5
-
-状态：已合并到 `main`
-
-已完成内容：
-
-- 设置页新增“备份与迁移”入口，并通过保留导航栈的二级页面进入，页面可返回。
-- 新增加密配置导出页面，可输入并确认导出密码。
-- 导出账号配置、IMAP/SMTP 配置、用户设置、语言设置、翻译设置。
-- 使用用户输入密码通过 PBKDF2-HMAC-SHA256 派生 AES-256-GCM 密钥加密导出文件。
-- 导出密码只在内存中用于密钥派生，不保存到数据库、SecureStorage 或导出文件。
-- 导出账号 secret/token 时只写入加密 payload，不在 UI、日志或未加密 envelope 中展示。
-- 默认不读取、不导出邮件正文、邮件头缓存、附件缓存、搜索索引。
-- 导出文件名使用 `mailnest-backup-YYYYMMDD.enc`。
-- 不实现导入功能，导入保留为后续 PR。
-- 增加配置导出 service 测试，覆盖 payload 边界、文件名和密文不含明文账号数据。
-
-
-
-### PR #10：发送记录和 Sent 文件夹保存
-
-链接：https://github.com/353338110/MailNest/pull/11
-
-状态：已创建，CI 待验证，待合并到 `main`
-
-已完成内容：
-
-- 新增本地发送记录 Drift 表和 repository。
-- SMTP 发信成功后可保存本地发送记录。
-- 新增 Sent 文件夹 IMAP APPEND 支持和失败状态记录。
-- 无法保存到远端 Sent 时保留本地记录并展示状态。
-- 首页新增已发送入口，页面可正常返回。
-- 新增发送记录列表页，支持加载、空状态和错误状态。
-- 不实现 Gmail/Outlook API 已发送同步。
-- 增加发送记录 service 测试。
-
-### PR #9：本地草稿
-
-链接：https://github.com/353338110/MailNest/pull/7
-
-状态：已创建，CI 待验证，待合并到 `main`
-
-已完成内容：
-
-- 新增本地草稿 Drift 表，草稿正文只保存在本地数据库。
-- 新增草稿 repository，支持保存、读取、列表和删除。
-- 首页新增写邮件和草稿入口，页面使用保留导航栈跳转，可正常返回。
-- 新增写邮件页面，支持填写收件人、抄送、密送、主题和正文。
-- 支持手动保存草稿和编辑已有草稿。
-- 支持删除草稿，删除前显示确认弹窗。
-- 不实现 SMTP 发信、附件、Gmail/Outlook 发信。
-- 增加草稿 repository 测试。
-
-### PR #13：本地搜索和 FTS
-
-链接：https://github.com/353338110/MailNest/pull/8
-
-状态：已创建，CI 通过，待合并到 `main`
-
-已完成内容：
-
-- 新增本地邮件缓存表，为后续同步 PR 写入本地邮件数据提供查询目标。
-- 新增 SQLite FTS5 索引，覆盖发件人、收件人、主题、摘要、已缓存正文。
-- 新增本地搜索 repository 和 Drift 查询方法，只查询本机 SQLite 缓存。
-- 首页新增搜索入口，使用保留导航栈的二级页面跳转。
-- 新增搜索结果页，支持返回、输入搜索、清空搜索、加载/空结果/错误状态。
-- 搜索页提示未同步历史邮件时只能搜索本地已同步内容。
-- 不做远程全量搜索。
-
-### PR #14：桌面三栏和响应式布局完善
-
-链接：https://github.com/353338110/MailNest/pull/12
-
-状态：已创建，base 已同步到 `main`，待验证后合并
-
-已完成内容：
-
-- 首页邮箱工作台在宽屏窗口展示三栏：账号/文件夹导航、邮件列表、邮件详情预览。
-- 首页邮箱工作台在中等宽度窗口展示两栏：账号/文件夹导航、邮件列表。
-- 首页小窗口沿用已合并的 NavigationDrawer 移动导航，不展示桌面详情栏。
-- 保留搜索、写信、草稿、已发送、设置、备份导出、翻译设置、添加账号、编辑账号等二级页面的正常返回路径。
-- 邮件详情栏使用现有本地 mailbox repository 的头部预览，不改 IMAP/SMTP、OAuth 或邮件协议逻辑。
-- 增加响应式布局和二级页返回路径 widget 测试。
-
-### PR #22：多平台构建 CI
-
-链接：https://github.com/353338110/MailNest/pull/4
-
-状态：已合并到 `main`
-
-已完成内容：
-
-- 保留 PR Check 的 `dart format`、`flutter analyze`、`flutter test` 基础检查。
-- 将 Flutter workflow 切换到 `master` channel，以匹配当前 Dart dev SDK 约束。
-- CI workflow 增加 `workflow_dispatch` 手动触发。
-- CI workflow 增加 Linux、Android、Windows、macOS、iOS 分阶段构建 job。
-- Linux/Android 构建使用 Ubuntu runner。
-- Windows 构建使用 Windows runner。
-- macOS/iOS 构建使用 macOS runner。
-- iOS 构建使用 `--no-codesign`，避免 CI 依赖签名证书。
-- 手动触发 CI 时可按平台选择是否运行重平台构建。
-
-### PR #20：邮件详情和写信翻译 UI
-
-链接：https://github.com/353338110/MailNest/pull/17
-
-状态：已创建，base 为 `main`，待验证后合并
-
-已完成内容：
-
-- 新增邮件详情翻译入口和目标语言选择。
-- 写邮件/草稿页新增翻译当前正文入口。
-- 使用 `MockTranslationService`，不接入真实翻译 API。
-- 支持原文/译文切换、复制译文、写信正文使用译文。
-- 空正文和翻译失败通过弹层内提示展示。
-- 邮件详情页、写邮件页可返回，翻译弹层可取消。
-- 在邮件详情真实数据接入前提供可打开的详情预览路由，后续可通过路由 `extra` 接入真实 `MailDetail`。
+- PR #16：Gmail OAuth，已合并。
+- PR #17：邮件详情和写信翻译 UI，已合并。
 
 ## 已验证
 
-最近一次验证命令：
+最近一次功能 PR 合并前，本地和 GitHub Actions 均通过：
 
 ```sh
 dart format --output=none --set-exit-if-changed .
@@ -274,35 +48,26 @@ flutter analyze
 flutter test
 ```
 
-验证结果：通过。
+说明：测试中仍可能输出 Drift 多数据库 warning，目前不影响通过结果，后续可单独清理测试 provider 覆写。
 
 ## 未完成
 
-### 邮件基础同步
+### 邮件同步
 
-- IMAP 文件夹列表同步。
-- 本地保存文件夹列表。
-- 真实同步状态持久化和更完整的增量同步游标。
-- 统一收件箱接入真实数据源。
-- 按账号查看真实邮件。
-- 按文件夹查看真实邮件。
-- 未读、星标、已发送、草稿箱、垃圾箱等基础视图接入真实状态。
+- IMAP 文件夹列表同步和本地保存。
+- 更完整的真实同步状态持久化。
+- 多文件夹增量同步策略完善。
+- Gmail/Outlook 邮件列表同步。
 
-### 邮件详情与 MIME
+### 邮件详情与 HTML
 
-- 邮件详情页。
-- 按 UID 拉取完整邮件。
-- MIME 解析。
-- 纯文本正文展示。
-- HTML 正文展示。
-- base64、quoted-printable 解码。
+- HTML 正文安全渲染。
 - 远程图片默认拦截。
 - “加载远程图片”交互。
 - 外部链接使用系统浏览器打开。
 
 ### 附件
 
-- 附件元信息展示。
 - 附件类型图标。
 - 附件下载。
 - 附件本地缓存。
@@ -311,16 +76,9 @@ flutter test
 
 ### 写邮件与发信
 
-- 写邮件页面。
-- SMTP 发信。
+- SMTP 发信主流程接入写邮件页。
 - 回复、回复全部、转发。
-- 添加收件人、抄送、密送。
 - 添加/删除附件。
-- 发送记录与远端 Sent 状态接入真实发信流程。
-
-### 草稿
-
-- 自动保存草稿。
 - 发送草稿。
 
 ### 配置导入导出
@@ -371,22 +129,21 @@ flutter test
 建议按以下顺序继续，每项一个 PR：
 
 1. `codex/mail-folder-sync`：IMAP 文件夹列表同步和本地保存。
-2. `codex/mail-detail-mime`：邮件详情、正文拉取、MIME 解析。
-3. `codex/html-rendering-privacy`：HTML 渲染、远程图片拦截、外部链接处理。
-4. `codex/attachments-cache`：附件列表、下载、缓存和打开。
-5. `codex/composer-smtp-send`：写邮件和 SMTP 发信。
-6. `codex/reply-forward`：回复、回复全部、转发。
-7. `codex/drafts`：本地草稿。
-8. `codex/sent-records`：发送记录和 Sent 文件夹保存。
-9. `codex/backup-import`：配置导入和冲突处理。
-10. `codex/desktop-layout`：桌面三栏和响应式布局完善。
-11. `codex/mobile-navigation`：移动端 Drawer/NavigationDrawer。
-19. `codex/gmail-mail-provider`：Gmail 邮件列表、详情和发信。
-20. `codex/outlook-oauth`：Outlook OAuth。
-21. `codex/outlook-mail-provider`：Outlook 邮件列表、详情和发信。
-22. `codex/translation-ui`：邮件详情和写信翻译 UI。
-23. `codex/translation-provider`：真实翻译服务和隐私确认。
-24. `codex/release-workflow`：发布流程和 tag 自动化。
+2. `codex/html-rendering-privacy`：HTML 渲染、远程图片拦截、外部链接处理。
+3. `codex/attachments-cache`：附件下载、缓存和打开。
+4. `codex/composer-smtp-send`：写邮件页接入 SMTP 发信。
+5. `codex/reply-forward`：回复、回复全部、转发。
+6. `codex/backup-import`：配置导入和冲突处理。
+7. `codex/gmail-mail-provider`：Gmail 邮件列表、详情和发信。
+8. `codex/outlook-oauth`：Outlook OAuth。
+9. `codex/outlook-mail-provider`：Outlook 邮件列表、详情和发信。
+10. `codex/translation-provider`：真实翻译服务和隐私确认。
+11. `codex/release-workflow`：发布流程和 tag 自动化。
+
+## 开放 PR
+
+- PR #9：Dependabot，`actions/checkout` 4 -> 6，待验证和合并。
+- PR #10：Dependabot，`drift_flutter` 0.2.8 -> 0.3.0，待验证和合并。
 
 ## 注意事项
 
