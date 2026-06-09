@@ -16,6 +16,8 @@ class AccountRepository {
 
   Stream<List<EmailAccount>> watchAccounts() => database.watchAccounts();
 
+  Future<EmailAccount?> getAccount(String id) => database.getAccount(id);
+
   Future<void> savePasswordAccount({
     required String emailAddress,
     required String username,
@@ -57,6 +59,75 @@ class AccountRepository {
         updatedAt: Value(now),
       ),
     );
+  }
+
+  Future<void> updatePasswordAccount({
+    required EmailAccount current,
+    required String username,
+    required EmailProviderType provider,
+    required String imapHost,
+    required int imapPort,
+    required String imapSecurity,
+    required String smtpHost,
+    required int smtpPort,
+    required String smtpSecurity,
+    required bool smtpStartTls,
+    String? displayName,
+    String? newSecret,
+  }) async {
+    final secretRef = current.secretRef ?? 'account:${current.id}:password';
+    if (newSecret != null && newSecret.isNotEmpty) {
+      await secureStorage.writeSecret(ref: secretRef, value: newSecret);
+    }
+
+    await database.saveAccount(
+      EmailAccountsCompanion(
+        id: Value(current.id),
+        emailAddress: Value(current.emailAddress),
+        displayName: Value(displayName),
+        provider: Value(provider.storageValue),
+        username: Value(username),
+        authType: Value(current.authType),
+        imapHost: Value(imapHost),
+        imapPort: Value(imapPort),
+        imapSecurity: Value(imapSecurity),
+        smtpHost: Value(smtpHost),
+        smtpPort: Value(smtpPort),
+        smtpSecurity: Value(smtpSecurity),
+        smtpStartTls: Value(smtpStartTls),
+        secretRef: Value(secretRef),
+        oauthTokenRef: Value(current.oauthTokenRef),
+        syncEnabled: Value(current.syncEnabled),
+        createdAt: Value(current.createdAt),
+        updatedAt: Value(DateTime.now()),
+      ),
+    );
+  }
+
+  Future<void> setSyncEnabled({
+    required String accountId,
+    required bool enabled,
+  }) {
+    return database.setAccountSyncEnabled(accountId, enabled);
+  }
+
+  Future<void> deleteAccount(String accountId) async {
+    final account = await database.getAccount(accountId);
+    if (account == null) {
+      return;
+    }
+
+    final secretRef = account.secretRef;
+    final oauthTokenRef = account.oauthTokenRef;
+    await database.deleteAccount(accountId);
+
+    // Secrets are removed after the row is gone so stale UI cannot still use it.
+    if (secretRef != null) {
+      await secureStorage.deleteSecret(secretRef);
+    }
+    if (oauthTokenRef != null) {
+      await secureStorage.deleteSecret(oauthTokenRef);
+    }
   }
 
   String _accountId(String emailAddress) {

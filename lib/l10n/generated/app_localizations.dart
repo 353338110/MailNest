@@ -289,6 +289,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Custom mail'**
   String get customMail;
+
+  /// No description provided for @editAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit account'**
+  String get editAccount;
+
+  /// No description provided for @updateAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Update account'**
+  String get updateAccount;
+
+  /// No description provided for @accountUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Account updated.'**
+  String get accountUpdated;
+
+  /// No description provided for @accountNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Account not found.'**
+  String get accountNotFound;
+
+  /// No description provided for @accountActions.
+  ///
+  /// In en, this message translates to:
+  /// **'Account actions'**
+  String get accountActions;
+
+  /// No description provided for @enableAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable account'**
+  String get enableAccount;
+
+  /// No description provided for @disableAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Disable account'**
+  String get disableAccount;
+
+  /// No description provided for @deleteAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete account'**
+  String get deleteAccount;
+
+  /// No description provided for @deleteAccountTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete account?'**
+  String get deleteAccountTitle;
+
+  /// No description provided for @deleteAccountMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete {emailAddress} from this device? Its saved secret will also be removed.'**
+  String deleteAccountMessage(String emailAddress);
+
+  /// No description provided for @accountDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Account deleted.'**
+  String get accountDeleted;
+
+  /// No description provided for @cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
+
+  /// No description provided for @leavePasswordUnchanged.
+  ///
+  /// In en, this message translates to:
+  /// **'New password or app password (leave blank to keep current)'**
+  String get leavePasswordUnchanged;
 }
 
 class _AppLocalizationsDelegate

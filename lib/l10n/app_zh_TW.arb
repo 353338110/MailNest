@@ -27,5 +27,18 @@
   "ok": "確定",
   "qqMail": "QQ 信箱",
   "neteaseMail": "網易信箱",
-  "customMail": "自訂信箱"
+  "customMail": "自訂信箱",
+  "editAccount": "編輯帳號",
+  "updateAccount": "更新帳號",
+  "accountUpdated": "帳號已更新。",
+  "accountNotFound": "找不到帳號。",
+  "accountActions": "帳號操作",
+  "enableAccount": "啟用帳號",
+  "disableAccount": "停用帳號",
+  "deleteAccount": "刪除帳號",
+  "deleteAccountTitle": "刪除帳號？",
+  "deleteAccountMessage": "要從此裝置刪除 {emailAddress} 嗎？儲存的密鑰也會一併移除。",
+  "accountDeleted": "帳號已刪除。",
+  "cancel": "取消",
+  "leavePasswordUnchanged": "新密碼或授權碼（留空則保持不變）"
 }
