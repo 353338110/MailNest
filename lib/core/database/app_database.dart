@@ -51,7 +51,6 @@ class DraftMessages extends Table {
   Set<Column<Object>> get primaryKey => {id};
 }
 
-
 class LocalMailMessages extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get accountId => text()();
