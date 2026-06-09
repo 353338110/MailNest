@@ -397,6 +397,204 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Unknown error'**
   String get unknownError;
+
+  /// No description provided for @searchMail.
+  ///
+  /// In en, this message translates to:
+  /// **'Search mail'**
+  String get searchMail;
+
+  /// No description provided for @searchMailHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Sender, recipient, subject, summary, or cached body'**
+  String get searchMailHint;
+
+  /// No description provided for @clearSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear search'**
+  String get clearSearch;
+
+  /// No description provided for @localSearchLocalOnlyNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Search only covers mail already synced to this device. Mail that has not been synced locally will not appear.'**
+  String get localSearchLocalOnlyNotice;
+
+  /// No description provided for @searchMailEmptyPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Search local synced mail.'**
+  String get searchMailEmptyPrompt;
+
+  /// No description provided for @searchMailFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Search failed. Try again.'**
+  String get searchMailFailed;
+
+  /// No description provided for @noLocalSearchResults.
+  ///
+  /// In en, this message translates to:
+  /// **'No local results for “{query}”.'**
+  String noLocalSearchResults(String query);
+
+  /// No description provided for @localSearchResultCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} local results'**
+  String localSearchResultCount(int count);
+
+  /// No description provided for @noSubject.
+  ///
+  /// In en, this message translates to:
+  /// **'(No subject)'**
+  String get noSubject;
+
+  /// No description provided for @backupAndMigration.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup and migration'**
+  String get backupAndMigration;
+
+  /// No description provided for @backupAndMigrationSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Export an encrypted configuration backup.'**
+  String get backupAndMigrationSubtitle;
+
+  /// No description provided for @exportConfiguration.
+  ///
+  /// In en, this message translates to:
+  /// **'Export configuration'**
+  String get exportConfiguration;
+
+  /// No description provided for @backupExportDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Create an encrypted backup of account configuration, server settings, and app preferences. Import will be added later.'**
+  String get backupExportDescription;
+
+  /// No description provided for @backupIncludes.
+  ///
+  /// In en, this message translates to:
+  /// **'Included'**
+  String get backupIncludes;
+
+  /// No description provided for @backupIncludesAccounts.
+  ///
+  /// In en, this message translates to:
+  /// **'Account configuration'**
+  String get backupIncludesAccounts;
+
+  /// No description provided for @backupIncludesServerSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'IMAP and SMTP configuration'**
+  String get backupIncludesServerSettings;
+
+  /// No description provided for @backupIncludesUserSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'User settings'**
+  String get backupIncludesUserSettings;
+
+  /// No description provided for @backupIncludesLanguageSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Language settings'**
+  String get backupIncludesLanguageSettings;
+
+  /// No description provided for @backupIncludesTranslationSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Translation settings'**
+  String get backupIncludesTranslationSettings;
+
+  /// No description provided for @backupExcludes.
+  ///
+  /// In en, this message translates to:
+  /// **'Not included by default'**
+  String get backupExcludes;
+
+  /// No description provided for @backupExcludesMailBodies.
+  ///
+  /// In en, this message translates to:
+  /// **'Email bodies'**
+  String get backupExcludesMailBodies;
+
+  /// No description provided for @backupExcludesHeaderCache.
+  ///
+  /// In en, this message translates to:
+  /// **'Email header cache'**
+  String get backupExcludesHeaderCache;
+
+  /// No description provided for @backupExcludesAttachmentCache.
+  ///
+  /// In en, this message translates to:
+  /// **'Attachment cache'**
+  String get backupExcludesAttachmentCache;
+
+  /// No description provided for @backupExcludesSearchIndex.
+  ///
+  /// In en, this message translates to:
+  /// **'Search index'**
+  String get backupExcludesSearchIndex;
+
+  /// No description provided for @exportPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Export password'**
+  String get exportPassword;
+
+  /// No description provided for @confirmExportPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm export password'**
+  String get confirmExportPassword;
+
+  /// No description provided for @exportPasswordsDoNotMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords do not match.'**
+  String get exportPasswordsDoNotMatch;
+
+  /// No description provided for @exportPasswordNotSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'This password encrypts the export file and is not saved by MailNest.'**
+  String get exportPasswordNotSaved;
+
+  /// No description provided for @exportBackup.
+  ///
+  /// In en, this message translates to:
+  /// **'Export backup'**
+  String get exportBackup;
+
+  /// No description provided for @exportingBackup.
+  ///
+  /// In en, this message translates to:
+  /// **'Exporting...'**
+  String get exportingBackup;
+
+  /// No description provided for @backupExported.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup exported: {fileName}'**
+  String backupExported(String fileName);
+
+  /// No description provided for @backupExportedTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved to {filePath}'**
+  String backupExportedTo(String filePath);
+
+  /// No description provided for @backupExportFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup export failed.'**
+  String get backupExportFailed;
 }
 
 class _AppLocalizationsDelegate

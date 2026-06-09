@@ -45,5 +45,52 @@
   "connectionTestSucceeded": "IMAP 和 SMTP 连接测试通过。",
   "connectionTestFailed": "连接测试失败：{reason}",
   "passwordRequiredForConnectionTest": "请先输入密码或授权码再测试。",
-  "unknownError": "未知错误"
+  "unknownError": "未知错误",
+  "searchMail": "搜索邮件",
+  "searchMailHint": "发件人、收件人、主题、摘要或已缓存正文",
+  "clearSearch": "清除搜索",
+  "localSearchLocalOnlyNotice": "搜索只覆盖已同步到本设备的邮件。尚未同步到本地的邮件不会出现在结果中。",
+  "searchMailEmptyPrompt": "搜索本地已同步邮件。",
+  "searchMailFailed": "搜索失败，请重试。",
+  "noLocalSearchResults": "没有找到“{query}”的本地结果。",
+  "@noLocalSearchResults": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "localSearchResultCount": "{count} 条本地结果",
+  "@localSearchResultCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noSubject": "（无主题）",
+  "backupAndMigration": "备份与迁移",
+  "backupAndMigrationSubtitle": "导出加密配置备份。",
+  "exportConfiguration": "导出配置",
+  "backupExportDescription": "创建包含账号配置、服务器设置和应用偏好的加密备份。导入功能将在后续版本添加。",
+  "backupIncludes": "导出内容",
+  "backupIncludesAccounts": "账号配置",
+  "backupIncludesServerSettings": "IMAP 和 SMTP 配置",
+  "backupIncludesUserSettings": "用户设置",
+  "backupIncludesLanguageSettings": "语言设置",
+  "backupIncludesTranslationSettings": "翻译设置",
+  "backupExcludes": "默认不导出",
+  "backupExcludesMailBodies": "邮件正文",
+  "backupExcludesHeaderCache": "邮件头缓存",
+  "backupExcludesAttachmentCache": "附件缓存",
+  "backupExcludesSearchIndex": "搜索索引",
+  "exportPassword": "导出密码",
+  "confirmExportPassword": "确认导出密码",
+  "exportPasswordsDoNotMatch": "两次输入的密码不一致。",
+  "exportPasswordNotSaved": "此密码只用于加密导出文件，MailNest 不会保存。",
+  "exportBackup": "导出备份",
+  "exportingBackup": "正在导出...",
+  "backupExported": "备份已导出：{fileName}",
+  "backupExportedTo": "已保存到 {filePath}",
+  "backupExportFailed": "备份导出失败。"
 }

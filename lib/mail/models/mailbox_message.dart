@@ -31,10 +31,7 @@ class AccountMailboxScope extends MailboxScope {
 }
 
 class FolderMailboxScope extends MailboxScope {
-  const FolderMailboxScope({
-    required this.accountId,
-    required this.folderId,
-  });
+  const FolderMailboxScope({required this.accountId, required this.folderId});
 
   final String accountId;
   final String folderId;

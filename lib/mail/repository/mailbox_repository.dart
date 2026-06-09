@@ -24,12 +24,15 @@ class MailboxRepository {
       _ => null,
     };
 
-    final messages = scopedAccounts
-        .expand(_seedMessages)
-        .where((message) => folderId == null || message.folder.id == folderId)
-        .where((message) => _matchesFilter(message, filter))
-        .toList()
-      ..sort((a, b) => b.header.receivedAt.compareTo(a.header.receivedAt));
+    final messages =
+        scopedAccounts
+            .expand(_seedMessages)
+            .where(
+              (message) => folderId == null || message.folder.id == folderId,
+            )
+            .where((message) => _matchesFilter(message, filter))
+            .toList()
+          ..sort((a, b) => b.header.receivedAt.compareTo(a.header.receivedAt));
 
     return messages;
   }
