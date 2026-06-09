@@ -907,6 +907,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Folder navigation will be available after mail sync is added.'**
   String get foldersFutureNotice;
+
+  /// No description provided for @mailDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Message'**
+  String get mailDetail;
+
+  /// No description provided for @attachments.
+  ///
+  /// In en, this message translates to:
+  /// **'Attachments'**
+  String get attachments;
+
+  /// No description provided for @emptyMessageBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This message has no readable body.'**
+  String get emptyMessageBody;
+
+  /// No description provided for @htmlShownAsSource.
+  ///
+  /// In en, this message translates to:
+  /// **'HTML is shown as source text for now. Remote images are not loaded.'**
+  String get htmlShownAsSource;
+
+  /// No description provided for @messageLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load message.'**
+  String get messageLoadFailed;
+
+  /// No description provided for @noCachedMessages.
+  ///
+  /// In en, this message translates to:
+  /// **'No cached messages yet.'**
+  String get noCachedMessages;
 }
 
 class _AppLocalizationsDelegate

@@ -448,4 +448,23 @@ class AppLocalizationsKo extends AppLocalizations {
   @override
   String get foldersFutureNotice =>
       'Folder navigation will be available after mail sync is added.';
+
+  @override
+  String get mailDetail => 'Message';
+
+  @override
+  String get attachments => 'Attachments';
+
+  @override
+  String get emptyMessageBody => 'This message has no readable body.';
+
+  @override
+  String get htmlShownAsSource =>
+      'HTML is shown as source text for now. Remote images are not loaded.';
+
+  @override
+  String get messageLoadFailed => 'Could not load message.';
+
+  @override
+  String get noCachedMessages => 'No cached messages yet.';
 }

@@ -198,6 +198,23 @@
 - 搜索页提示未同步历史邮件时只能搜索本地已同步内容。
 - 不做远程全量搜索。
 
+### PR #14：邮件详情与 MIME
+
+链接：https://github.com/353338110/MailNest/pull/14
+
+状态：本分支 `codex/mail-detail-mime`，base 已更新为 `main`
+
+已完成内容：
+
+- 新增邮件详情页，真实数字 UID 邮件列表项可点击进入，详情页保留返回路径。
+- 普通 IMAP 账号支持按 UID 执行 `UID FETCH ... BODY.PEEK[]` 拉取完整邮件原文。
+- 新增基础 MIME 解析器，支持纯文本、HTML body 选择、base64、quoted-printable、常见 RFC 2047 header decode。
+- 在 `local_mail_messages` 中缓存已解析正文、正文类型、原始 header 和缓存时间。
+- 新增本地附件元信息表，只保存文件名、MIME 类型、大小和 Content-ID，不下载附件内容。
+- 删除账号时同步清理该账号的本地邮件正文与附件元信息缓存。
+- HTML 当前仅以源码文本展示，不加载远程图片。
+- 不实现附件下载、不实现远程图片加载、不实现发信/Gmail/Outlook。
+
 ### PR #22：多平台构建 CI
 
 链接：https://github.com/353338110/MailNest/pull/4
@@ -244,22 +261,13 @@ flutter test
 
 ### 邮件详情与 MIME
 
-- 邮件详情页。
-- 按 UID 拉取完整邮件。
-- MIME 解析。
-- 纯文本正文展示。
-- HTML 正文展示。
-- base64、quoted-printable 解码。
 - 远程图片默认拦截。
 - “加载远程图片”交互。
 - 外部链接使用系统浏览器打开。
 
 ### 附件
 
-- 附件元信息展示。
-- 附件类型图标。
 - 附件下载。
-- 附件本地缓存。
 - 使用系统方式打开附件。
 - 附件缓存清理。
 
@@ -331,7 +339,7 @@ flutter test
 
 1. `codex/mail-folder-sync`：IMAP 文件夹列表同步和本地保存。
 2. `codex/mail-header-sync`：最近 30 天邮件头同步和邮件列表真实数据。
-3. `codex/mail-detail-mime`：邮件详情、正文拉取、MIME 解析。
+3. `codex/mail-detail-mime`：邮件详情、正文拉取、MIME 解析。PR #14 已创建，base 已更新为 `main`。
 4. `codex/html-rendering-privacy`：HTML 渲染、远程图片拦截、外部链接处理。
 5. `codex/attachments-cache`：附件列表、下载、缓存和打开。
 6. `codex/composer-smtp-send`：写邮件和 SMTP 发信。

@@ -5,6 +5,7 @@ class MailHeader {
     required this.subject,
     required this.sender,
     required this.receivedAt,
+    this.folderId = 'inbox',
     this.preview,
     this.isRead = false,
     this.isStarred = false,
@@ -15,6 +16,7 @@ class MailHeader {
   final String subject;
   final String sender;
   final DateTime receivedAt;
+  final String folderId;
   final String? preview;
   final bool isRead;
   final bool isStarred;

@@ -5,6 +5,7 @@ import '../features/backup/pages/backup_export_page.dart';
 import '../features/drafts/pages/compose_mail_page.dart';
 import '../features/drafts/pages/drafts_page.dart';
 import '../features/home/pages/home_page.dart';
+import '../features/mail/pages/mail_detail_page.dart';
 import '../features/onboarding/pages/onboarding_page.dart';
 import '../features/search/pages/local_search_page.dart';
 import '../features/sent/pages/sent_messages_page.dart';
@@ -42,6 +43,14 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/sent',
       builder: (context, state) => const SentMessagesPage(),
+    ),
+    GoRoute(
+      path: '/accounts/:accountId/folders/:folderId/messages/:uid',
+      builder: (context, state) => MailDetailPage(
+        accountId: state.pathParameters['accountId'] ?? '',
+        folderId: state.pathParameters['folderId'] ?? 'inbox',
+        uid: state.pathParameters['uid'] ?? '',
+      ),
     ),
     GoRoute(
       path: '/settings',

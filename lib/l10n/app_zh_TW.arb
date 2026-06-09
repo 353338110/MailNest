@@ -127,5 +127,11 @@
   "accounts": "帳號",
   "composeEmail": "寫郵件",
   "composeFutureNotice": "寫郵件功能將在後續版本提供。",
-  "foldersFutureNotice": "加入郵件同步後將支援資料夾導覽。"
+  "foldersFutureNotice": "加入郵件同步後將支援資料夾導覽。",
+  "mailDetail": "郵件詳情",
+  "attachments": "附件",
+  "emptyMessageBody": "這封郵件沒有可讀內文。",
+  "htmlShownAsSource": "目前以原始碼文字顯示 HTML。不會載入遠端圖片。",
+  "messageLoadFailed": "無法載入郵件。",
+  "noCachedMessages": "暫無已快取郵件。"
 }

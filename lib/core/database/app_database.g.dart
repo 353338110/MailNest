@@ -2864,6 +2864,43 @@ class $LocalMailMessagesTable extends LocalMailMessages
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _cachedBodyIsHtmlMeta = const VerificationMeta(
+    'cachedBodyIsHtml',
+  );
+  @override
+  late final GeneratedColumn<bool> cachedBodyIsHtml = GeneratedColumn<bool>(
+    'cached_body_is_html',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("cached_body_is_html" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _rawHeadersMeta = const VerificationMeta(
+    'rawHeaders',
+  );
+  @override
+  late final GeneratedColumn<String> rawHeaders = GeneratedColumn<String>(
+    'raw_headers',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _bodyCachedAtMeta = const VerificationMeta(
+    'bodyCachedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> bodyCachedAt = GeneratedColumn<DateTime>(
+    'body_cached_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _isReadMeta = const VerificationMeta('isRead');
   @override
   late final GeneratedColumn<bool> isRead = GeneratedColumn<bool>(
@@ -2941,6 +2978,9 @@ class $LocalMailMessagesTable extends LocalMailMessages
     subject,
     summary,
     cachedBody,
+    cachedBodyIsHtml,
+    rawHeaders,
+    bodyCachedAt,
     isRead,
     isStarred,
     hasAttachments,
@@ -3026,6 +3066,30 @@ class $LocalMailMessagesTable extends LocalMailMessages
       context.handle(
         _cachedBodyMeta,
         cachedBody.isAcceptableOrUnknown(data['cached_body']!, _cachedBodyMeta),
+      );
+    }
+    if (data.containsKey('cached_body_is_html')) {
+      context.handle(
+        _cachedBodyIsHtmlMeta,
+        cachedBodyIsHtml.isAcceptableOrUnknown(
+          data['cached_body_is_html']!,
+          _cachedBodyIsHtmlMeta,
+        ),
+      );
+    }
+    if (data.containsKey('raw_headers')) {
+      context.handle(
+        _rawHeadersMeta,
+        rawHeaders.isAcceptableOrUnknown(data['raw_headers']!, _rawHeadersMeta),
+      );
+    }
+    if (data.containsKey('body_cached_at')) {
+      context.handle(
+        _bodyCachedAtMeta,
+        bodyCachedAt.isAcceptableOrUnknown(
+          data['body_cached_at']!,
+          _bodyCachedAtMeta,
+        ),
       );
     }
     if (data.containsKey('is_read')) {
@@ -3118,6 +3182,18 @@ class $LocalMailMessagesTable extends LocalMailMessages
         DriftSqlType.string,
         data['${effectivePrefix}cached_body'],
       ),
+      cachedBodyIsHtml: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}cached_body_is_html'],
+      )!,
+      rawHeaders: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}raw_headers'],
+      ),
+      bodyCachedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}body_cached_at'],
+      ),
       isRead: attachedDatabase.typeMapping.read(
         DriftSqlType.bool,
         data['${effectivePrefix}is_read'],
@@ -3159,6 +3235,9 @@ class LocalMailMessage extends DataClass
   final String subject;
   final String? summary;
   final String? cachedBody;
+  final bool cachedBodyIsHtml;
+  final String? rawHeaders;
+  final DateTime? bodyCachedAt;
   final bool isRead;
   final bool isStarred;
   final bool hasAttachments;
@@ -3175,6 +3254,9 @@ class LocalMailMessage extends DataClass
     required this.subject,
     this.summary,
     this.cachedBody,
+    required this.cachedBodyIsHtml,
+    this.rawHeaders,
+    this.bodyCachedAt,
     required this.isRead,
     required this.isStarred,
     required this.hasAttachments,
@@ -3199,6 +3281,13 @@ class LocalMailMessage extends DataClass
     }
     if (!nullToAbsent || cachedBody != null) {
       map['cached_body'] = Variable<String>(cachedBody);
+    }
+    map['cached_body_is_html'] = Variable<bool>(cachedBodyIsHtml);
+    if (!nullToAbsent || rawHeaders != null) {
+      map['raw_headers'] = Variable<String>(rawHeaders);
+    }
+    if (!nullToAbsent || bodyCachedAt != null) {
+      map['body_cached_at'] = Variable<DateTime>(bodyCachedAt);
     }
     map['is_read'] = Variable<bool>(isRead);
     map['is_starred'] = Variable<bool>(isStarred);
@@ -3226,6 +3315,13 @@ class LocalMailMessage extends DataClass
       cachedBody: cachedBody == null && nullToAbsent
           ? const Value.absent()
           : Value(cachedBody),
+      cachedBodyIsHtml: Value(cachedBodyIsHtml),
+      rawHeaders: rawHeaders == null && nullToAbsent
+          ? const Value.absent()
+          : Value(rawHeaders),
+      bodyCachedAt: bodyCachedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(bodyCachedAt),
       isRead: Value(isRead),
       isStarred: Value(isStarred),
       hasAttachments: Value(hasAttachments),
@@ -3250,6 +3346,9 @@ class LocalMailMessage extends DataClass
       subject: serializer.fromJson<String>(json['subject']),
       summary: serializer.fromJson<String?>(json['summary']),
       cachedBody: serializer.fromJson<String?>(json['cachedBody']),
+      cachedBodyIsHtml: serializer.fromJson<bool>(json['cachedBodyIsHtml']),
+      rawHeaders: serializer.fromJson<String?>(json['rawHeaders']),
+      bodyCachedAt: serializer.fromJson<DateTime?>(json['bodyCachedAt']),
       isRead: serializer.fromJson<bool>(json['isRead']),
       isStarred: serializer.fromJson<bool>(json['isStarred']),
       hasAttachments: serializer.fromJson<bool>(json['hasAttachments']),
@@ -3271,6 +3370,9 @@ class LocalMailMessage extends DataClass
       'subject': serializer.toJson<String>(subject),
       'summary': serializer.toJson<String?>(summary),
       'cachedBody': serializer.toJson<String?>(cachedBody),
+      'cachedBodyIsHtml': serializer.toJson<bool>(cachedBodyIsHtml),
+      'rawHeaders': serializer.toJson<String?>(rawHeaders),
+      'bodyCachedAt': serializer.toJson<DateTime?>(bodyCachedAt),
       'isRead': serializer.toJson<bool>(isRead),
       'isStarred': serializer.toJson<bool>(isStarred),
       'hasAttachments': serializer.toJson<bool>(hasAttachments),
@@ -3290,6 +3392,9 @@ class LocalMailMessage extends DataClass
     String? subject,
     Value<String?> summary = const Value.absent(),
     Value<String?> cachedBody = const Value.absent(),
+    bool? cachedBodyIsHtml,
+    Value<String?> rawHeaders = const Value.absent(),
+    Value<DateTime?> bodyCachedAt = const Value.absent(),
     bool? isRead,
     bool? isStarred,
     bool? hasAttachments,
@@ -3306,6 +3411,9 @@ class LocalMailMessage extends DataClass
     subject: subject ?? this.subject,
     summary: summary.present ? summary.value : this.summary,
     cachedBody: cachedBody.present ? cachedBody.value : this.cachedBody,
+    cachedBodyIsHtml: cachedBodyIsHtml ?? this.cachedBodyIsHtml,
+    rawHeaders: rawHeaders.present ? rawHeaders.value : this.rawHeaders,
+    bodyCachedAt: bodyCachedAt.present ? bodyCachedAt.value : this.bodyCachedAt,
     isRead: isRead ?? this.isRead,
     isStarred: isStarred ?? this.isStarred,
     hasAttachments: hasAttachments ?? this.hasAttachments,
@@ -3330,6 +3438,15 @@ class LocalMailMessage extends DataClass
       cachedBody: data.cachedBody.present
           ? data.cachedBody.value
           : this.cachedBody,
+      cachedBodyIsHtml: data.cachedBodyIsHtml.present
+          ? data.cachedBodyIsHtml.value
+          : this.cachedBodyIsHtml,
+      rawHeaders: data.rawHeaders.present
+          ? data.rawHeaders.value
+          : this.rawHeaders,
+      bodyCachedAt: data.bodyCachedAt.present
+          ? data.bodyCachedAt.value
+          : this.bodyCachedAt,
       isRead: data.isRead.present ? data.isRead.value : this.isRead,
       isStarred: data.isStarred.present ? data.isStarred.value : this.isStarred,
       hasAttachments: data.hasAttachments.present
@@ -3355,6 +3472,9 @@ class LocalMailMessage extends DataClass
           ..write('subject: $subject, ')
           ..write('summary: $summary, ')
           ..write('cachedBody: $cachedBody, ')
+          ..write('cachedBodyIsHtml: $cachedBodyIsHtml, ')
+          ..write('rawHeaders: $rawHeaders, ')
+          ..write('bodyCachedAt: $bodyCachedAt, ')
           ..write('isRead: $isRead, ')
           ..write('isStarred: $isStarred, ')
           ..write('hasAttachments: $hasAttachments, ')
@@ -3376,6 +3496,9 @@ class LocalMailMessage extends DataClass
     subject,
     summary,
     cachedBody,
+    cachedBodyIsHtml,
+    rawHeaders,
+    bodyCachedAt,
     isRead,
     isStarred,
     hasAttachments,
@@ -3396,6 +3519,9 @@ class LocalMailMessage extends DataClass
           other.subject == this.subject &&
           other.summary == this.summary &&
           other.cachedBody == this.cachedBody &&
+          other.cachedBodyIsHtml == this.cachedBodyIsHtml &&
+          other.rawHeaders == this.rawHeaders &&
+          other.bodyCachedAt == this.bodyCachedAt &&
           other.isRead == this.isRead &&
           other.isStarred == this.isStarred &&
           other.hasAttachments == this.hasAttachments &&
@@ -3414,6 +3540,9 @@ class LocalMailMessagesCompanion extends UpdateCompanion<LocalMailMessage> {
   final Value<String> subject;
   final Value<String?> summary;
   final Value<String?> cachedBody;
+  final Value<bool> cachedBodyIsHtml;
+  final Value<String?> rawHeaders;
+  final Value<DateTime?> bodyCachedAt;
   final Value<bool> isRead;
   final Value<bool> isStarred;
   final Value<bool> hasAttachments;
@@ -3430,6 +3559,9 @@ class LocalMailMessagesCompanion extends UpdateCompanion<LocalMailMessage> {
     this.subject = const Value.absent(),
     this.summary = const Value.absent(),
     this.cachedBody = const Value.absent(),
+    this.cachedBodyIsHtml = const Value.absent(),
+    this.rawHeaders = const Value.absent(),
+    this.bodyCachedAt = const Value.absent(),
     this.isRead = const Value.absent(),
     this.isStarred = const Value.absent(),
     this.hasAttachments = const Value.absent(),
@@ -3447,6 +3579,9 @@ class LocalMailMessagesCompanion extends UpdateCompanion<LocalMailMessage> {
     required String subject,
     this.summary = const Value.absent(),
     this.cachedBody = const Value.absent(),
+    this.cachedBodyIsHtml = const Value.absent(),
+    this.rawHeaders = const Value.absent(),
+    this.bodyCachedAt = const Value.absent(),
     this.isRead = const Value.absent(),
     this.isStarred = const Value.absent(),
     this.hasAttachments = const Value.absent(),
@@ -3471,6 +3606,9 @@ class LocalMailMessagesCompanion extends UpdateCompanion<LocalMailMessage> {
     Expression<String>? subject,
     Expression<String>? summary,
     Expression<String>? cachedBody,
+    Expression<bool>? cachedBodyIsHtml,
+    Expression<String>? rawHeaders,
+    Expression<DateTime>? bodyCachedAt,
     Expression<bool>? isRead,
     Expression<bool>? isStarred,
     Expression<bool>? hasAttachments,
@@ -3488,6 +3626,9 @@ class LocalMailMessagesCompanion extends UpdateCompanion<LocalMailMessage> {
       if (subject != null) 'subject': subject,
       if (summary != null) 'summary': summary,
       if (cachedBody != null) 'cached_body': cachedBody,
+      if (cachedBodyIsHtml != null) 'cached_body_is_html': cachedBodyIsHtml,
+      if (rawHeaders != null) 'raw_headers': rawHeaders,
+      if (bodyCachedAt != null) 'body_cached_at': bodyCachedAt,
       if (isRead != null) 'is_read': isRead,
       if (isStarred != null) 'is_starred': isStarred,
       if (hasAttachments != null) 'has_attachments': hasAttachments,
@@ -3507,6 +3648,9 @@ class LocalMailMessagesCompanion extends UpdateCompanion<LocalMailMessage> {
     Value<String>? subject,
     Value<String?>? summary,
     Value<String?>? cachedBody,
+    Value<bool>? cachedBodyIsHtml,
+    Value<String?>? rawHeaders,
+    Value<DateTime?>? bodyCachedAt,
     Value<bool>? isRead,
     Value<bool>? isStarred,
     Value<bool>? hasAttachments,
@@ -3524,6 +3668,9 @@ class LocalMailMessagesCompanion extends UpdateCompanion<LocalMailMessage> {
       subject: subject ?? this.subject,
       summary: summary ?? this.summary,
       cachedBody: cachedBody ?? this.cachedBody,
+      cachedBodyIsHtml: cachedBodyIsHtml ?? this.cachedBodyIsHtml,
+      rawHeaders: rawHeaders ?? this.rawHeaders,
+      bodyCachedAt: bodyCachedAt ?? this.bodyCachedAt,
       isRead: isRead ?? this.isRead,
       isStarred: isStarred ?? this.isStarred,
       hasAttachments: hasAttachments ?? this.hasAttachments,
@@ -3565,6 +3712,15 @@ class LocalMailMessagesCompanion extends UpdateCompanion<LocalMailMessage> {
     if (cachedBody.present) {
       map['cached_body'] = Variable<String>(cachedBody.value);
     }
+    if (cachedBodyIsHtml.present) {
+      map['cached_body_is_html'] = Variable<bool>(cachedBodyIsHtml.value);
+    }
+    if (rawHeaders.present) {
+      map['raw_headers'] = Variable<String>(rawHeaders.value);
+    }
+    if (bodyCachedAt.present) {
+      map['body_cached_at'] = Variable<DateTime>(bodyCachedAt.value);
+    }
     if (isRead.present) {
       map['is_read'] = Variable<bool>(isRead.value);
     }
@@ -3596,11 +3752,530 @@ class LocalMailMessagesCompanion extends UpdateCompanion<LocalMailMessage> {
           ..write('subject: $subject, ')
           ..write('summary: $summary, ')
           ..write('cachedBody: $cachedBody, ')
+          ..write('cachedBodyIsHtml: $cachedBodyIsHtml, ')
+          ..write('rawHeaders: $rawHeaders, ')
+          ..write('bodyCachedAt: $bodyCachedAt, ')
           ..write('isRead: $isRead, ')
           ..write('isStarred: $isStarred, ')
           ..write('hasAttachments: $hasAttachments, ')
           ..write('receivedAt: $receivedAt, ')
           ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $LocalMailAttachmentsTable extends LocalMailAttachments
+    with TableInfo<$LocalMailAttachmentsTable, LocalMailAttachment> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $LocalMailAttachmentsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _accountIdMeta = const VerificationMeta(
+    'accountId',
+  );
+  @override
+  late final GeneratedColumn<String> accountId = GeneratedColumn<String>(
+    'account_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _folderNameMeta = const VerificationMeta(
+    'folderName',
+  );
+  @override
+  late final GeneratedColumn<String> folderName = GeneratedColumn<String>(
+    'folder_name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _messageUidMeta = const VerificationMeta(
+    'messageUid',
+  );
+  @override
+  late final GeneratedColumn<int> messageUid = GeneratedColumn<int>(
+    'message_uid',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _fileNameMeta = const VerificationMeta(
+    'fileName',
+  );
+  @override
+  late final GeneratedColumn<String> fileName = GeneratedColumn<String>(
+    'file_name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _mimeTypeMeta = const VerificationMeta(
+    'mimeType',
+  );
+  @override
+  late final GeneratedColumn<String> mimeType = GeneratedColumn<String>(
+    'mime_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sizeMeta = const VerificationMeta('size');
+  @override
+  late final GeneratedColumn<int> size = GeneratedColumn<int>(
+    'size',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _contentIdMeta = const VerificationMeta(
+    'contentId',
+  );
+  @override
+  late final GeneratedColumn<String> contentId = GeneratedColumn<String>(
+    'content_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    accountId,
+    folderName,
+    messageUid,
+    fileName,
+    mimeType,
+    size,
+    contentId,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'local_mail_attachments';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<LocalMailAttachment> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('account_id')) {
+      context.handle(
+        _accountIdMeta,
+        accountId.isAcceptableOrUnknown(data['account_id']!, _accountIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_accountIdMeta);
+    }
+    if (data.containsKey('folder_name')) {
+      context.handle(
+        _folderNameMeta,
+        folderName.isAcceptableOrUnknown(data['folder_name']!, _folderNameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_folderNameMeta);
+    }
+    if (data.containsKey('message_uid')) {
+      context.handle(
+        _messageUidMeta,
+        messageUid.isAcceptableOrUnknown(data['message_uid']!, _messageUidMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_messageUidMeta);
+    }
+    if (data.containsKey('file_name')) {
+      context.handle(
+        _fileNameMeta,
+        fileName.isAcceptableOrUnknown(data['file_name']!, _fileNameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_fileNameMeta);
+    }
+    if (data.containsKey('mime_type')) {
+      context.handle(
+        _mimeTypeMeta,
+        mimeType.isAcceptableOrUnknown(data['mime_type']!, _mimeTypeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_mimeTypeMeta);
+    }
+    if (data.containsKey('size')) {
+      context.handle(
+        _sizeMeta,
+        size.isAcceptableOrUnknown(data['size']!, _sizeMeta),
+      );
+    }
+    if (data.containsKey('content_id')) {
+      context.handle(
+        _contentIdMeta,
+        contentId.isAcceptableOrUnknown(data['content_id']!, _contentIdMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  LocalMailAttachment map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return LocalMailAttachment(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      accountId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}account_id'],
+      )!,
+      folderName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}folder_name'],
+      )!,
+      messageUid: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}message_uid'],
+      )!,
+      fileName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}file_name'],
+      )!,
+      mimeType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}mime_type'],
+      )!,
+      size: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}size'],
+      ),
+      contentId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}content_id'],
+      ),
+    );
+  }
+
+  @override
+  $LocalMailAttachmentsTable createAlias(String alias) {
+    return $LocalMailAttachmentsTable(attachedDatabase, alias);
+  }
+}
+
+class LocalMailAttachment extends DataClass
+    implements Insertable<LocalMailAttachment> {
+  final String id;
+  final String accountId;
+  final String folderName;
+  final int messageUid;
+  final String fileName;
+  final String mimeType;
+  final int? size;
+  final String? contentId;
+  const LocalMailAttachment({
+    required this.id,
+    required this.accountId,
+    required this.folderName,
+    required this.messageUid,
+    required this.fileName,
+    required this.mimeType,
+    this.size,
+    this.contentId,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['account_id'] = Variable<String>(accountId);
+    map['folder_name'] = Variable<String>(folderName);
+    map['message_uid'] = Variable<int>(messageUid);
+    map['file_name'] = Variable<String>(fileName);
+    map['mime_type'] = Variable<String>(mimeType);
+    if (!nullToAbsent || size != null) {
+      map['size'] = Variable<int>(size);
+    }
+    if (!nullToAbsent || contentId != null) {
+      map['content_id'] = Variable<String>(contentId);
+    }
+    return map;
+  }
+
+  LocalMailAttachmentsCompanion toCompanion(bool nullToAbsent) {
+    return LocalMailAttachmentsCompanion(
+      id: Value(id),
+      accountId: Value(accountId),
+      folderName: Value(folderName),
+      messageUid: Value(messageUid),
+      fileName: Value(fileName),
+      mimeType: Value(mimeType),
+      size: size == null && nullToAbsent ? const Value.absent() : Value(size),
+      contentId: contentId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(contentId),
+    );
+  }
+
+  factory LocalMailAttachment.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return LocalMailAttachment(
+      id: serializer.fromJson<String>(json['id']),
+      accountId: serializer.fromJson<String>(json['accountId']),
+      folderName: serializer.fromJson<String>(json['folderName']),
+      messageUid: serializer.fromJson<int>(json['messageUid']),
+      fileName: serializer.fromJson<String>(json['fileName']),
+      mimeType: serializer.fromJson<String>(json['mimeType']),
+      size: serializer.fromJson<int?>(json['size']),
+      contentId: serializer.fromJson<String?>(json['contentId']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'accountId': serializer.toJson<String>(accountId),
+      'folderName': serializer.toJson<String>(folderName),
+      'messageUid': serializer.toJson<int>(messageUid),
+      'fileName': serializer.toJson<String>(fileName),
+      'mimeType': serializer.toJson<String>(mimeType),
+      'size': serializer.toJson<int?>(size),
+      'contentId': serializer.toJson<String?>(contentId),
+    };
+  }
+
+  LocalMailAttachment copyWith({
+    String? id,
+    String? accountId,
+    String? folderName,
+    int? messageUid,
+    String? fileName,
+    String? mimeType,
+    Value<int?> size = const Value.absent(),
+    Value<String?> contentId = const Value.absent(),
+  }) => LocalMailAttachment(
+    id: id ?? this.id,
+    accountId: accountId ?? this.accountId,
+    folderName: folderName ?? this.folderName,
+    messageUid: messageUid ?? this.messageUid,
+    fileName: fileName ?? this.fileName,
+    mimeType: mimeType ?? this.mimeType,
+    size: size.present ? size.value : this.size,
+    contentId: contentId.present ? contentId.value : this.contentId,
+  );
+  LocalMailAttachment copyWithCompanion(LocalMailAttachmentsCompanion data) {
+    return LocalMailAttachment(
+      id: data.id.present ? data.id.value : this.id,
+      accountId: data.accountId.present ? data.accountId.value : this.accountId,
+      folderName: data.folderName.present
+          ? data.folderName.value
+          : this.folderName,
+      messageUid: data.messageUid.present
+          ? data.messageUid.value
+          : this.messageUid,
+      fileName: data.fileName.present ? data.fileName.value : this.fileName,
+      mimeType: data.mimeType.present ? data.mimeType.value : this.mimeType,
+      size: data.size.present ? data.size.value : this.size,
+      contentId: data.contentId.present ? data.contentId.value : this.contentId,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LocalMailAttachment(')
+          ..write('id: $id, ')
+          ..write('accountId: $accountId, ')
+          ..write('folderName: $folderName, ')
+          ..write('messageUid: $messageUid, ')
+          ..write('fileName: $fileName, ')
+          ..write('mimeType: $mimeType, ')
+          ..write('size: $size, ')
+          ..write('contentId: $contentId')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    accountId,
+    folderName,
+    messageUid,
+    fileName,
+    mimeType,
+    size,
+    contentId,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is LocalMailAttachment &&
+          other.id == this.id &&
+          other.accountId == this.accountId &&
+          other.folderName == this.folderName &&
+          other.messageUid == this.messageUid &&
+          other.fileName == this.fileName &&
+          other.mimeType == this.mimeType &&
+          other.size == this.size &&
+          other.contentId == this.contentId);
+}
+
+class LocalMailAttachmentsCompanion
+    extends UpdateCompanion<LocalMailAttachment> {
+  final Value<String> id;
+  final Value<String> accountId;
+  final Value<String> folderName;
+  final Value<int> messageUid;
+  final Value<String> fileName;
+  final Value<String> mimeType;
+  final Value<int?> size;
+  final Value<String?> contentId;
+  final Value<int> rowid;
+  const LocalMailAttachmentsCompanion({
+    this.id = const Value.absent(),
+    this.accountId = const Value.absent(),
+    this.folderName = const Value.absent(),
+    this.messageUid = const Value.absent(),
+    this.fileName = const Value.absent(),
+    this.mimeType = const Value.absent(),
+    this.size = const Value.absent(),
+    this.contentId = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  LocalMailAttachmentsCompanion.insert({
+    required String id,
+    required String accountId,
+    required String folderName,
+    required int messageUid,
+    required String fileName,
+    required String mimeType,
+    this.size = const Value.absent(),
+    this.contentId = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       accountId = Value(accountId),
+       folderName = Value(folderName),
+       messageUid = Value(messageUid),
+       fileName = Value(fileName),
+       mimeType = Value(mimeType);
+  static Insertable<LocalMailAttachment> custom({
+    Expression<String>? id,
+    Expression<String>? accountId,
+    Expression<String>? folderName,
+    Expression<int>? messageUid,
+    Expression<String>? fileName,
+    Expression<String>? mimeType,
+    Expression<int>? size,
+    Expression<String>? contentId,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (accountId != null) 'account_id': accountId,
+      if (folderName != null) 'folder_name': folderName,
+      if (messageUid != null) 'message_uid': messageUid,
+      if (fileName != null) 'file_name': fileName,
+      if (mimeType != null) 'mime_type': mimeType,
+      if (size != null) 'size': size,
+      if (contentId != null) 'content_id': contentId,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  LocalMailAttachmentsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? accountId,
+    Value<String>? folderName,
+    Value<int>? messageUid,
+    Value<String>? fileName,
+    Value<String>? mimeType,
+    Value<int?>? size,
+    Value<String?>? contentId,
+    Value<int>? rowid,
+  }) {
+    return LocalMailAttachmentsCompanion(
+      id: id ?? this.id,
+      accountId: accountId ?? this.accountId,
+      folderName: folderName ?? this.folderName,
+      messageUid: messageUid ?? this.messageUid,
+      fileName: fileName ?? this.fileName,
+      mimeType: mimeType ?? this.mimeType,
+      size: size ?? this.size,
+      contentId: contentId ?? this.contentId,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (accountId.present) {
+      map['account_id'] = Variable<String>(accountId.value);
+    }
+    if (folderName.present) {
+      map['folder_name'] = Variable<String>(folderName.value);
+    }
+    if (messageUid.present) {
+      map['message_uid'] = Variable<int>(messageUid.value);
+    }
+    if (fileName.present) {
+      map['file_name'] = Variable<String>(fileName.value);
+    }
+    if (mimeType.present) {
+      map['mime_type'] = Variable<String>(mimeType.value);
+    }
+    if (size.present) {
+      map['size'] = Variable<int>(size.value);
+    }
+    if (contentId.present) {
+      map['content_id'] = Variable<String>(contentId.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LocalMailAttachmentsCompanion(')
+          ..write('id: $id, ')
+          ..write('accountId: $accountId, ')
+          ..write('folderName: $folderName, ')
+          ..write('messageUid: $messageUid, ')
+          ..write('fileName: $fileName, ')
+          ..write('mimeType: $mimeType, ')
+          ..write('size: $size, ')
+          ..write('contentId: $contentId, ')
+          ..write('rowid: $rowid')
           ..write(')'))
         .toString();
   }
@@ -3615,6 +4290,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $SentMessagesTable sentMessages = $SentMessagesTable(this);
   late final $LocalMailMessagesTable localMailMessages =
       $LocalMailMessagesTable(this);
+  late final $LocalMailAttachmentsTable localMailAttachments =
+      $LocalMailAttachmentsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -3625,6 +4302,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     draftMessages,
     sentMessages,
     localMailMessages,
+    localMailAttachments,
   ];
 }
 
@@ -4951,6 +5629,9 @@ typedef $$LocalMailMessagesTableCreateCompanionBuilder =
       required String subject,
       Value<String?> summary,
       Value<String?> cachedBody,
+      Value<bool> cachedBodyIsHtml,
+      Value<String?> rawHeaders,
+      Value<DateTime?> bodyCachedAt,
       Value<bool> isRead,
       Value<bool> isStarred,
       Value<bool> hasAttachments,
@@ -4969,6 +5650,9 @@ typedef $$LocalMailMessagesTableUpdateCompanionBuilder =
       Value<String> subject,
       Value<String?> summary,
       Value<String?> cachedBody,
+      Value<bool> cachedBodyIsHtml,
+      Value<String?> rawHeaders,
+      Value<DateTime?> bodyCachedAt,
       Value<bool> isRead,
       Value<bool> isStarred,
       Value<bool> hasAttachments,
@@ -5032,6 +5716,21 @@ class $$LocalMailMessagesTableFilterComposer
 
   ColumnFilters<String> get cachedBody => $composableBuilder(
     column: $table.cachedBody,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get cachedBodyIsHtml => $composableBuilder(
+    column: $table.cachedBodyIsHtml,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get rawHeaders => $composableBuilder(
+    column: $table.rawHeaders,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get bodyCachedAt => $composableBuilder(
+    column: $table.bodyCachedAt,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -5120,6 +5819,21 @@ class $$LocalMailMessagesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<bool> get cachedBodyIsHtml => $composableBuilder(
+    column: $table.cachedBodyIsHtml,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get rawHeaders => $composableBuilder(
+    column: $table.rawHeaders,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get bodyCachedAt => $composableBuilder(
+    column: $table.bodyCachedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<bool> get isRead => $composableBuilder(
     column: $table.isRead,
     builder: (column) => ColumnOrderings(column),
@@ -5188,6 +5902,21 @@ class $$LocalMailMessagesTableAnnotationComposer
 
   GeneratedColumn<String> get cachedBody => $composableBuilder(
     column: $table.cachedBody,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get cachedBodyIsHtml => $composableBuilder(
+    column: $table.cachedBodyIsHtml,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get rawHeaders => $composableBuilder(
+    column: $table.rawHeaders,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get bodyCachedAt => $composableBuilder(
+    column: $table.bodyCachedAt,
     builder: (column) => column,
   );
 
@@ -5261,6 +5990,9 @@ class $$LocalMailMessagesTableTableManager
                 Value<String> subject = const Value.absent(),
                 Value<String?> summary = const Value.absent(),
                 Value<String?> cachedBody = const Value.absent(),
+                Value<bool> cachedBodyIsHtml = const Value.absent(),
+                Value<String?> rawHeaders = const Value.absent(),
+                Value<DateTime?> bodyCachedAt = const Value.absent(),
                 Value<bool> isRead = const Value.absent(),
                 Value<bool> isStarred = const Value.absent(),
                 Value<bool> hasAttachments = const Value.absent(),
@@ -5277,6 +6009,9 @@ class $$LocalMailMessagesTableTableManager
                 subject: subject,
                 summary: summary,
                 cachedBody: cachedBody,
+                cachedBodyIsHtml: cachedBodyIsHtml,
+                rawHeaders: rawHeaders,
+                bodyCachedAt: bodyCachedAt,
                 isRead: isRead,
                 isStarred: isStarred,
                 hasAttachments: hasAttachments,
@@ -5295,6 +6030,9 @@ class $$LocalMailMessagesTableTableManager
                 required String subject,
                 Value<String?> summary = const Value.absent(),
                 Value<String?> cachedBody = const Value.absent(),
+                Value<bool> cachedBodyIsHtml = const Value.absent(),
+                Value<String?> rawHeaders = const Value.absent(),
+                Value<DateTime?> bodyCachedAt = const Value.absent(),
                 Value<bool> isRead = const Value.absent(),
                 Value<bool> isStarred = const Value.absent(),
                 Value<bool> hasAttachments = const Value.absent(),
@@ -5311,6 +6049,9 @@ class $$LocalMailMessagesTableTableManager
                 subject: subject,
                 summary: summary,
                 cachedBody: cachedBody,
+                cachedBodyIsHtml: cachedBodyIsHtml,
+                rawHeaders: rawHeaders,
+                bodyCachedAt: bodyCachedAt,
                 isRead: isRead,
                 isStarred: isStarred,
                 hasAttachments: hasAttachments,
@@ -5346,6 +6087,283 @@ typedef $$LocalMailMessagesTableProcessedTableManager =
       LocalMailMessage,
       PrefetchHooks Function()
     >;
+typedef $$LocalMailAttachmentsTableCreateCompanionBuilder =
+    LocalMailAttachmentsCompanion Function({
+      required String id,
+      required String accountId,
+      required String folderName,
+      required int messageUid,
+      required String fileName,
+      required String mimeType,
+      Value<int?> size,
+      Value<String?> contentId,
+      Value<int> rowid,
+    });
+typedef $$LocalMailAttachmentsTableUpdateCompanionBuilder =
+    LocalMailAttachmentsCompanion Function({
+      Value<String> id,
+      Value<String> accountId,
+      Value<String> folderName,
+      Value<int> messageUid,
+      Value<String> fileName,
+      Value<String> mimeType,
+      Value<int?> size,
+      Value<String?> contentId,
+      Value<int> rowid,
+    });
+
+class $$LocalMailAttachmentsTableFilterComposer
+    extends Composer<_$AppDatabase, $LocalMailAttachmentsTable> {
+  $$LocalMailAttachmentsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get accountId => $composableBuilder(
+    column: $table.accountId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get folderName => $composableBuilder(
+    column: $table.folderName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get messageUid => $composableBuilder(
+    column: $table.messageUid,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get fileName => $composableBuilder(
+    column: $table.fileName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get mimeType => $composableBuilder(
+    column: $table.mimeType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get size => $composableBuilder(
+    column: $table.size,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get contentId => $composableBuilder(
+    column: $table.contentId,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$LocalMailAttachmentsTableOrderingComposer
+    extends Composer<_$AppDatabase, $LocalMailAttachmentsTable> {
+  $$LocalMailAttachmentsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get accountId => $composableBuilder(
+    column: $table.accountId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get folderName => $composableBuilder(
+    column: $table.folderName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get messageUid => $composableBuilder(
+    column: $table.messageUid,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get fileName => $composableBuilder(
+    column: $table.fileName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get mimeType => $composableBuilder(
+    column: $table.mimeType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get size => $composableBuilder(
+    column: $table.size,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get contentId => $composableBuilder(
+    column: $table.contentId,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$LocalMailAttachmentsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $LocalMailAttachmentsTable> {
+  $$LocalMailAttachmentsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get accountId =>
+      $composableBuilder(column: $table.accountId, builder: (column) => column);
+
+  GeneratedColumn<String> get folderName => $composableBuilder(
+    column: $table.folderName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get messageUid => $composableBuilder(
+    column: $table.messageUid,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get fileName =>
+      $composableBuilder(column: $table.fileName, builder: (column) => column);
+
+  GeneratedColumn<String> get mimeType =>
+      $composableBuilder(column: $table.mimeType, builder: (column) => column);
+
+  GeneratedColumn<int> get size =>
+      $composableBuilder(column: $table.size, builder: (column) => column);
+
+  GeneratedColumn<String> get contentId =>
+      $composableBuilder(column: $table.contentId, builder: (column) => column);
+}
+
+class $$LocalMailAttachmentsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $LocalMailAttachmentsTable,
+          LocalMailAttachment,
+          $$LocalMailAttachmentsTableFilterComposer,
+          $$LocalMailAttachmentsTableOrderingComposer,
+          $$LocalMailAttachmentsTableAnnotationComposer,
+          $$LocalMailAttachmentsTableCreateCompanionBuilder,
+          $$LocalMailAttachmentsTableUpdateCompanionBuilder,
+          (
+            LocalMailAttachment,
+            BaseReferences<
+              _$AppDatabase,
+              $LocalMailAttachmentsTable,
+              LocalMailAttachment
+            >,
+          ),
+          LocalMailAttachment,
+          PrefetchHooks Function()
+        > {
+  $$LocalMailAttachmentsTableTableManager(
+    _$AppDatabase db,
+    $LocalMailAttachmentsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$LocalMailAttachmentsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$LocalMailAttachmentsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$LocalMailAttachmentsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> accountId = const Value.absent(),
+                Value<String> folderName = const Value.absent(),
+                Value<int> messageUid = const Value.absent(),
+                Value<String> fileName = const Value.absent(),
+                Value<String> mimeType = const Value.absent(),
+                Value<int?> size = const Value.absent(),
+                Value<String?> contentId = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => LocalMailAttachmentsCompanion(
+                id: id,
+                accountId: accountId,
+                folderName: folderName,
+                messageUid: messageUid,
+                fileName: fileName,
+                mimeType: mimeType,
+                size: size,
+                contentId: contentId,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String accountId,
+                required String folderName,
+                required int messageUid,
+                required String fileName,
+                required String mimeType,
+                Value<int?> size = const Value.absent(),
+                Value<String?> contentId = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => LocalMailAttachmentsCompanion.insert(
+                id: id,
+                accountId: accountId,
+                folderName: folderName,
+                messageUid: messageUid,
+                fileName: fileName,
+                mimeType: mimeType,
+                size: size,
+                contentId: contentId,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$LocalMailAttachmentsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $LocalMailAttachmentsTable,
+      LocalMailAttachment,
+      $$LocalMailAttachmentsTableFilterComposer,
+      $$LocalMailAttachmentsTableOrderingComposer,
+      $$LocalMailAttachmentsTableAnnotationComposer,
+      $$LocalMailAttachmentsTableCreateCompanionBuilder,
+      $$LocalMailAttachmentsTableUpdateCompanionBuilder,
+      (
+        LocalMailAttachment,
+        BaseReferences<
+          _$AppDatabase,
+          $LocalMailAttachmentsTable,
+          LocalMailAttachment
+        >,
+      ),
+      LocalMailAttachment,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -5360,4 +6378,6 @@ class $AppDatabaseManager {
       $$SentMessagesTableTableManager(_db, _db.sentMessages);
   $$LocalMailMessagesTableTableManager get localMailMessages =>
       $$LocalMailMessagesTableTableManager(_db, _db.localMailMessages);
+  $$LocalMailAttachmentsTableTableManager get localMailAttachments =>
+      $$LocalMailAttachmentsTableTableManager(_db, _db.localMailAttachments);
 }

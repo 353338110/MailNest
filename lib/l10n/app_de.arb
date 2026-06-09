@@ -155,5 +155,11 @@
   "accounts": "Accounts",
   "composeEmail": "Compose email",
   "composeFutureNotice": "Email composing will be available in a later version.",
-  "foldersFutureNotice": "Folder navigation will be available after mail sync is added."
+  "foldersFutureNotice": "Folder navigation will be available after mail sync is added.",
+  "mailDetail": "Message",
+  "attachments": "Attachments",
+  "emptyMessageBody": "This message has no readable body.",
+  "htmlShownAsSource": "HTML is shown as source text for now. Remote images are not loaded.",
+  "messageLoadFailed": "Could not load message.",
+  "noCachedMessages": "No cached messages yet."
 }
