@@ -152,6 +152,83 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get unknownError => '未知错误';
+
+  @override
+  String get backupAndMigration => '备份与迁移';
+
+  @override
+  String get backupAndMigrationSubtitle => '导出加密配置备份。';
+
+  @override
+  String get exportConfiguration => '导出配置';
+
+  @override
+  String get backupExportDescription =>
+      '创建包含账号配置、服务器设置和应用偏好的加密备份。导入功能将在后续版本添加。';
+
+  @override
+  String get backupIncludes => '导出内容';
+
+  @override
+  String get backupIncludesAccounts => '账号配置';
+
+  @override
+  String get backupIncludesServerSettings => 'IMAP 和 SMTP 配置';
+
+  @override
+  String get backupIncludesUserSettings => '用户设置';
+
+  @override
+  String get backupIncludesLanguageSettings => '语言设置';
+
+  @override
+  String get backupIncludesTranslationSettings => '翻译设置';
+
+  @override
+  String get backupExcludes => '默认不导出';
+
+  @override
+  String get backupExcludesMailBodies => '邮件正文';
+
+  @override
+  String get backupExcludesHeaderCache => '邮件头缓存';
+
+  @override
+  String get backupExcludesAttachmentCache => '附件缓存';
+
+  @override
+  String get backupExcludesSearchIndex => '搜索索引';
+
+  @override
+  String get exportPassword => '导出密码';
+
+  @override
+  String get confirmExportPassword => '确认导出密码';
+
+  @override
+  String get exportPasswordsDoNotMatch => '两次输入的密码不一致。';
+
+  @override
+  String get exportPasswordNotSaved => '此密码只用于加密导出文件，MailNest 不会保存。';
+
+  @override
+  String get exportBackup => '导出备份';
+
+  @override
+  String get exportingBackup => '正在导出...';
+
+  @override
+  String backupExported(String fileName) {
+    return '备份已导出：$fileName';
+  }
+
+  @override
+  String backupExportedTo(String filePath) {
+    return '已保存到 $filePath';
+  }
+
+  @override
+  String get backupExportFailed => '备份导出失败。';
 }
 
 /// The translations for Chinese, as used in China (`zh_CN`).
@@ -302,6 +379,83 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get unknownError => '未知错误';
+
+  @override
+  String get backupAndMigration => '备份与迁移';
+
+  @override
+  String get backupAndMigrationSubtitle => '导出加密配置备份。';
+
+  @override
+  String get exportConfiguration => '导出配置';
+
+  @override
+  String get backupExportDescription =>
+      '创建包含账号配置、服务器设置和应用偏好的加密备份。导入功能将在后续版本添加。';
+
+  @override
+  String get backupIncludes => '导出内容';
+
+  @override
+  String get backupIncludesAccounts => '账号配置';
+
+  @override
+  String get backupIncludesServerSettings => 'IMAP 和 SMTP 配置';
+
+  @override
+  String get backupIncludesUserSettings => '用户设置';
+
+  @override
+  String get backupIncludesLanguageSettings => '语言设置';
+
+  @override
+  String get backupIncludesTranslationSettings => '翻译设置';
+
+  @override
+  String get backupExcludes => '默认不导出';
+
+  @override
+  String get backupExcludesMailBodies => '邮件正文';
+
+  @override
+  String get backupExcludesHeaderCache => '邮件头缓存';
+
+  @override
+  String get backupExcludesAttachmentCache => '附件缓存';
+
+  @override
+  String get backupExcludesSearchIndex => '搜索索引';
+
+  @override
+  String get exportPassword => '导出密码';
+
+  @override
+  String get confirmExportPassword => '确认导出密码';
+
+  @override
+  String get exportPasswordsDoNotMatch => '两次输入的密码不一致。';
+
+  @override
+  String get exportPasswordNotSaved => '此密码只用于加密导出文件，MailNest 不会保存。';
+
+  @override
+  String get exportBackup => '导出备份';
+
+  @override
+  String get exportingBackup => '正在导出...';
+
+  @override
+  String backupExported(String fileName) {
+    return '备份已导出：$fileName';
+  }
+
+  @override
+  String backupExportedTo(String filePath) {
+    return '已保存到 $filePath';
+  }
+
+  @override
+  String get backupExportFailed => '备份导出失败。';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -452,4 +606,81 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get unknownError => '未知錯誤';
+
+  @override
+  String get backupAndMigration => '備份與遷移';
+
+  @override
+  String get backupAndMigrationSubtitle => '匯出加密設定備份。';
+
+  @override
+  String get exportConfiguration => '匯出設定';
+
+  @override
+  String get backupExportDescription =>
+      '建立包含帳號設定、伺服器設定和應用程式偏好的加密備份。匯入功能將在後續版本加入。';
+
+  @override
+  String get backupIncludes => '匯出內容';
+
+  @override
+  String get backupIncludesAccounts => '帳號設定';
+
+  @override
+  String get backupIncludesServerSettings => 'IMAP 和 SMTP 設定';
+
+  @override
+  String get backupIncludesUserSettings => '使用者設定';
+
+  @override
+  String get backupIncludesLanguageSettings => '語言設定';
+
+  @override
+  String get backupIncludesTranslationSettings => '翻譯設定';
+
+  @override
+  String get backupExcludes => '預設不匯出';
+
+  @override
+  String get backupExcludesMailBodies => '郵件正文';
+
+  @override
+  String get backupExcludesHeaderCache => '郵件標頭快取';
+
+  @override
+  String get backupExcludesAttachmentCache => '附件快取';
+
+  @override
+  String get backupExcludesSearchIndex => '搜尋索引';
+
+  @override
+  String get exportPassword => '匯出密碼';
+
+  @override
+  String get confirmExportPassword => '確認匯出密碼';
+
+  @override
+  String get exportPasswordsDoNotMatch => '兩次輸入的密碼不一致。';
+
+  @override
+  String get exportPasswordNotSaved => '此密碼只用於加密匯出檔案，MailNest 不會保存。';
+
+  @override
+  String get exportBackup => '匯出備份';
+
+  @override
+  String get exportingBackup => '正在匯出...';
+
+  @override
+  String backupExported(String fileName) {
+    return '備份已匯出：$fileName';
+  }
+
+  @override
+  String backupExportedTo(String filePath) {
+    return '已保存到 $filePath';
+  }
+
+  @override
+  String get backupExportFailed => '備份匯出失敗。';
 }

@@ -50,6 +50,12 @@ class AppDatabase extends _$AppDatabase {
     )..orderBy([(table) => OrderingTerm.desc(table.createdAt)])).get();
   }
 
+  Future<List<AppSetting>> appSettingsSnapshot() {
+    return (select(
+      appSettings,
+    )..orderBy([(table) => OrderingTerm.asc(table.key)])).get();
+  }
+
   Stream<List<EmailAccount>> watchAccounts() {
     return (select(
       emailAccounts,

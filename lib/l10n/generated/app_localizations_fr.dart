@@ -159,4 +159,83 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get unknownError => 'Unknown error';
+
+  @override
+  String get backupAndMigration => 'Backup and migration';
+
+  @override
+  String get backupAndMigrationSubtitle =>
+      'Export an encrypted configuration backup.';
+
+  @override
+  String get exportConfiguration => 'Export configuration';
+
+  @override
+  String get backupExportDescription =>
+      'Create an encrypted backup of account configuration, server settings, and app preferences. Import will be added later.';
+
+  @override
+  String get backupIncludes => 'Included';
+
+  @override
+  String get backupIncludesAccounts => 'Account configuration';
+
+  @override
+  String get backupIncludesServerSettings => 'IMAP and SMTP configuration';
+
+  @override
+  String get backupIncludesUserSettings => 'User settings';
+
+  @override
+  String get backupIncludesLanguageSettings => 'Language settings';
+
+  @override
+  String get backupIncludesTranslationSettings => 'Translation settings';
+
+  @override
+  String get backupExcludes => 'Not included by default';
+
+  @override
+  String get backupExcludesMailBodies => 'Email bodies';
+
+  @override
+  String get backupExcludesHeaderCache => 'Email header cache';
+
+  @override
+  String get backupExcludesAttachmentCache => 'Attachment cache';
+
+  @override
+  String get backupExcludesSearchIndex => 'Search index';
+
+  @override
+  String get exportPassword => 'Export password';
+
+  @override
+  String get confirmExportPassword => 'Confirm export password';
+
+  @override
+  String get exportPasswordsDoNotMatch => 'Passwords do not match.';
+
+  @override
+  String get exportPasswordNotSaved =>
+      'This password encrypts the export file and is not saved by MailNest.';
+
+  @override
+  String get exportBackup => 'Export backup';
+
+  @override
+  String get exportingBackup => 'Exporting...';
+
+  @override
+  String backupExported(String fileName) {
+    return 'Backup exported: $fileName';
+  }
+
+  @override
+  String backupExportedTo(String filePath) {
+    return 'Saved to $filePath';
+  }
+
+  @override
+  String get backupExportFailed => 'Backup export failed.';
 }
