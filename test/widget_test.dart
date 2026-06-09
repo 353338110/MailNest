@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:drift/native.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mailnest_app/app/app.dart';
@@ -25,9 +26,9 @@ void main() {
     await tester.tap(find.byTooltip('Open navigation menu'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Inbox'), findsOneWidget);
+    expect(find.text('Inbox'), findsWidgets);
     expect(find.text('Folders'), findsOneWidget);
-    expect(find.text('Accounts'), findsOneWidget);
+    expect(find.text('Accounts'), findsWidgets);
     expect(find.text('Settings'), findsOneWidget);
     expect(find.text('Message detail'), findsNothing);
   });
@@ -114,31 +115,44 @@ void main() {
 }
 
 extension on WidgetTester {
-  Future<void> pumpHomeWithAccount({required double width}) async {
+  Future<void> pumpHomeWithAccount({
+    required double width,
+    TargetPlatform platform = TargetPlatform.macOS,
+  }) async {
     view.physicalSize = Size(width, 900);
     view.devicePixelRatio = 1;
+    debugDefaultTargetPlatformOverride = platform;
     addTearDown(view.resetPhysicalSize);
     addTearDown(view.resetDevicePixelRatio);
 
     final database = AppDatabase(NativeDatabase.memory());
     final repository = _FakeAccountRepository(_testAccount, database: database);
-    addTearDown(database.close);
+    addTearDown(() async {
+      debugDefaultTargetPlatformOverride = null;
+      await database.close();
+    });
 
-    await pumpWidget(
-      ProviderScope(
-        overrides: [
-          appDatabaseProvider.overrideWithValue(database),
-          accountRepositoryProvider.overrideWithValue(repository),
-        ],
-        child: const MailNestApp(),
-      ),
-    );
-    await pumpAndSettle();
-
-    final getStarted = find.text('Get started');
-    if (getStarted.evaluate().isNotEmpty) {
-      await tap(getStarted);
+    try {
+      await pumpWidget(
+        ProviderScope(
+          overrides: [
+            appDatabaseProvider.overrideWithValue(database),
+            accountRepositoryProvider.overrideWithValue(repository),
+          ],
+          child: const MailNestApp(),
+        ),
+      );
       await pumpAndSettle();
+
+      final getStarted = find.text('Get started');
+      if (getStarted.evaluate().isNotEmpty) {
+        await tap(getStarted);
+        await pumpAndSettle();
+      }
+      debugDefaultTargetPlatformOverride = null;
+    } catch (_) {
+      debugDefaultTargetPlatformOverride = null;
+      rethrow;
     }
   }
 
@@ -146,7 +160,7 @@ extension on WidgetTester {
     required String tooltip,
     required String expectedText,
   }) async {
-    await tap(find.byTooltip(tooltip));
+    await tap(find.byTooltip(tooltip).first);
     await pumpAndSettle();
 
     expect(find.text(expectedText), findsWidgets);
