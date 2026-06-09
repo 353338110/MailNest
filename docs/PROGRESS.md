@@ -72,6 +72,26 @@
 - 不记录密码、授权码、Token 或认证响应。
 - 增加连接测试结果模型测试。
 
+
+### PR #4：邮箱视图导航
+
+链接：https://github.com/353338110/MailNest/pull/6
+
+状态：已创建，CI 待验证，待合并到 `main`
+
+已完成内容：
+
+- 首页从单纯账号列表改为邮箱工作台。
+- 支持统一收件箱入口。
+- 支持按账号查看本地邮件头列表。
+- 支持按账号下 Inbox、Sent、Drafts、Trash 文件夹查看。
+- 支持未读、星标、已发送、草稿箱、垃圾箱基础筛选。
+- 在真实邮件头同步完成前，使用基于账号的本地轻量邮件头样例驱动视图。
+- 保留账号添加、编辑、启用/停用、删除入口和确认流程。
+- 桌面使用左侧导航加右侧列表布局；移动端保持同页返回路径，不进入无法返回的子页面。
+- 不实现邮件详情正文、附件、发信、远程搜索。
+- 增加邮箱视图过滤 repository 测试。
+
 ### PR #5：加密配置导出
 
 链接：https://github.com/353338110/MailNest/pull/5
@@ -146,10 +166,10 @@ flutter test
 - 最近 30 天邮件头同步。
 - 增量同步游标。
 - 邮件列表真实数据展示。
-- 统一收件箱。
-- 按账号查看邮件。
-- 按文件夹查看邮件。
-- 未读、星标、已发送、草稿箱、垃圾箱等基础视图。
+- 统一收件箱接入真实数据源。
+- 按账号查看真实邮件。
+- 按文件夹查看真实邮件。
+- 未读、星标、已发送、草稿箱、垃圾箱等基础视图接入真实状态。
 
 ### 邮件详情与 MIME
 
@@ -248,24 +268,23 @@ flutter test
 
 1. `codex/mail-folder-sync`：IMAP 文件夹列表同步和本地保存。
 2. `codex/mail-header-sync`：最近 30 天邮件头同步和邮件列表真实数据。
-3. `codex/mailbox-views`：统一收件箱、按账号/文件夹查看、基础状态筛选。
-4. `codex/mail-detail-mime`：邮件详情、正文拉取、MIME 解析。
-5. `codex/html-rendering-privacy`：HTML 渲染、远程图片拦截、外部链接处理。
-6. `codex/attachments-cache`：附件列表、下载、缓存和打开。
-7. `codex/composer-smtp-send`：写邮件和 SMTP 发信。
-8. `codex/reply-forward`：回复、回复全部、转发。
-9. `codex/drafts`：本地草稿。
-10. `codex/sent-records`：发送记录和 Sent 文件夹保存。
-11. `codex/backup-import`：配置导入和冲突处理。
-12. `codex/desktop-layout`：桌面三栏和响应式布局完善。
-13. `codex/mobile-navigation`：移动端 Drawer/NavigationDrawer。
-14. `codex/gmail-oauth`：Gmail OAuth。
-15. `codex/gmail-mail-provider`：Gmail 邮件列表、详情和发信。
-16. `codex/outlook-oauth`：Outlook OAuth。
-17. `codex/outlook-mail-provider`：Outlook 邮件列表、详情和发信。
-18. `codex/translation-ui`：邮件详情和写信翻译 UI。
-19. `codex/translation-provider`：真实翻译服务和隐私确认。
-20. `codex/release-workflow`：发布流程和 tag 自动化。
+3. `codex/mail-detail-mime`：邮件详情、正文拉取、MIME 解析。
+4. `codex/html-rendering-privacy`：HTML 渲染、远程图片拦截、外部链接处理。
+5. `codex/attachments-cache`：附件列表、下载、缓存和打开。
+6. `codex/composer-smtp-send`：写邮件和 SMTP 发信。
+7. `codex/reply-forward`：回复、回复全部、转发。
+8. `codex/drafts`：本地草稿。
+9. `codex/sent-records`：发送记录和 Sent 文件夹保存。
+10. `codex/backup-import`：配置导入和冲突处理。
+11. `codex/desktop-layout`：桌面三栏和响应式布局完善。
+12. `codex/mobile-navigation`：移动端 Drawer/NavigationDrawer。
+13. `codex/gmail-oauth`：Gmail OAuth。
+14. `codex/gmail-mail-provider`：Gmail 邮件列表、详情和发信。
+15. `codex/outlook-oauth`：Outlook OAuth。
+16. `codex/outlook-mail-provider`：Outlook 邮件列表、详情和发信。
+17. `codex/translation-ui`：邮件详情和写信翻译 UI。
+18. `codex/translation-provider`：真实翻译服务和隐私确认。
+19. `codex/release-workflow`：发布流程和 tag 自动化。
 
 ## 注意事项
 
