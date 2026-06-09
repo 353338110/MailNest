@@ -7,7 +7,9 @@ import '../../../l10n/generated/app_localizations.dart';
 import '../../../mail/provider/mail_connection_tester.dart';
 import '../../../mail/provider/mail_connection_tester_provider.dart';
 import '../../../mail/repository/account_repository_provider.dart';
+import '../controllers/gmail_oauth_provider.dart';
 import '../controllers/mail_config_detector.dart';
+import '../controllers/oauth_service.dart';
 import '../models/email_provider_type.dart';
 import '../models/mail_server_config.dart';
 
@@ -39,9 +41,11 @@ class _AddAccountPageState extends ConsumerState<AddAccountPage> {
   bool _isSaving = false;
   bool _isLoading = false;
   bool _isTesting = false;
+  bool _isAuthorizing = false;
   EmailAccount? _editingAccount;
 
   bool get _isEditing => widget.accountId != null;
+  bool get _isGmailOAuth => _provider == EmailProviderType.gmail;
 
   @override
   void initState() {
@@ -83,16 +87,23 @@ class _AddAccountPageState extends ConsumerState<AddAccountPage> {
                   key: _formKey,
                   child: Column(
                     children: [
-                      TextFormField(
-                        controller: _emailController,
-                        decoration: InputDecoration(
-                          labelText: l10n.emailAddress,
+                      if (_isGmailOAuth && !_isEditing) ...[
+                        _GmailOAuthSection(
+                          isAuthorizing: _isAuthorizing,
+                          onAuthorize: _authorizeGmail,
                         ),
-                        keyboardType: TextInputType.emailAddress,
-                        readOnly: _isEditing,
-                        validator: _required,
-                        onChanged: _isEditing ? null : _detectFromEmail,
-                      ),
+                      ] else ...[
+                        TextFormField(
+                          controller: _emailController,
+                          decoration: InputDecoration(
+                            labelText: l10n.emailAddress,
+                          ),
+                          keyboardType: TextInputType.emailAddress,
+                          readOnly: _isEditing,
+                          validator: _required,
+                          onChanged: _isEditing ? null : _detectFromEmail,
+                        ),
+                      ],
                       const SizedBox(height: AppSpacing.medium),
                       TextFormField(
                         controller: _nameController,
@@ -101,66 +112,94 @@ class _AddAccountPageState extends ConsumerState<AddAccountPage> {
                         ),
                       ),
                       const SizedBox(height: AppSpacing.medium),
-                      TextFormField(
-                        controller: _usernameController,
-                        decoration: InputDecoration(labelText: l10n.username),
-                        validator: _required,
-                      ),
-                      const SizedBox(height: AppSpacing.medium),
-                      TextFormField(
-                        controller: _secretController,
-                        decoration: InputDecoration(
-                          labelText: _isEditing
-                              ? l10n.leavePasswordUnchanged
-                              : l10n.passwordOrAppPassword,
+                      if (_isGmailOAuth) ...[
+                        if (_isEditing) ...[
+                          ListTile(
+                            contentPadding: EdgeInsets.zero,
+                            leading: const Icon(Icons.verified_user_outlined),
+                            title: Text(l10n.gmailOAuthConnected),
+                            subtitle: Text(l10n.gmailReauthorizeHelp),
+                          ),
+                          OutlinedButton.icon(
+                            onPressed: _isSaving || _isAuthorizing
+                                ? null
+                                : _reauthorizeGmail,
+                            icon: _isAuthorizing
+                                ? const SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : const Icon(Icons.open_in_browser_outlined),
+                            label: Text(l10n.reauthorizeGmail),
+                          ),
+                        ],
+                      ] else ...[
+                        TextFormField(
+                          controller: _usernameController,
+                          decoration: InputDecoration(labelText: l10n.username),
+                          validator: _required,
                         ),
-                        obscureText: true,
-                        validator: _isEditing ? null : _required,
-                      ),
-                      const SizedBox(height: AppSpacing.large),
-                      _ServerSection(
-                        title: l10n.imapSettings,
-                        hostController: _imapHostController,
-                        portController: _imapPortController,
-                        security: _imapSecurity,
-                        onSecurityChanged: (value) =>
-                            setState(() => _imapSecurity = value),
-                      ),
-                      const SizedBox(height: AppSpacing.large),
-                      _ServerSection(
-                        title: l10n.smtpSettings,
-                        hostController: _smtpHostController,
-                        portController: _smtpPortController,
-                        security: _smtpSecurity,
-                        onSecurityChanged: (value) =>
-                            setState(() => _smtpSecurity = value),
-                      ),
-                      SwitchListTile(
-                        contentPadding: EdgeInsets.zero,
-                        title: Text(l10n.useStartTls),
-                        value: _smtpStartTls,
-                        onChanged: (value) =>
-                            setState(() => _smtpStartTls = value),
-                      ),
-                      const SizedBox(height: AppSpacing.large),
-                      OutlinedButton.icon(
-                        onPressed: _isSaving || _isTesting
-                            ? null
-                            : _testConnection,
-                        icon: _isTesting
-                            ? const SizedBox(
-                                width: 18,
-                                height: 18,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                ),
-                              )
-                            : const Icon(Icons.wifi_tethering_outlined),
-                        label: Text(l10n.testConnection),
-                      ),
-                      const SizedBox(height: AppSpacing.medium),
+                        const SizedBox(height: AppSpacing.medium),
+                        TextFormField(
+                          controller: _secretController,
+                          decoration: InputDecoration(
+                            labelText: _isEditing
+                                ? l10n.leavePasswordUnchanged
+                                : l10n.passwordOrAppPassword,
+                          ),
+                          obscureText: true,
+                          validator: _isEditing ? null : _required,
+                        ),
+                        const SizedBox(height: AppSpacing.large),
+                        _ServerSection(
+                          title: l10n.imapSettings,
+                          hostController: _imapHostController,
+                          portController: _imapPortController,
+                          security: _imapSecurity,
+                          onSecurityChanged: (value) =>
+                              setState(() => _imapSecurity = value),
+                        ),
+                        const SizedBox(height: AppSpacing.large),
+                        _ServerSection(
+                          title: l10n.smtpSettings,
+                          hostController: _smtpHostController,
+                          portController: _smtpPortController,
+                          security: _smtpSecurity,
+                          onSecurityChanged: (value) =>
+                              setState(() => _smtpSecurity = value),
+                        ),
+                        SwitchListTile(
+                          contentPadding: EdgeInsets.zero,
+                          title: Text(l10n.useStartTls),
+                          value: _smtpStartTls,
+                          onChanged: (value) =>
+                              setState(() => _smtpStartTls = value),
+                        ),
+                        const SizedBox(height: AppSpacing.large),
+                        OutlinedButton.icon(
+                          onPressed: _isSaving || _isTesting
+                              ? null
+                              : _testConnection,
+                          icon: _isTesting
+                              ? const SizedBox(
+                                  width: 18,
+                                  height: 18,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : const Icon(Icons.wifi_tethering_outlined),
+                          label: Text(l10n.testConnection),
+                        ),
+                        const SizedBox(height: AppSpacing.medium),
+                      ],
                       FilledButton.icon(
-                        onPressed: _isSaving ? null : _saveAccount,
+                        onPressed: _isSaving || (_isGmailOAuth && !_isEditing)
+                            ? null
+                            : _saveAccount,
                         icon: _isSaving
                             ? const SizedBox(
                                 width: 18,
@@ -229,8 +268,12 @@ class _AddAccountPageState extends ConsumerState<AddAccountPage> {
   }
 
   void _selectProvider(EmailProviderType provider) {
-    if (provider == EmailProviderType.gmail ||
-        provider == EmailProviderType.outlook) {
+    if (provider == EmailProviderType.gmail) {
+      setState(() => _provider = provider);
+      return;
+    }
+
+    if (provider == EmailProviderType.outlook) {
       _showFutureProviderMessage(provider);
       return;
     }
@@ -277,6 +320,10 @@ class _AddAccountPageState extends ConsumerState<AddAccountPage> {
     try {
       final editingAccount = _editingAccount;
       if (editingAccount != null) {
+        if (_isGmailOAuth) {
+          await _updateOAuthAccount(editingAccount);
+          return;
+        }
         await _updateAccount(editingAccount);
         return;
       }
@@ -310,6 +357,100 @@ class _AddAccountPageState extends ConsumerState<AddAccountPage> {
         setState(() => _isSaving = false);
       }
     }
+  }
+
+  Future<void> _authorizeGmail() async {
+    final l10n = AppLocalizations.of(context);
+    setState(() => _isAuthorizing = true);
+    try {
+      final result = await ref.read(gmailOAuthServiceProvider).authorize();
+      await ref
+          .read(accountRepositoryProvider)
+          .saveOAuthAccount(
+            emailAddress: result.emailAddress,
+            tokenRef: result.tokenRef,
+            provider: EmailProviderType.gmail,
+            displayName: _nameController.text.trim().isEmpty
+                ? null
+                : _nameController.text.trim(),
+          );
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.gmailAuthorizationSaved)));
+      Navigator.of(context).pop();
+    } on OAuthConfigurationException catch (error) {
+      _showOAuthError(l10n.gmailAuthorizationFailed(error.message));
+    } on OAuthAuthorizationCanceled {
+      _showOAuthError(l10n.gmailAuthorizationCanceled);
+    } on OAuthRefreshException catch (error) {
+      _showOAuthError(l10n.gmailAuthorizationFailed(error.message));
+    } on OAuthExchangeException catch (error) {
+      _showOAuthError(l10n.gmailAuthorizationFailed(error.message));
+    } finally {
+      if (mounted) {
+        setState(() => _isAuthorizing = false);
+      }
+    }
+  }
+
+  Future<void> _reauthorizeGmail() async {
+    final account = _editingAccount;
+    if (account == null) {
+      return;
+    }
+
+    final l10n = AppLocalizations.of(context);
+    setState(() => _isAuthorizing = true);
+    try {
+      final result = await ref.read(gmailOAuthServiceProvider).authorize();
+      if (result.emailAddress != account.emailAddress) {
+        await ref.read(gmailOAuthServiceProvider).revokeToken(result.tokenRef);
+        _showOAuthError(l10n.gmailReauthorizeEmailMismatch);
+        return;
+      }
+
+      await ref
+          .read(accountRepositoryProvider)
+          .updateOAuthAccount(
+            current: account,
+            tokenRef: result.tokenRef,
+            displayName: _nameController.text.trim().isEmpty
+                ? null
+                : _nameController.text.trim(),
+          );
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.gmailAuthorizationSaved)));
+      Navigator.of(context).pop();
+    } on OAuthConfigurationException catch (error) {
+      _showOAuthError(l10n.gmailAuthorizationFailed(error.message));
+    } on OAuthAuthorizationCanceled {
+      _showOAuthError(l10n.gmailAuthorizationCanceled);
+    } on OAuthRefreshException catch (error) {
+      _showOAuthError(l10n.gmailAuthorizationFailed(error.message));
+    } on OAuthExchangeException catch (error) {
+      _showOAuthError(l10n.gmailAuthorizationFailed(error.message));
+    } finally {
+      if (mounted) {
+        setState(() => _isAuthorizing = false);
+      }
+    }
+  }
+
+  void _showOAuthError(String message) {
+    if (!mounted) {
+      return;
+    }
+
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   Future<void> _testConnection() async {
@@ -414,6 +555,32 @@ class _AddAccountPageState extends ConsumerState<AddAccountPage> {
     }
   }
 
+  Future<void> _updateOAuthAccount(EmailAccount account) async {
+    final tokenRef = account.oauthTokenRef;
+    if (tokenRef == null) {
+      _showOAuthError(
+        AppLocalizations.of(context).gmailReauthorizationRequired,
+      );
+      return;
+    }
+
+    await ref
+        .read(accountRepositoryProvider)
+        .updateOAuthAccount(
+          current: account,
+          tokenRef: tokenRef,
+          displayName: _nameController.text.trim().isEmpty
+              ? null
+              : _nameController.text.trim(),
+        );
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppLocalizations.of(context).accountUpdated)),
+      );
+      Navigator.of(context).pop();
+    }
+  }
+
   EmailProviderType _providerFromStorageValue(String value) {
     return EmailProviderType.values.firstWhere(
       (provider) => provider.storageValue == value,
@@ -468,6 +635,44 @@ class _ProviderShortcuts extends StatelessWidget {
             label: Text(provider.$1),
             onPressed: () => onSelected(provider.$2),
           ),
+      ],
+    );
+  }
+}
+
+class _GmailOAuthSection extends StatelessWidget {
+  const _GmailOAuthSection({
+    required this.isAuthorizing,
+    required this.onAuthorize,
+  });
+
+  final bool isAuthorizing;
+  final VoidCallback onAuthorize;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        ListTile(
+          contentPadding: EdgeInsets.zero,
+          leading: const Icon(Icons.open_in_browser_outlined),
+          title: Text(l10n.gmailOAuthTitle),
+          subtitle: Text(l10n.gmailOAuthSystemBrowserNotice),
+        ),
+        FilledButton.icon(
+          onPressed: isAuthorizing ? null : onAuthorize,
+          icon: isAuthorizing
+              ? const SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : const Icon(Icons.login_outlined),
+          label: Text(l10n.authorizeGmail),
+        ),
       ],
     );
   }

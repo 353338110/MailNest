@@ -24,6 +24,24 @@
   "requiredField": "此项必填。",
   "invalidPort": "请输入有效端口。",
   "oauthFutureNotice": "真实 OAuth 授权将在后续版本支持。",
+  "gmailOAuthTitle": "使用 Google 登录",
+  "gmailOAuthSystemBrowserNotice": "MailNest 会在系统浏览器中打开 Google 授权，Token 只保存到安全存储。",
+  "authorizeGmail": "授权 Gmail",
+  "reauthorizeGmail": "重新授权 Gmail",
+  "gmailOAuthConnected": "Gmail 授权已连接。",
+  "gmailReauthorizeHelp": "如果 Google 访问权限被撤销或 Token 刷新失败，请重新授权。",
+  "gmailAuthorizationSaved": "Gmail 授权已保存。",
+  "gmailAuthorizationCanceled": "Gmail 授权已取消。",
+  "gmailAuthorizationFailed": "Gmail 授权失败：{reason}",
+  "@gmailAuthorizationFailed": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "gmailReauthorizeEmailMismatch": "请使用同一个 Gmail 地址重新授权。",
+  "gmailReauthorizationRequired": "需要重新授权 Gmail。",
   "ok": "确定",
   "qqMail": "QQ 邮箱",
   "neteaseMail": "网易邮箱",

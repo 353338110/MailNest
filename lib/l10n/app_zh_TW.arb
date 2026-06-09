@@ -24,6 +24,24 @@
   "requiredField": "此欄位必填。",
   "invalidPort": "請輸入有效連接埠。",
   "oauthFutureNotice": "真實 OAuth 授權將在後續版本支援。",
+  "gmailOAuthTitle": "使用 Google 登入",
+  "gmailOAuthSystemBrowserNotice": "MailNest 會在系統瀏覽器中開啟 Google 授權，Token 只儲存到安全儲存空間。",
+  "authorizeGmail": "授權 Gmail",
+  "reauthorizeGmail": "重新授權 Gmail",
+  "gmailOAuthConnected": "Gmail 授權已連接。",
+  "gmailReauthorizeHelp": "如果 Google 存取權遭撤銷或 Token 重新整理失敗，請重新授權。",
+  "gmailAuthorizationSaved": "Gmail 授權已儲存。",
+  "gmailAuthorizationCanceled": "Gmail 授權已取消。",
+  "gmailAuthorizationFailed": "Gmail 授權失敗：{reason}",
+  "@gmailAuthorizationFailed": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "gmailReauthorizeEmailMismatch": "請使用同一個 Gmail 地址重新授權。",
+  "gmailReauthorizationRequired": "需要重新授權 Gmail。",
   "ok": "確定",
   "qqMail": "QQ 信箱",
   "neteaseMail": "網易信箱",
