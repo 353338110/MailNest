@@ -68,5 +68,29 @@
       }
     }
   },
-  "noSubject": "（無主旨）"
+  "noSubject": "（無主旨）",
+  "backupAndMigration": "備份與遷移",
+  "backupAndMigrationSubtitle": "匯出加密設定備份。",
+  "exportConfiguration": "匯出設定",
+  "backupExportDescription": "建立包含帳號設定、伺服器設定和應用程式偏好的加密備份。匯入功能將在後續版本加入。",
+  "backupIncludes": "匯出內容",
+  "backupIncludesAccounts": "帳號設定",
+  "backupIncludesServerSettings": "IMAP 和 SMTP 設定",
+  "backupIncludesUserSettings": "使用者設定",
+  "backupIncludesLanguageSettings": "語言設定",
+  "backupIncludesTranslationSettings": "翻譯設定",
+  "backupExcludes": "預設不匯出",
+  "backupExcludesMailBodies": "郵件正文",
+  "backupExcludesHeaderCache": "郵件標頭快取",
+  "backupExcludesAttachmentCache": "附件快取",
+  "backupExcludesSearchIndex": "搜尋索引",
+  "exportPassword": "匯出密碼",
+  "confirmExportPassword": "確認匯出密碼",
+  "exportPasswordsDoNotMatch": "兩次輸入的密碼不一致。",
+  "exportPasswordNotSaved": "此密碼只用於加密匯出檔案，MailNest 不會保存。",
+  "exportBackup": "匯出備份",
+  "exportingBackup": "正在匯出...",
+  "backupExported": "備份已匯出：{fileName}",
+  "backupExportedTo": "已保存到 {filePath}",
+  "backupExportFailed": "備份匯出失敗。"
 }

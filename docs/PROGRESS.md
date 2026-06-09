@@ -15,7 +15,7 @@
 
 链接：https://github.com/353338110/MailNest/pull/1
 
-状态：已创建，待合并到 `main`
+状态：已合并到 `main`
 
 已完成内容：
 
@@ -40,7 +40,7 @@
 
 链接：https://github.com/353338110/MailNest/pull/2
 
-状态：已创建，base 为 `codex/first-stage-scaffold`，待 #1 合并后改 base 到 `main` 并合并
+状态：已合并到 `main`
 
 已完成内容：
 
@@ -57,7 +57,7 @@
 
 链接：https://github.com/353338110/MailNest/pull/3
 
-状态：已创建，base 为 `codex/account-management-crud`，待 #1/#2 合并后改 base 到 `main` 并合并
+状态：已合并到 `main`
 
 已完成内容：
 
@@ -71,6 +71,25 @@
 - 测试结果通过 snackbar 提示。
 - 不记录密码、授权码、Token 或认证响应。
 - 增加连接测试结果模型测试。
+
+### PR #5：加密配置导出
+
+链接：https://github.com/353338110/MailNest/pull/5
+
+状态：已合并到 `main`
+
+已完成内容：
+
+- 设置页新增“备份与迁移”入口，并通过保留导航栈的二级页面进入，页面可返回。
+- 新增加密配置导出页面，可输入并确认导出密码。
+- 导出账号配置、IMAP/SMTP 配置、用户设置、语言设置、翻译设置。
+- 使用用户输入密码通过 PBKDF2-HMAC-SHA256 派生 AES-256-GCM 密钥加密导出文件。
+- 导出密码只在内存中用于密钥派生，不保存到数据库、SecureStorage 或导出文件。
+- 导出账号 secret/token 时只写入加密 payload，不在 UI、日志或未加密 envelope 中展示。
+- 默认不读取、不导出邮件正文、邮件头缓存、附件缓存、搜索索引。
+- 导出文件名使用 `mailnest-backup-YYYYMMDD.enc`。
+- 不实现导入功能，导入保留为后续 PR。
+- 增加配置导出 service 测试，覆盖 payload 边界、文件名和密文不含明文账号数据。
 
 ### PR #13：本地搜索和 FTS
 
@@ -174,11 +193,10 @@ flutter test
 
 ### 配置导入导出
 
-- 加密导出配置。
 - 解密导入配置。
 - 导入冲突处理。
 - 导入后测试连接。
-- 导出语言设置、翻译设置、同步设置。
+- 导出同步设置。
 
 ### 搜索
 
@@ -238,21 +256,18 @@ flutter test
 8. `codex/reply-forward`：回复、回复全部、转发。
 9. `codex/drafts`：本地草稿。
 10. `codex/sent-records`：发送记录和 Sent 文件夹保存。
-11. `codex/backup-export`：加密配置导出。
-12. `codex/backup-import`：配置导入和冲突处理。
-13. `codex/local-search`：本地搜索和 FTS。（本分支）
-14. `codex/desktop-layout`：桌面三栏和响应式布局完善。
-15. `codex/mobile-navigation`：移动端 Drawer/NavigationDrawer。
-16. `codex/gmail-oauth`：Gmail OAuth。
-17. `codex/gmail-mail-provider`：Gmail 邮件列表、详情和发信。
-18. `codex/outlook-oauth`：Outlook OAuth。
-19. `codex/outlook-mail-provider`：Outlook 邮件列表、详情和发信。
-20. `codex/translation-ui`：邮件详情和写信翻译 UI。
-21. `codex/translation-provider`：真实翻译服务和隐私确认。
-22. `codex/release-workflow`：发布流程和 tag 自动化。
+11. `codex/backup-import`：配置导入和冲突处理。
+12. `codex/desktop-layout`：桌面三栏和响应式布局完善。
+13. `codex/mobile-navigation`：移动端 Drawer/NavigationDrawer。
+14. `codex/gmail-oauth`：Gmail OAuth。
+15. `codex/gmail-mail-provider`：Gmail 邮件列表、详情和发信。
+16. `codex/outlook-oauth`：Outlook OAuth。
+17. `codex/outlook-mail-provider`：Outlook 邮件列表、详情和发信。
+18. `codex/translation-ui`：邮件详情和写信翻译 UI。
+19. `codex/translation-provider`：真实翻译服务和隐私确认。
+20. `codex/release-workflow`：发布流程和 tag 自动化。
 
 ## 注意事项
 
 - 当前需求文档 `MailNest 项目规划与需求文档.docx` 仍未跟踪，默认不纳入代码 PR。
-- PR #1/#2/#3 是堆叠 PR；合并时需要按顺序合并，或者依次改 base 到 `main`。
-- 因 GitHub CLI 权限检查曾出现外部审核服务 503，合并 PR 前需要重新确认 `gh` 可访问 GitHub。
+- 合并 PR 前需要重新确认 `gh` 可访问 GitHub，并检查 CI 状态。

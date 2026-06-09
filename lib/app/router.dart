@@ -1,6 +1,7 @@
 import 'package:go_router/go_router.dart';
 
 import '../features/accounts/pages/add_account_page.dart';
+import '../features/backup/pages/backup_export_page.dart';
 import '../features/home/pages/home_page.dart';
 import '../features/onboarding/pages/onboarding_page.dart';
 import '../features/search/pages/local_search_page.dart';
@@ -32,6 +33,10 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/settings/translation',
       builder: (context, state) => const TranslationSettingsPage(),
+    ),
+    GoRoute(
+      path: '/settings/backup',
+      builder: (context, state) => const BackupExportPage(),
     ),
   ],
 );
