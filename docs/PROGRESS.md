@@ -74,9 +74,9 @@
 
 ### PR #4：邮箱视图导航
 
-链接：待创建
+链接：https://github.com/353338110/MailNest/pull/6
 
-状态：准备创建，base 为 `codex/progress-tracking`
+状态：已创建，base 为 `codex/progress-tracking`
 
 已完成内容：
 
