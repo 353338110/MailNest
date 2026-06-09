@@ -74,9 +74,9 @@
 
 ### PR #16：Gmail OAuth
 
-链接：待创建
+链接：https://github.com/353338110/MailNest/pull/16
 
-状态：已完成，待创建 PR
+状态：已创建，待合并
 
 已完成内容：
 
