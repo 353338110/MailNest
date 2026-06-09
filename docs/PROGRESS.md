@@ -74,9 +74,9 @@
 
 ### PR：加密配置导出
 
-链接：待创建
+链接：https://github.com/353338110/MailNest/pull/5
 
-状态：已实现，待创建 PR
+状态：已创建，待合并
 
 已完成内容：
 
@@ -230,7 +230,7 @@ flutter test
 8. `codex/reply-forward`：回复、回复全部、转发。
 9. `codex/drafts`：本地草稿。
 10. `codex/sent-records`：发送记录和 Sent 文件夹保存。
-11. `codex/backup-export`：加密配置导出。（已完成，待 PR 创建）
+11. `codex/backup-export`：加密配置导出。（已创建 PR #5）
 12. `codex/backup-import`：配置导入和冲突处理。
 13. `codex/local-search`：本地搜索和 FTS。
 14. `codex/desktop-layout`：桌面三栏和响应式布局完善。
