@@ -74,9 +74,9 @@
 
 ### PR #15：移动端 Drawer/NavigationDrawer
 
-链接：待创建
+链接：https://github.com/353338110/MailNest/pull/13
 
-状态：本分支 `codex/mobile-navigation` 待创建 PR
+状态：已创建，待合并
 
 已完成内容：
 
