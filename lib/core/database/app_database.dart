@@ -154,31 +154,63 @@ class AppDatabase extends _$AppDatabase {
     },
     onUpgrade: (migrator, from, to) async {
       if (from < 2) {
-        await migrator.createTable(draftMessages);
-        await migrator.createTable(sentMessages);
-        await migrator.createTable(localMailMessages);
+        await _createTableIfMissing(migrator, draftMessages);
+        await _createTableIfMissing(migrator, sentMessages);
+        await _createTableIfMissing(migrator, localMailMessages);
         await _createLocalSearchObjects();
       }
       if (from < 3) {
-        await migrator.createTable(mailSyncCursors);
+        await _createTableIfMissing(migrator, mailSyncCursors);
       }
       if (from < 4) {
-        await migrator.addColumn(
+        await _addColumnIfMissing(
+          migrator,
           localMailMessages,
           localMailMessages.cachedBodyIsHtml,
         );
-        await migrator.addColumn(
+        await _addColumnIfMissing(
+          migrator,
           localMailMessages,
           localMailMessages.rawHeaders,
         );
-        await migrator.addColumn(
+        await _addColumnIfMissing(
+          migrator,
           localMailMessages,
           localMailMessages.bodyCachedAt,
         );
-        await migrator.createTable(localMailAttachments);
+        await _createTableIfMissing(migrator, localMailAttachments);
       }
     },
   );
+
+  Future<void> _addColumnIfMissing(
+    Migrator migrator,
+    TableInfo<Table, Object?> table,
+    GeneratedColumn<Object> column,
+  ) async {
+    // Development builds may have partially migrated databases from earlier PRs.
+    // Check SQLite metadata before ALTER TABLE so startup remains recoverable.
+    final columns = await customSelect(
+      'PRAGMA table_info(${table.actualTableName})',
+    ).get();
+    final exists = columns.any((row) => row.data['name'] == column.$name);
+    if (!exists) {
+      await migrator.addColumn(table, column);
+    }
+  }
+
+  Future<void> _createTableIfMissing(
+    Migrator migrator,
+    TableInfo<Table, Object?> table,
+  ) async {
+    final rows = await customSelect(
+      "SELECT name FROM sqlite_master WHERE type = 'table' AND name = ?",
+      variables: [Variable<String>(table.actualTableName)],
+    ).get();
+    if (rows.isEmpty) {
+      await migrator.createTable(table);
+    }
+  }
 
   Future<List<EmailAccount>> watchableAccountsSnapshot() {
     return (select(
