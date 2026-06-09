@@ -72,6 +72,27 @@
 - 不记录密码、授权码、Token 或认证响应。
 - 增加连接测试结果模型测试。
 
+### PR #17：Gmail 邮件列表、详情和发信
+
+链接：https://github.com/353338110/MailNest/pull/29
+
+状态：已创建，分支为 `codex/gmail-mail-provider`
+
+已完成内容：
+
+- 新增基于 Gmail REST API 的 `GmailMailProvider`。
+- 支持 Gmail label/folder 列表读取。
+- 支持 Gmail 邮件列表读取，并按现有 `MailHeader` 模型展示。
+- 支持 Gmail 邮件详情读取，并按现有 `MailDetail` 模型展示纯文本或 HTML 正文。
+- 支持通过 Gmail API `messages.send` 发送文本邮件。
+- Gmail OAuth token 从 SecureStorage 读取，SQLite 仅保存 token 引用。
+- Access token 到期前自动刷新，Gmail API 返回 401 时刷新后重试一次。
+- Token 缺失、无效或刷新失败时返回重新授权提示。
+- 首页账号点击进入通用邮件列表页，详情页和写信页复用统一 `MailProvider` 流程。
+- 不实现 Outlook 邮件 Provider，不实现真实翻译。
+- 测试覆盖 Gmail token 序列化、列表、详情、发信和 token 刷新。
+- 邮件正文不写日志。
+
 ## 已验证
 
 最近一次验证命令：
@@ -155,10 +176,6 @@ flutter test
 ### Gmail
 
 - Gmail OAuth 授权。
-- Token 保存和刷新。
-- Gmail 邮件列表。
-- Gmail 邮件详情。
-- Gmail 发信。
 
 ### Outlook
 
@@ -218,7 +235,6 @@ flutter test
 14. `codex/desktop-layout`：桌面三栏和响应式布局完善。
 15. `codex/mobile-navigation`：移动端 Drawer/NavigationDrawer。
 16. `codex/gmail-oauth`：Gmail OAuth。
-17. `codex/gmail-mail-provider`：Gmail 邮件列表、详情和发信。
 18. `codex/outlook-oauth`：Outlook OAuth。
 19. `codex/outlook-mail-provider`：Outlook 邮件列表、详情和发信。
 20. `codex/translation-ui`：邮件详情和写信翻译 UI。

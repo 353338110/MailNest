@@ -43,7 +43,7 @@ class HomePage extends ConsumerWidget {
               final account = data[index];
               return Card(
                 child: ListTile(
-                  onTap: () => context.push('/accounts/${account.id}/edit'),
+                  onTap: () => context.push('/accounts/${account.id}/mail'),
                   leading: const Icon(Icons.alternate_email),
                   title: Text(account.emailAddress),
                   subtitle: Text(
