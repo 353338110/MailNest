@@ -154,6 +154,38 @@ class AppLocalizationsZh extends AppLocalizations {
   String get unknownError => '未知错误';
 
   @override
+  String get searchMail => '搜索邮件';
+
+  @override
+  String get searchMailHint => '发件人、收件人、主题、摘要或已缓存正文';
+
+  @override
+  String get clearSearch => '清除搜索';
+
+  @override
+  String get localSearchLocalOnlyNotice =>
+      '搜索只覆盖已同步到本设备的邮件。尚未同步到本地的邮件不会出现在结果中。';
+
+  @override
+  String get searchMailEmptyPrompt => '搜索本地已同步邮件。';
+
+  @override
+  String get searchMailFailed => '搜索失败，请重试。';
+
+  @override
+  String noLocalSearchResults(String query) {
+    return '没有找到“$query”的本地结果。';
+  }
+
+  @override
+  String localSearchResultCount(int count) {
+    return '$count 条本地结果';
+  }
+
+  @override
+  String get noSubject => '（无主题）';
+
+  @override
   String get backupAndMigration => '备份与迁移';
 
   @override
@@ -381,6 +413,38 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get unknownError => '未知错误';
 
   @override
+  String get searchMail => '搜索邮件';
+
+  @override
+  String get searchMailHint => '发件人、收件人、主题、摘要或已缓存正文';
+
+  @override
+  String get clearSearch => '清除搜索';
+
+  @override
+  String get localSearchLocalOnlyNotice =>
+      '搜索只覆盖已同步到本设备的邮件。尚未同步到本地的邮件不会出现在结果中。';
+
+  @override
+  String get searchMailEmptyPrompt => '搜索本地已同步邮件。';
+
+  @override
+  String get searchMailFailed => '搜索失败，请重试。';
+
+  @override
+  String noLocalSearchResults(String query) {
+    return '没有找到“$query”的本地结果。';
+  }
+
+  @override
+  String localSearchResultCount(int count) {
+    return '$count 条本地结果';
+  }
+
+  @override
+  String get noSubject => '（无主题）';
+
+  @override
   String get backupAndMigration => '备份与迁移';
 
   @override
@@ -606,6 +670,38 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get unknownError => '未知錯誤';
+
+  @override
+  String get searchMail => '搜尋郵件';
+
+  @override
+  String get searchMailHint => '寄件人、收件人、主旨、摘要或已快取內文';
+
+  @override
+  String get clearSearch => '清除搜尋';
+
+  @override
+  String get localSearchLocalOnlyNotice =>
+      '搜尋只涵蓋已同步到此裝置的郵件。尚未同步到本機的郵件不會出現在結果中。';
+
+  @override
+  String get searchMailEmptyPrompt => '搜尋本機已同步郵件。';
+
+  @override
+  String get searchMailFailed => '搜尋失敗，請重試。';
+
+  @override
+  String noLocalSearchResults(String query) {
+    return '沒有找到「$query」的本機結果。';
+  }
+
+  @override
+  String localSearchResultCount(int count) {
+    return '$count 筆本機結果';
+  }
+
+  @override
+  String get noSubject => '（無主旨）';
 
   @override
   String get backupAndMigration => '備份與遷移';

@@ -398,6 +398,60 @@ abstract class AppLocalizations {
   /// **'Unknown error'**
   String get unknownError;
 
+  /// No description provided for @searchMail.
+  ///
+  /// In en, this message translates to:
+  /// **'Search mail'**
+  String get searchMail;
+
+  /// No description provided for @searchMailHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Sender, recipient, subject, summary, or cached body'**
+  String get searchMailHint;
+
+  /// No description provided for @clearSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear search'**
+  String get clearSearch;
+
+  /// No description provided for @localSearchLocalOnlyNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Search only covers mail already synced to this device. Mail that has not been synced locally will not appear.'**
+  String get localSearchLocalOnlyNotice;
+
+  /// No description provided for @searchMailEmptyPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Search local synced mail.'**
+  String get searchMailEmptyPrompt;
+
+  /// No description provided for @searchMailFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Search failed. Try again.'**
+  String get searchMailFailed;
+
+  /// No description provided for @noLocalSearchResults.
+  ///
+  /// In en, this message translates to:
+  /// **'No local results for “{query}”.'**
+  String noLocalSearchResults(String query);
+
+  /// No description provided for @localSearchResultCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} local results'**
+  String localSearchResultCount(int count);
+
+  /// No description provided for @noSubject.
+  ///
+  /// In en, this message translates to:
+  /// **'(No subject)'**
+  String get noSubject;
+
   /// No description provided for @backupAndMigration.
   ///
   /// In en, this message translates to:

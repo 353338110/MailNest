@@ -60,6 +60,29 @@
   },
   "passwordRequiredForConnectionTest": "Enter a password or app password before testing.",
   "unknownError": "Unknown error",
+  "searchMail": "Search mail",
+  "searchMailHint": "Sender, recipient, subject, summary, or cached body",
+  "clearSearch": "Clear search",
+  "localSearchLocalOnlyNotice": "Search only covers mail already synced to this device. Mail that has not been synced locally will not appear.",
+  "searchMailEmptyPrompt": "Search local synced mail.",
+  "searchMailFailed": "Search failed. Try again.",
+  "noLocalSearchResults": "No local results for “{query}”.",
+  "@noLocalSearchResults": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "localSearchResultCount": "{count} local results",
+  "@localSearchResultCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noSubject": "(No subject)",
   "backupAndMigration": "Backup and migration",
   "backupAndMigrationSubtitle": "Export an encrypted configuration backup.",
   "exportConfiguration": "Export configuration",
