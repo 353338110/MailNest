@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../app/theme/app_spacing.dart';
 import '../../../core/database/app_database.dart';
 import '../../../l10n/generated/app_localizations.dart';
+import '../../../mail/provider/mail_connection_tester.dart';
+import '../../../mail/provider/mail_connection_tester_provider.dart';
 import '../../../mail/repository/account_repository_provider.dart';
 import '../controllers/mail_config_detector.dart';
 import '../models/email_provider_type.dart';
@@ -36,6 +38,7 @@ class _AddAccountPageState extends ConsumerState<AddAccountPage> {
   bool _smtpStartTls = true;
   bool _isSaving = false;
   bool _isLoading = false;
+  bool _isTesting = false;
   EmailAccount? _editingAccount;
 
   bool get _isEditing => widget.accountId != null;
@@ -140,6 +143,22 @@ class _AddAccountPageState extends ConsumerState<AddAccountPage> {
                             setState(() => _smtpStartTls = value),
                       ),
                       const SizedBox(height: AppSpacing.large),
+                      OutlinedButton.icon(
+                        onPressed: _isSaving || _isTesting
+                            ? null
+                            : _testConnection,
+                        icon: _isTesting
+                            ? const SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : const Icon(Icons.wifi_tethering_outlined),
+                        label: Text(l10n.testConnection),
+                      ),
+                      const SizedBox(height: AppSpacing.medium),
                       FilledButton.icon(
                         onPressed: _isSaving ? null : _saveAccount,
                         icon: _isSaving
@@ -291,6 +310,79 @@ class _AddAccountPageState extends ConsumerState<AddAccountPage> {
         setState(() => _isSaving = false);
       }
     }
+  }
+
+  Future<void> _testConnection() async {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    final l10n = AppLocalizations.of(context);
+    final settings = await _connectionSettings();
+    if (settings == null) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.passwordRequiredForConnectionTest)),
+        );
+      }
+      return;
+    }
+
+    setState(() => _isTesting = true);
+    try {
+      final result = await ref
+          .read(mailConnectionTesterProvider)
+          .test(settings: settings);
+      if (!mounted) {
+        return;
+      }
+
+      final message = result.isSuccess
+          ? l10n.connectionTestSucceeded
+          : l10n.connectionTestFailed(result.firstError ?? l10n.unknownError);
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message)));
+    } finally {
+      if (mounted) {
+        setState(() => _isTesting = false);
+      }
+    }
+  }
+
+  Future<MailConnectionSettings?> _connectionSettings() async {
+    final secret = await _secretForConnectionTest();
+    if (secret == null || secret.isEmpty) {
+      return null;
+    }
+
+    return MailConnectionSettings(
+      username: _usernameController.text.trim(),
+      secret: secret,
+      imapHost: _imapHostController.text.trim(),
+      imapPort: int.parse(_imapPortController.text.trim()),
+      imapSecurity: _imapSecurity,
+      smtpHost: _smtpHostController.text.trim(),
+      smtpPort: int.parse(_smtpPortController.text.trim()),
+      smtpSecurity: _smtpSecurity,
+      smtpStartTls: _smtpStartTls,
+    );
+  }
+
+  Future<String?> _secretForConnectionTest() async {
+    if (_secretController.text.isNotEmpty) {
+      return _secretController.text;
+    }
+
+    final secretRef = _editingAccount?.secretRef;
+    if (secretRef == null) {
+      return null;
+    }
+
+    return ref
+        .read(accountRepositoryProvider)
+        .secureStorage
+        .readSecret(secretRef);
   }
 
   Future<void> _updateAccount(EmailAccount account) async {

@@ -40,5 +40,10 @@
   "deleteAccountMessage": "要从此设备删除 {emailAddress} 吗？保存的密钥也会一并移除。",
   "accountDeleted": "账号已删除。",
   "cancel": "取消",
-  "leavePasswordUnchanged": "新密码或授权码（留空则保持不变）"
+  "leavePasswordUnchanged": "新密码或授权码（留空则保持不变）",
+  "testConnection": "测试连接",
+  "connectionTestSucceeded": "IMAP 和 SMTP 连接测试通过。",
+  "connectionTestFailed": "连接测试失败：{reason}",
+  "passwordRequiredForConnectionTest": "请先输入密码或授权码再测试。",
+  "unknownError": "未知错误"
 }

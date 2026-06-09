@@ -40,5 +40,10 @@
   "deleteAccountMessage": "要從此裝置刪除 {emailAddress} 嗎？儲存的密鑰也會一併移除。",
   "accountDeleted": "帳號已刪除。",
   "cancel": "取消",
-  "leavePasswordUnchanged": "新密碼或授權碼（留空則保持不變）"
+  "leavePasswordUnchanged": "新密碼或授權碼（留空則保持不變）",
+  "testConnection": "測試連線",
+  "connectionTestSucceeded": "IMAP 和 SMTP 連線測試通過。",
+  "connectionTestFailed": "連線測試失敗：{reason}",
+  "passwordRequiredForConnectionTest": "請先輸入密碼或授權碼再測試。",
+  "unknownError": "未知錯誤"
 }
