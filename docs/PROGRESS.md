@@ -15,7 +15,7 @@
 
 链接：https://github.com/353338110/MailNest/pull/1
 
-状态：已创建，待合并到 `main`
+状态：已合并到 `main`
 
 已完成内容：
 
@@ -40,7 +40,7 @@
 
 链接：https://github.com/353338110/MailNest/pull/2
 
-状态：已创建，base 为 `codex/first-stage-scaffold`，待 #1 合并后改 base 到 `main` 并合并
+状态：已合并到 `main`
 
 已完成内容：
 
@@ -57,7 +57,7 @@
 
 链接：https://github.com/353338110/MailNest/pull/3
 
-状态：已创建，base 为 `codex/account-management-crud`，待 #1/#2 合并后改 base 到 `main` 并合并
+状态：已合并到 `main`
 
 已完成内容：
 
@@ -72,21 +72,149 @@
 - 不记录密码、授权码、Token 或认证响应。
 - 增加连接测试结果模型测试。
 
+
 ### PR #15：移动端 Drawer/NavigationDrawer
 
 链接：https://github.com/353338110/MailNest/pull/13
+
+状态：已创建，CI 待验证，待合并到 `main`
+
+已完成内容：
+
+- Android/iOS 和窄屏首页使用 NavigationDrawer。
+- Drawer 提供统一收件箱、搜索、写邮件、草稿、已发送、账号和设置入口。
+- Drawer 内二级入口使用保留导航栈跳转，页面可正常返回。
+- 写邮件 FAB 在已有账号时直接进入写邮件页，无账号时保持添加账号入口。
+- 保留桌面宽屏邮箱工作台布局，不改协议逻辑。
+- 增加窄屏 Drawer 相关 widget 测试。
+
+### PR #16：Gmail OAuth
+
+链接：https://github.com/353338110/MailNest/pull/16
 
 状态：已创建，待合并
 
 已完成内容：
 
-- Android、iOS 和窄屏启用移动端 `NavigationDrawer`。
-- 首页 AppBar 在移动端提供系统 Drawer 菜单按钮，桌面宽屏保留设置快捷入口。
-- Drawer 清晰展示收件箱、文件夹、账号、添加账号和设置入口。
-- 账号入口可进入账号编辑页，添加账号和设置保持保留导航栈的二级页面返回。
-- 写邮件 FAB 在已有账号时保持右下角易用位置，并在写邮件功能未实现前给出后续版本提示。
-- 未改动桌面三栏逻辑以外的邮件协议功能。
-- 增加窄屏 Drawer 导航 Widget 测试。
+- 新增 Gmail OAuth 授权流程。
+- 移动端使用系统浏览器和 app link 回调抽象。
+- 桌面端使用短生命周期 localhost loopback callback。
+- Google 登录强制使用系统浏览器，不在 App WebView 输入 Google 密码。
+- 使用 PKCE 授权码流程获取 token。
+- Token JSON 只保存到 SecureStorage。
+- 数据库只保存 `oauth_token_ref`，不保存 token 内容。
+- 支持 token 刷新失败提示重新授权。
+- 支持取消授权、授权超时、重新授权和账号不匹配提示。
+- Gmail 账号保存为 OAuth 账号，不实现 Gmail 邮件列表、详情或发信。
+- 补充 OAuth token 和账号 token ref 测试。
+
+### PR #4：邮箱视图导航
+
+链接：https://github.com/353338110/MailNest/pull/6
+
+状态：已创建，CI 待验证，待合并到 `main`
+
+已完成内容：
+
+- 首页从单纯账号列表改为邮箱工作台。
+- 支持统一收件箱入口。
+- 支持按账号查看本地邮件头列表。
+- 支持按账号下 Inbox、Sent、Drafts、Trash 文件夹查看。
+- 支持未读、星标、已发送、草稿箱、垃圾箱基础筛选。
+- 在真实邮件头同步完成前，使用基于账号的本地轻量邮件头样例驱动视图。
+- 保留账号添加、编辑、启用/停用、删除入口和确认流程。
+- 桌面使用左侧导航加右侧列表布局；移动端保持同页返回路径，不进入无法返回的子页面。
+- 不实现邮件详情正文、附件、发信、远程搜索。
+- 增加邮箱视图过滤 repository 测试。
+
+### PR #5：加密配置导出
+
+链接：https://github.com/353338110/MailNest/pull/5
+
+状态：已合并到 `main`
+
+已完成内容：
+
+- 设置页新增“备份与迁移”入口，并通过保留导航栈的二级页面进入，页面可返回。
+- 新增加密配置导出页面，可输入并确认导出密码。
+- 导出账号配置、IMAP/SMTP 配置、用户设置、语言设置、翻译设置。
+- 使用用户输入密码通过 PBKDF2-HMAC-SHA256 派生 AES-256-GCM 密钥加密导出文件。
+- 导出密码只在内存中用于密钥派生，不保存到数据库、SecureStorage 或导出文件。
+- 导出账号 secret/token 时只写入加密 payload，不在 UI、日志或未加密 envelope 中展示。
+- 默认不读取、不导出邮件正文、邮件头缓存、附件缓存、搜索索引。
+- 导出文件名使用 `mailnest-backup-YYYYMMDD.enc`。
+- 不实现导入功能，导入保留为后续 PR。
+- 增加配置导出 service 测试，覆盖 payload 边界、文件名和密文不含明文账号数据。
+
+
+
+### PR #10：发送记录和 Sent 文件夹保存
+
+链接：https://github.com/353338110/MailNest/pull/11
+
+状态：已创建，CI 待验证，待合并到 `main`
+
+已完成内容：
+
+- 新增本地发送记录 Drift 表和 repository。
+- SMTP 发信成功后可保存本地发送记录。
+- 新增 Sent 文件夹 IMAP APPEND 支持和失败状态记录。
+- 无法保存到远端 Sent 时保留本地记录并展示状态。
+- 首页新增已发送入口，页面可正常返回。
+- 新增发送记录列表页，支持加载、空状态和错误状态。
+- 不实现 Gmail/Outlook API 已发送同步。
+- 增加发送记录 service 测试。
+
+### PR #9：本地草稿
+
+链接：https://github.com/353338110/MailNest/pull/7
+
+状态：已创建，CI 待验证，待合并到 `main`
+
+已完成内容：
+
+- 新增本地草稿 Drift 表，草稿正文只保存在本地数据库。
+- 新增草稿 repository，支持保存、读取、列表和删除。
+- 首页新增写邮件和草稿入口，页面使用保留导航栈跳转，可正常返回。
+- 新增写邮件页面，支持填写收件人、抄送、密送、主题和正文。
+- 支持手动保存草稿和编辑已有草稿。
+- 支持删除草稿，删除前显示确认弹窗。
+- 不实现 SMTP 发信、附件、Gmail/Outlook 发信。
+- 增加草稿 repository 测试。
+
+### PR #13：本地搜索和 FTS
+
+链接：https://github.com/353338110/MailNest/pull/8
+
+状态：已创建，CI 通过，待合并到 `main`
+
+已完成内容：
+
+- 新增本地邮件缓存表，为后续同步 PR 写入本地邮件数据提供查询目标。
+- 新增 SQLite FTS5 索引，覆盖发件人、收件人、主题、摘要、已缓存正文。
+- 新增本地搜索 repository 和 Drift 查询方法，只查询本机 SQLite 缓存。
+- 首页新增搜索入口，使用保留导航栈的二级页面跳转。
+- 新增搜索结果页，支持返回、输入搜索、清空搜索、加载/空结果/错误状态。
+- 搜索页提示未同步历史邮件时只能搜索本地已同步内容。
+- 不做远程全量搜索。
+
+### PR #22：多平台构建 CI
+
+链接：https://github.com/353338110/MailNest/pull/4
+
+状态：已合并到 `main`
+
+已完成内容：
+
+- 保留 PR Check 的 `dart format`、`flutter analyze`、`flutter test` 基础检查。
+- 将 Flutter workflow 切换到 `master` channel，以匹配当前 Dart dev SDK 约束。
+- CI workflow 增加 `workflow_dispatch` 手动触发。
+- CI workflow 增加 Linux、Android、Windows、macOS、iOS 分阶段构建 job。
+- Linux/Android 构建使用 Ubuntu runner。
+- Windows 构建使用 Windows runner。
+- macOS/iOS 构建使用 macOS runner。
+- iOS 构建使用 `--no-codesign`，避免 CI 依赖签名证书。
+- 手动触发 CI 时可按平台选择是否运行重平台构建。
 
 ## 已验证
 
@@ -109,10 +237,10 @@ flutter test
 - 最近 30 天邮件头同步。
 - 增量同步游标。
 - 邮件列表真实数据展示。
-- 统一收件箱。
-- 按账号查看邮件。
-- 按文件夹查看邮件。
-- 未读、星标、已发送、草稿箱、垃圾箱等基础视图。
+- 统一收件箱接入真实数据源。
+- 按账号查看真实邮件。
+- 按文件夹查看真实邮件。
+- 未读、星标、已发送、草稿箱、垃圾箱等基础视图接入真实状态。
 
 ### 邮件详情与 MIME
 
@@ -142,36 +270,26 @@ flutter test
 - 回复、回复全部、转发。
 - 添加收件人、抄送、密送。
 - 添加/删除附件。
-- 本地发送记录。
-- 尝试 IMAP APPEND 保存到 Sent 文件夹。
+- 发送记录与远端 Sent 状态接入真实发信流程。
 
 ### 草稿
 
-- 本地草稿。
 - 自动保存草稿。
-- 手动保存草稿。
-- 删除草稿。
-- 编辑草稿。
 - 发送草稿。
 
 ### 配置导入导出
 
-- 加密导出配置。
 - 解密导入配置。
 - 导入冲突处理。
 - 导入后测试连接。
-- 导出语言设置、翻译设置、同步设置。
+- 导出同步设置。
 
 ### 搜索
 
-- 本地搜索。
-- SQLite FTS。
-- 搜索发件人、收件人、主题、摘要、已缓存正文。
+- 远程全量搜索。
 
 ### Gmail
 
-- Gmail OAuth 授权。
-- Token 保存和刷新。
 - Gmail 邮件列表。
 - Gmail 邮件详情。
 - Gmail 发信。
@@ -204,12 +322,6 @@ flutter test
 
 ### CI 与发布
 
-- 多平台构建 CI。
-- Linux build。
-- Android build。
-- Windows build。
-- macOS build。
-- iOS build。
 - Release workflow。
 - SemVer tag 发布流程。
 
@@ -219,29 +331,24 @@ flutter test
 
 1. `codex/mail-folder-sync`：IMAP 文件夹列表同步和本地保存。
 2. `codex/mail-header-sync`：最近 30 天邮件头同步和邮件列表真实数据。
-3. `codex/mailbox-views`：统一收件箱、按账号/文件夹查看、基础状态筛选。
-4. `codex/mail-detail-mime`：邮件详情、正文拉取、MIME 解析。
-5. `codex/html-rendering-privacy`：HTML 渲染、远程图片拦截、外部链接处理。
-6. `codex/attachments-cache`：附件列表、下载、缓存和打开。
-7. `codex/composer-smtp-send`：写邮件和 SMTP 发信。
-8. `codex/reply-forward`：回复、回复全部、转发。
-9. `codex/drafts`：本地草稿。
-10. `codex/sent-records`：发送记录和 Sent 文件夹保存。
-11. `codex/backup-export`：加密配置导出。
-12. `codex/backup-import`：配置导入和冲突处理。
-13. `codex/local-search`：本地搜索和 FTS。
-14. `codex/desktop-layout`：桌面三栏和响应式布局完善。
-15. `codex/gmail-oauth`：Gmail OAuth。
-17. `codex/gmail-mail-provider`：Gmail 邮件列表、详情和发信。
-18. `codex/outlook-oauth`：Outlook OAuth。
-19. `codex/outlook-mail-provider`：Outlook 邮件列表、详情和发信。
-20. `codex/translation-ui`：邮件详情和写信翻译 UI。
-21. `codex/translation-provider`：真实翻译服务和隐私确认。
-22. `codex/multiplatform-ci`：多平台构建 CI。
-23. `codex/release-workflow`：发布流程和 tag 自动化。
+3. `codex/mail-detail-mime`：邮件详情、正文拉取、MIME 解析。
+4. `codex/html-rendering-privacy`：HTML 渲染、远程图片拦截、外部链接处理。
+5. `codex/attachments-cache`：附件列表、下载、缓存和打开。
+6. `codex/composer-smtp-send`：写邮件和 SMTP 发信。
+7. `codex/reply-forward`：回复、回复全部、转发。
+8. `codex/drafts`：本地草稿。
+9. `codex/sent-records`：发送记录和 Sent 文件夹保存。
+10. `codex/backup-import`：配置导入和冲突处理。
+11. `codex/desktop-layout`：桌面三栏和响应式布局完善。
+12. `codex/mobile-navigation`：移动端 Drawer/NavigationDrawer。
+13. `codex/gmail-mail-provider`：Gmail 邮件列表、详情和发信。
+14. `codex/outlook-oauth`：Outlook OAuth。
+15. `codex/outlook-mail-provider`：Outlook 邮件列表、详情和发信。
+16. `codex/translation-ui`：邮件详情和写信翻译 UI。
+17. `codex/translation-provider`：真实翻译服务和隐私确认。
+18. `codex/release-workflow`：发布流程和 tag 自动化。
 
 ## 注意事项
 
 - 当前需求文档 `MailNest 项目规划与需求文档.docx` 仍未跟踪，默认不纳入代码 PR。
-- PR #1/#2/#3 是堆叠 PR；合并时需要按顺序合并，或者依次改 base 到 `main`。
-- 因 GitHub CLI 权限检查曾出现外部审核服务 503，合并 PR 前需要重新确认 `gh` 可访问 GitHub。
+- 合并 PR 前需要重新确认 `gh` 可访问 GitHub，并检查 CI 状态。

@@ -1,7 +1,9 @@
 /// Cross-platform OAuth boundary for Gmail and Outlook.
 ///
-/// Mobile implementations should use system browser redirects. Desktop
-/// implementations should use a short-lived localhost callback server.
+/// Mobile implementations must use system browser redirects plus an app-link
+/// callback. Desktop implementations should use a short-lived localhost
+/// callback server. Implementations must never collect provider passwords in an
+/// app WebView.
 abstract class OAuthService {
   Future<void> startAuthorization();
 
@@ -10,4 +12,40 @@ abstract class OAuthService {
   Future<void> refreshToken();
 
   Future<void> revokeToken();
+}
+
+class OAuthAuthorizationCanceled implements Exception {
+  const OAuthAuthorizationCanceled([this.message = 'Authorization canceled.']);
+
+  final String message;
+
+  @override
+  String toString() => message;
+}
+
+class OAuthConfigurationException implements Exception {
+  const OAuthConfigurationException(this.message);
+
+  final String message;
+
+  @override
+  String toString() => message;
+}
+
+class OAuthExchangeException implements Exception {
+  const OAuthExchangeException(this.message);
+
+  final String message;
+
+  @override
+  String toString() => message;
+}
+
+class OAuthRefreshException implements Exception {
+  const OAuthRefreshException(this.message);
+
+  final String message;
+
+  @override
+  String toString() => message;
 }

@@ -24,6 +24,24 @@
   "requiredField": "此欄位必填。",
   "invalidPort": "請輸入有效連接埠。",
   "oauthFutureNotice": "真實 OAuth 授權將在後續版本支援。",
+  "gmailOAuthTitle": "使用 Google 登入",
+  "gmailOAuthSystemBrowserNotice": "MailNest 會在系統瀏覽器中開啟 Google 授權，Token 只儲存到安全儲存空間。",
+  "authorizeGmail": "授權 Gmail",
+  "reauthorizeGmail": "重新授權 Gmail",
+  "gmailOAuthConnected": "Gmail 授權已連接。",
+  "gmailReauthorizeHelp": "如果 Google 存取權遭撤銷或 Token 重新整理失敗，請重新授權。",
+  "gmailAuthorizationSaved": "Gmail 授權已儲存。",
+  "gmailAuthorizationCanceled": "Gmail 授權已取消。",
+  "gmailAuthorizationFailed": "Gmail 授權失敗：{reason}",
+  "@gmailAuthorizationFailed": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "gmailReauthorizeEmailMismatch": "請使用同一個 Gmail 地址重新授權。",
+  "gmailReauthorizationRequired": "需要重新授權 Gmail。",
   "ok": "確定",
   "qqMail": "QQ 信箱",
   "neteaseMail": "網易信箱",
@@ -46,6 +64,64 @@
   "connectionTestFailed": "連線測試失敗：{reason}",
   "passwordRequiredForConnectionTest": "請先輸入密碼或授權碼再測試。",
   "unknownError": "未知錯誤",
+  "searchMail": "搜尋郵件",
+  "searchMailHint": "寄件人、收件人、主旨、摘要或已快取內文",
+  "clearSearch": "清除搜尋",
+  "localSearchLocalOnlyNotice": "搜尋只涵蓋已同步到此裝置的郵件。尚未同步到本機的郵件不會出現在結果中。",
+  "searchMailEmptyPrompt": "搜尋本機已同步郵件。",
+  "searchMailFailed": "搜尋失敗，請重試。",
+  "noLocalSearchResults": "沒有找到「{query}」的本機結果。",
+  "@noLocalSearchResults": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "localSearchResultCount": "{count} 筆本機結果",
+  "@localSearchResultCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noSubject": "（無主旨）",
+  "backupAndMigration": "備份與遷移",
+  "backupAndMigrationSubtitle": "匯出加密設定備份。",
+  "exportConfiguration": "匯出設定",
+  "backupExportDescription": "建立包含帳號設定、伺服器設定和應用程式偏好的加密備份。匯入功能將在後續版本加入。",
+  "backupIncludes": "匯出內容",
+  "backupIncludesAccounts": "帳號設定",
+  "backupIncludesServerSettings": "IMAP 和 SMTP 設定",
+  "backupIncludesUserSettings": "使用者設定",
+  "backupIncludesLanguageSettings": "語言設定",
+  "backupIncludesTranslationSettings": "翻譯設定",
+  "backupExcludes": "預設不匯出",
+  "backupExcludesMailBodies": "郵件正文",
+  "backupExcludesHeaderCache": "郵件標頭快取",
+  "backupExcludesAttachmentCache": "附件快取",
+  "backupExcludesSearchIndex": "搜尋索引",
+  "exportPassword": "匯出密碼",
+  "confirmExportPassword": "確認匯出密碼",
+  "exportPasswordsDoNotMatch": "兩次輸入的密碼不一致。",
+  "exportPasswordNotSaved": "此密碼只用於加密匯出檔案，MailNest 不會保存。",
+  "exportBackup": "匯出備份",
+  "exportingBackup": "正在匯出...",
+  "backupExported": "備份已匯出：{fileName}",
+  "backupExportedTo": "已保存到 {filePath}",
+  "backupExportFailed": "備份匯出失敗。",
+  "sentMessages": "已傳送",
+  "noSentMessagesYet": "尚無已傳送郵件。",
+  "sentToRecipients": "收件人：{recipients}",
+  "chooseSentFolder": "選擇 Sent 資料夾",
+  "sentFolderOnlyLocalRecord": "這封郵件僅儲存了本機傳送記錄。",
+  "sentFolderSavePending": "正在儲存到 Sent",
+  "sentFolderSaved": "已儲存到 {folderName}",
+  "sentFolderSelectionRequired": "請選擇 Sent 資料夾",
+  "sentFolderSaveFailed": "Sent 資料夾儲存失敗",
+  "sentFolderAppendSucceeded": "已儲存到 {folderName}。",
+  "sentFolderAppendFailed": "無法儲存到 Sent：{reason}",
   "inbox": "收件匣",
   "folders": "資料夾",
   "accounts": "帳號",
