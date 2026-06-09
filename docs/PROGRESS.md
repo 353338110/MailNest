@@ -72,6 +72,23 @@
 - 不记录密码、授权码、Token 或认证响应。
 - 增加连接测试结果模型测试。
 
+### PR #23：发布流程和 tag 自动化
+
+链接：待创建
+
+状态：本分支实现中，base 为 `codex/progress-tracking`
+
+已完成内容：
+
+- 新增 `Release` GitHub Actions workflow。
+- 支持 `vMAJOR.MINOR.PATCH` 格式 SemVer tag 触发，例如 `v0.1.0`、`v0.2.0`。
+- 支持手动输入已有 tag 触发发布。
+- 发布前校验 tag 与 `pubspec.yaml` 版本一致。
+- 发布前运行 format、analyze、test。
+- 生成 GitHub Release 和基础 release notes artifact。
+- 明确 Android、iOS、macOS、Windows、Linux 分阶段发布策略。
+- 不引入自动合并或自动商店发布。
+
 ## 已验证
 
 最近一次验证命令：
@@ -196,7 +213,6 @@ flutter test
 - macOS build。
 - iOS build。
 - Release workflow。
-- SemVer tag 发布流程。
 
 ## 后续 PR 队列
 
@@ -224,7 +240,7 @@ flutter test
 20. `codex/translation-ui`：邮件详情和写信翻译 UI。
 21. `codex/translation-provider`：真实翻译服务和隐私确认。
 22. `codex/multiplatform-ci`：多平台构建 CI。
-23. `codex/release-workflow`：发布流程和 tag 自动化。
+23. `codex/release-workflow`：发布流程和 tag 自动化。（本 PR）
 
 ## 注意事项
 

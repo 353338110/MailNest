@@ -1,0 +1,113 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing SemVer tag to release, for example v0.1.0'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Resolve release tag
+        id: release_tag
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            tag="${{ inputs.tag }}"
+          else
+            tag="${GITHUB_REF_NAME}"
+          fi
+
+          if ! printf '%s\n' "$tag" | grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "Release tag must match vMAJOR.MINOR.PATCH, got: $tag" >&2
+            exit 1
+          fi
+
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "version=${tag#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.release_tag.outputs.tag }}
+
+      - name: Validate pubspec version
+        run: |
+          pubspec_version="$(grep -E '^version:' pubspec.yaml | awk '{print $2}' | cut -d+ -f1)"
+          release_version="${{ steps.release_tag.outputs.version }}"
+
+          if [ "$pubspec_version" != "$release_version" ]; then
+            echo "pubspec.yaml version ($pubspec_version) must match release tag ($release_version)." >&2
+            exit 1
+          fi
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Generate code
+        run: dart run build_runner build
+
+      - name: Check formatting
+        run: dart format --output=none --set-exit-if-changed .
+
+      - name: Analyze
+        run: flutter analyze
+
+      - name: Run tests
+        run: flutter test
+
+      - name: Create release notes artifact
+        run: |
+          mkdir -p release
+          {
+            echo "# MailNest ${{ steps.release_tag.outputs.tag }}"
+            echo
+            echo "Release tag: ${{ steps.release_tag.outputs.tag }}"
+            echo
+            echo "## Release strategy"
+            echo
+            echo "MailNest uses staged platform releases until signing, notarization, and store delivery are configured for every target."
+            echo
+            echo "- Android: build and sign APK/AAB from the release tag, then distribute through an internal track before wider rollout."
+            echo "- iOS: archive from the release tag and distribute through TestFlight before App Store release."
+            echo "- macOS: archive, sign, notarize, and distribute after manual verification on supported macOS versions."
+            echo "- Windows: build the release bundle or installer from the release tag, then verify on supported Windows versions."
+            echo "- Linux: build the release bundle from the release tag, then verify on the target package format before publishing."
+            echo
+            echo "## Validation"
+            echo
+            echo "- dart format --output=none --set-exit-if-changed ."
+            echo "- flutter analyze"
+            echo "- flutter test"
+          } > "release/mailnest-${{ steps.release_tag.outputs.tag }}-release-notes.md"
+
+      - name: Upload release notes artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mailnest-${{ steps.release_tag.outputs.tag }}-release-notes
+          path: release/mailnest-${{ steps.release_tag.outputs.tag }}-release-notes.md
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.release_tag.outputs.tag }}
+          name: MailNest ${{ steps.release_tag.outputs.tag }}
+          body_path: release/mailnest-${{ steps.release_tag.outputs.tag }}-release-notes.md
+          files: release/mailnest-${{ steps.release_tag.outputs.tag }}-release-notes.md
+          fail_on_unmatched_files: true
