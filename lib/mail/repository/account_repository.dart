@@ -104,6 +104,72 @@ class AccountRepository {
     );
   }
 
+  Future<void> saveOAuthAccount({
+    required String emailAddress,
+    required String tokenRef,
+    required EmailProviderType provider,
+    String? displayName,
+  }) async {
+    final now = DateTime.now();
+    final accountId = _accountId(emailAddress);
+
+    await database.saveAccount(
+      EmailAccountsCompanion(
+        id: Value(accountId),
+        emailAddress: Value(emailAddress),
+        displayName: Value(displayName),
+        provider: Value(provider.storageValue),
+        username: Value(emailAddress),
+        authType: const Value('oauth'),
+        imapHost: const Value(''),
+        imapPort: const Value(993),
+        imapSecurity: const Value('ssl'),
+        smtpHost: const Value(''),
+        smtpPort: const Value(587),
+        smtpSecurity: const Value('starttls'),
+        smtpStartTls: const Value(true),
+        secretRef: const Value(null),
+        oauthTokenRef: Value(tokenRef),
+        syncEnabled: const Value(true),
+        createdAt: Value(now),
+        updatedAt: Value(now),
+      ),
+    );
+  }
+
+  Future<void> updateOAuthAccount({
+    required EmailAccount current,
+    required String tokenRef,
+    String? displayName,
+  }) async {
+    if (current.oauthTokenRef != null && current.oauthTokenRef != tokenRef) {
+      await secureStorage.deleteSecret(current.oauthTokenRef!);
+    }
+
+    await database.saveAccount(
+      EmailAccountsCompanion(
+        id: Value(current.id),
+        emailAddress: Value(current.emailAddress),
+        displayName: Value(displayName),
+        provider: Value(EmailProviderType.gmail.storageValue),
+        username: Value(current.emailAddress),
+        authType: const Value('oauth'),
+        imapHost: Value(current.imapHost),
+        imapPort: Value(current.imapPort),
+        imapSecurity: Value(current.imapSecurity),
+        smtpHost: Value(current.smtpHost),
+        smtpPort: Value(current.smtpPort),
+        smtpSecurity: Value(current.smtpSecurity),
+        smtpStartTls: Value(current.smtpStartTls),
+        secretRef: const Value(null),
+        oauthTokenRef: Value(tokenRef),
+        syncEnabled: Value(current.syncEnabled),
+        createdAt: Value(current.createdAt),
+        updatedAt: Value(DateTime.now()),
+      ),
+    );
+  }
+
   Future<void> setSyncEnabled({
     required String accountId,
     required bool enabled,

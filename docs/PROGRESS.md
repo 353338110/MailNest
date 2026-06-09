@@ -72,6 +72,26 @@
 - 不记录密码、授权码、Token 或认证响应。
 - 增加连接测试结果模型测试。
 
+### PR #16：Gmail OAuth
+
+链接：待创建
+
+状态：已完成，待创建 PR
+
+已完成内容：
+
+- 新增 Gmail OAuth 授权流程。
+- 移动端使用系统浏览器和 app link 回调抽象。
+- 桌面端使用短生命周期 localhost loopback callback。
+- Google 登录强制使用系统浏览器，不在 App WebView 输入 Google 密码。
+- 使用 PKCE 授权码流程获取 token。
+- Token JSON 只保存到 SecureStorage。
+- 数据库只保存 `oauth_token_ref`，不保存 token 内容。
+- 支持 token 刷新失败提示重新授权。
+- 支持取消授权、授权超时、重新授权和账号不匹配提示。
+- Gmail 账号保存为 OAuth 账号，不实现 Gmail 邮件列表、详情或发信。
+- 补充 OAuth token 和账号 token ref 测试。
+
 ## 已验证
 
 最近一次验证命令：
@@ -154,8 +174,6 @@ flutter test
 
 ### Gmail
 
-- Gmail OAuth 授权。
-- Token 保存和刷新。
 - Gmail 邮件列表。
 - Gmail 邮件详情。
 - Gmail 发信。
@@ -217,14 +235,13 @@ flutter test
 13. `codex/local-search`：本地搜索和 FTS。
 14. `codex/desktop-layout`：桌面三栏和响应式布局完善。
 15. `codex/mobile-navigation`：移动端 Drawer/NavigationDrawer。
-16. `codex/gmail-oauth`：Gmail OAuth。
-17. `codex/gmail-mail-provider`：Gmail 邮件列表、详情和发信。
-18. `codex/outlook-oauth`：Outlook OAuth。
-19. `codex/outlook-mail-provider`：Outlook 邮件列表、详情和发信。
-20. `codex/translation-ui`：邮件详情和写信翻译 UI。
-21. `codex/translation-provider`：真实翻译服务和隐私确认。
-22. `codex/multiplatform-ci`：多平台构建 CI。
-23. `codex/release-workflow`：发布流程和 tag 自动化。
+16. `codex/gmail-mail-provider`：Gmail 邮件列表、详情和发信。
+17. `codex/outlook-oauth`：Outlook OAuth。
+18. `codex/outlook-mail-provider`：Outlook 邮件列表、详情和发信。
+19. `codex/translation-ui`：邮件详情和写信翻译 UI。
+20. `codex/translation-provider`：真实翻译服务和隐私确认。
+21. `codex/multiplatform-ci`：多平台构建 CI。
+22. `codex/release-workflow`：发布流程和 tag 自动化。
 
 ## 注意事项
 

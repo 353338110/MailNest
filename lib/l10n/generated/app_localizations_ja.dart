@@ -88,6 +88,45 @@ class AppLocalizationsJa extends AppLocalizations {
       'Real OAuth authorization will be supported in a later version.';
 
   @override
+  String get gmailOAuthTitle => 'Sign in with Google';
+
+  @override
+  String get gmailOAuthSystemBrowserNotice =>
+      'MailNest opens Google authorization in your system browser and stores tokens only in secure storage.';
+
+  @override
+  String get authorizeGmail => 'Authorize Gmail';
+
+  @override
+  String get reauthorizeGmail => 'Reauthorize Gmail';
+
+  @override
+  String get gmailOAuthConnected => 'Gmail authorization is connected.';
+
+  @override
+  String get gmailReauthorizeHelp =>
+      'Use reauthorization if Google access was revoked or token refresh fails.';
+
+  @override
+  String get gmailAuthorizationSaved => 'Gmail authorization saved.';
+
+  @override
+  String get gmailAuthorizationCanceled => 'Gmail authorization canceled.';
+
+  @override
+  String gmailAuthorizationFailed(String reason) {
+    return 'Gmail authorization failed: $reason';
+  }
+
+  @override
+  String get gmailReauthorizeEmailMismatch =>
+      'Reauthorize with the same Gmail address.';
+
+  @override
+  String get gmailReauthorizationRequired =>
+      'Gmail reauthorization is required.';
+
+  @override
   String get ok => 'OK';
 
   @override
