@@ -4281,6 +4281,421 @@ class LocalMailAttachmentsCompanion
   }
 }
 
+class $MailSyncCursorsTable extends MailSyncCursors
+    with TableInfo<$MailSyncCursorsTable, MailSyncCursorEntry> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $MailSyncCursorsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _accountIdMeta = const VerificationMeta(
+    'accountId',
+  );
+  @override
+  late final GeneratedColumn<String> accountId = GeneratedColumn<String>(
+    'account_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _folderNameMeta = const VerificationMeta(
+    'folderName',
+  );
+  @override
+  late final GeneratedColumn<String> folderName = GeneratedColumn<String>(
+    'folder_name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _lastUidMeta = const VerificationMeta(
+    'lastUid',
+  );
+  @override
+  late final GeneratedColumn<int> lastUid = GeneratedColumn<int>(
+    'last_uid',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _pageTokenMeta = const VerificationMeta(
+    'pageToken',
+  );
+  @override
+  late final GeneratedColumn<String> pageToken = GeneratedColumn<String>(
+    'page_token',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _syncedAtMeta = const VerificationMeta(
+    'syncedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> syncedAt = GeneratedColumn<DateTime>(
+    'synced_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    accountId,
+    folderName,
+    lastUid,
+    pageToken,
+    syncedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'mail_sync_cursors';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<MailSyncCursorEntry> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('account_id')) {
+      context.handle(
+        _accountIdMeta,
+        accountId.isAcceptableOrUnknown(data['account_id']!, _accountIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_accountIdMeta);
+    }
+    if (data.containsKey('folder_name')) {
+      context.handle(
+        _folderNameMeta,
+        folderName.isAcceptableOrUnknown(data['folder_name']!, _folderNameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_folderNameMeta);
+    }
+    if (data.containsKey('last_uid')) {
+      context.handle(
+        _lastUidMeta,
+        lastUid.isAcceptableOrUnknown(data['last_uid']!, _lastUidMeta),
+      );
+    }
+    if (data.containsKey('page_token')) {
+      context.handle(
+        _pageTokenMeta,
+        pageToken.isAcceptableOrUnknown(data['page_token']!, _pageTokenMeta),
+      );
+    }
+    if (data.containsKey('synced_at')) {
+      context.handle(
+        _syncedAtMeta,
+        syncedAt.isAcceptableOrUnknown(data['synced_at']!, _syncedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_syncedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  MailSyncCursorEntry map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return MailSyncCursorEntry(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      accountId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}account_id'],
+      )!,
+      folderName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}folder_name'],
+      )!,
+      lastUid: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}last_uid'],
+      ),
+      pageToken: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}page_token'],
+      ),
+      syncedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}synced_at'],
+      )!,
+    );
+  }
+
+  @override
+  $MailSyncCursorsTable createAlias(String alias) {
+    return $MailSyncCursorsTable(attachedDatabase, alias);
+  }
+}
+
+class MailSyncCursorEntry extends DataClass
+    implements Insertable<MailSyncCursorEntry> {
+  final String id;
+  final String accountId;
+  final String folderName;
+  final int? lastUid;
+  final String? pageToken;
+  final DateTime syncedAt;
+  const MailSyncCursorEntry({
+    required this.id,
+    required this.accountId,
+    required this.folderName,
+    this.lastUid,
+    this.pageToken,
+    required this.syncedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['account_id'] = Variable<String>(accountId);
+    map['folder_name'] = Variable<String>(folderName);
+    if (!nullToAbsent || lastUid != null) {
+      map['last_uid'] = Variable<int>(lastUid);
+    }
+    if (!nullToAbsent || pageToken != null) {
+      map['page_token'] = Variable<String>(pageToken);
+    }
+    map['synced_at'] = Variable<DateTime>(syncedAt);
+    return map;
+  }
+
+  MailSyncCursorsCompanion toCompanion(bool nullToAbsent) {
+    return MailSyncCursorsCompanion(
+      id: Value(id),
+      accountId: Value(accountId),
+      folderName: Value(folderName),
+      lastUid: lastUid == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastUid),
+      pageToken: pageToken == null && nullToAbsent
+          ? const Value.absent()
+          : Value(pageToken),
+      syncedAt: Value(syncedAt),
+    );
+  }
+
+  factory MailSyncCursorEntry.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return MailSyncCursorEntry(
+      id: serializer.fromJson<String>(json['id']),
+      accountId: serializer.fromJson<String>(json['accountId']),
+      folderName: serializer.fromJson<String>(json['folderName']),
+      lastUid: serializer.fromJson<int?>(json['lastUid']),
+      pageToken: serializer.fromJson<String?>(json['pageToken']),
+      syncedAt: serializer.fromJson<DateTime>(json['syncedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'accountId': serializer.toJson<String>(accountId),
+      'folderName': serializer.toJson<String>(folderName),
+      'lastUid': serializer.toJson<int?>(lastUid),
+      'pageToken': serializer.toJson<String?>(pageToken),
+      'syncedAt': serializer.toJson<DateTime>(syncedAt),
+    };
+  }
+
+  MailSyncCursorEntry copyWith({
+    String? id,
+    String? accountId,
+    String? folderName,
+    Value<int?> lastUid = const Value.absent(),
+    Value<String?> pageToken = const Value.absent(),
+    DateTime? syncedAt,
+  }) => MailSyncCursorEntry(
+    id: id ?? this.id,
+    accountId: accountId ?? this.accountId,
+    folderName: folderName ?? this.folderName,
+    lastUid: lastUid.present ? lastUid.value : this.lastUid,
+    pageToken: pageToken.present ? pageToken.value : this.pageToken,
+    syncedAt: syncedAt ?? this.syncedAt,
+  );
+  MailSyncCursorEntry copyWithCompanion(MailSyncCursorsCompanion data) {
+    return MailSyncCursorEntry(
+      id: data.id.present ? data.id.value : this.id,
+      accountId: data.accountId.present ? data.accountId.value : this.accountId,
+      folderName: data.folderName.present
+          ? data.folderName.value
+          : this.folderName,
+      lastUid: data.lastUid.present ? data.lastUid.value : this.lastUid,
+      pageToken: data.pageToken.present ? data.pageToken.value : this.pageToken,
+      syncedAt: data.syncedAt.present ? data.syncedAt.value : this.syncedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MailSyncCursorEntry(')
+          ..write('id: $id, ')
+          ..write('accountId: $accountId, ')
+          ..write('folderName: $folderName, ')
+          ..write('lastUid: $lastUid, ')
+          ..write('pageToken: $pageToken, ')
+          ..write('syncedAt: $syncedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, accountId, folderName, lastUid, pageToken, syncedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is MailSyncCursorEntry &&
+          other.id == this.id &&
+          other.accountId == this.accountId &&
+          other.folderName == this.folderName &&
+          other.lastUid == this.lastUid &&
+          other.pageToken == this.pageToken &&
+          other.syncedAt == this.syncedAt);
+}
+
+class MailSyncCursorsCompanion extends UpdateCompanion<MailSyncCursorEntry> {
+  final Value<String> id;
+  final Value<String> accountId;
+  final Value<String> folderName;
+  final Value<int?> lastUid;
+  final Value<String?> pageToken;
+  final Value<DateTime> syncedAt;
+  final Value<int> rowid;
+  const MailSyncCursorsCompanion({
+    this.id = const Value.absent(),
+    this.accountId = const Value.absent(),
+    this.folderName = const Value.absent(),
+    this.lastUid = const Value.absent(),
+    this.pageToken = const Value.absent(),
+    this.syncedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  MailSyncCursorsCompanion.insert({
+    required String id,
+    required String accountId,
+    required String folderName,
+    this.lastUid = const Value.absent(),
+    this.pageToken = const Value.absent(),
+    required DateTime syncedAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       accountId = Value(accountId),
+       folderName = Value(folderName),
+       syncedAt = Value(syncedAt);
+  static Insertable<MailSyncCursorEntry> custom({
+    Expression<String>? id,
+    Expression<String>? accountId,
+    Expression<String>? folderName,
+    Expression<int>? lastUid,
+    Expression<String>? pageToken,
+    Expression<DateTime>? syncedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (accountId != null) 'account_id': accountId,
+      if (folderName != null) 'folder_name': folderName,
+      if (lastUid != null) 'last_uid': lastUid,
+      if (pageToken != null) 'page_token': pageToken,
+      if (syncedAt != null) 'synced_at': syncedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  MailSyncCursorsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? accountId,
+    Value<String>? folderName,
+    Value<int?>? lastUid,
+    Value<String?>? pageToken,
+    Value<DateTime>? syncedAt,
+    Value<int>? rowid,
+  }) {
+    return MailSyncCursorsCompanion(
+      id: id ?? this.id,
+      accountId: accountId ?? this.accountId,
+      folderName: folderName ?? this.folderName,
+      lastUid: lastUid ?? this.lastUid,
+      pageToken: pageToken ?? this.pageToken,
+      syncedAt: syncedAt ?? this.syncedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (accountId.present) {
+      map['account_id'] = Variable<String>(accountId.value);
+    }
+    if (folderName.present) {
+      map['folder_name'] = Variable<String>(folderName.value);
+    }
+    if (lastUid.present) {
+      map['last_uid'] = Variable<int>(lastUid.value);
+    }
+    if (pageToken.present) {
+      map['page_token'] = Variable<String>(pageToken.value);
+    }
+    if (syncedAt.present) {
+      map['synced_at'] = Variable<DateTime>(syncedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MailSyncCursorsCompanion(')
+          ..write('id: $id, ')
+          ..write('accountId: $accountId, ')
+          ..write('folderName: $folderName, ')
+          ..write('lastUid: $lastUid, ')
+          ..write('pageToken: $pageToken, ')
+          ..write('syncedAt: $syncedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -4292,6 +4707,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       $LocalMailMessagesTable(this);
   late final $LocalMailAttachmentsTable localMailAttachments =
       $LocalMailAttachmentsTable(this);
+  late final $MailSyncCursorsTable mailSyncCursors = $MailSyncCursorsTable(
+    this,
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -4303,6 +4721,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     sentMessages,
     localMailMessages,
     localMailAttachments,
+    mailSyncCursors,
   ];
 }
 
@@ -6364,6 +6783,237 @@ typedef $$LocalMailAttachmentsTableProcessedTableManager =
       LocalMailAttachment,
       PrefetchHooks Function()
     >;
+typedef $$MailSyncCursorsTableCreateCompanionBuilder =
+    MailSyncCursorsCompanion Function({
+      required String id,
+      required String accountId,
+      required String folderName,
+      Value<int?> lastUid,
+      Value<String?> pageToken,
+      required DateTime syncedAt,
+      Value<int> rowid,
+    });
+typedef $$MailSyncCursorsTableUpdateCompanionBuilder =
+    MailSyncCursorsCompanion Function({
+      Value<String> id,
+      Value<String> accountId,
+      Value<String> folderName,
+      Value<int?> lastUid,
+      Value<String?> pageToken,
+      Value<DateTime> syncedAt,
+      Value<int> rowid,
+    });
+
+class $$MailSyncCursorsTableFilterComposer
+    extends Composer<_$AppDatabase, $MailSyncCursorsTable> {
+  $$MailSyncCursorsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get accountId => $composableBuilder(
+    column: $table.accountId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get folderName => $composableBuilder(
+    column: $table.folderName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get lastUid => $composableBuilder(
+    column: $table.lastUid,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get pageToken => $composableBuilder(
+    column: $table.pageToken,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get syncedAt => $composableBuilder(
+    column: $table.syncedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$MailSyncCursorsTableOrderingComposer
+    extends Composer<_$AppDatabase, $MailSyncCursorsTable> {
+  $$MailSyncCursorsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get accountId => $composableBuilder(
+    column: $table.accountId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get folderName => $composableBuilder(
+    column: $table.folderName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get lastUid => $composableBuilder(
+    column: $table.lastUid,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get pageToken => $composableBuilder(
+    column: $table.pageToken,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get syncedAt => $composableBuilder(
+    column: $table.syncedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$MailSyncCursorsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $MailSyncCursorsTable> {
+  $$MailSyncCursorsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get accountId =>
+      $composableBuilder(column: $table.accountId, builder: (column) => column);
+
+  GeneratedColumn<String> get folderName => $composableBuilder(
+    column: $table.folderName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get lastUid =>
+      $composableBuilder(column: $table.lastUid, builder: (column) => column);
+
+  GeneratedColumn<String> get pageToken =>
+      $composableBuilder(column: $table.pageToken, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get syncedAt =>
+      $composableBuilder(column: $table.syncedAt, builder: (column) => column);
+}
+
+class $$MailSyncCursorsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $MailSyncCursorsTable,
+          MailSyncCursorEntry,
+          $$MailSyncCursorsTableFilterComposer,
+          $$MailSyncCursorsTableOrderingComposer,
+          $$MailSyncCursorsTableAnnotationComposer,
+          $$MailSyncCursorsTableCreateCompanionBuilder,
+          $$MailSyncCursorsTableUpdateCompanionBuilder,
+          (
+            MailSyncCursorEntry,
+            BaseReferences<
+              _$AppDatabase,
+              $MailSyncCursorsTable,
+              MailSyncCursorEntry
+            >,
+          ),
+          MailSyncCursorEntry,
+          PrefetchHooks Function()
+        > {
+  $$MailSyncCursorsTableTableManager(
+    _$AppDatabase db,
+    $MailSyncCursorsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$MailSyncCursorsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$MailSyncCursorsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$MailSyncCursorsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> accountId = const Value.absent(),
+                Value<String> folderName = const Value.absent(),
+                Value<int?> lastUid = const Value.absent(),
+                Value<String?> pageToken = const Value.absent(),
+                Value<DateTime> syncedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => MailSyncCursorsCompanion(
+                id: id,
+                accountId: accountId,
+                folderName: folderName,
+                lastUid: lastUid,
+                pageToken: pageToken,
+                syncedAt: syncedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String accountId,
+                required String folderName,
+                Value<int?> lastUid = const Value.absent(),
+                Value<String?> pageToken = const Value.absent(),
+                required DateTime syncedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => MailSyncCursorsCompanion.insert(
+                id: id,
+                accountId: accountId,
+                folderName: folderName,
+                lastUid: lastUid,
+                pageToken: pageToken,
+                syncedAt: syncedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$MailSyncCursorsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $MailSyncCursorsTable,
+      MailSyncCursorEntry,
+      $$MailSyncCursorsTableFilterComposer,
+      $$MailSyncCursorsTableOrderingComposer,
+      $$MailSyncCursorsTableAnnotationComposer,
+      $$MailSyncCursorsTableCreateCompanionBuilder,
+      $$MailSyncCursorsTableUpdateCompanionBuilder,
+      (
+        MailSyncCursorEntry,
+        BaseReferences<
+          _$AppDatabase,
+          $MailSyncCursorsTable,
+          MailSyncCursorEntry
+        >,
+      ),
+      MailSyncCursorEntry,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -6380,4 +7030,6 @@ class $AppDatabaseManager {
       $$LocalMailMessagesTableTableManager(_db, _db.localMailMessages);
   $$LocalMailAttachmentsTableTableManager get localMailAttachments =>
       $$LocalMailAttachmentsTableTableManager(_db, _db.localMailAttachments);
+  $$MailSyncCursorsTableTableManager get mailSyncCursors =>
+      $$MailSyncCursorsTableTableManager(_db, _db.mailSyncCursors);
 }

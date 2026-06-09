@@ -36,6 +36,65 @@ class AppLocalizationsDe extends AppLocalizations {
       'The first release only includes translation entry points and a mock service.';
 
   @override
+  String get translate => 'Translate';
+
+  @override
+  String get targetLanguage => 'Target language';
+
+  @override
+  String get translationSourceEmpty => 'There is no text to translate.';
+
+  @override
+  String translationFailed(String reason) {
+    return 'Translation failed: $reason';
+  }
+
+  @override
+  String get translationCopied => 'Translation copied.';
+
+  @override
+  String get translatedText => 'Translation';
+
+  @override
+  String get originalText => 'Original';
+
+  @override
+  String get translateAgain => 'Translate again';
+
+  @override
+  String get copyTranslation => 'Copy translation';
+
+  @override
+  String get useTranslation => 'Use translation';
+
+  @override
+  String get mailDetail => 'Mail detail';
+
+  @override
+  String get from => 'From';
+
+  @override
+  String get received => 'Received';
+
+  @override
+  String get translateMessage => 'Translate message';
+
+  @override
+  String get translateBody => 'Translate body';
+
+  @override
+  String get to => 'To';
+
+  @override
+  String get body => 'Body';
+
+  @override
+  String get send => 'Send';
+
+  @override
+  String get openMailDetailPreview => 'Open mail detail preview';
+
+  @override
   String get addEmailAccount => 'Add email account';
 
   @override
@@ -450,7 +509,67 @@ class AppLocalizationsDe extends AppLocalizations {
       'Folder navigation will be available after mail sync is added.';
 
   @override
-  String get mailDetail => 'Message';
+  String get syncMail => 'Sync mail';
+
+  @override
+  String mailSyncFailed(String reason) {
+    return 'Mail sync failed: $reason';
+  }
+
+  @override
+  String get retry => 'Retry';
+
+  @override
+  String get mailboxes => 'Mailboxes';
+
+  @override
+  String get unifiedInbox => 'Unified inbox';
+
+  @override
+  String get filters => 'Filters';
+
+  @override
+  String get unread => 'Unread';
+
+  @override
+  String get starred => 'Starred';
+
+  @override
+  String get trash => 'Trash';
+
+  @override
+  String get account => 'Account';
+
+  @override
+  String get folder => 'Folder';
+
+  @override
+  String get fullMessageBodiesFutureNotice =>
+      'Full message bodies will appear in a later PR.';
+
+  @override
+  String get noMessageSelected => 'No message selected';
+
+  @override
+  String get messageContentsPlaceholder =>
+      'Message contents will appear here on wide desktop windows.';
+
+  @override
+  String get accountMailbox => 'Account mailbox';
+
+  @override
+  String get allMessages => 'All';
+
+  @override
+  String mailMessageCount(int count) {
+    return '$count messages';
+  }
+
+  @override
+  String get noMessagesMatchFilter => 'No messages match this filter.';
+
+  @override
+  String get noMessages => 'No messages.';
 
   @override
   String get attachments => 'Attachments';
@@ -464,7 +583,4 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get messageLoadFailed => 'Could not load message.';
-
-  @override
-  String get noCachedMessages => 'No cached messages yet.';
 }

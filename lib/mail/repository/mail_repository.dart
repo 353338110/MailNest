@@ -21,11 +21,12 @@ class MailRepository {
   final MimeParser mimeParser;
 
   Stream<List<MailHeader>> watchCachedHeaders(String accountId) {
-    return database
-        .watchLocalMailMessages(accountId)
-        .map(
-          (messages) => messages.map(_headerFromLocal).toList(growable: false),
-        );
+    return database.watchLocalMailMessages().map(
+      (messages) => messages
+          .where((message) => message.accountId == accountId)
+          .map(_headerFromLocal)
+          .toList(growable: false),
+    );
   }
 
   Future<MailDetail> fetchMessageDetail({
@@ -151,6 +152,7 @@ class MailRepository {
   static MailHeader _headerFromLocal(LocalMailMessage row) {
     return MailHeader(
       id: row.uid.toString(),
+      uid: row.uid,
       subject: row.subject,
       sender: row.sender,
       receivedAt: row.receivedAt,

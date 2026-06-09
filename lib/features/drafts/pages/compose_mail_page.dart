@@ -3,11 +3,13 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../app/localization/app_language.dart';
 import '../../../app/theme/app_spacing.dart';
 import '../../../core/database/app_database.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../../mail/repository/account_repository_provider.dart';
 import '../../../mail/repository/draft_repository_provider.dart';
+import '../../translation/widgets/translation_sheet.dart';
 
 class ComposeMailPage extends ConsumerStatefulWidget {
   const ComposeMailPage({super.key, this.draftId});
@@ -80,6 +82,11 @@ class _ComposeMailPageState extends ConsumerState<ComposeMailPage> {
       appBar: AppBar(
         title: Text(_draftId == null ? l10n.composeMail : l10n.editDraft),
         actions: [
+          IconButton(
+            tooltip: l10n.translateBody,
+            onPressed: _isLoading ? null : _showTranslationSheet,
+            icon: const Icon(Icons.translate),
+          ),
           IconButton(
             tooltip: l10n.deleteDraft,
             onPressed: _draftId == null || _isDeleting ? null : _confirmDelete,
@@ -164,6 +171,12 @@ class _ComposeMailPageState extends ConsumerState<ComposeMailPage> {
                 const SizedBox(height: AppSpacing.medium),
                 _SaveStatus(isSaving: _isSaving, lastSavedAt: _lastSavedAt),
                 const SizedBox(height: AppSpacing.large),
+                OutlinedButton.icon(
+                  onPressed: _showTranslationSheet,
+                  icon: const Icon(Icons.translate),
+                  label: Text(l10n.translateBody),
+                ),
+                const SizedBox(height: AppSpacing.small),
                 FilledButton.icon(
                   onPressed: _isSaving ? null : _saveDraftManually,
                   icon: _isSaving
@@ -177,6 +190,30 @@ class _ComposeMailPageState extends ConsumerState<ComposeMailPage> {
                 ),
               ],
             ),
+    );
+  }
+
+  Future<void> _showTranslationSheet() {
+    return showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (context) {
+        return FractionallySizedBox(
+          heightFactor: 0.86,
+          child: TranslationSheet(
+            sourceText: _bodyController.text,
+            initialTargetLanguage: AppLanguage.en,
+            onUseTranslation: (translatedText) {
+              _bodyController.text = translatedText;
+              _bodyController.selection = TextSelection.collapsed(
+                offset: _bodyController.text.length,
+              );
+              _scheduleAutosave();
+            },
+          ),
+        );
+      },
     );
   }
 

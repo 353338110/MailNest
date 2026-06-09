@@ -49,6 +49,7 @@ class MimeParser {
     return ParsedMimeMessage(
       header: MailHeader(
         id: uid,
+        uid: int.tryParse(uid) ?? 0,
         subject: subject.isEmpty ? '(No subject)' : subject,
         sender: sender.isEmpty ? 'Unknown sender' : sender,
         receivedAt: _parseDate(headers.value('date')) ?? DateTime.now(),

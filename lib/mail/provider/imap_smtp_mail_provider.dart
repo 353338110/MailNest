@@ -46,7 +46,29 @@ class ImapSmtpMailProvider implements MailProvider {
 
   @override
   Future<List<MailFolder>> listFolders(String accountId) async {
-    return const [MailFolder(id: 'inbox', name: 'Inbox')];
+    final account = await accountRepository.getAccount(accountId);
+    if (account == null) {
+      throw const MailProtocolException('Account not found.');
+    }
+    final secret = await accountRepository.readSecretForAccount(account);
+    if (secret == null || secret.isEmpty) {
+      throw const MailProtocolException('Account secret is unavailable.');
+    }
+
+    final client = await ImapClient.connect(
+      host: account.imapHost,
+      port: account.imapPort,
+      security: account.imapSecurity,
+      timeout: timeout,
+    );
+    try {
+      await client.login(username: account.username, secret: secret);
+      final folders = await client.listFolders();
+      await client.logout();
+      return folders.map(_toMailFolder).toList(growable: false);
+    } finally {
+      client.close();
+    }
   }
 
   @override
@@ -123,7 +145,44 @@ class ImapSmtpMailProvider implements MailProvider {
     required String folderId,
     required SyncCursor cursor,
   }) async {
-    return const [];
+    final account = await accountRepository.getAccount(accountId);
+    if (account == null) {
+      throw const MailProtocolException('Account not found.');
+    }
+    final secret = await accountRepository.readSecretForAccount(account);
+    if (secret == null || secret.isEmpty) {
+      throw const MailProtocolException('Account secret is unavailable.');
+    }
+
+    final client = await ImapClient.connect(
+      host: account.imapHost,
+      port: account.imapPort,
+      security: account.imapSecurity,
+      timeout: timeout,
+    );
+    try {
+      await client.login(username: account.username, secret: secret);
+      final folderName = folderId.toLowerCase() == 'inbox' ? 'INBOX' : folderId;
+      final headers = await client.fetchHeaders(
+        folderName: folderName,
+        since: DateTime.now().toUtc().subtract(const Duration(days: 30)),
+        cursor: cursor,
+      );
+      await client.logout();
+      return headers;
+    } finally {
+      client.close();
+    }
+  }
+
+  MailFolder _toMailFolder(ImapFolderInfo folder) {
+    return MailFolder(
+      id: folder.name.toLowerCase(),
+      name: folder.name,
+      path: folder.name,
+      delimiter: folder.delimiter,
+      flags: folder.attributes,
+    );
   }
 
   Future<String> fetchRawMessageByUid({

@@ -7,6 +7,25 @@
   "translationSettings": "翻译设置",
   "translationPrivacyNote": "MailNest 默认不会把邮件内容发送到第三方翻译服务。",
   "translationMockOnly": "第一版只包含翻译入口和 Mock 服务。",
+  "translate": "翻译",
+  "targetLanguage": "目标语言",
+  "translationSourceEmpty": "没有可翻译的文本。",
+  "translationFailed": "翻译失败：{reason}",
+  "translationCopied": "译文已复制。",
+  "translatedText": "译文",
+  "originalText": "原文",
+  "translateAgain": "重新翻译",
+  "copyTranslation": "复制译文",
+  "useTranslation": "使用译文",
+  "mailDetail": "邮件详情",
+  "from": "发件人",
+  "received": "接收时间",
+  "translateMessage": "翻译邮件",
+  "translateBody": "翻译正文",
+  "to": "收件人",
+  "body": "正文",
+  "send": "发送",
+  "openMailDetailPreview": "打开邮件详情预览",
   "addEmailAccount": "添加邮箱账号",
   "noAccountsYet": "还没有邮箱账号。",
   "emailAddress": "邮箱地址",
@@ -152,10 +171,41 @@
   "composeEmail": "写邮件",
   "composeFutureNotice": "写邮件功能将在后续版本提供。",
   "foldersFutureNotice": "邮件同步加入后将支持文件夹导航。",
-  "mailDetail": "邮件详情",
+  "syncMail": "同步邮件",
+  "mailSyncFailed": "邮件同步失败：{reason}",
+  "@mailSyncFailed": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "retry": "重试",
+  "mailboxes": "邮箱",
+  "unifiedInbox": "统一收件箱",
+  "filters": "筛选",
+  "unread": "未读",
+  "starred": "星标",
+  "trash": "废纸篓",
+  "account": "账号",
+  "folder": "文件夹",
+  "fullMessageBodiesFutureNotice": "完整邮件正文将在后续 PR 中显示。",
+  "noMessageSelected": "未选择邮件",
+  "messageContentsPlaceholder": "邮件内容会显示在宽屏桌面的这里。",
+  "accountMailbox": "账号邮箱",
+  "allMessages": "全部",
+  "mailMessageCount": "{count} 封邮件",
+  "@mailMessageCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noMessagesMatchFilter": "没有符合此筛选条件的邮件。",
+  "noMessages": "没有邮件。",
   "attachments": "附件",
   "emptyMessageBody": "这封邮件没有可读正文。",
   "htmlShownAsSource": "当前以源码文本显示 HTML。不会加载远程图片。",
-  "messageLoadFailed": "无法加载邮件。",
-  "noCachedMessages": "暂无已缓存邮件。"
+  "messageLoadFailed": "无法加载邮件。"
 }

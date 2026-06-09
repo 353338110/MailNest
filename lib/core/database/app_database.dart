@@ -115,6 +115,19 @@ class LocalMailAttachments extends Table {
   Set<Column<Object>> get primaryKey => {id};
 }
 
+@DataClassName('MailSyncCursorEntry')
+class MailSyncCursors extends Table {
+  TextColumn get id => text()();
+  TextColumn get accountId => text()();
+  TextColumn get folderName => text()();
+  IntColumn get lastUid => integer().nullable()();
+  TextColumn get pageToken => text().nullable()();
+  DateTimeColumn get syncedAt => dateTime()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
 @DriftDatabase(
   tables: [
     EmailAccounts,
@@ -123,6 +136,7 @@ class LocalMailAttachments extends Table {
     SentMessages,
     LocalMailMessages,
     LocalMailAttachments,
+    MailSyncCursors,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -130,7 +144,7 @@ class AppDatabase extends _$AppDatabase {
     : super(executor ?? driftDatabase(name: 'mailnest'));
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -146,6 +160,9 @@ class AppDatabase extends _$AppDatabase {
         await _createLocalSearchObjects();
       }
       if (from < 3) {
+        await migrator.createTable(mailSyncCursors);
+      }
+      if (from < 4) {
         await migrator.addColumn(
           localMailMessages,
           localMailMessages.cachedBodyIsHtml,
@@ -270,11 +287,10 @@ class AppDatabase extends _$AppDatabase {
     );
   }
 
-  Stream<List<LocalMailMessage>> watchLocalMailMessages(String accountId) {
-    return (select(localMailMessages)
-          ..where((table) => table.accountId.equals(accountId))
-          ..orderBy([(table) => OrderingTerm.desc(table.receivedAt)]))
-        .watch();
+  Stream<List<LocalMailMessage>> watchLocalMailMessages() {
+    return (select(
+      localMailMessages,
+    )..orderBy([(table) => OrderingTerm.desc(table.receivedAt)])).watch();
   }
 
   Future<LocalMailMessage?> getLocalMailMessage({
@@ -289,6 +305,14 @@ class AppDatabase extends _$AppDatabase {
               table.uid.equals(uid),
         ))
         .getSingleOrNull();
+  }
+
+  Future<void> saveLocalMailMessages(
+    List<LocalMailMessagesCompanion> messages,
+  ) {
+    return batch((batch) {
+      batch.insertAllOnConflictUpdate(localMailMessages, messages);
+    });
   }
 
   Future<List<LocalMailAttachment>> getLocalMailAttachments({
@@ -327,6 +351,20 @@ class AppDatabase extends _$AppDatabase {
         await into(localMailAttachments).insertOnConflictUpdate(attachment);
       }
     });
+  }
+
+  Future<MailSyncCursorEntry?> getMailSyncCursor({
+    required String accountId,
+    required String folderName,
+  }) {
+    final id = mailSyncCursorId(accountId: accountId, folderName: folderName);
+    return (select(
+      mailSyncCursors,
+    )..where((table) => table.id.equals(id))).getSingleOrNull();
+  }
+
+  Future<void> saveMailSyncCursor(MailSyncCursorsCompanion cursor) {
+    return into(mailSyncCursors).insertOnConflictUpdate(cursor);
   }
 
   Future<List<LocalMailSearchResult>> searchLocalMail(String rawQuery) async {
@@ -505,6 +543,13 @@ class AppDatabase extends _$AppDatabase {
       return null;
     }
     return escapedTokens.join(' ');
+  }
+
+  static String mailSyncCursorId({
+    required String accountId,
+    required String folderName,
+  }) {
+    return '$accountId:${folderName.toLowerCase()}';
   }
 }
 

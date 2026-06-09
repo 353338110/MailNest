@@ -1,35 +1,68 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../app/localization/app_language.dart';
 import '../../../app/theme/app_spacing.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../../mail/models/mail_detail.dart';
+import '../../../mail/models/mail_header.dart';
 import '../../../mail/repository/mail_repository_provider.dart';
+import '../../translation/widgets/translation_sheet.dart';
 
 class MailDetailPage extends ConsumerWidget {
   const MailDetailPage({
-    required this.accountId,
-    required this.folderId,
-    required this.uid,
     super.key,
+    this.accountId,
+    this.folderId,
+    this.uid,
+    this.detail,
   });
 
-  final String accountId;
-  final String folderId;
-  final String uid;
+  final String? accountId;
+  final String? folderId;
+  final String? uid;
+  final MailDetail? detail;
+
+  static MailDetail previewDetail() {
+    return MailDetail(
+      header: MailHeader(
+        id: 'preview-message',
+        uid: 1,
+        subject: 'Translation UI preview',
+        sender: 'alex@example.com',
+        receivedAt: DateTime(2026, 6, 9, 9, 30),
+        preview: 'This preview message exercises the translation UI.',
+        isRead: true,
+      ),
+      body:
+          'Hello from MailNest.\n\nThis is a local preview message used by the translation UI. Real mail details load through the IMAP/MIME path when a cached message is opened.',
+    );
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final explicitDetail = detail;
+    if (explicitDetail != null) {
+      return _MailDetailScaffold(detail: explicitDetail);
+    }
+
+    final account = accountId;
+    final folder = folderId;
+    final messageUid = uid;
+    if (account == null || folder == null || messageUid == null) {
+      return _MailDetailScaffold(detail: previewDetail());
+    }
+
     final future = ref.watch(
       _mailDetailProvider(
-        _MailDetailKey(accountId: accountId, folderId: folderId, uid: uid),
+        _MailDetailKey(accountId: account, folderId: folder, uid: messageUid),
       ),
     );
 
     return Scaffold(
       appBar: AppBar(title: Text(AppLocalizations.of(context).mailDetail)),
       body: future.when(
-        data: (detail) => _MailDetailView(detail: detail),
+        data: (detail) => _MailDetailBody(detail: detail),
         error: (error, _) => _DetailError(message: error.toString()),
         loading: () => const Center(child: CircularProgressIndicator()),
       ),
@@ -73,8 +106,41 @@ class _MailDetailKey {
   int get hashCode => Object.hash(accountId, folderId, uid);
 }
 
-class _MailDetailView extends StatelessWidget {
-  const _MailDetailView({required this.detail});
+class _MailDetailScaffold extends StatelessWidget {
+  const _MailDetailScaffold({required this.detail});
+
+  final MailDetail detail;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(l10n.mailDetail),
+        actions: [
+          IconButton(
+            tooltip: l10n.translate,
+            onPressed: () => _showTranslationSheet(context, detail.body),
+            icon: const Icon(Icons.translate),
+          ),
+        ],
+      ),
+      body: _MailDetailBody(detail: detail),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.all(AppSpacing.medium),
+        child: FilledButton.icon(
+          onPressed: () => _showTranslationSheet(context, detail.body),
+          icon: const Icon(Icons.translate),
+          label: Text(l10n.translateMessage),
+        ),
+      ),
+    );
+  }
+}
+
+class _MailDetailBody extends StatelessWidget {
+  const _MailDetailBody({required this.detail});
 
   final MailDetail detail;
 
@@ -87,14 +153,14 @@ class _MailDetailView extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.medium),
       children: [
         Text(detail.header.subject, style: theme.textTheme.headlineSmall),
+        const SizedBox(height: AppSpacing.medium),
+        _HeaderRow(label: l10n.from, value: detail.header.sender),
         const SizedBox(height: AppSpacing.small),
-        Text(detail.header.sender, style: theme.textTheme.titleMedium),
-        const SizedBox(height: AppSpacing.xsmall),
-        Text(
-          MaterialLocalizations.of(
+        _HeaderRow(
+          label: l10n.received,
+          value: MaterialLocalizations.of(
             context,
           ).formatFullDate(detail.header.receivedAt.toLocal()),
-          style: theme.textTheme.bodySmall,
         ),
         if (detail.isHtml) ...[
           const SizedBox(height: AppSpacing.medium),
@@ -112,7 +178,7 @@ class _MailDetailView extends StatelessWidget {
               subtitle: Text(_attachmentSubtitle(attachment)),
             ),
         ],
-        const SizedBox(height: AppSpacing.large),
+        const Divider(height: AppSpacing.xlarge),
         SelectableText(
           detail.body.isEmpty ? l10n.emptyMessageBody : detail.body,
           style: detail.isHtml
@@ -128,7 +194,7 @@ class _MailDetailView extends StatelessWidget {
     if (size == null) {
       return attachment.mimeType;
     }
-    return '${attachment.mimeType} · ${_formatBytes(size)}';
+    return '${attachment.mimeType} - ${_formatBytes(size)}';
   }
 
   String _formatBytes(int bytes) {
@@ -139,6 +205,27 @@ class _MailDetailView extends StatelessWidget {
       return '${(bytes / 1024).toStringAsFixed(1)} KB';
     }
     return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+  }
+}
+
+class _HeaderRow extends StatelessWidget {
+  const _HeaderRow({required this.label, required this.value});
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          width: 80,
+          child: Text(label, style: Theme.of(context).textTheme.labelLarge),
+        ),
+        Expanded(child: SelectableText(value)),
+      ],
+    );
   }
 }
 
@@ -195,4 +282,21 @@ class _DetailError extends StatelessWidget {
       ),
     );
   }
+}
+
+Future<void> _showTranslationSheet(BuildContext context, String body) {
+  return showModalBottomSheet<void>(
+    context: context,
+    isScrollControlled: true,
+    showDragHandle: true,
+    builder: (context) {
+      return FractionallySizedBox(
+        heightFactor: 0.86,
+        child: TranslationSheet(
+          sourceText: body,
+          initialTargetLanguage: AppLanguage.zhCN,
+        ),
+      );
+    },
+  );
 }

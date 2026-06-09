@@ -7,6 +7,27 @@
   "translationSettings": "翻譯設定",
   "translationPrivacyNote": "MailNest 預設不會把郵件內容傳送到第三方翻譯服務。",
   "translationMockOnly": "第一版只包含翻譯入口和 Mock 服務。",
+  "translate": "翻譯",
+  "targetLanguage": "目標語言",
+  "translationSourceEmpty": "沒有可翻譯的文字。",
+  "translationFailed": "翻譯失敗：{reason}",
+  "translationCopied": "譯文已複製。",
+  "translatedText": "譯文",
+  "originalText": "原文",
+  "translateAgain": "重新翻譯",
+  "copyTranslation": "複製譯文",
+  "useTranslation": "使用譯文",
+  "mailDetail": "郵件詳情",
+  "from": "寄件者",
+  "received": "接收時間",
+  "translateMessage": "翻譯郵件",
+  "composeMail": "寫郵件",
+  "translateBody": "翻譯正文",
+  "to": "收件者",
+  "subject": "主旨",
+  "body": "正文",
+  "send": "傳送",
+  "openMailDetailPreview": "開啟郵件詳情預覽",
   "addEmailAccount": "新增信箱帳號",
   "noAccountsYet": "尚無信箱帳號。",
   "emailAddress": "信箱地址",
@@ -128,10 +149,41 @@
   "composeEmail": "寫郵件",
   "composeFutureNotice": "寫郵件功能將在後續版本提供。",
   "foldersFutureNotice": "加入郵件同步後將支援資料夾導覽。",
-  "mailDetail": "郵件詳情",
+  "syncMail": "同步邮件",
+  "mailSyncFailed": "邮件同步失败：{reason}",
+  "@mailSyncFailed": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "retry": "重试",
+  "mailboxes": "信箱",
+  "unifiedInbox": "統一收件匣",
+  "filters": "篩選",
+  "unread": "未讀",
+  "starred": "星標",
+  "trash": "垃圾桶",
+  "account": "帳號",
+  "folder": "資料夾",
+  "fullMessageBodiesFutureNotice": "完整郵件正文將在後續 PR 中顯示。",
+  "noMessageSelected": "未選擇郵件",
+  "messageContentsPlaceholder": "郵件內容會顯示在寬螢幕桌面的這裡。",
+  "accountMailbox": "帳號信箱",
+  "allMessages": "全部",
+  "mailMessageCount": "{count} 封郵件",
+  "@mailMessageCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noMessagesMatchFilter": "沒有符合此篩選條件的郵件。",
+  "noMessages": "沒有郵件。",
   "attachments": "附件",
   "emptyMessageBody": "這封郵件沒有可讀內文。",
   "htmlShownAsSource": "目前以原始碼文字顯示 HTML。不會載入遠端圖片。",
-  "messageLoadFailed": "無法載入郵件。",
-  "noCachedMessages": "暫無已快取郵件。"
+  "messageLoadFailed": "無法載入郵件。"
 }
