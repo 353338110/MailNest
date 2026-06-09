@@ -135,6 +135,23 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get leavePasswordUnchanged => '新密码或授权码（留空则保持不变）';
+
+  @override
+  String get testConnection => '测试连接';
+
+  @override
+  String get connectionTestSucceeded => 'IMAP 和 SMTP 连接测试通过。';
+
+  @override
+  String connectionTestFailed(String reason) {
+    return '连接测试失败：$reason';
+  }
+
+  @override
+  String get passwordRequiredForConnectionTest => '请先输入密码或授权码再测试。';
+
+  @override
+  String get unknownError => '未知错误';
 }
 
 /// The translations for Chinese, as used in China (`zh_CN`).
@@ -268,6 +285,23 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get leavePasswordUnchanged => '新密码或授权码（留空则保持不变）';
+
+  @override
+  String get testConnection => '测试连接';
+
+  @override
+  String get connectionTestSucceeded => 'IMAP 和 SMTP 连接测试通过。';
+
+  @override
+  String connectionTestFailed(String reason) {
+    return '连接测试失败：$reason';
+  }
+
+  @override
+  String get passwordRequiredForConnectionTest => '请先输入密码或授权码再测试。';
+
+  @override
+  String get unknownError => '未知错误';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -401,4 +435,21 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get leavePasswordUnchanged => '新密碼或授權碼（留空則保持不變）';
+
+  @override
+  String get testConnection => '測試連線';
+
+  @override
+  String get connectionTestSucceeded => 'IMAP 和 SMTP 連線測試通過。';
+
+  @override
+  String connectionTestFailed(String reason) {
+    return '連線測試失敗：$reason';
+  }
+
+  @override
+  String get passwordRequiredForConnectionTest => '請先輸入密碼或授權碼再測試。';
+
+  @override
+  String get unknownError => '未知錯誤';
 }

@@ -140,4 +140,23 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get leavePasswordUnchanged =>
       'New password or app password (leave blank to keep current)';
+
+  @override
+  String get testConnection => 'Test connection';
+
+  @override
+  String get connectionTestSucceeded =>
+      'IMAP and SMTP connection tests passed.';
+
+  @override
+  String connectionTestFailed(String reason) {
+    return 'Connection test failed: $reason';
+  }
+
+  @override
+  String get passwordRequiredForConnectionTest =>
+      'Enter a password or app password before testing.';
+
+  @override
+  String get unknownError => 'Unknown error';
 }

@@ -367,6 +367,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'New password or app password (leave blank to keep current)'**
   String get leavePasswordUnchanged;
+
+  /// No description provided for @testConnection.
+  ///
+  /// In en, this message translates to:
+  /// **'Test connection'**
+  String get testConnection;
+
+  /// No description provided for @connectionTestSucceeded.
+  ///
+  /// In en, this message translates to:
+  /// **'IMAP and SMTP connection tests passed.'**
+  String get connectionTestSucceeded;
+
+  /// No description provided for @connectionTestFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Connection test failed: {reason}'**
+  String connectionTestFailed(String reason);
+
+  /// No description provided for @passwordRequiredForConnectionTest.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a password or app password before testing.'**
+  String get passwordRequiredForConnectionTest;
+
+  /// No description provided for @unknownError.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown error'**
+  String get unknownError;
 }
 
 class _AppLocalizationsDelegate

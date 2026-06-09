@@ -40,5 +40,10 @@
   "deleteAccountMessage": "Delete {emailAddress} from this device? Its saved secret will also be removed.",
   "accountDeleted": "Account deleted.",
   "cancel": "Cancel",
-  "leavePasswordUnchanged": "New password or app password (leave blank to keep current)"
+  "leavePasswordUnchanged": "New password or app password (leave blank to keep current)",
+  "testConnection": "Test connection",
+  "connectionTestSucceeded": "IMAP and SMTP connection tests passed.",
+  "connectionTestFailed": "Connection test failed: {reason}",
+  "passwordRequiredForConnectionTest": "Enter a password or app password before testing.",
+  "unknownError": "Unknown error"
 }
