@@ -33,6 +33,65 @@ class AppLocalizationsZh extends AppLocalizations {
   String get translationMockOnly => '第一版只包含翻译入口和 Mock 服务。';
 
   @override
+  String get translate => '翻译';
+
+  @override
+  String get targetLanguage => '目标语言';
+
+  @override
+  String get translationSourceEmpty => '没有可翻译的文本。';
+
+  @override
+  String translationFailed(String reason) {
+    return '翻译失败：$reason';
+  }
+
+  @override
+  String get translationCopied => '译文已复制。';
+
+  @override
+  String get translatedText => '译文';
+
+  @override
+  String get originalText => '原文';
+
+  @override
+  String get translateAgain => '重新翻译';
+
+  @override
+  String get copyTranslation => '复制译文';
+
+  @override
+  String get useTranslation => '使用译文';
+
+  @override
+  String get mailDetail => '邮件详情';
+
+  @override
+  String get from => '发件人';
+
+  @override
+  String get received => '接收时间';
+
+  @override
+  String get translateMessage => '翻译邮件';
+
+  @override
+  String get translateBody => '翻译正文';
+
+  @override
+  String get to => '收件人';
+
+  @override
+  String get body => '正文';
+
+  @override
+  String get send => '发送';
+
+  @override
+  String get openMailDetailPreview => '打开邮件详情预览';
+
+  @override
   String get addEmailAccount => '添加邮箱账号';
 
   @override
@@ -416,6 +475,24 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get inbox => '收件箱';
+
+  @override
+  String get folders => '文件夹';
+
+  @override
+  String get accounts => '账号';
+
+  @override
+  String get composeEmail => '写邮件';
+
+  @override
+  String get composeFutureNotice => '写邮件功能将在后续版本提供。';
+
+  @override
+  String get foldersFutureNotice => '邮件同步加入后将支持文件夹导航。';
+
+  @override
   String get syncMail => '同步邮件';
 
   @override
@@ -425,6 +502,56 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get retry => '重试';
+
+  @override
+  String get mailboxes => '邮箱';
+
+  @override
+  String get unifiedInbox => '统一收件箱';
+
+  @override
+  String get filters => '筛选';
+
+  @override
+  String get unread => '未读';
+
+  @override
+  String get starred => '星标';
+
+  @override
+  String get trash => '废纸篓';
+
+  @override
+  String get account => '账号';
+
+  @override
+  String get folder => '文件夹';
+
+  @override
+  String get fullMessageBodiesFutureNotice => '完整邮件正文将在后续 PR 中显示。';
+
+  @override
+  String get noMessageSelected => '未选择邮件';
+
+  @override
+  String get messageContentsPlaceholder => '邮件内容会显示在宽屏桌面的这里。';
+
+  @override
+  String get accountMailbox => '账号邮箱';
+
+  @override
+  String get allMessages => '全部';
+
+  @override
+  String mailMessageCount(int count) {
+    return '$count 封邮件';
+  }
+
+  @override
+  String get noMessagesMatchFilter => '没有符合此筛选条件的邮件。';
+
+  @override
+  String get noMessages => '没有邮件。';
 }
 
 /// The translations for Chinese, as used in China (`zh_CN`).
@@ -454,6 +581,65 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get translationMockOnly => '第一版只包含翻译入口和 Mock 服务。';
+
+  @override
+  String get translate => '翻译';
+
+  @override
+  String get targetLanguage => '目标语言';
+
+  @override
+  String get translationSourceEmpty => '没有可翻译的文本。';
+
+  @override
+  String translationFailed(String reason) {
+    return '翻译失败：$reason';
+  }
+
+  @override
+  String get translationCopied => '译文已复制。';
+
+  @override
+  String get translatedText => '译文';
+
+  @override
+  String get originalText => '原文';
+
+  @override
+  String get translateAgain => '重新翻译';
+
+  @override
+  String get copyTranslation => '复制译文';
+
+  @override
+  String get useTranslation => '使用译文';
+
+  @override
+  String get mailDetail => '邮件详情';
+
+  @override
+  String get from => '发件人';
+
+  @override
+  String get received => '接收时间';
+
+  @override
+  String get translateMessage => '翻译邮件';
+
+  @override
+  String get translateBody => '翻译正文';
+
+  @override
+  String get to => '收件人';
+
+  @override
+  String get body => '正文';
+
+  @override
+  String get send => '发送';
+
+  @override
+  String get openMailDetailPreview => '打开邮件详情预览';
 
   @override
   String get addEmailAccount => '添加邮箱账号';
@@ -722,6 +908,12 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get backupExportFailed => '备份导出失败。';
 
   @override
+  String get composeMail => '写邮件';
+
+  @override
+  String get subject => '主题';
+
+  @override
   String get sentMessages => 'Sent';
 
   @override
@@ -764,6 +956,24 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   }
 
   @override
+  String get inbox => '收件箱';
+
+  @override
+  String get folders => '文件夹';
+
+  @override
+  String get accounts => '账号';
+
+  @override
+  String get composeEmail => '写邮件';
+
+  @override
+  String get composeFutureNotice => '写邮件功能将在后续版本提供。';
+
+  @override
+  String get foldersFutureNotice => '邮件同步加入后将支持文件夹导航。';
+
+  @override
   String get syncMail => '同步邮件';
 
   @override
@@ -773,6 +983,56 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get retry => '重试';
+
+  @override
+  String get mailboxes => '邮箱';
+
+  @override
+  String get unifiedInbox => '统一收件箱';
+
+  @override
+  String get filters => '筛选';
+
+  @override
+  String get unread => '未读';
+
+  @override
+  String get starred => '星标';
+
+  @override
+  String get trash => '废纸篓';
+
+  @override
+  String get account => '账号';
+
+  @override
+  String get folder => '文件夹';
+
+  @override
+  String get fullMessageBodiesFutureNotice => '完整邮件正文将在后续 PR 中显示。';
+
+  @override
+  String get noMessageSelected => '未选择邮件';
+
+  @override
+  String get messageContentsPlaceholder => '邮件内容会显示在宽屏桌面的这里。';
+
+  @override
+  String get accountMailbox => '账号邮箱';
+
+  @override
+  String get allMessages => '全部';
+
+  @override
+  String mailMessageCount(int count) {
+    return '$count 封邮件';
+  }
+
+  @override
+  String get noMessagesMatchFilter => '没有符合此筛选条件的邮件。';
+
+  @override
+  String get noMessages => '没有邮件。';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -802,6 +1062,65 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get translationMockOnly => '第一版只包含翻譯入口和 Mock 服務。';
+
+  @override
+  String get translate => '翻譯';
+
+  @override
+  String get targetLanguage => '目標語言';
+
+  @override
+  String get translationSourceEmpty => '沒有可翻譯的文字。';
+
+  @override
+  String translationFailed(String reason) {
+    return '翻譯失敗：$reason';
+  }
+
+  @override
+  String get translationCopied => '譯文已複製。';
+
+  @override
+  String get translatedText => '譯文';
+
+  @override
+  String get originalText => '原文';
+
+  @override
+  String get translateAgain => '重新翻譯';
+
+  @override
+  String get copyTranslation => '複製譯文';
+
+  @override
+  String get useTranslation => '使用譯文';
+
+  @override
+  String get mailDetail => '郵件詳情';
+
+  @override
+  String get from => '寄件者';
+
+  @override
+  String get received => '接收時間';
+
+  @override
+  String get translateMessage => '翻譯郵件';
+
+  @override
+  String get translateBody => '翻譯正文';
+
+  @override
+  String get to => '收件者';
+
+  @override
+  String get body => '正文';
+
+  @override
+  String get send => '傳送';
+
+  @override
+  String get openMailDetailPreview => '開啟郵件詳情預覽';
 
   @override
   String get addEmailAccount => '新增信箱帳號';
@@ -1070,6 +1389,12 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get backupExportFailed => '備份匯出失敗。';
 
   @override
+  String get composeMail => '寫郵件';
+
+  @override
+  String get subject => '主旨';
+
+  @override
   String get sentMessages => '已傳送';
 
   @override
@@ -1111,6 +1436,24 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   }
 
   @override
+  String get inbox => '收件匣';
+
+  @override
+  String get folders => '資料夾';
+
+  @override
+  String get accounts => '帳號';
+
+  @override
+  String get composeEmail => '寫郵件';
+
+  @override
+  String get composeFutureNotice => '寫郵件功能將在後續版本提供。';
+
+  @override
+  String get foldersFutureNotice => '加入郵件同步後將支援資料夾導覽。';
+
+  @override
   String get syncMail => '同步邮件';
 
   @override
@@ -1120,4 +1463,54 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get retry => '重试';
+
+  @override
+  String get mailboxes => '信箱';
+
+  @override
+  String get unifiedInbox => '統一收件匣';
+
+  @override
+  String get filters => '篩選';
+
+  @override
+  String get unread => '未讀';
+
+  @override
+  String get starred => '星標';
+
+  @override
+  String get trash => '垃圾桶';
+
+  @override
+  String get account => '帳號';
+
+  @override
+  String get folder => '資料夾';
+
+  @override
+  String get fullMessageBodiesFutureNotice => '完整郵件正文將在後續 PR 中顯示。';
+
+  @override
+  String get noMessageSelected => '未選擇郵件';
+
+  @override
+  String get messageContentsPlaceholder => '郵件內容會顯示在寬螢幕桌面的這裡。';
+
+  @override
+  String get accountMailbox => '帳號信箱';
+
+  @override
+  String get allMessages => '全部';
+
+  @override
+  String mailMessageCount(int count) {
+    return '$count 封郵件';
+  }
+
+  @override
+  String get noMessagesMatchFilter => '沒有符合此篩選條件的郵件。';
+
+  @override
+  String get noMessages => '沒有郵件。';
 }

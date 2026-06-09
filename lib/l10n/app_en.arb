@@ -7,6 +7,32 @@
   "translationSettings": "Translation settings",
   "translationPrivacyNote": "MailNest does not send email content to third-party translation services by default.",
   "translationMockOnly": "The first release only includes translation entry points and a mock service.",
+  "translate": "Translate",
+  "targetLanguage": "Target language",
+  "translationSourceEmpty": "There is no text to translate.",
+  "translationFailed": "Translation failed: {reason}",
+  "@translationFailed": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "translationCopied": "Translation copied.",
+  "translatedText": "Translation",
+  "originalText": "Original",
+  "translateAgain": "Translate again",
+  "copyTranslation": "Copy translation",
+  "useTranslation": "Use translation",
+  "mailDetail": "Mail detail",
+  "from": "From",
+  "received": "Received",
+  "translateMessage": "Translate message",
+  "translateBody": "Translate body",
+  "to": "To",
+  "body": "Body",
+  "send": "Send",
+  "openMailDetailPreview": "Open mail detail preview",
   "addEmailAccount": "Add email account",
   "noAccountsYet": "No email accounts yet.",
   "emailAddress": "Email address",
@@ -216,6 +242,12 @@
       }
     }
   },
+  "inbox": "Inbox",
+  "folders": "Folders",
+  "accounts": "Accounts",
+  "composeEmail": "Compose email",
+  "composeFutureNotice": "Email composing will be available in a later version.",
+  "foldersFutureNotice": "Folder navigation will be available after mail sync is added.",
   "syncMail": "Sync mail",
   "mailSyncFailed": "Mail sync failed: {reason}",
   "@mailSyncFailed": {
@@ -225,5 +257,28 @@
       }
     }
   },
-  "retry": "Retry"
+  "retry": "Retry",
+  "mailboxes": "Mailboxes",
+  "unifiedInbox": "Unified inbox",
+  "filters": "Filters",
+  "unread": "Unread",
+  "starred": "Starred",
+  "trash": "Trash",
+  "account": "Account",
+  "folder": "Folder",
+  "fullMessageBodiesFutureNotice": "Full message bodies will appear in a later PR.",
+  "noMessageSelected": "No message selected",
+  "messageContentsPlaceholder": "Message contents will appear here on wide desktop windows.",
+  "accountMailbox": "Account mailbox",
+  "allMessages": "All",
+  "mailMessageCount": "{count} messages",
+  "@mailMessageCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noMessagesMatchFilter": "No messages match this filter.",
+  "noMessages": "No messages."
 }

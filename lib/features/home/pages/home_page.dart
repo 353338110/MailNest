@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../app/theme/app_spacing.dart';
 import '../../../core/database/app_database.dart';
+import '../../../core/platform/platform_info.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../../mail/models/mailbox_folder.dart';
 import '../../../mail/models/mailbox_message.dart';
@@ -14,58 +15,227 @@ import '../../../mail/repository/mailbox_repository_provider.dart';
 class HomePage extends ConsumerWidget {
   const HomePage({super.key});
 
+  static const _mobileNavigationBreakpoint = 720.0;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final accounts = ref.watch(accountRepositoryProvider).watchAccounts();
+    final platform = const PlatformInfo();
+    final width = MediaQuery.sizeOf(context).width;
+    final useMobileNavigation =
+        !platform.isDesktop || width < _mobileNavigationBreakpoint;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.appTitle),
-        actions: [
-          IconButton(
-            tooltip: l10n.searchMail,
-            onPressed: () => context.push('/search'),
-            icon: const Icon(Icons.search),
-          ),
-          IconButton(
-            tooltip: l10n.composeMail,
-            onPressed: () => context.push('/compose'),
-            icon: const Icon(Icons.edit_outlined),
-          ),
-          IconButton(
-            tooltip: l10n.drafts,
-            onPressed: () => context.push('/drafts'),
-            icon: const Icon(Icons.drafts_outlined),
-          ),
-          IconButton(
-            tooltip: l10n.sentMessages,
-            onPressed: () => context.push('/sent'),
-            icon: const Icon(Icons.outbox_outlined),
-          ),
-          IconButton(
-            tooltip: l10n.settings,
-            onPressed: () => context.push('/settings'),
-            icon: const Icon(Icons.settings_outlined),
-          ),
-        ],
-      ),
-      body: StreamBuilder<List<EmailAccount>>(
-        stream: accounts,
-        builder: (context, snapshot) {
-          final data = snapshot.data ?? const <EmailAccount>[];
-          if (data.isEmpty) {
-            return _EmptyState(onAdd: () => context.push('/accounts/add'));
-          }
+    return StreamBuilder<List<EmailAccount>>(
+      stream: accounts,
+      builder: (context, snapshot) {
+        final data = snapshot.data ?? const <EmailAccount>[];
 
-          return _MailboxWorkspace(accounts: data);
-        },
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push('/accounts/add'),
+        return Scaffold(
+          appBar: AppBar(
+            title: Text(l10n.appTitle),
+            actions: useMobileNavigation
+                ? null
+                : [
+                    IconButton(
+                      tooltip: l10n.searchMail,
+                      onPressed: () => context.push('/search'),
+                      icon: const Icon(Icons.search),
+                    ),
+                    IconButton(
+                      tooltip: l10n.composeMail,
+                      onPressed: () => context.push('/compose'),
+                      icon: const Icon(Icons.edit_outlined),
+                    ),
+                    IconButton(
+                      tooltip: l10n.drafts,
+                      onPressed: () => context.push('/drafts'),
+                      icon: const Icon(Icons.drafts_outlined),
+                    ),
+                    IconButton(
+                      tooltip: l10n.sentMessages,
+                      onPressed: () => context.push('/sent'),
+                      icon: const Icon(Icons.outbox_outlined),
+                    ),
+                    IconButton(
+                      tooltip: l10n.settings,
+                      onPressed: () => context.push('/settings'),
+                      icon: const Icon(Icons.settings_outlined),
+                    ),
+                  ],
+          ),
+          drawer: useMobileNavigation
+              ? _HomeNavigationDrawer(accounts: data)
+              : null,
+          body: data.isEmpty
+              ? _EmptyState(onAdd: () => context.push('/accounts/add'))
+              : _MailboxWorkspace(accounts: data),
+          floatingActionButton: _HomeFab(
+            hasAccounts: data.isNotEmpty,
+            onAddAccount: () => context.push('/accounts/add'),
+            onCompose: () => context.push('/compose'),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _HomeNavigationDrawer extends StatelessWidget {
+  const _HomeNavigationDrawer({required this.accounts});
+
+  final List<EmailAccount> accounts;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return NavigationDrawer(
+      selectedIndex: 0,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.medium,
+            AppSpacing.large,
+            AppSpacing.medium,
+            AppSpacing.small,
+          ),
+          child: Text(
+            l10n.appTitle,
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+        ),
+        NavigationDrawerDestination(
+          icon: const Icon(Icons.move_to_inbox_outlined),
+          selectedIcon: const Icon(Icons.move_to_inbox),
+          label: Text(l10n.inbox),
+        ),
+        ListTile(
+          leading: const Icon(Icons.folder_outlined),
+          title: Text(l10n.folders),
+          onTap: () {
+            Navigator.of(context).pop();
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(l10n.foldersFutureNotice)));
+          },
+        ),
+        ListTile(
+          leading: const Icon(Icons.search),
+          title: Text(l10n.searchMail),
+          onTap: () => _closeAndPush(context, '/search'),
+        ),
+        ListTile(
+          leading: const Icon(Icons.edit_outlined),
+          title: Text(l10n.composeMail),
+          onTap: () => _closeAndPush(context, '/compose'),
+        ),
+        ListTile(
+          leading: const Icon(Icons.drafts_outlined),
+          title: Text(l10n.drafts),
+          onTap: () => _closeAndPush(context, '/drafts'),
+        ),
+        ListTile(
+          leading: const Icon(Icons.outbox_outlined),
+          title: Text(l10n.sentMessages),
+          onTap: () => _closeAndPush(context, '/sent'),
+        ),
+        const Divider(),
+        Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.medium,
+            vertical: AppSpacing.small,
+          ),
+          child: Text(
+            l10n.accounts,
+            style: Theme.of(context).textTheme.labelLarge?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ),
+        ListTile(
+          leading: const Icon(Icons.add),
+          title: Text(l10n.addEmailAccount),
+          onTap: () => _closeAndPush(context, '/accounts/add'),
+        ),
+        if (accounts.isEmpty)
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.medium,
+              vertical: AppSpacing.small,
+            ),
+            child: Text(
+              l10n.noAccountsYet,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
+          )
+        else
+          for (final account in accounts)
+            ListTile(
+              leading: Icon(
+                account.syncEnabled
+                    ? Icons.alternate_email
+                    : Icons.sync_disabled_outlined,
+              ),
+              title: Text(
+                account.emailAddress,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              subtitle: Text(
+                account.provider,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              onTap: () =>
+                  _closeAndPush(context, '/accounts/${account.id}/edit'),
+            ),
+        const Divider(),
+        ListTile(
+          leading: const Icon(Icons.settings_outlined),
+          title: Text(l10n.settings),
+          onTap: () => _closeAndPush(context, '/settings'),
+        ),
+      ],
+    );
+  }
+
+  void _closeAndPush(BuildContext context, String location) {
+    Navigator.of(context).pop();
+    context.push(location);
+  }
+}
+
+class _HomeFab extends StatelessWidget {
+  const _HomeFab({
+    required this.hasAccounts,
+    required this.onAddAccount,
+    required this.onCompose,
+  });
+
+  final bool hasAccounts;
+  final VoidCallback onAddAccount;
+  final VoidCallback onCompose;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
+    if (!hasAccounts) {
+      return FloatingActionButton.extended(
+        onPressed: onAddAccount,
         icon: const Icon(Icons.add),
         label: Text(l10n.addEmailAccount),
-      ),
+      );
+    }
+
+    return FloatingActionButton(
+      tooltip: l10n.composeMail,
+      onPressed: onCompose,
+      child: const Icon(Icons.edit_outlined),
     );
   }
 }
@@ -80,6 +250,9 @@ class _MailboxWorkspace extends ConsumerStatefulWidget {
 }
 
 class _MailboxWorkspaceState extends ConsumerState<_MailboxWorkspace> {
+  static const double _mediumWidth = 700;
+  static const double _wideWidth = 1100;
+
   MailboxScope _scope = const UnifiedMailboxScope();
   MailboxFilter _filter = MailboxFilter.all;
   late Future<void> _syncFuture;
@@ -118,12 +291,14 @@ class _MailboxWorkspaceState extends ConsumerState<_MailboxWorkspace> {
 
   @override
   Widget build(BuildContext context) {
-    final isWide = MediaQuery.sizeOf(context).width >= 900;
+    final width = MediaQuery.sizeOf(context).width;
+    final isWide = width >= _wideWidth;
+    final isMedium = width >= _mediumWidth;
     final navigation = _MailboxNavigation(
       accounts: widget.accounts,
       scope: _scope,
       filter: _filter,
-      scrollable: isWide,
+      scrollable: isMedium,
       onScopeSelected: (scope) {
         setState(() {
           _scope = scope;
@@ -144,12 +319,30 @@ class _MailboxWorkspaceState extends ConsumerState<_MailboxWorkspace> {
       syncFuture: _syncFuture,
       onRefresh: _refresh,
     );
+    final detail = _MailboxDetailPane(
+      accounts: widget.accounts,
+      scope: _scope,
+      filter: _filter,
+    );
 
     if (isWide) {
       return Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          SizedBox(width: 320, child: navigation),
+          SizedBox(width: 280, child: navigation),
+          const VerticalDivider(width: 1),
+          SizedBox(width: 380, child: mailbox),
+          const VerticalDivider(width: 1),
+          Expanded(child: detail),
+        ],
+      );
+    }
+
+    if (isMedium) {
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          SizedBox(width: 300, child: navigation),
           const VerticalDivider(width: 1),
           Expanded(child: mailbox),
         ],
@@ -195,6 +388,126 @@ class _MailboxWorkspaceState extends ConsumerState<_MailboxWorkspace> {
   }
 }
 
+class _MailboxDetailPane extends ConsumerWidget {
+  const _MailboxDetailPane({
+    required this.accounts,
+    required this.scope,
+    required this.filter,
+  });
+
+  final List<EmailAccount> accounts;
+  final MailboxScope scope;
+  final MailboxFilter filter;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final repository = ref.watch(mailboxRepositoryProvider);
+    final localHeaders = ref
+        .watch(mailSyncRepositoryProvider)
+        .watchRecentHeaders();
+
+    return StreamBuilder<List<LocalMailMessage>>(
+      stream: localHeaders,
+      builder: (context, snapshot) {
+        final localMessages = snapshot.data ?? const <LocalMailMessage>[];
+        final messages = repository.messagesFor(
+          accounts: accounts,
+          localMessages: localMessages,
+          scope: scope,
+          filter: filter,
+        );
+        final message = messages.isEmpty ? null : messages.first;
+
+        return Padding(
+          padding: const EdgeInsets.all(AppSpacing.large),
+          child: message == null
+              ? const _MailboxDetailEmptyState()
+              : _MailboxDetailPreview(message: message),
+        );
+      },
+    );
+  }
+}
+
+class _MailboxDetailPreview extends StatelessWidget {
+  const _MailboxDetailPreview({required this.message});
+
+  final MailboxMessage message;
+
+  @override
+  Widget build(BuildContext context) {
+    final header = message.header;
+    final textTheme = Theme.of(context).textTheme;
+    final l10n = AppLocalizations.of(context);
+
+    return ListView(
+      children: [
+        Text(l10n.mailDetail, style: textTheme.titleMedium),
+        const SizedBox(height: AppSpacing.large),
+        Text(header.subject, style: textTheme.headlineSmall),
+        const SizedBox(height: AppSpacing.medium),
+        _DetailRow(label: l10n.from, value: header.sender),
+        _DetailRow(label: l10n.account, value: message.account.emailAddress),
+        _DetailRow(label: l10n.folder, value: message.folder.name),
+        const Divider(height: AppSpacing.xlarge),
+        Text(
+          header.preview ?? l10n.fullMessageBodiesFutureNotice,
+          style: textTheme.bodyLarge,
+        ),
+      ],
+    );
+  }
+}
+
+class _DetailRow extends StatelessWidget {
+  const _DetailRow({required this.label, required this.value});
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.small),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 72,
+            child: Text(label, style: Theme.of(context).textTheme.labelLarge),
+          ),
+          Expanded(child: Text(value)),
+        ],
+      ),
+    );
+  }
+}
+
+class _MailboxDetailEmptyState extends StatelessWidget {
+  const _MailboxDetailEmptyState();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.article_outlined, size: 48),
+          const SizedBox(height: AppSpacing.medium),
+          Text(
+            l10n.noMessageSelected,
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+          const SizedBox(height: AppSpacing.small),
+          Text(l10n.messageContentsPlaceholder, textAlign: TextAlign.center),
+        ],
+      ),
+    );
+  }
+}
+
 class _MailboxNavigation extends StatelessWidget {
   const _MailboxNavigation({
     required this.accounts,
@@ -214,21 +527,23 @@ class _MailboxNavigation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return ListView(
       shrinkWrap: !scrollable,
       physics: scrollable ? null : const NeverScrollableScrollPhysics(),
       padding: const EdgeInsets.all(AppSpacing.medium),
       children: [
-        Text('Mailboxes', style: Theme.of(context).textTheme.titleMedium),
+        Text(l10n.mailboxes, style: Theme.of(context).textTheme.titleMedium),
         const SizedBox(height: AppSpacing.small),
         _NavigationTile(
           icon: Icons.move_to_inbox_outlined,
-          title: 'Unified inbox',
+          title: l10n.unifiedInbox,
           selected: scope is UnifiedMailboxScope && filter == MailboxFilter.all,
           onTap: () => onScopeSelected(const UnifiedMailboxScope()),
         ),
         const SizedBox(height: AppSpacing.medium),
-        Text('Filters', style: Theme.of(context).textTheme.titleSmall),
+        Text(l10n.filters, style: Theme.of(context).textTheme.titleSmall),
         const SizedBox(height: AppSpacing.small),
         Wrap(
           spacing: AppSpacing.small,
@@ -236,38 +551,38 @@ class _MailboxNavigation extends StatelessWidget {
           children: [
             _FilterChipButton(
               icon: Icons.mark_email_unread_outlined,
-              label: 'Unread',
+              label: l10n.unread,
               selected: filter == MailboxFilter.unread,
               onTap: () => onFilterSelected(MailboxFilter.unread),
             ),
             _FilterChipButton(
               icon: Icons.star_outline,
-              label: 'Starred',
+              label: l10n.starred,
               selected: filter == MailboxFilter.starred,
               onTap: () => onFilterSelected(MailboxFilter.starred),
             ),
             _FilterChipButton(
               icon: Icons.send_outlined,
-              label: 'Sent',
+              label: l10n.sentMessages,
               selected: filter == MailboxFilter.sent,
               onTap: () => onFilterSelected(MailboxFilter.sent),
             ),
             _FilterChipButton(
               icon: Icons.drafts_outlined,
-              label: 'Drafts',
+              label: l10n.drafts,
               selected: filter == MailboxFilter.drafts,
               onTap: () => onFilterSelected(MailboxFilter.drafts),
             ),
             _FilterChipButton(
               icon: Icons.delete_outline,
-              label: 'Trash',
+              label: l10n.trash,
               selected: filter == MailboxFilter.trash,
               onTap: () => onFilterSelected(MailboxFilter.trash),
             ),
           ],
         ),
         const SizedBox(height: AppSpacing.medium),
-        Text('Accounts', style: Theme.of(context).textTheme.titleSmall),
+        Text(l10n.accounts, style: Theme.of(context).textTheme.titleSmall),
         const SizedBox(height: AppSpacing.small),
         for (final account in accounts) ...[
           _AccountNavigationTile(
@@ -435,12 +750,12 @@ class _MailboxHeader extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  _scopeTitle(),
+                  _scopeTitle(l10n),
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
                 const SizedBox(height: AppSpacing.xsmall),
                 Text(
-                  '${_filterTitle()} • $count messages',
+                  '${_filterTitle(l10n)} • ${l10n.mailMessageCount(count)}',
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
               ],
@@ -463,22 +778,22 @@ class _MailboxHeader extends StatelessWidget {
     );
   }
 
-  String _scopeTitle() {
+  String _scopeTitle(AppLocalizations l10n) {
     return switch (scope) {
-      UnifiedMailboxScope() => 'Unified inbox',
-      AccountMailboxScope() => 'Account mailbox',
+      UnifiedMailboxScope() => l10n.unifiedInbox,
+      AccountMailboxScope() => l10n.accountMailbox,
       FolderMailboxScope(:final folderId) => _folderName(folderId),
     };
   }
 
-  String _filterTitle() {
+  String _filterTitle(AppLocalizations l10n) {
     return switch (filter) {
-      MailboxFilter.all => 'All',
-      MailboxFilter.unread => 'Unread',
-      MailboxFilter.starred => 'Starred',
-      MailboxFilter.sent => 'Sent',
-      MailboxFilter.drafts => 'Drafts',
-      MailboxFilter.trash => 'Trash',
+      MailboxFilter.all => l10n.allMessages,
+      MailboxFilter.unread => l10n.unread,
+      MailboxFilter.starred => l10n.starred,
+      MailboxFilter.sent => l10n.sentMessages,
+      MailboxFilter.drafts => l10n.drafts,
+      MailboxFilter.trash => l10n.trash,
     };
   }
 
@@ -731,7 +1046,10 @@ class _MailboxEmptyState extends StatelessWidget {
           children: [
             const Icon(Icons.inbox_outlined, size: 48),
             const SizedBox(height: AppSpacing.medium),
-            Text(filtered ? 'No messages match this filter.' : 'No messages.'),
+            Text(
+              filtered ? l10n.noMessagesMatchFilter : l10n.noMessages,
+              textAlign: TextAlign.center,
+            ),
             const SizedBox(height: AppSpacing.medium),
             FilledButton.icon(
               onPressed: onRefresh,
@@ -932,6 +1250,12 @@ class _EmptyState extends StatelessWidget {
               onPressed: onAdd,
               icon: const Icon(Icons.add),
               label: Text(l10n.addEmailAccount),
+            ),
+            const SizedBox(height: AppSpacing.small),
+            OutlinedButton.icon(
+              onPressed: () => context.push('/mail/detail'),
+              icon: const Icon(Icons.article_outlined),
+              label: Text(l10n.openMailDetailPreview),
             ),
           ],
         ),
