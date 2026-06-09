@@ -8,6 +8,7 @@ import '../features/home/pages/home_page.dart';
 import '../features/mail/pages/mail_detail_page.dart';
 import '../features/onboarding/pages/onboarding_page.dart';
 import '../features/search/pages/local_search_page.dart';
+import '../features/sent/pages/sent_messages_page.dart';
 import '../features/settings/pages/settings_page.dart';
 import '../features/translation/pages/translation_settings_page.dart';
 import '../mail/models/mail_detail.dart';
@@ -39,6 +40,10 @@ final appRouter = GoRouter(
       path: '/drafts/:draftId/edit',
       builder: (context, state) =>
           ComposeMailPage(draftId: state.pathParameters['draftId']),
+    ),
+    GoRoute(
+      path: '/sent',
+      builder: (context, state) => const SentMessagesPage(),
     ),
     GoRoute(
       path: '/settings',

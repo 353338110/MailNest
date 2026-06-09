@@ -50,6 +50,24 @@
   "requiredField": "This field is required.",
   "invalidPort": "Enter a valid port.",
   "oauthFutureNotice": "Real OAuth authorization will be supported in a later version.",
+  "gmailOAuthTitle": "Sign in with Google",
+  "gmailOAuthSystemBrowserNotice": "MailNest opens Google authorization in your system browser and stores tokens only in secure storage.",
+  "authorizeGmail": "Authorize Gmail",
+  "reauthorizeGmail": "Reauthorize Gmail",
+  "gmailOAuthConnected": "Gmail authorization is connected.",
+  "gmailReauthorizeHelp": "Use reauthorization if Google access was revoked or token refresh fails.",
+  "gmailAuthorizationSaved": "Gmail authorization saved.",
+  "gmailAuthorizationCanceled": "Gmail authorization canceled.",
+  "gmailAuthorizationFailed": "Gmail authorization failed: {reason}",
+  "@gmailAuthorizationFailed": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "gmailReauthorizeEmailMismatch": "Reauthorize with the same Gmail address.",
+  "gmailReauthorizationRequired": "Gmail reauthorization is required.",
   "ok": "OK",
   "qqMail": "QQ Mail",
   "neteaseMail": "NetEase Mail",
@@ -184,5 +202,50 @@
         "type": "String"
       }
     }
-  }
+  },
+  "sentMessages": "Sent",
+  "noSentMessagesYet": "No sent messages yet.",
+  "sentToRecipients": "To: {recipients}",
+  "@sentToRecipients": {
+    "placeholders": {
+      "recipients": {
+        "type": "String"
+      }
+    }
+  },
+  "chooseSentFolder": "Choose Sent folder",
+  "sentFolderOnlyLocalRecord": "Only the local sent record is saved for this message.",
+  "sentFolderSavePending": "Saving to Sent",
+  "sentFolderSaved": "Saved to {folderName}",
+  "@sentFolderSaved": {
+    "placeholders": {
+      "folderName": {
+        "type": "String"
+      }
+    }
+  },
+  "sentFolderSelectionRequired": "Choose a Sent folder",
+  "sentFolderSaveFailed": "Sent folder save failed",
+  "sentFolderAppendSucceeded": "Saved to {folderName}.",
+  "@sentFolderAppendSucceeded": {
+    "placeholders": {
+      "folderName": {
+        "type": "String"
+      }
+    }
+  },
+  "sentFolderAppendFailed": "Could not save to Sent: {reason}",
+  "@sentFolderAppendFailed": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "inbox": "Inbox",
+  "folders": "Folders",
+  "accounts": "Accounts",
+  "composeEmail": "Compose email",
+  "composeFutureNotice": "Email composing will be available in a later version.",
+  "foldersFutureNotice": "Folder navigation will be available after mail sync is added."
 }

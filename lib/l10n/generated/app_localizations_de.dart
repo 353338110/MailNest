@@ -147,6 +147,45 @@ class AppLocalizationsDe extends AppLocalizations {
       'Real OAuth authorization will be supported in a later version.';
 
   @override
+  String get gmailOAuthTitle => 'Sign in with Google';
+
+  @override
+  String get gmailOAuthSystemBrowserNotice =>
+      'MailNest opens Google authorization in your system browser and stores tokens only in secure storage.';
+
+  @override
+  String get authorizeGmail => 'Authorize Gmail';
+
+  @override
+  String get reauthorizeGmail => 'Reauthorize Gmail';
+
+  @override
+  String get gmailOAuthConnected => 'Gmail authorization is connected.';
+
+  @override
+  String get gmailReauthorizeHelp =>
+      'Use reauthorization if Google access was revoked or token refresh fails.';
+
+  @override
+  String get gmailAuthorizationSaved => 'Gmail authorization saved.';
+
+  @override
+  String get gmailAuthorizationCanceled => 'Gmail authorization canceled.';
+
+  @override
+  String gmailAuthorizationFailed(String reason) {
+    return 'Gmail authorization failed: $reason';
+  }
+
+  @override
+  String get gmailReauthorizeEmailMismatch =>
+      'Reauthorize with the same Gmail address.';
+
+  @override
+  String get gmailReauthorizationRequired =>
+      'Gmail reauthorization is required.';
+
+  @override
   String get ok => 'OK';
 
   @override
@@ -406,4 +445,66 @@ class AppLocalizationsDe extends AppLocalizations {
   String toLine(String recipients) {
     return 'To: $recipients';
   }
+
+  @override
+  String get sentMessages => 'Sent';
+
+  @override
+  String get noSentMessagesYet => 'No sent messages yet.';
+
+  @override
+  String sentToRecipients(String recipients) {
+    return 'To: $recipients';
+  }
+
+  @override
+  String get chooseSentFolder => 'Choose Sent folder';
+
+  @override
+  String get sentFolderOnlyLocalRecord =>
+      'Only the local sent record is saved for this message.';
+
+  @override
+  String get sentFolderSavePending => 'Saving to Sent';
+
+  @override
+  String sentFolderSaved(String folderName) {
+    return 'Saved to $folderName';
+  }
+
+  @override
+  String get sentFolderSelectionRequired => 'Choose a Sent folder';
+
+  @override
+  String get sentFolderSaveFailed => 'Sent folder save failed';
+
+  @override
+  String sentFolderAppendSucceeded(String folderName) {
+    return 'Saved to $folderName.';
+  }
+
+  @override
+  String sentFolderAppendFailed(String reason) {
+    return 'Could not save to Sent: $reason';
+  }
+
+  @override
+  String get inbox => 'Inbox';
+
+  @override
+  String get folders => 'Folders';
+
+  @override
+  String get accounts => 'Accounts';
+
+  @override
+  String get composeEmail => 'Compose email';
+
+  @override
+  String get composeFutureNotice =>
+      'Email composing will be available in a later version.';
+
+  @override
+  String get foldersFutureNotice =>
+      'Folder navigation will be available after mail sync is added.';
 }

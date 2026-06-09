@@ -143,6 +143,42 @@ class AppLocalizationsZh extends AppLocalizations {
   String get oauthFutureNotice => '真实 OAuth 授权将在后续版本支持。';
 
   @override
+  String get gmailOAuthTitle => '使用 Google 登录';
+
+  @override
+  String get gmailOAuthSystemBrowserNotice =>
+      'MailNest 会在系统浏览器中打开 Google 授权，Token 只保存到安全存储。';
+
+  @override
+  String get authorizeGmail => '授权 Gmail';
+
+  @override
+  String get reauthorizeGmail => '重新授权 Gmail';
+
+  @override
+  String get gmailOAuthConnected => 'Gmail 授权已连接。';
+
+  @override
+  String get gmailReauthorizeHelp => '如果 Google 访问权限被撤销或 Token 刷新失败，请重新授权。';
+
+  @override
+  String get gmailAuthorizationSaved => 'Gmail 授权已保存。';
+
+  @override
+  String get gmailAuthorizationCanceled => 'Gmail 授权已取消。';
+
+  @override
+  String gmailAuthorizationFailed(String reason) {
+    return 'Gmail 授权失败：$reason';
+  }
+
+  @override
+  String get gmailReauthorizeEmailMismatch => '请使用同一个 Gmail 地址重新授权。';
+
+  @override
+  String get gmailReauthorizationRequired => '需要重新授权 Gmail。';
+
+  @override
   String get ok => '确定';
 
   @override
@@ -396,6 +432,65 @@ class AppLocalizationsZh extends AppLocalizations {
   String toLine(String recipients) {
     return '收件人：$recipients';
   }
+
+  @override
+  String get sentMessages => '已发送';
+
+  @override
+  String get noSentMessagesYet => '还没有已发送邮件。';
+
+  @override
+  String sentToRecipients(String recipients) {
+    return '收件人：$recipients';
+  }
+
+  @override
+  String get chooseSentFolder => '选择 Sent 文件夹';
+
+  @override
+  String get sentFolderOnlyLocalRecord => '这封邮件仅保存了本地发送记录。';
+
+  @override
+  String get sentFolderSavePending => '正在保存到 Sent';
+
+  @override
+  String sentFolderSaved(String folderName) {
+    return '已保存到 $folderName';
+  }
+
+  @override
+  String get sentFolderSelectionRequired => '请选择 Sent 文件夹';
+
+  @override
+  String get sentFolderSaveFailed => 'Sent 文件夹保存失败';
+
+  @override
+  String sentFolderAppendSucceeded(String folderName) {
+    return '已保存到 $folderName。';
+  }
+
+  @override
+  String sentFolderAppendFailed(String reason) {
+    return '无法保存到 Sent：$reason';
+  }
+
+  @override
+  String get inbox => '收件箱';
+
+  @override
+  String get folders => '文件夹';
+
+  @override
+  String get accounts => '账号';
+
+  @override
+  String get composeEmail => '写邮件';
+
+  @override
+  String get composeFutureNotice => '写邮件功能将在后续版本提供。';
+
+  @override
+  String get foldersFutureNotice => '邮件同步加入后将支持文件夹导航。';
 }
 
 /// The translations for Chinese, as used in China (`zh_CN`).
@@ -535,6 +630,42 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get oauthFutureNotice => '真实 OAuth 授权将在后续版本支持。';
+
+  @override
+  String get gmailOAuthTitle => '使用 Google 登录';
+
+  @override
+  String get gmailOAuthSystemBrowserNotice =>
+      'MailNest 会在系统浏览器中打开 Google 授权，Token 只保存到安全存储。';
+
+  @override
+  String get authorizeGmail => '授权 Gmail';
+
+  @override
+  String get reauthorizeGmail => '重新授权 Gmail';
+
+  @override
+  String get gmailOAuthConnected => 'Gmail 授权已连接。';
+
+  @override
+  String get gmailReauthorizeHelp => '如果 Google 访问权限被撤销或 Token 刷新失败，请重新授权。';
+
+  @override
+  String get gmailAuthorizationSaved => 'Gmail 授权已保存。';
+
+  @override
+  String get gmailAuthorizationCanceled => 'Gmail 授权已取消。';
+
+  @override
+  String gmailAuthorizationFailed(String reason) {
+    return 'Gmail 授权失败：$reason';
+  }
+
+  @override
+  String get gmailReauthorizeEmailMismatch => '请使用同一个 Gmail 地址重新授权。';
+
+  @override
+  String get gmailReauthorizationRequired => '需要重新授权 Gmail。';
 
   @override
   String get ok => '确定';
@@ -720,6 +851,66 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get subject => '主题';
+
+  @override
+  String get sentMessages => 'Sent';
+
+  @override
+  String get noSentMessagesYet => 'No sent messages yet.';
+
+  @override
+  String sentToRecipients(String recipients) {
+    return 'To: $recipients';
+  }
+
+  @override
+  String get chooseSentFolder => 'Choose Sent folder';
+
+  @override
+  String get sentFolderOnlyLocalRecord =>
+      'Only the local sent record is saved for this message.';
+
+  @override
+  String get sentFolderSavePending => 'Saving to Sent';
+
+  @override
+  String sentFolderSaved(String folderName) {
+    return 'Saved to $folderName';
+  }
+
+  @override
+  String get sentFolderSelectionRequired => 'Choose a Sent folder';
+
+  @override
+  String get sentFolderSaveFailed => 'Sent folder save failed';
+
+  @override
+  String sentFolderAppendSucceeded(String folderName) {
+    return 'Saved to $folderName.';
+  }
+
+  @override
+  String sentFolderAppendFailed(String reason) {
+    return 'Could not save to Sent: $reason';
+  }
+
+  @override
+  String get inbox => '收件箱';
+
+  @override
+  String get folders => '文件夹';
+
+  @override
+  String get accounts => '账号';
+
+  @override
+  String get composeEmail => '写邮件';
+
+  @override
+  String get composeFutureNotice => '写邮件功能将在后续版本提供。';
+
+  @override
+  String get foldersFutureNotice => '邮件同步加入后将支持文件夹导航。';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -859,6 +1050,42 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get oauthFutureNotice => '真實 OAuth 授權將在後續版本支援。';
+
+  @override
+  String get gmailOAuthTitle => '使用 Google 登入';
+
+  @override
+  String get gmailOAuthSystemBrowserNotice =>
+      'MailNest 會在系統瀏覽器中開啟 Google 授權，Token 只儲存到安全儲存空間。';
+
+  @override
+  String get authorizeGmail => '授權 Gmail';
+
+  @override
+  String get reauthorizeGmail => '重新授權 Gmail';
+
+  @override
+  String get gmailOAuthConnected => 'Gmail 授權已連接。';
+
+  @override
+  String get gmailReauthorizeHelp => '如果 Google 存取權遭撤銷或 Token 重新整理失敗，請重新授權。';
+
+  @override
+  String get gmailAuthorizationSaved => 'Gmail 授權已儲存。';
+
+  @override
+  String get gmailAuthorizationCanceled => 'Gmail 授權已取消。';
+
+  @override
+  String gmailAuthorizationFailed(String reason) {
+    return 'Gmail 授權失敗：$reason';
+  }
+
+  @override
+  String get gmailReauthorizeEmailMismatch => '請使用同一個 Gmail 地址重新授權。';
+
+  @override
+  String get gmailReauthorizationRequired => '需要重新授權 Gmail。';
 
   @override
   String get ok => '確定';
@@ -1044,4 +1271,63 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get subject => '主旨';
+
+  @override
+  String get sentMessages => '已傳送';
+
+  @override
+  String get noSentMessagesYet => '尚無已傳送郵件。';
+
+  @override
+  String sentToRecipients(String recipients) {
+    return '收件人：$recipients';
+  }
+
+  @override
+  String get chooseSentFolder => '選擇 Sent 資料夾';
+
+  @override
+  String get sentFolderOnlyLocalRecord => '這封郵件僅儲存了本機傳送記錄。';
+
+  @override
+  String get sentFolderSavePending => '正在儲存到 Sent';
+
+  @override
+  String sentFolderSaved(String folderName) {
+    return '已儲存到 $folderName';
+  }
+
+  @override
+  String get sentFolderSelectionRequired => '請選擇 Sent 資料夾';
+
+  @override
+  String get sentFolderSaveFailed => 'Sent 資料夾儲存失敗';
+
+  @override
+  String sentFolderAppendSucceeded(String folderName) {
+    return '已儲存到 $folderName。';
+  }
+
+  @override
+  String sentFolderAppendFailed(String reason) {
+    return '無法儲存到 Sent：$reason';
+  }
+
+  @override
+  String get inbox => '收件匣';
+
+  @override
+  String get folders => '資料夾';
+
+  @override
+  String get accounts => '帳號';
+
+  @override
+  String get composeEmail => '寫郵件';
+
+  @override
+  String get composeFutureNotice => '寫郵件功能將在後續版本提供。';
+
+  @override
+  String get foldersFutureNotice => '加入郵件同步後將支援資料夾導覽。';
 }

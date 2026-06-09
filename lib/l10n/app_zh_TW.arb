@@ -45,6 +45,24 @@
   "requiredField": "此欄位必填。",
   "invalidPort": "請輸入有效連接埠。",
   "oauthFutureNotice": "真實 OAuth 授權將在後續版本支援。",
+  "gmailOAuthTitle": "使用 Google 登入",
+  "gmailOAuthSystemBrowserNotice": "MailNest 會在系統瀏覽器中開啟 Google 授權，Token 只儲存到安全儲存空間。",
+  "authorizeGmail": "授權 Gmail",
+  "reauthorizeGmail": "重新授權 Gmail",
+  "gmailOAuthConnected": "Gmail 授權已連接。",
+  "gmailReauthorizeHelp": "如果 Google 存取權遭撤銷或 Token 重新整理失敗，請重新授權。",
+  "gmailAuthorizationSaved": "Gmail 授權已儲存。",
+  "gmailAuthorizationCanceled": "Gmail 授權已取消。",
+  "gmailAuthorizationFailed": "Gmail 授權失敗：{reason}",
+  "@gmailAuthorizationFailed": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "gmailReauthorizeEmailMismatch": "請使用同一個 Gmail 地址重新授權。",
+  "gmailReauthorizationRequired": "需要重新授權 Gmail。",
   "ok": "確定",
   "qqMail": "QQ 信箱",
   "neteaseMail": "網易信箱",
@@ -113,5 +131,22 @@
   "exportingBackup": "正在匯出...",
   "backupExported": "備份已匯出：{fileName}",
   "backupExportedTo": "已保存到 {filePath}",
-  "backupExportFailed": "備份匯出失敗。"
+  "backupExportFailed": "備份匯出失敗。",
+  "sentMessages": "已傳送",
+  "noSentMessagesYet": "尚無已傳送郵件。",
+  "sentToRecipients": "收件人：{recipients}",
+  "chooseSentFolder": "選擇 Sent 資料夾",
+  "sentFolderOnlyLocalRecord": "這封郵件僅儲存了本機傳送記錄。",
+  "sentFolderSavePending": "正在儲存到 Sent",
+  "sentFolderSaved": "已儲存到 {folderName}",
+  "sentFolderSelectionRequired": "請選擇 Sent 資料夾",
+  "sentFolderSaveFailed": "Sent 資料夾儲存失敗",
+  "sentFolderAppendSucceeded": "已儲存到 {folderName}。",
+  "sentFolderAppendFailed": "無法儲存到 Sent：{reason}",
+  "inbox": "收件匣",
+  "folders": "資料夾",
+  "accounts": "帳號",
+  "composeEmail": "寫郵件",
+  "composeFutureNotice": "寫郵件功能將在後續版本提供。",
+  "foldersFutureNotice": "加入郵件同步後將支援資料夾導覽。"
 }

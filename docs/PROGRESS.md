@@ -73,6 +73,41 @@
 - 增加连接测试结果模型测试。
 
 
+### PR #15：移动端 Drawer/NavigationDrawer
+
+链接：https://github.com/353338110/MailNest/pull/13
+
+状态：已创建，CI 待验证，待合并到 `main`
+
+已完成内容：
+
+- Android/iOS 和窄屏首页使用 NavigationDrawer。
+- Drawer 提供统一收件箱、搜索、写邮件、草稿、已发送、账号和设置入口。
+- Drawer 内二级入口使用保留导航栈跳转，页面可正常返回。
+- 写邮件 FAB 在已有账号时直接进入写邮件页，无账号时保持添加账号入口。
+- 保留桌面宽屏邮箱工作台布局，不改协议逻辑。
+- 增加窄屏 Drawer 相关 widget 测试。
+
+### PR #16：Gmail OAuth
+
+链接：https://github.com/353338110/MailNest/pull/16
+
+状态：已创建，待合并
+
+已完成内容：
+
+- 新增 Gmail OAuth 授权流程。
+- 移动端使用系统浏览器和 app link 回调抽象。
+- 桌面端使用短生命周期 localhost loopback callback。
+- Google 登录强制使用系统浏览器，不在 App WebView 输入 Google 密码。
+- 使用 PKCE 授权码流程获取 token。
+- Token JSON 只保存到 SecureStorage。
+- 数据库只保存 `oauth_token_ref`，不保存 token 内容。
+- 支持 token 刷新失败提示重新授权。
+- 支持取消授权、授权超时、重新授权和账号不匹配提示。
+- Gmail 账号保存为 OAuth 账号，不实现 Gmail 邮件列表、详情或发信。
+- 补充 OAuth token 和账号 token ref 测试。
+
 ### PR #4：邮箱视图导航
 
 链接：https://github.com/353338110/MailNest/pull/6
@@ -111,6 +146,24 @@
 - 不实现导入功能，导入保留为后续 PR。
 - 增加配置导出 service 测试，覆盖 payload 边界、文件名和密文不含明文账号数据。
 
+
+
+### PR #10：发送记录和 Sent 文件夹保存
+
+链接：https://github.com/353338110/MailNest/pull/11
+
+状态：已创建，CI 待验证，待合并到 `main`
+
+已完成内容：
+
+- 新增本地发送记录 Drift 表和 repository。
+- SMTP 发信成功后可保存本地发送记录。
+- 新增 Sent 文件夹 IMAP APPEND 支持和失败状态记录。
+- 无法保存到远端 Sent 时保留本地记录并展示状态。
+- 首页新增已发送入口，页面可正常返回。
+- 新增发送记录列表页，支持加载、空状态和错误状态。
+- 不实现 Gmail/Outlook API 已发送同步。
+- 增加发送记录 service 测试。
 
 ### PR #9：本地草稿
 
@@ -233,8 +286,7 @@ flutter test
 - 回复、回复全部、转发。
 - 添加收件人、抄送、密送。
 - 添加/删除附件。
-- 本地发送记录。
-- 尝试 IMAP APPEND 保存到 Sent 文件夹。
+- 发送记录与远端 Sent 状态接入真实发信流程。
 
 ### 草稿
 
@@ -254,8 +306,6 @@ flutter test
 
 ### Gmail
 
-- Gmail OAuth 授权。
-- Token 保存和刷新。
 - Gmail 邮件列表。
 - Gmail 邮件详情。
 - Gmail 发信。
@@ -280,7 +330,6 @@ flutter test
 - 桌面三栏布局。
 - 中等宽度两栏布局。
 - 小窗口退化为移动端导航。
-- 移动端 Drawer 或 NavigationDrawer。
 - 键盘快捷键。
 - 右键菜单。
 - 更完整的返回、取消、确认、加载状态。
@@ -306,6 +355,7 @@ flutter test
 10. `codex/backup-import`：配置导入和冲突处理。
 11. `codex/desktop-layout`：桌面三栏和响应式布局完善。
 12. `codex/mobile-navigation`：移动端 Drawer/NavigationDrawer。
+<<<<<<< HEAD
 13. `codex/gmail-oauth`：Gmail OAuth。
 14. `codex/gmail-mail-provider`：Gmail 邮件列表、详情和发信。
 15. `codex/outlook-oauth`：Outlook OAuth。
@@ -313,6 +363,14 @@ flutter test
 17. `codex/translation-ui`：邮件详情和写信翻译 UI。已创建 PR #17。
 18. `codex/translation-provider`：真实翻译服务和隐私确认。
 19. `codex/release-workflow`：发布流程和 tag 自动化。
+=======
+13. `codex/gmail-mail-provider`：Gmail 邮件列表、详情和发信。
+14. `codex/outlook-oauth`：Outlook OAuth。
+15. `codex/outlook-mail-provider`：Outlook 邮件列表、详情和发信。
+16. `codex/translation-ui`：邮件详情和写信翻译 UI。
+17. `codex/translation-provider`：真实翻译服务和隐私确认。
+18. `codex/release-workflow`：发布流程和 tag 自动化。
+>>>>>>> origin/main
 
 ## 注意事项
 

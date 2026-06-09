@@ -51,6 +51,28 @@ class DraftMessages extends Table {
   Set<Column<Object>> get primaryKey => {id};
 }
 
+class SentMessages extends Table {
+  TextColumn get id => text()();
+  TextColumn get accountId => text()();
+  TextColumn get fromEmail => text()();
+  TextColumn get toRecipientsJson => text()();
+  TextColumn get ccRecipientsJson => text().withDefault(const Constant('[]'))();
+  TextColumn get bccRecipientsJson =>
+      text().withDefault(const Constant('[]'))();
+  TextColumn get subject => text()();
+  TextColumn get bodyPreview => text()();
+  TextColumn get rfc822Content => text()();
+  DateTimeColumn get sentAt => dateTime()();
+  TextColumn get appendStatus => text()();
+  TextColumn get sentFolderName => text().nullable()();
+  TextColumn get appendError => text().nullable()();
+  DateTimeColumn get createdAt => dateTime()();
+  DateTimeColumn get updatedAt => dateTime()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
 class LocalMailMessages extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get accountId => text()();
@@ -76,7 +98,13 @@ class LocalMailMessages extends Table {
 }
 
 @DriftDatabase(
-  tables: [EmailAccounts, AppSettings, DraftMessages, LocalMailMessages],
+  tables: [
+    EmailAccounts,
+    AppSettings,
+    DraftMessages,
+    SentMessages,
+    LocalMailMessages,
+  ],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor])
@@ -94,6 +122,7 @@ class AppDatabase extends _$AppDatabase {
     onUpgrade: (migrator, from, to) async {
       if (from < 2) {
         await migrator.createTable(draftMessages);
+        await migrator.createTable(sentMessages);
         await migrator.createTable(localMailMessages);
         await _createLocalSearchObjects();
       }
@@ -142,6 +171,9 @@ class AppDatabase extends _$AppDatabase {
       await (delete(
         localMailMessages,
       )..where((table) => table.accountId.equals(id))).go();
+      await (delete(
+        sentMessages,
+      )..where((table) => table.accountId.equals(id))).go();
       await (delete(emailAccounts)..where((table) => table.id.equals(id))).go();
     });
   }
@@ -166,6 +198,39 @@ class AppDatabase extends _$AppDatabase {
 
   Future<void> deleteDraft(String id) {
     return (delete(draftMessages)..where((table) => table.id.equals(id))).go();
+  }
+
+  Stream<List<SentMessage>> watchSentMessages() {
+    return (select(
+      sentMessages,
+    )..orderBy([(table) => OrderingTerm.desc(table.sentAt)])).watch();
+  }
+
+  Future<SentMessage?> getSentMessage(String id) {
+    return (select(
+      sentMessages,
+    )..where((table) => table.id.equals(id))).getSingleOrNull();
+  }
+
+  Future<void> saveSentMessage(SentMessagesCompanion message) {
+    return into(sentMessages).insertOnConflictUpdate(message);
+  }
+
+  Future<void> updateSentMessageAppendState({
+    required String id,
+    required String appendStatus,
+    required DateTime updatedAt,
+    String? sentFolderName,
+    String? appendError,
+  }) {
+    return (update(sentMessages)..where((table) => table.id.equals(id))).write(
+      SentMessagesCompanion(
+        appendStatus: Value(appendStatus),
+        sentFolderName: Value(sentFolderName),
+        appendError: Value(appendError),
+        updatedAt: Value(updatedAt),
+      ),
+    );
   }
 
   Future<List<LocalMailSearchResult>> searchLocalMail(String rawQuery) async {

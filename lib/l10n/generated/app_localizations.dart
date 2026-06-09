@@ -380,6 +380,72 @@ abstract class AppLocalizations {
   /// **'Real OAuth authorization will be supported in a later version.'**
   String get oauthFutureNotice;
 
+  /// No description provided for @gmailOAuthTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in with Google'**
+  String get gmailOAuthTitle;
+
+  /// No description provided for @gmailOAuthSystemBrowserNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'MailNest opens Google authorization in your system browser and stores tokens only in secure storage.'**
+  String get gmailOAuthSystemBrowserNotice;
+
+  /// No description provided for @authorizeGmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Authorize Gmail'**
+  String get authorizeGmail;
+
+  /// No description provided for @reauthorizeGmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Reauthorize Gmail'**
+  String get reauthorizeGmail;
+
+  /// No description provided for @gmailOAuthConnected.
+  ///
+  /// In en, this message translates to:
+  /// **'Gmail authorization is connected.'**
+  String get gmailOAuthConnected;
+
+  /// No description provided for @gmailReauthorizeHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Use reauthorization if Google access was revoked or token refresh fails.'**
+  String get gmailReauthorizeHelp;
+
+  /// No description provided for @gmailAuthorizationSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Gmail authorization saved.'**
+  String get gmailAuthorizationSaved;
+
+  /// No description provided for @gmailAuthorizationCanceled.
+  ///
+  /// In en, this message translates to:
+  /// **'Gmail authorization canceled.'**
+  String get gmailAuthorizationCanceled;
+
+  /// No description provided for @gmailAuthorizationFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Gmail authorization failed: {reason}'**
+  String gmailAuthorizationFailed(String reason);
+
+  /// No description provided for @gmailReauthorizeEmailMismatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Reauthorize with the same Gmail address.'**
+  String get gmailReauthorizeEmailMismatch;
+
+  /// No description provided for @gmailReauthorizationRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Gmail reauthorization is required.'**
+  String get gmailReauthorizationRequired;
+
   /// No description provided for @ok.
   ///
   /// In en, this message translates to:
@@ -853,6 +919,108 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'To: {recipients}'**
   String toLine(String recipients);
+
+  /// No description provided for @sentMessages.
+  ///
+  /// In en, this message translates to:
+  /// **'Sent'**
+  String get sentMessages;
+
+  /// No description provided for @noSentMessagesYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No sent messages yet.'**
+  String get noSentMessagesYet;
+
+  /// No description provided for @sentToRecipients.
+  ///
+  /// In en, this message translates to:
+  /// **'To: {recipients}'**
+  String sentToRecipients(String recipients);
+
+  /// No description provided for @chooseSentFolder.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose Sent folder'**
+  String get chooseSentFolder;
+
+  /// No description provided for @sentFolderOnlyLocalRecord.
+  ///
+  /// In en, this message translates to:
+  /// **'Only the local sent record is saved for this message.'**
+  String get sentFolderOnlyLocalRecord;
+
+  /// No description provided for @sentFolderSavePending.
+  ///
+  /// In en, this message translates to:
+  /// **'Saving to Sent'**
+  String get sentFolderSavePending;
+
+  /// No description provided for @sentFolderSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved to {folderName}'**
+  String sentFolderSaved(String folderName);
+
+  /// No description provided for @sentFolderSelectionRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a Sent folder'**
+  String get sentFolderSelectionRequired;
+
+  /// No description provided for @sentFolderSaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Sent folder save failed'**
+  String get sentFolderSaveFailed;
+
+  /// No description provided for @sentFolderAppendSucceeded.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved to {folderName}.'**
+  String sentFolderAppendSucceeded(String folderName);
+
+  /// No description provided for @sentFolderAppendFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save to Sent: {reason}'**
+  String sentFolderAppendFailed(String reason);
+
+  /// No description provided for @inbox.
+  ///
+  /// In en, this message translates to:
+  /// **'Inbox'**
+  String get inbox;
+
+  /// No description provided for @folders.
+  ///
+  /// In en, this message translates to:
+  /// **'Folders'**
+  String get folders;
+
+  /// No description provided for @accounts.
+  ///
+  /// In en, this message translates to:
+  /// **'Accounts'**
+  String get accounts;
+
+  /// No description provided for @composeEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Compose email'**
+  String get composeEmail;
+
+  /// No description provided for @composeFutureNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Email composing will be available in a later version.'**
+  String get composeFutureNotice;
+
+  /// No description provided for @foldersFutureNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Folder navigation will be available after mail sync is added.'**
+  String get foldersFutureNotice;
 }
 
 class _AppLocalizationsDelegate
