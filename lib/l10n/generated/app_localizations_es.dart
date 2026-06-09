@@ -583,4 +583,13 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get messageLoadFailed => 'Could not load message.';
+
+  @override
+  String get formValidationFailed =>
+      'Please complete the required account fields.';
+
+  @override
+  String accountSaveFailed(String reason) {
+    return 'Account save failed: $reason';
+  }
 }

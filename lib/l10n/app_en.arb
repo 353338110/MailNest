@@ -284,5 +284,14 @@
   "attachments": "Attachments",
   "emptyMessageBody": "This message has no readable body.",
   "htmlShownAsSource": "HTML is shown as source text for now. Remote images are not loaded.",
-  "messageLoadFailed": "Could not load message."
+  "messageLoadFailed": "Could not load message.",
+  "formValidationFailed": "Please complete the required account fields.",
+  "accountSaveFailed": "Account save failed: {reason}",
+  "@accountSaveFailed": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  }
 }

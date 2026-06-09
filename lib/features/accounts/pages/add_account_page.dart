@@ -313,9 +313,11 @@ class _AddAccountPageState extends ConsumerState<AddAccountPage> {
 
   Future<void> _saveAccount() async {
     if (!_formKey.currentState!.validate()) {
+      _showValidationFailed();
       return;
     }
 
+    final l10n = AppLocalizations.of(context);
     setState(() => _isSaving = true);
     try {
       final editingAccount = _editingAccount;
@@ -347,11 +349,15 @@ class _AddAccountPageState extends ConsumerState<AddAccountPage> {
                 : _nameController.text.trim(),
           );
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppLocalizations.of(context).accountSaved)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.accountSaved)));
         Navigator.of(context).pop();
       }
+    } on FormatException {
+      _showSaveError(l10n.invalidPort);
+    } catch (error) {
+      _showSaveError(l10n.accountSaveFailed(_safeErrorMessage(error, l10n)));
     } finally {
       if (mounted) {
         setState(() => _isSaving = false);
@@ -455,6 +461,7 @@ class _AddAccountPageState extends ConsumerState<AddAccountPage> {
 
   Future<void> _testConnection() async {
     if (!_formKey.currentState!.validate()) {
+      _showValidationFailed();
       return;
     }
 
@@ -489,6 +496,36 @@ class _AddAccountPageState extends ConsumerState<AddAccountPage> {
         setState(() => _isTesting = false);
       }
     }
+  }
+
+  void _showValidationFailed() {
+    if (!mounted) {
+      return;
+    }
+
+    FocusScope.of(context).unfocus();
+    final l10n = AppLocalizations.of(context);
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(l10n.formValidationFailed)));
+  }
+
+  void _showSaveError(String message) {
+    if (!mounted) {
+      return;
+    }
+
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  String _safeErrorMessage(Object error, AppLocalizations l10n) {
+    final message = error.toString().trim();
+    if (message.isEmpty) {
+      return l10n.unknownError;
+    }
+    return message;
   }
 
   Future<MailConnectionSettings?> _connectionSettings() async {

@@ -227,5 +227,14 @@
   "attachments": "附件",
   "emptyMessageBody": "这封邮件没有可读正文。",
   "htmlShownAsSource": "当前以源码文本显示 HTML。不会加载远程图片。",
-  "messageLoadFailed": "无法加载邮件。"
+  "messageLoadFailed": "无法加载邮件。",
+  "formValidationFailed": "请先补全账号必填信息。",
+  "accountSaveFailed": "账号保存失败：{reason}",
+  "@accountSaveFailed": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  }
 }

@@ -185,5 +185,14 @@
   "attachments": "附件",
   "emptyMessageBody": "這封郵件沒有可讀內文。",
   "htmlShownAsSource": "目前以原始碼文字顯示 HTML。不會載入遠端圖片。",
-  "messageLoadFailed": "無法載入郵件。"
+  "messageLoadFailed": "無法載入郵件。",
+  "formValidationFailed": "請先補全帳號必填資訊。",
+  "accountSaveFailed": "帳號儲存失敗：{reason}",
+  "@accountSaveFailed": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  }
 }

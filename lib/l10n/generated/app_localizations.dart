@@ -1159,6 +1159,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Could not load message.'**
   String get messageLoadFailed;
+
+  /// No description provided for @formValidationFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Please complete the required account fields.'**
+  String get formValidationFailed;
+
+  /// No description provided for @accountSaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Account save failed: {reason}'**
+  String accountSaveFailed(String reason);
 }
 
 class _AppLocalizationsDelegate

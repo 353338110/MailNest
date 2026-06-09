@@ -564,6 +564,14 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get messageLoadFailed => '无法加载邮件。';
+
+  @override
+  String get formValidationFailed => '请先补全账号必填信息。';
+
+  @override
+  String accountSaveFailed(String reason) {
+    return '账号保存失败：$reason';
+  }
 }
 
 /// The translations for Chinese, as used in China (`zh_CN`).
@@ -1057,6 +1065,14 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get messageLoadFailed => '无法加载邮件。';
+
+  @override
+  String get formValidationFailed => '请先补全账号必填信息。';
+
+  @override
+  String accountSaveFailed(String reason) {
+    return '账号保存失败：$reason';
+  }
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -1549,4 +1565,12 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get messageLoadFailed => '無法載入郵件。';
+
+  @override
+  String get formValidationFailed => '請先補全帳號必填資訊。';
+
+  @override
+  String accountSaveFailed(String reason) {
+    return '帳號儲存失敗：$reason';
+  }
 }
