@@ -72,6 +72,24 @@
 - 不记录密码、授权码、Token 或认证响应。
 - 增加连接测试结果模型测试。
 
+### PR #10：发送记录和 Sent 文件夹保存
+
+链接：待创建
+
+状态：本分支 `codex/sent-records` 待创建 PR
+
+已完成内容：
+
+- SMTP 发信成功后保存本地发送记录。
+- 新增本地 `sent_messages` 表，保存收件人、抄送、密送、主题、正文预览、RFC 822 内容、发送时间和 Sent 保存状态。
+- 普通 IMAP/SMTP 账号发信成功后尝试通过 IMAP `APPEND` 保存到 Sent 文件夹。
+- Sent 文件夹识别优先使用 IMAP `\Sent` special-use 属性，并 fallback 到常见中英文文件夹名。
+- 无法自动识别 Sent 文件夹时保留本地发送记录，并提示用户选择 Sent 文件夹或仅保存本地记录。
+- 首页新增“已发送”入口，展示本地发送记录和 Sent 保存状态。
+- 已发送列表支持对未保存到 Sent 的记录手动选择文件夹并重试 IMAP `APPEND`。
+- 不实现 Gmail/Outlook API 已发送同步。
+- 增加 Sent 文件夹识别和 RFC 822 内容生成测试。
+
 ## 已验证
 
 最近一次验证命令：
@@ -126,8 +144,6 @@ flutter test
 - 回复、回复全部、转发。
 - 添加收件人、抄送、密送。
 - 添加/删除附件。
-- 本地发送记录。
-- 尝试 IMAP APPEND 保存到 Sent 文件夹。
 
 ### 草稿
 
@@ -211,20 +227,19 @@ flutter test
 7. `codex/composer-smtp-send`：写邮件和 SMTP 发信。
 8. `codex/reply-forward`：回复、回复全部、转发。
 9. `codex/drafts`：本地草稿。
-10. `codex/sent-records`：发送记录和 Sent 文件夹保存。
-11. `codex/backup-export`：加密配置导出。
-12. `codex/backup-import`：配置导入和冲突处理。
-13. `codex/local-search`：本地搜索和 FTS。
-14. `codex/desktop-layout`：桌面三栏和响应式布局完善。
-15. `codex/mobile-navigation`：移动端 Drawer/NavigationDrawer。
-16. `codex/gmail-oauth`：Gmail OAuth。
-17. `codex/gmail-mail-provider`：Gmail 邮件列表、详情和发信。
-18. `codex/outlook-oauth`：Outlook OAuth。
-19. `codex/outlook-mail-provider`：Outlook 邮件列表、详情和发信。
-20. `codex/translation-ui`：邮件详情和写信翻译 UI。
-21. `codex/translation-provider`：真实翻译服务和隐私确认。
-22. `codex/multiplatform-ci`：多平台构建 CI。
-23. `codex/release-workflow`：发布流程和 tag 自动化。
+10. `codex/backup-export`：加密配置导出。
+11. `codex/backup-import`：配置导入和冲突处理。
+12. `codex/local-search`：本地搜索和 FTS。
+13. `codex/desktop-layout`：桌面三栏和响应式布局完善。
+14. `codex/mobile-navigation`：移动端 Drawer/NavigationDrawer。
+15. `codex/gmail-oauth`：Gmail OAuth。
+16. `codex/gmail-mail-provider`：Gmail 邮件列表、详情和发信。
+17. `codex/outlook-oauth`：Outlook OAuth。
+18. `codex/outlook-mail-provider`：Outlook 邮件列表、详情和发信。
+19. `codex/translation-ui`：邮件详情和写信翻译 UI。
+20. `codex/translation-provider`：真实翻译服务和隐私确认。
+21. `codex/multiplatform-ci`：多平台构建 CI。
+22. `codex/release-workflow`：发布流程和 tag 自动化。
 
 ## 注意事项
 

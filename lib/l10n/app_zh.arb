@@ -45,5 +45,17 @@
   "connectionTestSucceeded": "IMAP 和 SMTP 连接测试通过。",
   "connectionTestFailed": "连接测试失败：{reason}",
   "passwordRequiredForConnectionTest": "请先输入密码或授权码再测试。",
-  "unknownError": "未知错误"
+  "unknownError": "未知错误",
+  "sentMessages": "已发送",
+  "noSentMessagesYet": "还没有已发送邮件。",
+  "noSubject": "（无主题）",
+  "sentToRecipients": "收件人：{recipients}",
+  "chooseSentFolder": "选择 Sent 文件夹",
+  "sentFolderOnlyLocalRecord": "这封邮件仅保存了本地发送记录。",
+  "sentFolderSavePending": "正在保存到 Sent",
+  "sentFolderSaved": "已保存到 {folderName}",
+  "sentFolderSelectionRequired": "请选择 Sent 文件夹",
+  "sentFolderSaveFailed": "Sent 文件夹保存失败",
+  "sentFolderAppendSucceeded": "已保存到 {folderName}。",
+  "sentFolderAppendFailed": "无法保存到 Sent：{reason}"
 }

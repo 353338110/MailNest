@@ -148,6 +148,18 @@ class MailProtocolException implements Exception {
   final String message;
 }
 
+class ImapFolderInfo {
+  const ImapFolderInfo({
+    required this.name,
+    required this.attributes,
+    this.delimiter,
+  });
+
+  final String name;
+  final List<String> attributes;
+  final String? delimiter;
+}
+
 class ImapClient {
   ImapClient._(this._socket, this._lines);
 
@@ -199,6 +211,62 @@ class ImapClient {
 
   Future<void> logout() async {
     await _command('LOGOUT');
+  }
+
+  Future<List<ImapFolderInfo>> listFolders() async {
+    final tag = 'mn${_tag++}';
+    _socket.write('$tag LIST "" "*"\r\n');
+    final folders = <ImapFolderInfo>[];
+
+    while (true) {
+      final line = await _readLine();
+      if (line.startsWith(tag)) {
+        final response = _TaggedResponse(line);
+        if (!response.isOk) {
+          throw const MailProtocolException('IMAP folder list failed.');
+        }
+        return folders;
+      }
+      final folder = _parseListFolder(line);
+      if (folder != null) {
+        folders.add(folder);
+      }
+    }
+  }
+
+  Future<void> appendMessage({
+    required String folderName,
+    required String rfc822Content,
+    required DateTime sentAt,
+  }) async {
+    final tag = 'mn${_tag++}';
+    final bytes = utf8.encode(rfc822Content);
+    final flags = r'(\Seen)';
+    final date = _imapInternalDate(sentAt);
+    _socket.write(
+      '$tag APPEND ${_imapQuote(folderName)} $flags "$date" {${bytes.length}}\r\n',
+    );
+    await _socket.flush();
+
+    final continuation = await _readLine();
+    if (!continuation.startsWith('+')) {
+      throw const MailProtocolException('IMAP APPEND was rejected.');
+    }
+
+    _socket.add(bytes);
+    _socket.write('\r\n');
+    await _socket.flush();
+
+    while (true) {
+      final line = await _readLine();
+      if (line.startsWith(tag)) {
+        final response = _TaggedResponse(line);
+        if (!response.isOk) {
+          throw const MailProtocolException('IMAP APPEND failed.');
+        }
+        return;
+      }
+    }
   }
 
   void close() {
@@ -272,6 +340,29 @@ class SmtpClient {
     await _expectCode(334);
     await _writeCommand(base64Encode(utf8.encode(secret)));
     await _expectCode(235);
+  }
+
+  Future<void> sendMessage({
+    required String fromEmail,
+    required List<String> recipients,
+    required String rfc822Content,
+  }) async {
+    await _writeCommand('MAIL FROM:<$fromEmail>');
+    await _expectCode(250);
+    for (final recipient in recipients) {
+      await _writeCommand('RCPT TO:<$recipient>');
+      final response = await _readResponse();
+      if (response.code != 250 && response.code != 251) {
+        throw MailProtocolException(
+          'SMTP server rejected a recipient with ${response.code}.',
+        );
+      }
+    }
+    await _writeCommand('DATA');
+    await _expectCode(354);
+    _socket.write('${_dotStuff(rfc822Content)}\r\n.\r\n');
+    await _socket.flush();
+    await _expectCode(250);
   }
 
   Future<void> quit() async {
@@ -352,6 +443,77 @@ Stream<String> _lineStream(Socket socket) {
 String _imapQuote(String value) {
   final escaped = value.replaceAll(r'\', r'\\').replaceAll('"', r'\"');
   return '"$escaped"';
+}
+
+ImapFolderInfo? _parseListFolder(String line) {
+  final match = RegExp(
+    r'^\* LIST \(([^)]*)\) ("([^"]*)"|NIL) (.+)$',
+    caseSensitive: false,
+  ).firstMatch(line);
+  if (match == null) {
+    return null;
+  }
+
+  final attributes = match
+      .group(1)!
+      .split(' ')
+      .where((value) => value.isNotEmpty)
+      .toList(growable: false);
+  final delimiter = match.group(3);
+  final namePart = match.group(4)!.trim();
+  final name = _decodeImapListString(namePart);
+  if (name.isEmpty) {
+    return null;
+  }
+
+  return ImapFolderInfo(
+    name: name,
+    attributes: attributes,
+    delimiter: delimiter,
+  );
+}
+
+String _decodeImapListString(String value) {
+  if (value.startsWith('"') && value.endsWith('"')) {
+    return value
+        .substring(1, value.length - 1)
+        .replaceAll(r'\"', '"')
+        .replaceAll(r'\\', r'\');
+  }
+  return value;
+}
+
+String _imapInternalDate(DateTime dateTime) {
+  final utc = dateTime.toUtc();
+  const months = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+  ];
+  final day = utc.day.toString().padLeft(2, '0');
+  final month = months[utc.month - 1];
+  final hour = utc.hour.toString().padLeft(2, '0');
+  final minute = utc.minute.toString().padLeft(2, '0');
+  final second = utc.second.toString().padLeft(2, '0');
+  return '$day-$month-${utc.year} $hour:$minute:$second +0000';
+}
+
+String _dotStuff(String value) {
+  return value
+      .replaceAll('\r\n', '\n')
+      .split('\n')
+      .map((line) => line.startsWith('.') ? '.$line' : line)
+      .join('\r\n')
+      .trimRight();
 }
 
 class _TaggedResponse {

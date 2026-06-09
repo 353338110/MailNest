@@ -36,13 +36,45 @@ class AppSettings extends Table {
   Set<Column<Object>> get primaryKey => {key};
 }
 
-@DriftDatabase(tables: [EmailAccounts, AppSettings])
+class SentMessages extends Table {
+  TextColumn get id => text()();
+  TextColumn get accountId => text()();
+  TextColumn get fromEmail => text()();
+  TextColumn get toRecipientsJson => text()();
+  TextColumn get ccRecipientsJson => text().withDefault(const Constant('[]'))();
+  TextColumn get bccRecipientsJson =>
+      text().withDefault(const Constant('[]'))();
+  TextColumn get subject => text()();
+  TextColumn get bodyPreview => text()();
+  TextColumn get rfc822Content => text()();
+  DateTimeColumn get sentAt => dateTime()();
+  TextColumn get appendStatus => text()();
+  TextColumn get sentFolderName => text().nullable()();
+  TextColumn get appendError => text().nullable()();
+  DateTimeColumn get createdAt => dateTime()();
+  DateTimeColumn get updatedAt => dateTime()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DriftDatabase(tables: [EmailAccounts, AppSettings, SentMessages])
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor])
     : super(executor ?? driftDatabase(name: 'mailnest'));
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+    onCreate: (m) => m.createAll(),
+    onUpgrade: (m, from, to) async {
+      if (from < 2) {
+        await m.createTable(sentMessages);
+      }
+    },
+  );
 
   Future<List<EmailAccount>> watchableAccountsSnapshot() {
     return (select(
@@ -77,5 +109,38 @@ class AppDatabase extends _$AppDatabase {
 
   Future<void> deleteAccount(String id) {
     return (delete(emailAccounts)..where((table) => table.id.equals(id))).go();
+  }
+
+  Stream<List<SentMessage>> watchSentMessages() {
+    return (select(
+      sentMessages,
+    )..orderBy([(table) => OrderingTerm.desc(table.sentAt)])).watch();
+  }
+
+  Future<SentMessage?> getSentMessage(String id) {
+    return (select(
+      sentMessages,
+    )..where((table) => table.id.equals(id))).getSingleOrNull();
+  }
+
+  Future<void> saveSentMessage(SentMessagesCompanion message) {
+    return into(sentMessages).insertOnConflictUpdate(message);
+  }
+
+  Future<void> updateSentMessageAppendState({
+    required String id,
+    required String appendStatus,
+    required DateTime updatedAt,
+    String? sentFolderName,
+    String? appendError,
+  }) {
+    return (update(sentMessages)..where((table) => table.id.equals(id))).write(
+      SentMessagesCompanion(
+        appendStatus: Value(appendStatus),
+        sentFolderName: Value(sentFolderName),
+        appendError: Value(appendError),
+        updatedAt: Value(updatedAt),
+      ),
+    );
   }
 }

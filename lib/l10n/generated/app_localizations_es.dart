@@ -159,4 +159,49 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get unknownError => 'Unknown error';
+
+  @override
+  String get sentMessages => 'Sent';
+
+  @override
+  String get noSentMessagesYet => 'No sent messages yet.';
+
+  @override
+  String get noSubject => '(No subject)';
+
+  @override
+  String sentToRecipients(String recipients) {
+    return 'To: $recipients';
+  }
+
+  @override
+  String get chooseSentFolder => 'Choose Sent folder';
+
+  @override
+  String get sentFolderOnlyLocalRecord =>
+      'Only the local sent record is saved for this message.';
+
+  @override
+  String get sentFolderSavePending => 'Saving to Sent';
+
+  @override
+  String sentFolderSaved(String folderName) {
+    return 'Saved to $folderName';
+  }
+
+  @override
+  String get sentFolderSelectionRequired => 'Choose a Sent folder';
+
+  @override
+  String get sentFolderSaveFailed => 'Sent folder save failed';
+
+  @override
+  String sentFolderAppendSucceeded(String folderName) {
+    return 'Saved to $folderName.';
+  }
+
+  @override
+  String sentFolderAppendFailed(String reason) {
+    return 'Could not save to Sent: $reason';
+  }
 }

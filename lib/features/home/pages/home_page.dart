@@ -20,6 +20,11 @@ class HomePage extends ConsumerWidget {
         title: Text(l10n.appTitle),
         actions: [
           IconButton(
+            tooltip: l10n.sentMessages,
+            onPressed: () => context.push('/sent'),
+            icon: const Icon(Icons.outbox_outlined),
+          ),
+          IconButton(
             tooltip: l10n.settings,
             onPressed: () => context.push('/settings'),
             icon: const Icon(Icons.settings_outlined),

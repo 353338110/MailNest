@@ -1299,11 +1299,899 @@ class AppSettingsCompanion extends UpdateCompanion<AppSetting> {
   }
 }
 
+class $SentMessagesTable extends SentMessages
+    with TableInfo<$SentMessagesTable, SentMessage> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $SentMessagesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _accountIdMeta = const VerificationMeta(
+    'accountId',
+  );
+  @override
+  late final GeneratedColumn<String> accountId = GeneratedColumn<String>(
+    'account_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _fromEmailMeta = const VerificationMeta(
+    'fromEmail',
+  );
+  @override
+  late final GeneratedColumn<String> fromEmail = GeneratedColumn<String>(
+    'from_email',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _toRecipientsJsonMeta = const VerificationMeta(
+    'toRecipientsJson',
+  );
+  @override
+  late final GeneratedColumn<String> toRecipientsJson = GeneratedColumn<String>(
+    'to_recipients_json',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _ccRecipientsJsonMeta = const VerificationMeta(
+    'ccRecipientsJson',
+  );
+  @override
+  late final GeneratedColumn<String> ccRecipientsJson = GeneratedColumn<String>(
+    'cc_recipients_json',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('[]'),
+  );
+  static const VerificationMeta _bccRecipientsJsonMeta = const VerificationMeta(
+    'bccRecipientsJson',
+  );
+  @override
+  late final GeneratedColumn<String> bccRecipientsJson =
+      GeneratedColumn<String>(
+        'bcc_recipients_json',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant('[]'),
+      );
+  static const VerificationMeta _subjectMeta = const VerificationMeta(
+    'subject',
+  );
+  @override
+  late final GeneratedColumn<String> subject = GeneratedColumn<String>(
+    'subject',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _bodyPreviewMeta = const VerificationMeta(
+    'bodyPreview',
+  );
+  @override
+  late final GeneratedColumn<String> bodyPreview = GeneratedColumn<String>(
+    'body_preview',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _rfc822ContentMeta = const VerificationMeta(
+    'rfc822Content',
+  );
+  @override
+  late final GeneratedColumn<String> rfc822Content = GeneratedColumn<String>(
+    'rfc822_content',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sentAtMeta = const VerificationMeta('sentAt');
+  @override
+  late final GeneratedColumn<DateTime> sentAt = GeneratedColumn<DateTime>(
+    'sent_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _appendStatusMeta = const VerificationMeta(
+    'appendStatus',
+  );
+  @override
+  late final GeneratedColumn<String> appendStatus = GeneratedColumn<String>(
+    'append_status',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sentFolderNameMeta = const VerificationMeta(
+    'sentFolderName',
+  );
+  @override
+  late final GeneratedColumn<String> sentFolderName = GeneratedColumn<String>(
+    'sent_folder_name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _appendErrorMeta = const VerificationMeta(
+    'appendError',
+  );
+  @override
+  late final GeneratedColumn<String> appendError = GeneratedColumn<String>(
+    'append_error',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    accountId,
+    fromEmail,
+    toRecipientsJson,
+    ccRecipientsJson,
+    bccRecipientsJson,
+    subject,
+    bodyPreview,
+    rfc822Content,
+    sentAt,
+    appendStatus,
+    sentFolderName,
+    appendError,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'sent_messages';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<SentMessage> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('account_id')) {
+      context.handle(
+        _accountIdMeta,
+        accountId.isAcceptableOrUnknown(data['account_id']!, _accountIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_accountIdMeta);
+    }
+    if (data.containsKey('from_email')) {
+      context.handle(
+        _fromEmailMeta,
+        fromEmail.isAcceptableOrUnknown(data['from_email']!, _fromEmailMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_fromEmailMeta);
+    }
+    if (data.containsKey('to_recipients_json')) {
+      context.handle(
+        _toRecipientsJsonMeta,
+        toRecipientsJson.isAcceptableOrUnknown(
+          data['to_recipients_json']!,
+          _toRecipientsJsonMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_toRecipientsJsonMeta);
+    }
+    if (data.containsKey('cc_recipients_json')) {
+      context.handle(
+        _ccRecipientsJsonMeta,
+        ccRecipientsJson.isAcceptableOrUnknown(
+          data['cc_recipients_json']!,
+          _ccRecipientsJsonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('bcc_recipients_json')) {
+      context.handle(
+        _bccRecipientsJsonMeta,
+        bccRecipientsJson.isAcceptableOrUnknown(
+          data['bcc_recipients_json']!,
+          _bccRecipientsJsonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('subject')) {
+      context.handle(
+        _subjectMeta,
+        subject.isAcceptableOrUnknown(data['subject']!, _subjectMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_subjectMeta);
+    }
+    if (data.containsKey('body_preview')) {
+      context.handle(
+        _bodyPreviewMeta,
+        bodyPreview.isAcceptableOrUnknown(
+          data['body_preview']!,
+          _bodyPreviewMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_bodyPreviewMeta);
+    }
+    if (data.containsKey('rfc822_content')) {
+      context.handle(
+        _rfc822ContentMeta,
+        rfc822Content.isAcceptableOrUnknown(
+          data['rfc822_content']!,
+          _rfc822ContentMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_rfc822ContentMeta);
+    }
+    if (data.containsKey('sent_at')) {
+      context.handle(
+        _sentAtMeta,
+        sentAt.isAcceptableOrUnknown(data['sent_at']!, _sentAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sentAtMeta);
+    }
+    if (data.containsKey('append_status')) {
+      context.handle(
+        _appendStatusMeta,
+        appendStatus.isAcceptableOrUnknown(
+          data['append_status']!,
+          _appendStatusMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_appendStatusMeta);
+    }
+    if (data.containsKey('sent_folder_name')) {
+      context.handle(
+        _sentFolderNameMeta,
+        sentFolderName.isAcceptableOrUnknown(
+          data['sent_folder_name']!,
+          _sentFolderNameMeta,
+        ),
+      );
+    }
+    if (data.containsKey('append_error')) {
+      context.handle(
+        _appendErrorMeta,
+        appendError.isAcceptableOrUnknown(
+          data['append_error']!,
+          _appendErrorMeta,
+        ),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  SentMessage map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return SentMessage(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      accountId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}account_id'],
+      )!,
+      fromEmail: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}from_email'],
+      )!,
+      toRecipientsJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}to_recipients_json'],
+      )!,
+      ccRecipientsJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}cc_recipients_json'],
+      )!,
+      bccRecipientsJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}bcc_recipients_json'],
+      )!,
+      subject: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}subject'],
+      )!,
+      bodyPreview: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}body_preview'],
+      )!,
+      rfc822Content: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}rfc822_content'],
+      )!,
+      sentAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}sent_at'],
+      )!,
+      appendStatus: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}append_status'],
+      )!,
+      sentFolderName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}sent_folder_name'],
+      ),
+      appendError: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}append_error'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $SentMessagesTable createAlias(String alias) {
+    return $SentMessagesTable(attachedDatabase, alias);
+  }
+}
+
+class SentMessage extends DataClass implements Insertable<SentMessage> {
+  final String id;
+  final String accountId;
+  final String fromEmail;
+  final String toRecipientsJson;
+  final String ccRecipientsJson;
+  final String bccRecipientsJson;
+  final String subject;
+  final String bodyPreview;
+  final String rfc822Content;
+  final DateTime sentAt;
+  final String appendStatus;
+  final String? sentFolderName;
+  final String? appendError;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const SentMessage({
+    required this.id,
+    required this.accountId,
+    required this.fromEmail,
+    required this.toRecipientsJson,
+    required this.ccRecipientsJson,
+    required this.bccRecipientsJson,
+    required this.subject,
+    required this.bodyPreview,
+    required this.rfc822Content,
+    required this.sentAt,
+    required this.appendStatus,
+    this.sentFolderName,
+    this.appendError,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['account_id'] = Variable<String>(accountId);
+    map['from_email'] = Variable<String>(fromEmail);
+    map['to_recipients_json'] = Variable<String>(toRecipientsJson);
+    map['cc_recipients_json'] = Variable<String>(ccRecipientsJson);
+    map['bcc_recipients_json'] = Variable<String>(bccRecipientsJson);
+    map['subject'] = Variable<String>(subject);
+    map['body_preview'] = Variable<String>(bodyPreview);
+    map['rfc822_content'] = Variable<String>(rfc822Content);
+    map['sent_at'] = Variable<DateTime>(sentAt);
+    map['append_status'] = Variable<String>(appendStatus);
+    if (!nullToAbsent || sentFolderName != null) {
+      map['sent_folder_name'] = Variable<String>(sentFolderName);
+    }
+    if (!nullToAbsent || appendError != null) {
+      map['append_error'] = Variable<String>(appendError);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  SentMessagesCompanion toCompanion(bool nullToAbsent) {
+    return SentMessagesCompanion(
+      id: Value(id),
+      accountId: Value(accountId),
+      fromEmail: Value(fromEmail),
+      toRecipientsJson: Value(toRecipientsJson),
+      ccRecipientsJson: Value(ccRecipientsJson),
+      bccRecipientsJson: Value(bccRecipientsJson),
+      subject: Value(subject),
+      bodyPreview: Value(bodyPreview),
+      rfc822Content: Value(rfc822Content),
+      sentAt: Value(sentAt),
+      appendStatus: Value(appendStatus),
+      sentFolderName: sentFolderName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(sentFolderName),
+      appendError: appendError == null && nullToAbsent
+          ? const Value.absent()
+          : Value(appendError),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory SentMessage.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return SentMessage(
+      id: serializer.fromJson<String>(json['id']),
+      accountId: serializer.fromJson<String>(json['accountId']),
+      fromEmail: serializer.fromJson<String>(json['fromEmail']),
+      toRecipientsJson: serializer.fromJson<String>(json['toRecipientsJson']),
+      ccRecipientsJson: serializer.fromJson<String>(json['ccRecipientsJson']),
+      bccRecipientsJson: serializer.fromJson<String>(json['bccRecipientsJson']),
+      subject: serializer.fromJson<String>(json['subject']),
+      bodyPreview: serializer.fromJson<String>(json['bodyPreview']),
+      rfc822Content: serializer.fromJson<String>(json['rfc822Content']),
+      sentAt: serializer.fromJson<DateTime>(json['sentAt']),
+      appendStatus: serializer.fromJson<String>(json['appendStatus']),
+      sentFolderName: serializer.fromJson<String?>(json['sentFolderName']),
+      appendError: serializer.fromJson<String?>(json['appendError']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'accountId': serializer.toJson<String>(accountId),
+      'fromEmail': serializer.toJson<String>(fromEmail),
+      'toRecipientsJson': serializer.toJson<String>(toRecipientsJson),
+      'ccRecipientsJson': serializer.toJson<String>(ccRecipientsJson),
+      'bccRecipientsJson': serializer.toJson<String>(bccRecipientsJson),
+      'subject': serializer.toJson<String>(subject),
+      'bodyPreview': serializer.toJson<String>(bodyPreview),
+      'rfc822Content': serializer.toJson<String>(rfc822Content),
+      'sentAt': serializer.toJson<DateTime>(sentAt),
+      'appendStatus': serializer.toJson<String>(appendStatus),
+      'sentFolderName': serializer.toJson<String?>(sentFolderName),
+      'appendError': serializer.toJson<String?>(appendError),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  SentMessage copyWith({
+    String? id,
+    String? accountId,
+    String? fromEmail,
+    String? toRecipientsJson,
+    String? ccRecipientsJson,
+    String? bccRecipientsJson,
+    String? subject,
+    String? bodyPreview,
+    String? rfc822Content,
+    DateTime? sentAt,
+    String? appendStatus,
+    Value<String?> sentFolderName = const Value.absent(),
+    Value<String?> appendError = const Value.absent(),
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) => SentMessage(
+    id: id ?? this.id,
+    accountId: accountId ?? this.accountId,
+    fromEmail: fromEmail ?? this.fromEmail,
+    toRecipientsJson: toRecipientsJson ?? this.toRecipientsJson,
+    ccRecipientsJson: ccRecipientsJson ?? this.ccRecipientsJson,
+    bccRecipientsJson: bccRecipientsJson ?? this.bccRecipientsJson,
+    subject: subject ?? this.subject,
+    bodyPreview: bodyPreview ?? this.bodyPreview,
+    rfc822Content: rfc822Content ?? this.rfc822Content,
+    sentAt: sentAt ?? this.sentAt,
+    appendStatus: appendStatus ?? this.appendStatus,
+    sentFolderName: sentFolderName.present
+        ? sentFolderName.value
+        : this.sentFolderName,
+    appendError: appendError.present ? appendError.value : this.appendError,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  SentMessage copyWithCompanion(SentMessagesCompanion data) {
+    return SentMessage(
+      id: data.id.present ? data.id.value : this.id,
+      accountId: data.accountId.present ? data.accountId.value : this.accountId,
+      fromEmail: data.fromEmail.present ? data.fromEmail.value : this.fromEmail,
+      toRecipientsJson: data.toRecipientsJson.present
+          ? data.toRecipientsJson.value
+          : this.toRecipientsJson,
+      ccRecipientsJson: data.ccRecipientsJson.present
+          ? data.ccRecipientsJson.value
+          : this.ccRecipientsJson,
+      bccRecipientsJson: data.bccRecipientsJson.present
+          ? data.bccRecipientsJson.value
+          : this.bccRecipientsJson,
+      subject: data.subject.present ? data.subject.value : this.subject,
+      bodyPreview: data.bodyPreview.present
+          ? data.bodyPreview.value
+          : this.bodyPreview,
+      rfc822Content: data.rfc822Content.present
+          ? data.rfc822Content.value
+          : this.rfc822Content,
+      sentAt: data.sentAt.present ? data.sentAt.value : this.sentAt,
+      appendStatus: data.appendStatus.present
+          ? data.appendStatus.value
+          : this.appendStatus,
+      sentFolderName: data.sentFolderName.present
+          ? data.sentFolderName.value
+          : this.sentFolderName,
+      appendError: data.appendError.present
+          ? data.appendError.value
+          : this.appendError,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SentMessage(')
+          ..write('id: $id, ')
+          ..write('accountId: $accountId, ')
+          ..write('fromEmail: $fromEmail, ')
+          ..write('toRecipientsJson: $toRecipientsJson, ')
+          ..write('ccRecipientsJson: $ccRecipientsJson, ')
+          ..write('bccRecipientsJson: $bccRecipientsJson, ')
+          ..write('subject: $subject, ')
+          ..write('bodyPreview: $bodyPreview, ')
+          ..write('rfc822Content: $rfc822Content, ')
+          ..write('sentAt: $sentAt, ')
+          ..write('appendStatus: $appendStatus, ')
+          ..write('sentFolderName: $sentFolderName, ')
+          ..write('appendError: $appendError, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    accountId,
+    fromEmail,
+    toRecipientsJson,
+    ccRecipientsJson,
+    bccRecipientsJson,
+    subject,
+    bodyPreview,
+    rfc822Content,
+    sentAt,
+    appendStatus,
+    sentFolderName,
+    appendError,
+    createdAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is SentMessage &&
+          other.id == this.id &&
+          other.accountId == this.accountId &&
+          other.fromEmail == this.fromEmail &&
+          other.toRecipientsJson == this.toRecipientsJson &&
+          other.ccRecipientsJson == this.ccRecipientsJson &&
+          other.bccRecipientsJson == this.bccRecipientsJson &&
+          other.subject == this.subject &&
+          other.bodyPreview == this.bodyPreview &&
+          other.rfc822Content == this.rfc822Content &&
+          other.sentAt == this.sentAt &&
+          other.appendStatus == this.appendStatus &&
+          other.sentFolderName == this.sentFolderName &&
+          other.appendError == this.appendError &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class SentMessagesCompanion extends UpdateCompanion<SentMessage> {
+  final Value<String> id;
+  final Value<String> accountId;
+  final Value<String> fromEmail;
+  final Value<String> toRecipientsJson;
+  final Value<String> ccRecipientsJson;
+  final Value<String> bccRecipientsJson;
+  final Value<String> subject;
+  final Value<String> bodyPreview;
+  final Value<String> rfc822Content;
+  final Value<DateTime> sentAt;
+  final Value<String> appendStatus;
+  final Value<String?> sentFolderName;
+  final Value<String?> appendError;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<int> rowid;
+  const SentMessagesCompanion({
+    this.id = const Value.absent(),
+    this.accountId = const Value.absent(),
+    this.fromEmail = const Value.absent(),
+    this.toRecipientsJson = const Value.absent(),
+    this.ccRecipientsJson = const Value.absent(),
+    this.bccRecipientsJson = const Value.absent(),
+    this.subject = const Value.absent(),
+    this.bodyPreview = const Value.absent(),
+    this.rfc822Content = const Value.absent(),
+    this.sentAt = const Value.absent(),
+    this.appendStatus = const Value.absent(),
+    this.sentFolderName = const Value.absent(),
+    this.appendError = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  SentMessagesCompanion.insert({
+    required String id,
+    required String accountId,
+    required String fromEmail,
+    required String toRecipientsJson,
+    this.ccRecipientsJson = const Value.absent(),
+    this.bccRecipientsJson = const Value.absent(),
+    required String subject,
+    required String bodyPreview,
+    required String rfc822Content,
+    required DateTime sentAt,
+    required String appendStatus,
+    this.sentFolderName = const Value.absent(),
+    this.appendError = const Value.absent(),
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       accountId = Value(accountId),
+       fromEmail = Value(fromEmail),
+       toRecipientsJson = Value(toRecipientsJson),
+       subject = Value(subject),
+       bodyPreview = Value(bodyPreview),
+       rfc822Content = Value(rfc822Content),
+       sentAt = Value(sentAt),
+       appendStatus = Value(appendStatus),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<SentMessage> custom({
+    Expression<String>? id,
+    Expression<String>? accountId,
+    Expression<String>? fromEmail,
+    Expression<String>? toRecipientsJson,
+    Expression<String>? ccRecipientsJson,
+    Expression<String>? bccRecipientsJson,
+    Expression<String>? subject,
+    Expression<String>? bodyPreview,
+    Expression<String>? rfc822Content,
+    Expression<DateTime>? sentAt,
+    Expression<String>? appendStatus,
+    Expression<String>? sentFolderName,
+    Expression<String>? appendError,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (accountId != null) 'account_id': accountId,
+      if (fromEmail != null) 'from_email': fromEmail,
+      if (toRecipientsJson != null) 'to_recipients_json': toRecipientsJson,
+      if (ccRecipientsJson != null) 'cc_recipients_json': ccRecipientsJson,
+      if (bccRecipientsJson != null) 'bcc_recipients_json': bccRecipientsJson,
+      if (subject != null) 'subject': subject,
+      if (bodyPreview != null) 'body_preview': bodyPreview,
+      if (rfc822Content != null) 'rfc822_content': rfc822Content,
+      if (sentAt != null) 'sent_at': sentAt,
+      if (appendStatus != null) 'append_status': appendStatus,
+      if (sentFolderName != null) 'sent_folder_name': sentFolderName,
+      if (appendError != null) 'append_error': appendError,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  SentMessagesCompanion copyWith({
+    Value<String>? id,
+    Value<String>? accountId,
+    Value<String>? fromEmail,
+    Value<String>? toRecipientsJson,
+    Value<String>? ccRecipientsJson,
+    Value<String>? bccRecipientsJson,
+    Value<String>? subject,
+    Value<String>? bodyPreview,
+    Value<String>? rfc822Content,
+    Value<DateTime>? sentAt,
+    Value<String>? appendStatus,
+    Value<String?>? sentFolderName,
+    Value<String?>? appendError,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return SentMessagesCompanion(
+      id: id ?? this.id,
+      accountId: accountId ?? this.accountId,
+      fromEmail: fromEmail ?? this.fromEmail,
+      toRecipientsJson: toRecipientsJson ?? this.toRecipientsJson,
+      ccRecipientsJson: ccRecipientsJson ?? this.ccRecipientsJson,
+      bccRecipientsJson: bccRecipientsJson ?? this.bccRecipientsJson,
+      subject: subject ?? this.subject,
+      bodyPreview: bodyPreview ?? this.bodyPreview,
+      rfc822Content: rfc822Content ?? this.rfc822Content,
+      sentAt: sentAt ?? this.sentAt,
+      appendStatus: appendStatus ?? this.appendStatus,
+      sentFolderName: sentFolderName ?? this.sentFolderName,
+      appendError: appendError ?? this.appendError,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (accountId.present) {
+      map['account_id'] = Variable<String>(accountId.value);
+    }
+    if (fromEmail.present) {
+      map['from_email'] = Variable<String>(fromEmail.value);
+    }
+    if (toRecipientsJson.present) {
+      map['to_recipients_json'] = Variable<String>(toRecipientsJson.value);
+    }
+    if (ccRecipientsJson.present) {
+      map['cc_recipients_json'] = Variable<String>(ccRecipientsJson.value);
+    }
+    if (bccRecipientsJson.present) {
+      map['bcc_recipients_json'] = Variable<String>(bccRecipientsJson.value);
+    }
+    if (subject.present) {
+      map['subject'] = Variable<String>(subject.value);
+    }
+    if (bodyPreview.present) {
+      map['body_preview'] = Variable<String>(bodyPreview.value);
+    }
+    if (rfc822Content.present) {
+      map['rfc822_content'] = Variable<String>(rfc822Content.value);
+    }
+    if (sentAt.present) {
+      map['sent_at'] = Variable<DateTime>(sentAt.value);
+    }
+    if (appendStatus.present) {
+      map['append_status'] = Variable<String>(appendStatus.value);
+    }
+    if (sentFolderName.present) {
+      map['sent_folder_name'] = Variable<String>(sentFolderName.value);
+    }
+    if (appendError.present) {
+      map['append_error'] = Variable<String>(appendError.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SentMessagesCompanion(')
+          ..write('id: $id, ')
+          ..write('accountId: $accountId, ')
+          ..write('fromEmail: $fromEmail, ')
+          ..write('toRecipientsJson: $toRecipientsJson, ')
+          ..write('ccRecipientsJson: $ccRecipientsJson, ')
+          ..write('bccRecipientsJson: $bccRecipientsJson, ')
+          ..write('subject: $subject, ')
+          ..write('bodyPreview: $bodyPreview, ')
+          ..write('rfc822Content: $rfc822Content, ')
+          ..write('sentAt: $sentAt, ')
+          ..write('appendStatus: $appendStatus, ')
+          ..write('sentFolderName: $sentFolderName, ')
+          ..write('appendError: $appendError, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $EmailAccountsTable emailAccounts = $EmailAccountsTable(this);
   late final $AppSettingsTable appSettings = $AppSettingsTable(this);
+  late final $SentMessagesTable sentMessages = $SentMessagesTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -1311,6 +2199,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   List<DatabaseSchemaEntity> get allSchemaEntities => [
     emailAccounts,
     appSettings,
+    sentMessages,
   ];
 }
 
@@ -1937,6 +2826,412 @@ typedef $$AppSettingsTableProcessedTableManager =
       AppSetting,
       PrefetchHooks Function()
     >;
+typedef $$SentMessagesTableCreateCompanionBuilder =
+    SentMessagesCompanion Function({
+      required String id,
+      required String accountId,
+      required String fromEmail,
+      required String toRecipientsJson,
+      Value<String> ccRecipientsJson,
+      Value<String> bccRecipientsJson,
+      required String subject,
+      required String bodyPreview,
+      required String rfc822Content,
+      required DateTime sentAt,
+      required String appendStatus,
+      Value<String?> sentFolderName,
+      Value<String?> appendError,
+      required DateTime createdAt,
+      required DateTime updatedAt,
+      Value<int> rowid,
+    });
+typedef $$SentMessagesTableUpdateCompanionBuilder =
+    SentMessagesCompanion Function({
+      Value<String> id,
+      Value<String> accountId,
+      Value<String> fromEmail,
+      Value<String> toRecipientsJson,
+      Value<String> ccRecipientsJson,
+      Value<String> bccRecipientsJson,
+      Value<String> subject,
+      Value<String> bodyPreview,
+      Value<String> rfc822Content,
+      Value<DateTime> sentAt,
+      Value<String> appendStatus,
+      Value<String?> sentFolderName,
+      Value<String?> appendError,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<int> rowid,
+    });
+
+class $$SentMessagesTableFilterComposer
+    extends Composer<_$AppDatabase, $SentMessagesTable> {
+  $$SentMessagesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get accountId => $composableBuilder(
+    column: $table.accountId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get fromEmail => $composableBuilder(
+    column: $table.fromEmail,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get toRecipientsJson => $composableBuilder(
+    column: $table.toRecipientsJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get ccRecipientsJson => $composableBuilder(
+    column: $table.ccRecipientsJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get bccRecipientsJson => $composableBuilder(
+    column: $table.bccRecipientsJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get subject => $composableBuilder(
+    column: $table.subject,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get bodyPreview => $composableBuilder(
+    column: $table.bodyPreview,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get rfc822Content => $composableBuilder(
+    column: $table.rfc822Content,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get sentAt => $composableBuilder(
+    column: $table.sentAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get appendStatus => $composableBuilder(
+    column: $table.appendStatus,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get sentFolderName => $composableBuilder(
+    column: $table.sentFolderName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get appendError => $composableBuilder(
+    column: $table.appendError,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$SentMessagesTableOrderingComposer
+    extends Composer<_$AppDatabase, $SentMessagesTable> {
+  $$SentMessagesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get accountId => $composableBuilder(
+    column: $table.accountId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get fromEmail => $composableBuilder(
+    column: $table.fromEmail,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get toRecipientsJson => $composableBuilder(
+    column: $table.toRecipientsJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get ccRecipientsJson => $composableBuilder(
+    column: $table.ccRecipientsJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get bccRecipientsJson => $composableBuilder(
+    column: $table.bccRecipientsJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get subject => $composableBuilder(
+    column: $table.subject,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get bodyPreview => $composableBuilder(
+    column: $table.bodyPreview,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get rfc822Content => $composableBuilder(
+    column: $table.rfc822Content,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get sentAt => $composableBuilder(
+    column: $table.sentAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get appendStatus => $composableBuilder(
+    column: $table.appendStatus,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get sentFolderName => $composableBuilder(
+    column: $table.sentFolderName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get appendError => $composableBuilder(
+    column: $table.appendError,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$SentMessagesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $SentMessagesTable> {
+  $$SentMessagesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get accountId =>
+      $composableBuilder(column: $table.accountId, builder: (column) => column);
+
+  GeneratedColumn<String> get fromEmail =>
+      $composableBuilder(column: $table.fromEmail, builder: (column) => column);
+
+  GeneratedColumn<String> get toRecipientsJson => $composableBuilder(
+    column: $table.toRecipientsJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get ccRecipientsJson => $composableBuilder(
+    column: $table.ccRecipientsJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get bccRecipientsJson => $composableBuilder(
+    column: $table.bccRecipientsJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get subject =>
+      $composableBuilder(column: $table.subject, builder: (column) => column);
+
+  GeneratedColumn<String> get bodyPreview => $composableBuilder(
+    column: $table.bodyPreview,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get rfc822Content => $composableBuilder(
+    column: $table.rfc822Content,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get sentAt =>
+      $composableBuilder(column: $table.sentAt, builder: (column) => column);
+
+  GeneratedColumn<String> get appendStatus => $composableBuilder(
+    column: $table.appendStatus,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get sentFolderName => $composableBuilder(
+    column: $table.sentFolderName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get appendError => $composableBuilder(
+    column: $table.appendError,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$SentMessagesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $SentMessagesTable,
+          SentMessage,
+          $$SentMessagesTableFilterComposer,
+          $$SentMessagesTableOrderingComposer,
+          $$SentMessagesTableAnnotationComposer,
+          $$SentMessagesTableCreateCompanionBuilder,
+          $$SentMessagesTableUpdateCompanionBuilder,
+          (
+            SentMessage,
+            BaseReferences<_$AppDatabase, $SentMessagesTable, SentMessage>,
+          ),
+          SentMessage,
+          PrefetchHooks Function()
+        > {
+  $$SentMessagesTableTableManager(_$AppDatabase db, $SentMessagesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$SentMessagesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$SentMessagesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$SentMessagesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> accountId = const Value.absent(),
+                Value<String> fromEmail = const Value.absent(),
+                Value<String> toRecipientsJson = const Value.absent(),
+                Value<String> ccRecipientsJson = const Value.absent(),
+                Value<String> bccRecipientsJson = const Value.absent(),
+                Value<String> subject = const Value.absent(),
+                Value<String> bodyPreview = const Value.absent(),
+                Value<String> rfc822Content = const Value.absent(),
+                Value<DateTime> sentAt = const Value.absent(),
+                Value<String> appendStatus = const Value.absent(),
+                Value<String?> sentFolderName = const Value.absent(),
+                Value<String?> appendError = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => SentMessagesCompanion(
+                id: id,
+                accountId: accountId,
+                fromEmail: fromEmail,
+                toRecipientsJson: toRecipientsJson,
+                ccRecipientsJson: ccRecipientsJson,
+                bccRecipientsJson: bccRecipientsJson,
+                subject: subject,
+                bodyPreview: bodyPreview,
+                rfc822Content: rfc822Content,
+                sentAt: sentAt,
+                appendStatus: appendStatus,
+                sentFolderName: sentFolderName,
+                appendError: appendError,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String accountId,
+                required String fromEmail,
+                required String toRecipientsJson,
+                Value<String> ccRecipientsJson = const Value.absent(),
+                Value<String> bccRecipientsJson = const Value.absent(),
+                required String subject,
+                required String bodyPreview,
+                required String rfc822Content,
+                required DateTime sentAt,
+                required String appendStatus,
+                Value<String?> sentFolderName = const Value.absent(),
+                Value<String?> appendError = const Value.absent(),
+                required DateTime createdAt,
+                required DateTime updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => SentMessagesCompanion.insert(
+                id: id,
+                accountId: accountId,
+                fromEmail: fromEmail,
+                toRecipientsJson: toRecipientsJson,
+                ccRecipientsJson: ccRecipientsJson,
+                bccRecipientsJson: bccRecipientsJson,
+                subject: subject,
+                bodyPreview: bodyPreview,
+                rfc822Content: rfc822Content,
+                sentAt: sentAt,
+                appendStatus: appendStatus,
+                sentFolderName: sentFolderName,
+                appendError: appendError,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$SentMessagesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $SentMessagesTable,
+      SentMessage,
+      $$SentMessagesTableFilterComposer,
+      $$SentMessagesTableOrderingComposer,
+      $$SentMessagesTableAnnotationComposer,
+      $$SentMessagesTableCreateCompanionBuilder,
+      $$SentMessagesTableUpdateCompanionBuilder,
+      (
+        SentMessage,
+        BaseReferences<_$AppDatabase, $SentMessagesTable, SentMessage>,
+      ),
+      SentMessage,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -1945,4 +3240,6 @@ class $AppDatabaseManager {
       $$EmailAccountsTableTableManager(_db, _db.emailAccounts);
   $$AppSettingsTableTableManager get appSettings =>
       $$AppSettingsTableTableManager(_db, _db.appSettings);
+  $$SentMessagesTableTableManager get sentMessages =>
+      $$SentMessagesTableTableManager(_db, _db.sentMessages);
 }

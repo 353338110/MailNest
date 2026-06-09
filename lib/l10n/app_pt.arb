@@ -45,5 +45,59 @@
   "connectionTestSucceeded": "IMAP and SMTP connection tests passed.",
   "connectionTestFailed": "Connection test failed: {reason}",
   "passwordRequiredForConnectionTest": "Enter a password or app password before testing.",
-  "unknownError": "Unknown error"
+  "unknownError": "Unknown error",
+  "@deleteAccountMessage": {
+    "placeholders": {
+      "emailAddress": {
+        "type": "String"
+      }
+    }
+  },
+  "@connectionTestFailed": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "sentMessages": "Sent",
+  "noSentMessagesYet": "No sent messages yet.",
+  "noSubject": "(No subject)",
+  "sentToRecipients": "To: {recipients}",
+  "@sentToRecipients": {
+    "placeholders": {
+      "recipients": {
+        "type": "String"
+      }
+    }
+  },
+  "chooseSentFolder": "Choose Sent folder",
+  "sentFolderOnlyLocalRecord": "Only the local sent record is saved for this message.",
+  "sentFolderSavePending": "Saving to Sent",
+  "sentFolderSaved": "Saved to {folderName}",
+  "@sentFolderSaved": {
+    "placeholders": {
+      "folderName": {
+        "type": "String"
+      }
+    }
+  },
+  "sentFolderSelectionRequired": "Choose a Sent folder",
+  "sentFolderSaveFailed": "Sent folder save failed",
+  "sentFolderAppendSucceeded": "Saved to {folderName}.",
+  "@sentFolderAppendSucceeded": {
+    "placeholders": {
+      "folderName": {
+        "type": "String"
+      }
+    }
+  },
+  "sentFolderAppendFailed": "Could not save to Sent: {reason}",
+  "@sentFolderAppendFailed": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  }
 }

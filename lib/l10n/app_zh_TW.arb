@@ -45,5 +45,17 @@
   "connectionTestSucceeded": "IMAP 和 SMTP 連線測試通過。",
   "connectionTestFailed": "連線測試失敗：{reason}",
   "passwordRequiredForConnectionTest": "請先輸入密碼或授權碼再測試。",
-  "unknownError": "未知錯誤"
+  "unknownError": "未知錯誤",
+  "sentMessages": "已傳送",
+  "noSentMessagesYet": "尚無已傳送郵件。",
+  "noSubject": "（無主旨）",
+  "sentToRecipients": "收件人：{recipients}",
+  "chooseSentFolder": "選擇 Sent 資料夾",
+  "sentFolderOnlyLocalRecord": "這封郵件僅儲存了本機傳送記錄。",
+  "sentFolderSavePending": "正在儲存到 Sent",
+  "sentFolderSaved": "已儲存到 {folderName}",
+  "sentFolderSelectionRequired": "請選擇 Sent 資料夾",
+  "sentFolderSaveFailed": "Sent 資料夾儲存失敗",
+  "sentFolderAppendSucceeded": "已儲存到 {folderName}。",
+  "sentFolderAppendFailed": "無法儲存到 Sent：{reason}"
 }
