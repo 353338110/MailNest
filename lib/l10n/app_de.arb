@@ -149,5 +149,15 @@
         "type": "String"
       }
     }
-  }
+  },
+  "syncMail": "Sync mail",
+  "mailSyncFailed": "Mail sync failed: {reason}",
+  "@mailSyncFailed": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "retry": "Retry"
 }

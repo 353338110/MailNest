@@ -871,6 +871,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Could not save to Sent: {reason}'**
   String sentFolderAppendFailed(String reason);
+
+  /// No description provided for @syncMail.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync mail'**
+  String get syncMail;
+
+  /// No description provided for @mailSyncFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Mail sync failed: {reason}'**
+  String mailSyncFailed(String reason);
+
+  /// No description provided for @retry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get retry;
 }
 
 class _AppLocalizationsDelegate

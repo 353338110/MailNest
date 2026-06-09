@@ -8,6 +8,7 @@ class MailboxRepository {
 
   List<MailboxMessage> messagesFor({
     required List<EmailAccount> accounts,
+    required List<LocalMailMessage> localMessages,
     required MailboxScope scope,
     required MailboxFilter filter,
   }) {
@@ -24,9 +25,16 @@ class MailboxRepository {
       _ => null,
     };
 
+    final accountById = {
+      for (final account in scopedAccounts) account.id: account,
+    };
     final messages =
-        scopedAccounts
-            .expand(_seedMessages)
+        localMessages
+            .where((message) => accountById.containsKey(message.accountId))
+            .map(
+              (message) =>
+                  _fromLocalMessage(accountById[message.accountId]!, message),
+            )
             .where(
               (message) => folderId == null || message.folder.id == folderId,
             )
@@ -39,10 +47,12 @@ class MailboxRepository {
 
   bool hasAnyMessages({
     required List<EmailAccount> accounts,
+    required List<LocalMailMessage> localMessages,
     required MailboxScope scope,
   }) {
     return messagesFor(
       accounts: accounts,
+      localMessages: localMessages,
       scope: scope,
       filter: MailboxFilter.all,
     ).isNotEmpty;
@@ -59,73 +69,43 @@ class MailboxRepository {
     };
   }
 
-  Iterable<MailboxMessage> _seedMessages(EmailAccount account) sync* {
-    final now = DateTime.now();
-    final displayName = account.displayName?.trim().isNotEmpty == true
-        ? account.displayName!.trim()
-        : account.emailAddress;
+  MailboxMessage _fromLocalMessage(
+    EmailAccount account,
+    LocalMailMessage message,
+  ) {
+    final folder = _folderForLocalMessage(message.folderName);
+    return MailboxMessage(
+      account: account,
+      folder: folder,
+      header: MailHeader(
+        id: message.id.toString(),
+        uid: message.uid,
+        messageId: message.messageId,
+        sender: message.sender,
+        recipients: _splitRecipients(message.recipients),
+        subject: message.subject,
+        preview: message.summary,
+        receivedAt: message.receivedAt,
+        isRead: message.isRead,
+        isStarred: message.isStarred,
+        hasAttachments: message.hasAttachments,
+      ),
+    );
+  }
 
-    yield MailboxMessage(
-      account: account,
-      folder: standardMailboxFolders[0],
-      header: MailHeader(
-        id: '${account.id}:inbox:welcome',
-        sender: 'MailNest',
-        subject: 'Welcome to $displayName',
-        preview: 'This local header preview keeps the mailbox views usable.',
-        receivedAt: now.subtract(const Duration(minutes: 18)),
-        isRead: false,
-        isStarred: true,
-      ),
+  MailboxFolder _folderForLocalMessage(String folderName) {
+    final normalized = folderName.toLowerCase();
+    return standardMailboxFolders.firstWhere(
+      (folder) => folder.id == normalized,
+      orElse: () => standardMailboxFolders.first,
     );
-    yield MailboxMessage(
-      account: account,
-      folder: standardMailboxFolders[0],
-      header: MailHeader(
-        id: '${account.id}:inbox:sync-plan',
-        sender: 'Sync status',
-        subject: 'Mailbox headers are ready for local navigation',
-        preview: 'Folder sync and real header persistence are planned next.',
-        receivedAt: now.subtract(const Duration(hours: 5)),
-        isRead: true,
-      ),
-    );
-    yield MailboxMessage(
-      account: account,
-      folder: standardMailboxFolders[1],
-      header: MailHeader(
-        id: '${account.id}:sent:first',
-        sender: account.emailAddress,
-        subject: 'Sent mailbox placeholder',
-        preview: 'Sent records will be stored when SMTP sending lands.',
-        receivedAt: now.subtract(const Duration(days: 1, hours: 2)),
-        isRead: true,
-      ),
-    );
-    yield MailboxMessage(
-      account: account,
-      folder: standardMailboxFolders[2],
-      header: MailHeader(
-        id: '${account.id}:drafts:first',
-        sender: account.emailAddress,
-        subject: 'Draft placeholder',
-        preview: 'Draft editing is intentionally outside this PR.',
-        receivedAt: now.subtract(const Duration(days: 2)),
-        isRead: true,
-        isStarred: true,
-      ),
-    );
-    yield MailboxMessage(
-      account: account,
-      folder: standardMailboxFolders[3],
-      header: MailHeader(
-        id: '${account.id}:trash:first',
-        sender: 'Local mailbox',
-        subject: 'Trash placeholder',
-        preview: 'Delete and restore actions will be implemented later.',
-        receivedAt: now.subtract(const Duration(days: 4)),
-        isRead: true,
-      ),
-    );
+  }
+
+  List<String> _splitRecipients(String value) {
+    return value
+        .split(',')
+        .map((recipient) => recipient.trim())
+        .where((recipient) => recipient.isNotEmpty)
+        .toList(growable: false);
   }
 }

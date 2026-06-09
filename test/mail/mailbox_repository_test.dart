@@ -14,22 +14,25 @@ void main() {
     expect(
       repository.messagesFor(
         accounts: accounts,
+        localMessages: _messages(),
         scope: const UnifiedMailboxScope(),
         filter: MailboxFilter.all,
       ),
-      hasLength(10),
+      hasLength(3),
     );
     expect(
       repository.messagesFor(
         accounts: accounts,
+        localMessages: _messages(),
         scope: const AccountMailboxScope('first@example.com'),
         filter: MailboxFilter.all,
       ),
-      hasLength(5),
+      hasLength(2),
     );
     expect(
       repository.messagesFor(
         accounts: accounts,
+        localMessages: _messages(),
         scope: const FolderMailboxScope(
           accountId: 'first@example.com',
           folderId: 'inbox',
@@ -41,6 +44,7 @@ void main() {
     expect(
       repository.messagesFor(
         accounts: accounts,
+        localMessages: _messages(),
         scope: const UnifiedMailboxScope(),
         filter: MailboxFilter.unread,
       ),
@@ -49,20 +53,78 @@ void main() {
     expect(
       repository.messagesFor(
         accounts: accounts,
+        localMessages: _messages(),
         scope: const UnifiedMailboxScope(),
         filter: MailboxFilter.starred,
       ),
-      hasLength(4),
+      hasLength(1),
     );
     expect(
       repository.messagesFor(
         accounts: accounts,
+        localMessages: _messages(),
         scope: const UnifiedMailboxScope(),
         filter: MailboxFilter.sent,
       ),
-      hasLength(2),
+      isEmpty,
     );
   });
+}
+
+List<LocalMailMessage> _messages() {
+  final now = DateTime(2026, 6, 9);
+  return [
+    _message(
+      id: 1,
+      accountId: 'first@example.com',
+      uid: 1,
+      subject: 'Unread starred',
+      isRead: false,
+      isStarred: true,
+      receivedAt: now,
+    ),
+    _message(
+      id: 2,
+      accountId: 'first@example.com',
+      uid: 2,
+      subject: 'Read',
+      isRead: true,
+      receivedAt: now.subtract(const Duration(hours: 1)),
+    ),
+    _message(
+      id: 3,
+      accountId: 'second@example.com',
+      uid: 1,
+      subject: 'Second unread',
+      isRead: false,
+      receivedAt: now.subtract(const Duration(hours: 2)),
+    ),
+  ];
+}
+
+LocalMailMessage _message({
+  required int id,
+  required String accountId,
+  required int uid,
+  required String subject,
+  required bool isRead,
+  required DateTime receivedAt,
+  bool isStarred = false,
+}) {
+  return LocalMailMessage(
+    id: id,
+    accountId: accountId,
+    folderName: 'Inbox',
+    uid: uid,
+    sender: 'sender@example.com',
+    recipients: accountId,
+    subject: subject,
+    isRead: isRead,
+    isStarred: isStarred,
+    hasAttachments: false,
+    receivedAt: receivedAt,
+    updatedAt: receivedAt,
+  );
 }
 
 EmailAccount _account(String emailAddress) {

@@ -428,4 +428,15 @@ class AppLocalizationsFr extends AppLocalizations {
   String sentFolderAppendFailed(String reason) {
     return 'Could not save to Sent: $reason';
   }
+
+  @override
+  String get syncMail => 'Sync mail';
+
+  @override
+  String mailSyncFailed(String reason) {
+    return 'Mail sync failed: $reason';
+  }
+
+  @override
+  String get retry => 'Retry';
 }

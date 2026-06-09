@@ -414,6 +414,17 @@ class AppLocalizationsZh extends AppLocalizations {
   String sentFolderAppendFailed(String reason) {
     return '无法保存到 Sent：$reason';
   }
+
+  @override
+  String get syncMail => '同步邮件';
+
+  @override
+  String mailSyncFailed(String reason) {
+    return '邮件同步失败：$reason';
+  }
+
+  @override
+  String get retry => '重试';
 }
 
 /// The translations for Chinese, as used in China (`zh_CN`).
@@ -751,6 +762,17 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String sentFolderAppendFailed(String reason) {
     return 'Could not save to Sent: $reason';
   }
+
+  @override
+  String get syncMail => '同步邮件';
+
+  @override
+  String mailSyncFailed(String reason) {
+    return '邮件同步失败：$reason';
+  }
+
+  @override
+  String get retry => '重试';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -1087,4 +1109,15 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String sentFolderAppendFailed(String reason) {
     return '無法儲存到 Sent：$reason';
   }
+
+  @override
+  String get syncMail => '同步邮件';
+
+  @override
+  String mailSyncFailed(String reason) {
+    return '邮件同步失败：$reason';
+  }
+
+  @override
+  String get retry => '重试';
 }

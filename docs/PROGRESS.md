@@ -182,6 +182,23 @@
 - 搜索页提示未同步历史邮件时只能搜索本地已同步内容。
 - 不做远程全量搜索。
 
+### PR #15：最近 30 天邮件头同步和邮件列表真实数据
+
+链接：https://github.com/353338110/MailNest/pull/15
+
+状态：已创建，base 改为 `main`，待验证合并
+
+已完成内容：
+
+- 普通 IMAP/SMTP 账号可同步最近 30 天 Inbox 邮件头。
+- 邮件头写入主线已有 `local_mail_messages` 本地缓存表。
+- 保存 Message-ID、UID、日期、发件人、收件人、主题、摘要、已读、星标、附件标记。
+- 新增每账号/文件夹 UID 同步游标表。
+- 首页邮箱视图读取真实本地邮件缓存，不再使用样例邮件头。
+- 首页邮件列表提供同步加载、错误、空状态和重试路径。
+- 保留搜索、写信、草稿、已发送、设置、账号编辑等现有返回路径。
+- 不拉取完整正文，不下载附件，不实现 Gmail/Outlook 邮件同步。
+
 ### PR #22：多平台构建 CI
 
 链接：https://github.com/353338110/MailNest/pull/4
@@ -218,13 +235,13 @@ flutter test
 
 - IMAP 文件夹列表同步。
 - 本地保存文件夹列表。
-- 最近 30 天邮件头同步。
-- 增量同步游标。
-- 邮件列表真实数据展示。
-- 统一收件箱接入真实数据源。
-- 按账号查看真实邮件。
-- 按文件夹查看真实邮件。
-- 未读、星标、已发送、草稿箱、垃圾箱等基础视图接入真实状态。
+- 最近 30 天邮件头同步。（普通 IMAP/SMTP Inbox 已完成）
+- 增量同步游标。（普通 IMAP/SMTP Inbox UID 游标已完成）
+- 邮件列表真实数据展示。（首页邮箱视图已接入本地缓存）
+- 统一收件箱接入真实数据源。（本地缓存已接入）
+- 按账号查看真实邮件。（本地缓存已接入）
+- 按文件夹查看真实邮件。（Inbox 本地缓存已接入）
+- 未读、星标、已发送、草稿箱、垃圾箱等基础视图接入真实状态。（本地缓存状态已接入）
 
 ### 邮件详情与 MIME
 
@@ -315,23 +332,22 @@ flutter test
 建议按以下顺序继续，每项一个 PR：
 
 1. `codex/mail-folder-sync`：IMAP 文件夹列表同步和本地保存。
-2. `codex/mail-header-sync`：最近 30 天邮件头同步和邮件列表真实数据。
-3. `codex/mail-detail-mime`：邮件详情、正文拉取、MIME 解析。
-4. `codex/html-rendering-privacy`：HTML 渲染、远程图片拦截、外部链接处理。
-5. `codex/attachments-cache`：附件列表、下载、缓存和打开。
-6. `codex/composer-smtp-send`：写邮件和 SMTP 发信。
-7. `codex/reply-forward`：回复、回复全部、转发。
-8. `codex/drafts`：本地草稿。
-9. `codex/sent-records`：发送记录和 Sent 文件夹保存。
-10. `codex/backup-import`：配置导入和冲突处理。
-11. `codex/desktop-layout`：桌面三栏和响应式布局完善。
-12. `codex/mobile-navigation`：移动端 Drawer/NavigationDrawer。
-13. `codex/gmail-mail-provider`：Gmail 邮件列表、详情和发信。
-14. `codex/outlook-oauth`：Outlook OAuth。
-15. `codex/outlook-mail-provider`：Outlook 邮件列表、详情和发信。
-16. `codex/translation-ui`：邮件详情和写信翻译 UI。
-17. `codex/translation-provider`：真实翻译服务和隐私确认。
-18. `codex/release-workflow`：发布流程和 tag 自动化。
+2. `codex/mail-detail-mime`：邮件详情、正文拉取、MIME 解析。
+3. `codex/html-rendering-privacy`：HTML 渲染、远程图片拦截、外部链接处理。
+4. `codex/attachments-cache`：附件列表、下载、缓存和打开。
+5. `codex/composer-smtp-send`：写邮件和 SMTP 发信。
+6. `codex/reply-forward`：回复、回复全部、转发。
+7. `codex/drafts`：本地草稿。
+8. `codex/sent-records`：发送记录和 Sent 文件夹保存。
+9. `codex/backup-import`：配置导入和冲突处理。
+10. `codex/desktop-layout`：桌面三栏和响应式布局完善。
+11. `codex/mobile-navigation`：移动端 Drawer/NavigationDrawer。
+12. `codex/gmail-mail-provider`：Gmail 邮件列表、详情和发信。
+13. `codex/outlook-oauth`：Outlook OAuth。
+14. `codex/outlook-mail-provider`：Outlook 邮件列表、详情和发信。
+15. `codex/translation-ui`：邮件详情和写信翻译 UI。
+16. `codex/translation-provider`：真实翻译服务和隐私确认。
+17. `codex/release-workflow`：发布流程和 tag 自动化。
 
 ## 注意事项
 

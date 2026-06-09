@@ -121,5 +121,15 @@
   "sentFolderSelectionRequired": "請選擇 Sent 資料夾",
   "sentFolderSaveFailed": "Sent 資料夾儲存失敗",
   "sentFolderAppendSucceeded": "已儲存到 {folderName}。",
-  "sentFolderAppendFailed": "無法儲存到 Sent：{reason}"
+  "sentFolderAppendFailed": "無法儲存到 Sent：{reason}",
+  "syncMail": "同步邮件",
+  "mailSyncFailed": "邮件同步失败：{reason}",
+  "@mailSyncFailed": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "retry": "重试"
 }

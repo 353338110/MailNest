@@ -8,6 +8,7 @@ import '../../../l10n/generated/app_localizations.dart';
 import '../../../mail/models/mailbox_folder.dart';
 import '../../../mail/models/mailbox_message.dart';
 import '../../../mail/repository/account_repository_provider.dart';
+import '../../../mail/repository/mail_sync_repository_provider.dart';
 import '../../../mail/repository/mailbox_repository_provider.dart';
 
 class HomePage extends ConsumerWidget {
@@ -81,6 +82,13 @@ class _MailboxWorkspace extends ConsumerStatefulWidget {
 class _MailboxWorkspaceState extends ConsumerState<_MailboxWorkspace> {
   MailboxScope _scope = const UnifiedMailboxScope();
   MailboxFilter _filter = MailboxFilter.all;
+  late Future<void> _syncFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _syncFuture = _sync();
+  }
 
   @override
   void didUpdateWidget(_MailboxWorkspace oldWidget) {
@@ -96,6 +104,16 @@ class _MailboxWorkspaceState extends ConsumerState<_MailboxWorkspace> {
           _filter = MailboxFilter.all;
         }
     }
+  }
+
+  Future<void> _sync() {
+    return ref.read(mailSyncRepositoryProvider).syncRecentHeaders();
+  }
+
+  void _refresh() {
+    setState(() {
+      _syncFuture = _sync();
+    });
   }
 
   @override
@@ -123,6 +141,8 @@ class _MailboxWorkspaceState extends ConsumerState<_MailboxWorkspace> {
       accounts: widget.accounts,
       scope: _scope,
       filter: _filter,
+      syncFuture: _syncFuture,
+      onRefresh: _refresh,
     );
 
     if (isWide) {
@@ -318,43 +338,71 @@ class _MailboxList extends ConsumerWidget {
     required this.accounts,
     required this.scope,
     required this.filter,
+    required this.syncFuture,
+    required this.onRefresh,
   });
 
   final List<EmailAccount> accounts;
   final MailboxScope scope;
   final MailboxFilter filter;
+  final Future<void> syncFuture;
+  final VoidCallback onRefresh;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final repository = ref.watch(mailboxRepositoryProvider);
-    final messages = repository.messagesFor(
-      accounts: accounts,
-      scope: scope,
-      filter: filter,
-    );
-    final hasMessages = repository.hasAnyMessages(
-      accounts: accounts,
-      scope: scope,
-    );
+    final localHeaders = ref
+        .watch(mailSyncRepositoryProvider)
+        .watchRecentHeaders();
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        _MailboxHeader(scope: scope, filter: filter, count: messages.length),
-        const Divider(height: 1),
-        Expanded(
-          child: messages.isEmpty
-              ? _MailboxEmptyState(filtered: hasMessages)
-              : ListView.separated(
-                  padding: const EdgeInsets.only(bottom: AppSpacing.xlarge * 4),
-                  itemCount: messages.length,
-                  separatorBuilder: (_, _) => const Divider(height: 1),
-                  itemBuilder: (context, index) {
-                    return _MessageTile(message: messages[index]);
-                  },
+    return StreamBuilder<List<LocalMailMessage>>(
+      stream: localHeaders,
+      builder: (context, snapshot) {
+        final localMessages = snapshot.data ?? const <LocalMailMessage>[];
+        final messages = repository.messagesFor(
+          accounts: accounts,
+          localMessages: localMessages,
+          scope: scope,
+          filter: filter,
+        );
+        final hasMessages = repository.hasAnyMessages(
+          accounts: accounts,
+          localMessages: localMessages,
+          scope: scope,
+        );
+
+        return FutureBuilder<void>(
+          future: syncFuture,
+          builder: (context, syncSnapshot) {
+            final isLoading =
+                snapshot.connectionState == ConnectionState.waiting ||
+                syncSnapshot.connectionState == ConnectionState.waiting;
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _MailboxHeader(
+                  scope: scope,
+                  filter: filter,
+                  count: messages.length,
+                  isSyncing: isLoading,
+                  onRefresh: onRefresh,
                 ),
-        ),
-      ],
+                const Divider(height: 1),
+                Expanded(
+                  child: _MailboxContent(
+                    messages: messages,
+                    hasMessages: hasMessages,
+                    isLoading: isLoading && localMessages.isEmpty,
+                    error: syncSnapshot.error,
+                    onRefresh: onRefresh,
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 }
@@ -364,14 +412,20 @@ class _MailboxHeader extends StatelessWidget {
     required this.scope,
     required this.filter,
     required this.count,
+    required this.isSyncing,
+    required this.onRefresh,
   });
 
   final MailboxScope scope;
   final MailboxFilter filter;
   final int count;
+  final bool isSyncing;
+  final VoidCallback onRefresh;
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return Padding(
       padding: const EdgeInsets.all(AppSpacing.medium),
       child: Row(
@@ -391,6 +445,16 @@ class _MailboxHeader extends StatelessWidget {
                 ),
               ],
             ),
+          ),
+          IconButton(
+            tooltip: l10n.syncMail,
+            onPressed: isSyncing ? null : onRefresh,
+            icon: isSyncing
+                ? const SizedBox.square(
+                    dimension: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Icon(Icons.sync_outlined),
           ),
           if (filter != MailboxFilter.all)
             Icon(_filterIcon(), color: Theme.of(context).colorScheme.primary),
@@ -433,6 +497,62 @@ class _MailboxHeader extends StatelessWidget {
     return standardMailboxFolders
         .firstWhere((folder) => folder.id == folderId)
         .name;
+  }
+}
+
+class _MailboxContent extends StatelessWidget {
+  const _MailboxContent({
+    required this.messages,
+    required this.hasMessages,
+    required this.isLoading,
+    required this.error,
+    required this.onRefresh,
+  });
+
+  final List<MailboxMessage> messages;
+  final bool hasMessages;
+  final bool isLoading;
+  final Object? error;
+  final VoidCallback onRefresh;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
+    if (isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (error != null && messages.isEmpty) {
+      return _MailboxErrorState(
+        message: l10n.mailSyncFailed(error!.toString()),
+        onRefresh: onRefresh,
+      );
+    }
+
+    if (messages.isEmpty) {
+      return _MailboxEmptyState(filtered: hasMessages, onRefresh: onRefresh);
+    }
+
+    return RefreshIndicator(
+      onRefresh: () async => onRefresh(),
+      child: ListView.separated(
+        padding: const EdgeInsets.only(bottom: AppSpacing.xlarge * 4),
+        itemCount: messages.length + (error == null ? 0 : 1),
+        separatorBuilder: (_, _) => const Divider(height: 1),
+        itemBuilder: (context, index) {
+          if (error != null && index == 0) {
+            return _InlineMailboxError(
+              message: l10n.mailSyncFailed(error!.toString()),
+              onRefresh: onRefresh,
+            );
+          }
+          return _MessageTile(
+            message: messages[error == null ? index : index - 1],
+          );
+        },
+      ),
+    );
   }
 }
 
@@ -594,12 +714,15 @@ class _MessageTile extends StatelessWidget {
 }
 
 class _MailboxEmptyState extends StatelessWidget {
-  const _MailboxEmptyState({required this.filtered});
+  const _MailboxEmptyState({required this.filtered, required this.onRefresh});
 
   final bool filtered;
+  final VoidCallback onRefresh;
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.large),
@@ -609,8 +732,63 @@ class _MailboxEmptyState extends StatelessWidget {
             const Icon(Icons.inbox_outlined, size: 48),
             const SizedBox(height: AppSpacing.medium),
             Text(filtered ? 'No messages match this filter.' : 'No messages.'),
+            const SizedBox(height: AppSpacing.medium),
+            FilledButton.icon(
+              onPressed: onRefresh,
+              icon: const Icon(Icons.sync_outlined),
+              label: Text(l10n.syncMail),
+            ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _MailboxErrorState extends StatelessWidget {
+  const _MailboxErrorState({required this.message, required this.onRefresh});
+
+  final String message;
+  final VoidCallback onRefresh;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.large),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.error_outline, size: 48),
+            const SizedBox(height: AppSpacing.medium),
+            Text(message, textAlign: TextAlign.center),
+            const SizedBox(height: AppSpacing.medium),
+            FilledButton.icon(
+              onPressed: onRefresh,
+              icon: const Icon(Icons.refresh_outlined),
+              label: Text(AppLocalizations.of(context).retry),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _InlineMailboxError extends StatelessWidget {
+  const _InlineMailboxError({required this.message, required this.onRefresh});
+
+  final String message;
+  final VoidCallback onRefresh;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: const Icon(Icons.error_outline),
+      title: Text(message),
+      trailing: TextButton(
+        onPressed: onRefresh,
+        child: Text(AppLocalizations.of(context).retry),
       ),
     );
   }
