@@ -36,6 +36,65 @@ class AppLocalizationsDe extends AppLocalizations {
       'The first release only includes translation entry points and a mock service.';
 
   @override
+  String get translate => 'Translate';
+
+  @override
+  String get targetLanguage => 'Target language';
+
+  @override
+  String get translationSourceEmpty => 'There is no text to translate.';
+
+  @override
+  String translationFailed(String reason) {
+    return 'Translation failed: $reason';
+  }
+
+  @override
+  String get translationCopied => 'Translation copied.';
+
+  @override
+  String get translatedText => 'Translation';
+
+  @override
+  String get originalText => 'Original';
+
+  @override
+  String get translateAgain => 'Translate again';
+
+  @override
+  String get copyTranslation => 'Copy translation';
+
+  @override
+  String get useTranslation => 'Use translation';
+
+  @override
+  String get mailDetail => 'Mail detail';
+
+  @override
+  String get from => 'From';
+
+  @override
+  String get received => 'Received';
+
+  @override
+  String get translateMessage => 'Translate message';
+
+  @override
+  String get translateBody => 'Translate body';
+
+  @override
+  String get to => 'To';
+
+  @override
+  String get body => 'Body';
+
+  @override
+  String get send => 'Send';
+
+  @override
+  String get openMailDetailPreview => 'Open mail detail preview';
+
+  @override
   String get addEmailAccount => 'Add email account';
 
   @override
