@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
+
 import '../models/mail_header.dart';
 import '../models/sync_cursor.dart';
 
@@ -621,7 +623,9 @@ MailHeader _mailHeaderFromBlock({
   final sender = _decodeMimeHeader(fields['from'] ?? '').trim();
   final recipients = _splitAddresses(_decodeMimeHeader(fields['to'] ?? ''));
   final receivedAt =
-      _parseMailDate(fields['date']) ?? block.internalDate ?? DateTime.now();
+      parseMailHeaderDate(fields['date']) ??
+      block.internalDate ??
+      DateTime.now();
 
   return MailHeader(
     id: block.uid.toString(),
@@ -673,15 +677,97 @@ Map<String, String> _parseHeaderFields(String rawHeader) {
   return fields;
 }
 
-DateTime? _parseMailDate(String? value) {
+@visibleForTesting
+DateTime? parseMailHeaderDate(String? value) {
   if (value == null || value.trim().isEmpty) {
     return null;
   }
+  final trimmed = value.trim();
   try {
-    return HttpDate.parse(value).toLocal();
+    return HttpDate.parse(trimmed).toLocal();
   } on FormatException {
+    return _parseFlexibleMailDate(trimmed);
+  } on HttpException {
+    return _parseFlexibleMailDate(trimmed);
+  }
+}
+
+DateTime? _parseFlexibleMailDate(String value) {
+  return _parseImapDateTime(value) ?? _parseRfc822DateTime(value);
+}
+
+DateTime? _parseImapDateTime(String value) {
+  final match = RegExp(
+    r'^(\d{1,2})-([A-Za-z]{3})-(\d{4}) '
+    r'(\d{2}):(\d{2}):(\d{2}) ([+-]\d{4})$',
+  ).firstMatch(value);
+  if (match == null) {
     return null;
   }
+
+  final month = _monthNumber(match.group(2)!);
+  if (month == null) {
+    return null;
+  }
+
+  final day = int.parse(match.group(1)!);
+  final year = int.parse(match.group(3)!);
+  final hour = int.parse(match.group(4)!);
+  final minute = int.parse(match.group(5)!);
+  final second = int.parse(match.group(6)!);
+  final offset = _parseTimeZoneOffset(match.group(7)!);
+  final localDate = DateTime.utc(year, month, day, hour, minute, second);
+  return localDate.subtract(offset).toLocal();
+}
+
+DateTime? _parseRfc822DateTime(String value) {
+  final normalized = value.replaceFirst(RegExp(r'^[A-Za-z]{3},\s*'), '');
+  final match = RegExp(
+    r'^(\d{1,2}) ([A-Za-z]{3}) (\d{4}) '
+    r'(\d{2}):(\d{2})(?::(\d{2}))? ([+-]\d{4})$',
+  ).firstMatch(normalized);
+  if (match == null) {
+    return null;
+  }
+
+  final month = _monthNumber(match.group(2)!);
+  if (month == null) {
+    return null;
+  }
+
+  final day = int.parse(match.group(1)!);
+  final year = int.parse(match.group(3)!);
+  final hour = int.parse(match.group(4)!);
+  final minute = int.parse(match.group(5)!);
+  final second = int.parse(match.group(6) ?? '0');
+  final offset = _parseTimeZoneOffset(match.group(7)!);
+  final localDate = DateTime.utc(year, month, day, hour, minute, second);
+  return localDate.subtract(offset).toLocal();
+}
+
+int? _monthNumber(String value) {
+  const months = {
+    'jan': 1,
+    'feb': 2,
+    'mar': 3,
+    'apr': 4,
+    'may': 5,
+    'jun': 6,
+    'jul': 7,
+    'aug': 8,
+    'sep': 9,
+    'oct': 10,
+    'nov': 11,
+    'dec': 12,
+  };
+  return months[value.toLowerCase()];
+}
+
+Duration _parseTimeZoneOffset(String value) {
+  final sign = value.startsWith('-') ? -1 : 1;
+  final hours = int.parse(value.substring(1, 3));
+  final minutes = int.parse(value.substring(3, 5));
+  return Duration(minutes: sign * (hours * 60 + minutes));
 }
 
 List<String> _splitAddresses(String value) {
@@ -812,7 +898,7 @@ class _FetchedHeaderBlock {
     return _FetchedHeaderBlock(
       uid: uid,
       flags: flags,
-      internalDate: _parseMailDate(internalDateText),
+      internalDate: parseMailHeaderDate(internalDateText),
       hasAttachments: line.toLowerCase().contains('attachment'),
     );
   }
