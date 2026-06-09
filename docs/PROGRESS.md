@@ -74,9 +74,9 @@
 
 ### PR #13：本地搜索和 FTS
 
-链接：待创建
+链接：https://github.com/353338110/MailNest/pull/8
 
-状态：本分支实现中，分支 `codex/local-search`
+状态：已创建，CI 通过，待合并到 `main`
 
 已完成内容：
 
@@ -87,6 +87,24 @@
 - 新增搜索结果页，支持返回、输入搜索、清空搜索、加载/空结果/错误状态。
 - 搜索页提示未同步历史邮件时只能搜索本地已同步内容。
 - 不做远程全量搜索。
+
+### PR #22：多平台构建 CI
+
+链接：https://github.com/353338110/MailNest/pull/4
+
+状态：已合并到 `main`
+
+已完成内容：
+
+- 保留 PR Check 的 `dart format`、`flutter analyze`、`flutter test` 基础检查。
+- 将 Flutter workflow 切换到 `master` channel，以匹配当前 Dart dev SDK 约束。
+- CI workflow 增加 `workflow_dispatch` 手动触发。
+- CI workflow 增加 Linux、Android、Windows、macOS、iOS 分阶段构建 job。
+- Linux/Android 构建使用 Ubuntu runner。
+- Windows 构建使用 Windows runner。
+- macOS/iOS 构建使用 macOS runner。
+- iOS 构建使用 `--no-codesign`，避免 CI 依赖签名证书。
+- 手动触发 CI 时可按平台选择是否运行重平台构建。
 
 ## 已验证
 
@@ -203,12 +221,6 @@ flutter test
 
 ### CI 与发布
 
-- 多平台构建 CI。
-- Linux build。
-- Android build。
-- Windows build。
-- macOS build。
-- iOS build。
 - Release workflow。
 - SemVer tag 发布流程。
 
@@ -237,8 +249,7 @@ flutter test
 19. `codex/outlook-mail-provider`：Outlook 邮件列表、详情和发信。
 20. `codex/translation-ui`：邮件详情和写信翻译 UI。
 21. `codex/translation-provider`：真实翻译服务和隐私确认。
-22. `codex/multiplatform-ci`：多平台构建 CI。
-23. `codex/release-workflow`：发布流程和 tag 自动化。
+22. `codex/release-workflow`：发布流程和 tag 自动化。
 
 ## 注意事项
 
