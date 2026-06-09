@@ -1,0 +1,11 @@
+name: Task
+description: Track implementation work.
+title: "chore: "
+labels: ["task"]
+body:
+  - type: textarea
+    id: work
+    attributes:
+      label: Work
+    validations:
+      required: true
