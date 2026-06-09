@@ -74,9 +74,9 @@
 
 ### PR #10：发送记录和 Sent 文件夹保存
 
-链接：待创建
+链接：https://github.com/353338110/MailNest/pull/11
 
-状态：本分支 `codex/sent-records` 待创建 PR
+状态：已创建，base 为 `main`
 
 已完成内容：
 
