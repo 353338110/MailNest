@@ -36,6 +36,21 @@ class AppSettings extends Table {
   Set<Column<Object>> get primaryKey => {key};
 }
 
+class DraftMessages extends Table {
+  TextColumn get id => text()();
+  TextColumn get accountId => text().nullable()();
+  TextColumn get toRecipients => text().withDefault(const Constant(''))();
+  TextColumn get ccRecipients => text().withDefault(const Constant(''))();
+  TextColumn get bccRecipients => text().withDefault(const Constant(''))();
+  TextColumn get subject => text().withDefault(const Constant(''))();
+  TextColumn get body => text().withDefault(const Constant(''))();
+  DateTimeColumn get createdAt => dateTime()();
+  DateTimeColumn get updatedAt => dateTime()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
 class LocalMailMessages extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get accountId => text()();
@@ -60,7 +75,9 @@ class LocalMailMessages extends Table {
   ];
 }
 
-@DriftDatabase(tables: [EmailAccounts, AppSettings, LocalMailMessages])
+@DriftDatabase(
+  tables: [EmailAccounts, AppSettings, DraftMessages, LocalMailMessages],
+)
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor])
     : super(executor ?? driftDatabase(name: 'mailnest'));
@@ -76,6 +93,7 @@ class AppDatabase extends _$AppDatabase {
     },
     onUpgrade: (migrator, from, to) async {
       if (from < 2) {
+        await migrator.createTable(draftMessages);
         await migrator.createTable(localMailMessages);
         await _createLocalSearchObjects();
       }
@@ -126,6 +144,28 @@ class AppDatabase extends _$AppDatabase {
       )..where((table) => table.accountId.equals(id))).go();
       await (delete(emailAccounts)..where((table) => table.id.equals(id))).go();
     });
+  }
+
+  Stream<List<DraftMessage>> watchDrafts() {
+    return (select(draftMessages)..orderBy([
+          (table) => OrderingTerm.desc(table.updatedAt),
+          (table) => OrderingTerm.desc(table.id),
+        ]))
+        .watch();
+  }
+
+  Future<DraftMessage?> getDraft(String id) {
+    return (select(
+      draftMessages,
+    )..where((table) => table.id.equals(id))).getSingleOrNull();
+  }
+
+  Future<void> saveDraft(DraftMessagesCompanion draft) {
+    return into(draftMessages).insertOnConflictUpdate(draft);
+  }
+
+  Future<void> deleteDraft(String id) {
+    return (delete(draftMessages)..where((table) => table.id.equals(id))).go();
   }
 
   Future<List<LocalMailSearchResult>> searchLocalMail(String rawQuery) async {

@@ -271,4 +271,80 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get backupExportFailed => 'Backup export failed.';
+
+  @override
+  String get composeMail => 'Compose';
+
+  @override
+  String get drafts => 'Drafts';
+
+  @override
+  String get editDraft => 'Edit draft';
+
+  @override
+  String get saveDraft => 'Save draft';
+
+  @override
+  String get draftSaved => 'Draft saved.';
+
+  @override
+  String get savingDraft => 'Saving draft...';
+
+  @override
+  String get draftAutosaveReady => 'Autosave is ready.';
+
+  @override
+  String draftLastSaved(String time) {
+    return 'Last saved at $time';
+  }
+
+  @override
+  String get deleteDraft => 'Delete draft';
+
+  @override
+  String get deleteDraftTitle => 'Delete draft?';
+
+  @override
+  String get deleteDraftMessage => 'Delete this local draft from this device?';
+
+  @override
+  String get draftDeleted => 'Draft deleted.';
+
+  @override
+  String get draftNotFound => 'Draft not found.';
+
+  @override
+  String get emptyDraft => 'Write something before saving a draft.';
+
+  @override
+  String get fromAccount => 'From account';
+
+  @override
+  String get noAccountSelected => 'No account selected';
+
+  @override
+  String get toRecipients => 'To';
+
+  @override
+  String get ccRecipients => 'Cc';
+
+  @override
+  String get bccRecipients => 'Bcc';
+
+  @override
+  String get subject => 'Subject';
+
+  @override
+  String get messageBody => 'Message';
+
+  @override
+  String get noDraftsYet => 'No drafts yet.';
+
+  @override
+  String get untitledDraft => 'Untitled draft';
+
+  @override
+  String toLine(String recipients) {
+    return 'To: $recipients';
+  }
 }

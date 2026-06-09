@@ -28,6 +28,16 @@ class HomePage extends ConsumerWidget {
             icon: const Icon(Icons.search),
           ),
           IconButton(
+            tooltip: l10n.composeMail,
+            onPressed: () => context.push('/compose'),
+            icon: const Icon(Icons.edit_outlined),
+          ),
+          IconButton(
+            tooltip: l10n.drafts,
+            onPressed: () => context.push('/drafts'),
+            icon: const Icon(Icons.drafts_outlined),
+          ),
+          IconButton(
             tooltip: l10n.settings,
             onPressed: () => context.push('/settings'),
             icon: const Icon(Icons.settings_outlined),
