@@ -1,11 +1,11 @@
 import 'dart:ui';
 
-import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mailnest_app/app/app.dart';
 import 'package:mailnest_app/core/database/app_database.dart';
+import 'package:mailnest_app/core/database/database_providers.dart';
 import 'package:mailnest_app/core/secure_storage/secure_storage_service.dart';
 import 'package:mailnest_app/mail/repository/account_repository.dart';
 import 'package:mailnest_app/mail/repository/account_repository_provider.dart';
@@ -20,23 +20,8 @@ void main() {
   });
 
   testWidgets('uses drawer navigation on a narrow home screen', (tester) async {
-    tester.view.physicalSize = const Size(390, 844);
-    tester.view.devicePixelRatio = 1;
-    addTearDown(tester.view.resetPhysicalSize);
-    addTearDown(tester.view.resetDevicePixelRatio);
+    await tester.pumpHomeWithAccount(width: 390);
 
-    final repository = _EmptyAccountRepository();
-    addTearDown(repository.close);
-
-    await tester.pumpWidget(
-      ProviderScope(
-        overrides: [accountRepositoryProvider.overrideWithValue(repository)],
-        child: const MailNestApp(),
-      ),
-    );
-
-    await tester.tap(find.text('Get started'));
-    await tester.pumpAndSettle();
     await tester.tap(find.byTooltip('Open navigation menu'));
     await tester.pumpAndSettle();
 
@@ -44,20 +29,168 @@ void main() {
     expect(find.text('Folders'), findsOneWidget);
     expect(find.text('Accounts'), findsOneWidget);
     expect(find.text('Settings'), findsOneWidget);
+    expect(find.text('Message detail'), findsNothing);
+  });
+
+  group('responsive desktop home layout', () {
+    testWidgets('uses three panes on wide desktop windows', (tester) async {
+      await tester.pumpHomeWithAccount(width: 1200);
+
+      expect(find.text('Mailboxes'), findsOneWidget);
+      expect(find.text('Unified inbox'), findsWidgets);
+      expect(find.text('Message detail'), findsOneWidget);
+    });
+
+    testWidgets('uses two panes on medium desktop windows', (tester) async {
+      await tester.pumpHomeWithAccount(width: 800);
+
+      expect(find.text('Mailboxes'), findsOneWidget);
+      expect(find.text('Unified inbox'), findsWidgets);
+      expect(find.text('Message detail'), findsNothing);
+    });
+
+    testWidgets('keeps account editing reachable and returnable', (
+      tester,
+    ) async {
+      await tester.pumpHomeWithAccount(width: 1200);
+
+      await tester.tap(find.byTooltip('Account actions'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Edit account'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Edit account'), findsOneWidget);
+      expect(find.byTooltip('Back'), findsOneWidget);
+
+      await tester.tap(find.byTooltip('Back'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Mailboxes'), findsOneWidget);
+      expect(find.text('Message detail'), findsOneWidget);
+    });
+
+    testWidgets('keeps app bar secondary pages returnable', (tester) async {
+      await tester.pumpHomeWithAccount(width: 1200);
+
+      await tester.expectPageReturns(
+        tooltip: 'Search mail',
+        expectedText: 'Search mail',
+      );
+      await tester.expectPageReturns(
+        tooltip: 'Compose',
+        expectedText: 'Compose',
+      );
+      await tester.expectPageReturns(tooltip: 'Drafts', expectedText: 'Drafts');
+      await tester.expectPageReturns(tooltip: 'Sent', expectedText: 'Sent');
+      await tester.expectPageReturns(
+        tooltip: 'Settings',
+        expectedText: 'Settings',
+      );
+
+      await tester.tap(find.byTooltip('Settings'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Backup and migration'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Export configuration'), findsOneWidget);
+      expect(find.byTooltip('Back'), findsOneWidget);
+
+      await tester.tap(find.byTooltip('Back'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Translation settings'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Translation settings'), findsWidgets);
+      expect(find.byTooltip('Back'), findsOneWidget);
+
+      await tester.tap(find.byTooltip('Back'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byTooltip('Back'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Mailboxes'), findsOneWidget);
+    });
   });
 }
 
-class _EmptyAccountRepository extends AccountRepository {
-  _EmptyAccountRepository()
-    : super(
-        database: AppDatabase(DatabaseConnection(NativeDatabase.memory())),
-        secureStorage: const SecureStorageService(),
-      );
+extension on WidgetTester {
+  Future<void> pumpHomeWithAccount({required double width}) async {
+    view.physicalSize = Size(width, 900);
+    view.devicePixelRatio = 1;
+    addTearDown(view.resetPhysicalSize);
+    addTearDown(view.resetDevicePixelRatio);
+
+    final database = AppDatabase(NativeDatabase.memory());
+    final repository = _FakeAccountRepository(_testAccount, database: database);
+    addTearDown(database.close);
+
+    await pumpWidget(
+      ProviderScope(
+        overrides: [
+          appDatabaseProvider.overrideWithValue(database),
+          accountRepositoryProvider.overrideWithValue(repository),
+        ],
+        child: const MailNestApp(),
+      ),
+    );
+    await pumpAndSettle();
+
+    final getStarted = find.text('Get started');
+    if (getStarted.evaluate().isNotEmpty) {
+      await tap(getStarted);
+      await pumpAndSettle();
+    }
+  }
+
+  Future<void> expectPageReturns({
+    required String tooltip,
+    required String expectedText,
+  }) async {
+    await tap(find.byTooltip(tooltip));
+    await pumpAndSettle();
+
+    expect(find.text(expectedText), findsWidgets);
+    expect(find.byTooltip('Back'), findsOneWidget);
+
+    await tap(find.byTooltip('Back'));
+    await pumpAndSettle();
+
+    expect(find.text('Mailboxes'), findsOneWidget);
+  }
+}
+
+final _testAccount = EmailAccount(
+  id: 'a@test.com',
+  emailAddress: 'a@test.com',
+  provider: 'custom',
+  username: 'a@test.com',
+  authType: 'app_password',
+  imapHost: 'imap.test.com',
+  imapPort: 993,
+  imapSecurity: 'ssl',
+  smtpHost: 'smtp.test.com',
+  smtpPort: 587,
+  smtpSecurity: 'starttls',
+  smtpStartTls: true,
+  secretRef: 'account:a@test.com:password',
+  syncEnabled: true,
+  createdAt: DateTime(2026),
+  updatedAt: DateTime(2026),
+);
+
+class _FakeAccountRepository extends AccountRepository {
+  _FakeAccountRepository(this.account, {required super.database})
+    : super(secureStorage: const SecureStorageService());
+
+  final EmailAccount account;
 
   @override
   Stream<List<EmailAccount>> watchAccounts() {
-    return Stream.value(const <EmailAccount>[]);
+    return Stream.value([account]);
   }
 
-  Future<void> close() => database.close();
+  @override
+  Future<EmailAccount?> getAccount(String id) async {
+    return id == account.id ? account : null;
+  }
 }

@@ -249,6 +249,9 @@ class _MailboxWorkspace extends ConsumerStatefulWidget {
 }
 
 class _MailboxWorkspaceState extends ConsumerState<_MailboxWorkspace> {
+  static const double _mediumWidth = 700;
+  static const double _wideWidth = 1100;
+
   MailboxScope _scope = const UnifiedMailboxScope();
   MailboxFilter _filter = MailboxFilter.all;
 
@@ -270,12 +273,14 @@ class _MailboxWorkspaceState extends ConsumerState<_MailboxWorkspace> {
 
   @override
   Widget build(BuildContext context) {
-    final isWide = MediaQuery.sizeOf(context).width >= 900;
+    final width = MediaQuery.sizeOf(context).width;
+    final isWide = width >= _wideWidth;
+    final isMedium = width >= _mediumWidth;
     final navigation = _MailboxNavigation(
       accounts: widget.accounts,
       scope: _scope,
       filter: _filter,
-      scrollable: isWide,
+      scrollable: isMedium,
       onScopeSelected: (scope) {
         setState(() {
           _scope = scope;
@@ -294,12 +299,30 @@ class _MailboxWorkspaceState extends ConsumerState<_MailboxWorkspace> {
       scope: _scope,
       filter: _filter,
     );
+    final detail = _MailboxDetailPane(
+      accounts: widget.accounts,
+      scope: _scope,
+      filter: _filter,
+    );
 
     if (isWide) {
       return Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          SizedBox(width: 320, child: navigation),
+          SizedBox(width: 280, child: navigation),
+          const VerticalDivider(width: 1),
+          SizedBox(width: 380, child: mailbox),
+          const VerticalDivider(width: 1),
+          Expanded(child: detail),
+        ],
+      );
+    }
+
+    if (isMedium) {
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          SizedBox(width: 300, child: navigation),
           const VerticalDivider(width: 1),
           Expanded(child: mailbox),
         ],
@@ -342,6 +365,115 @@ class _MailboxWorkspaceState extends ConsumerState<_MailboxWorkspace> {
       (folder) => folder.type == folderType,
     );
     return FolderMailboxScope(accountId: currentAccountId, folderId: folder.id);
+  }
+}
+
+class _MailboxDetailPane extends ConsumerWidget {
+  const _MailboxDetailPane({
+    required this.accounts,
+    required this.scope,
+    required this.filter,
+  });
+
+  final List<EmailAccount> accounts;
+  final MailboxScope scope;
+  final MailboxFilter filter;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final repository = ref.watch(mailboxRepositoryProvider);
+    final messages = repository.messagesFor(
+      accounts: accounts,
+      scope: scope,
+      filter: filter,
+    );
+    final message = messages.isEmpty ? null : messages.first;
+
+    return Padding(
+      padding: const EdgeInsets.all(AppSpacing.large),
+      child: message == null
+          ? const _MailboxDetailEmptyState()
+          : _MailboxDetailPreview(message: message),
+    );
+  }
+}
+
+class _MailboxDetailPreview extends StatelessWidget {
+  const _MailboxDetailPreview({required this.message});
+
+  final MailboxMessage message;
+
+  @override
+  Widget build(BuildContext context) {
+    final header = message.header;
+    final textTheme = Theme.of(context).textTheme;
+
+    return ListView(
+      children: [
+        Text('Message detail', style: textTheme.titleMedium),
+        const SizedBox(height: AppSpacing.large),
+        Text(header.subject, style: textTheme.headlineSmall),
+        const SizedBox(height: AppSpacing.medium),
+        _DetailRow(label: 'From', value: header.sender),
+        _DetailRow(label: 'Account', value: message.account.emailAddress),
+        _DetailRow(label: 'Folder', value: message.folder.name),
+        const Divider(height: AppSpacing.xlarge),
+        Text(
+          header.preview ?? 'Full message bodies will appear in a later PR.',
+          style: textTheme.bodyLarge,
+        ),
+      ],
+    );
+  }
+}
+
+class _DetailRow extends StatelessWidget {
+  const _DetailRow({required this.label, required this.value});
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.small),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 72,
+            child: Text(label, style: Theme.of(context).textTheme.labelLarge),
+          ),
+          Expanded(child: Text(value)),
+        ],
+      ),
+    );
+  }
+}
+
+class _MailboxDetailEmptyState extends StatelessWidget {
+  const _MailboxDetailEmptyState();
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.article_outlined, size: 48),
+          const SizedBox(height: AppSpacing.medium),
+          Text(
+            'No message selected',
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+          const SizedBox(height: AppSpacing.small),
+          const Text(
+            'Message contents will appear here on wide desktop windows.',
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
   }
 }
 
