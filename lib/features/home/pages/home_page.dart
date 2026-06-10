@@ -8,9 +8,12 @@ import '../../../core/platform/platform_info.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../../mail/models/mailbox_folder.dart';
 import '../../../mail/models/mailbox_message.dart';
+import '../../../mail/models/mail_detail.dart';
+import '../../../mail/repository/mail_repository_provider.dart';
 import '../../../mail/repository/account_repository_provider.dart';
 import '../../../mail/repository/mail_sync_repository_provider.dart';
 import '../../../mail/repository/mailbox_repository_provider.dart';
+import '../../mail/pages/mail_detail_page.dart';
 
 class HomePage extends ConsumerWidget {
   const HomePage({super.key});
@@ -56,6 +59,11 @@ class HomePage extends ConsumerWidget {
                       tooltip: l10n.sentMessages,
                       onPressed: () => context.push('/sent'),
                       icon: const Icon(Icons.outbox_outlined),
+                    ),
+                    IconButton(
+                      tooltip: l10n.addEmailAccount,
+                      onPressed: () => context.push('/accounts/add'),
+                      icon: const Icon(Icons.person_add_outlined),
                     ),
                     IconButton(
                       tooltip: l10n.settings,
@@ -253,8 +261,9 @@ class _MailboxWorkspaceState extends ConsumerState<_MailboxWorkspace> {
   static const double _mediumWidth = 700;
   static const double _wideWidth = 1100;
 
-  MailboxScope _scope = const UnifiedMailboxScope();
+  MailboxScope? _scope;
   MailboxFilter _filter = MailboxFilter.all;
+  _SelectedMessage? _selectedMessage;
   late Future<void> _syncFuture;
 
   @override
@@ -267,13 +276,19 @@ class _MailboxWorkspaceState extends ConsumerState<_MailboxWorkspace> {
   void didUpdateWidget(_MailboxWorkspace oldWidget) {
     super.didUpdateWidget(oldWidget);
     final accountIds = widget.accounts.map((account) => account.id).toSet();
-    switch (_scope) {
+    final groups = widget.accounts.map((account) => account.groupName).toSet();
+    switch (_effectiveScope) {
       case UnifiedMailboxScope():
         break;
+      case GroupMailboxScope(:final groupName):
+        if (!groups.contains(groupName)) {
+          _scope = _defaultScope();
+          _filter = MailboxFilter.all;
+        }
       case AccountMailboxScope(:final accountId):
       case FolderMailboxScope(:final accountId):
         if (!accountIds.contains(accountId)) {
-          _scope = const UnifiedMailboxScope();
+          _scope = _defaultScope();
           _filter = MailboxFilter.all;
         }
     }
@@ -294,58 +309,77 @@ class _MailboxWorkspaceState extends ConsumerState<_MailboxWorkspace> {
     final width = MediaQuery.sizeOf(context).width;
     final isWide = width >= _wideWidth;
     final isMedium = width >= _mediumWidth;
+    final scope = _effectiveScope;
     final navigation = _MailboxNavigation(
       accounts: widget.accounts,
-      scope: _scope,
+      scope: scope,
       filter: _filter,
       scrollable: isMedium,
       onScopeSelected: (scope) {
         setState(() {
           _scope = scope;
           _filter = MailboxFilter.all;
+          _selectedMessage = null;
         });
       },
       onFilterSelected: (filter) {
         setState(() {
           _scope = _scopeForFilter(filter);
           _filter = filter;
+          _selectedMessage = null;
         });
       },
     );
     final mailbox = _MailboxList(
       accounts: widget.accounts,
-      scope: _scope,
+      scope: scope,
       filter: _filter,
       syncFuture: _syncFuture,
       onRefresh: _refresh,
+      selectedMessage: _selectedMessage,
+      embedded: isMedium,
+      onMessageSelected: (message) {
+        if (isMedium) {
+          setState(() => _selectedMessage = _SelectedMessage.from(message));
+          return;
+        }
+        _openMessage(context, message);
+      },
     );
     final detail = _MailboxDetailPane(
       accounts: widget.accounts,
-      scope: _scope,
+      scope: scope,
       filter: _filter,
+      selectedMessage: _selectedMessage,
     );
 
     if (isWide) {
-      return Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          SizedBox(width: 280, child: navigation),
-          const VerticalDivider(width: 1),
-          SizedBox(width: 380, child: mailbox),
-          const VerticalDivider(width: 1),
-          Expanded(child: detail),
-        ],
+      return ColoredBox(
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            SizedBox(width: 280, child: navigation),
+            const VerticalDivider(width: 1),
+            SizedBox(width: width > 1340 ? 400 : 360, child: mailbox),
+            const VerticalDivider(width: 1),
+            Expanded(child: detail),
+          ],
+        ),
       );
     }
 
     if (isMedium) {
-      return Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          SizedBox(width: 300, child: navigation),
-          const VerticalDivider(width: 1),
-          Expanded(child: mailbox),
-        ],
+      return ColoredBox(
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            SizedBox(width: 280, child: navigation),
+            const VerticalDivider(width: 1),
+            Expanded(child: mailbox),
+          ],
+        ),
       );
     }
 
@@ -367,13 +401,14 @@ class _MailboxWorkspaceState extends ConsumerState<_MailboxWorkspace> {
       MailboxFilter.sent => _folderScope(MailboxFolderType.sent),
       MailboxFilter.drafts => _folderScope(MailboxFolderType.drafts),
       MailboxFilter.trash => _folderScope(MailboxFolderType.trash),
-      _ => _scope,
+      _ => _effectiveScope,
     };
   }
 
   MailboxScope _folderScope(MailboxFolderType folderType) {
-    final currentAccountId = switch (_scope) {
+    final currentAccountId = switch (_effectiveScope) {
       UnifiedMailboxScope() => null,
+      GroupMailboxScope() => null,
       AccountMailboxScope(:final accountId) => accountId,
       FolderMailboxScope(:final accountId) => accountId,
     };
@@ -386,6 +421,53 @@ class _MailboxWorkspaceState extends ConsumerState<_MailboxWorkspace> {
     );
     return FolderMailboxScope(accountId: currentAccountId, folderId: folder.id);
   }
+
+  MailboxScope get _effectiveScope => _scope ?? _defaultScope();
+
+  MailboxScope _defaultScope() {
+    if (widget.accounts.isEmpty) {
+      return const UnifiedMailboxScope();
+    }
+    return GroupMailboxScope(widget.accounts.first.groupName);
+  }
+
+  void _openMessage(BuildContext context, MailboxMessage message) {
+    final uid = message.header.id;
+    if (!RegExp(r'^\d+$').hasMatch(uid)) {
+      return;
+    }
+    context.push(
+      '/accounts/${Uri.encodeComponent(message.account.id)}'
+      '/folders/${Uri.encodeComponent(message.folder.id)}'
+      '/messages/${Uri.encodeComponent(uid)}',
+    );
+  }
+}
+
+class _SelectedMessage {
+  const _SelectedMessage({
+    required this.accountId,
+    required this.folderId,
+    required this.uid,
+  });
+
+  factory _SelectedMessage.from(MailboxMessage message) {
+    return _SelectedMessage(
+      accountId: message.account.id,
+      folderId: message.folder.id,
+      uid: message.header.id,
+    );
+  }
+
+  final String accountId;
+  final String folderId;
+  final String uid;
+
+  bool matches(MailboxMessage message) {
+    return accountId == message.account.id &&
+        folderId == message.folder.id &&
+        uid == message.header.id;
+  }
 }
 
 class _MailboxDetailPane extends ConsumerWidget {
@@ -393,91 +475,92 @@ class _MailboxDetailPane extends ConsumerWidget {
     required this.accounts,
     required this.scope,
     required this.filter,
+    required this.selectedMessage,
   });
 
   final List<EmailAccount> accounts;
   final MailboxScope scope;
   final MailboxFilter filter;
+  final _SelectedMessage? selectedMessage;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final repository = ref.watch(mailboxRepositoryProvider);
-    final localHeaders = ref
-        .watch(mailSyncRepositoryProvider)
-        .watchRecentHeaders();
+    final selected = selectedMessage;
+    if (selected == null || !RegExp(r'^\d+$').hasMatch(selected.uid)) {
+      return const Padding(
+        padding: EdgeInsets.all(AppSpacing.large),
+        child: _MailboxDetailEmptyState(),
+      );
+    }
 
-    return StreamBuilder<List<LocalMailMessage>>(
-      stream: localHeaders,
-      builder: (context, snapshot) {
-        final localMessages = snapshot.data ?? const <LocalMailMessage>[];
-        final messages = repository.messagesFor(
-          accounts: accounts,
-          localMessages: localMessages,
-          scope: scope,
-          filter: filter,
-        );
-        final message = messages.isEmpty ? null : messages.first;
-
-        return Padding(
-          padding: const EdgeInsets.all(AppSpacing.large),
-          child: message == null
-              ? const _MailboxDetailEmptyState()
-              : _MailboxDetailPreview(message: message),
-        );
-      },
-    );
-  }
-}
-
-class _MailboxDetailPreview extends StatelessWidget {
-  const _MailboxDetailPreview({required this.message});
-
-  final MailboxMessage message;
-
-  @override
-  Widget build(BuildContext context) {
-    final header = message.header;
-    final textTheme = Theme.of(context).textTheme;
-    final l10n = AppLocalizations.of(context);
-
-    return ListView(
-      children: [
-        Text(l10n.mailDetail, style: textTheme.titleMedium),
-        const SizedBox(height: AppSpacing.large),
-        Text(header.subject, style: textTheme.headlineSmall),
-        const SizedBox(height: AppSpacing.medium),
-        _DetailRow(label: l10n.from, value: header.sender),
-        _DetailRow(label: l10n.account, value: message.account.emailAddress),
-        _DetailRow(label: l10n.folder, value: message.folder.name),
-        const Divider(height: AppSpacing.xlarge),
-        Text(
-          header.preview ?? l10n.fullMessageBodiesFutureNotice,
-          style: textTheme.bodyLarge,
+    final detail = ref.watch(
+      _homeMailDetailProvider(
+        _HomeMailDetailKey(
+          accountId: selected.accountId,
+          folderId: selected.folderId,
+          uid: selected.uid,
         ),
-      ],
+      ),
+    );
+
+    return detail.when(
+      data: (detail) => MailDetailEmbeddedView(detail: detail),
+      error: (error, _) => const _MailboxDetailError(),
+      loading: () => const Center(child: CircularProgressIndicator()),
     );
   }
 }
 
-class _DetailRow extends StatelessWidget {
-  const _DetailRow({required this.label, required this.value});
+final _homeMailDetailProvider =
+    FutureProvider.family<MailDetail, _HomeMailDetailKey>((ref, key) {
+      return ref
+          .watch(mailRepositoryProvider)
+          .fetchMessageDetail(
+            accountId: key.accountId,
+            folderId: key.folderId,
+            uid: key.uid,
+          );
+    });
 
-  final String label;
-  final String value;
+class _HomeMailDetailKey {
+  const _HomeMailDetailKey({
+    required this.accountId,
+    required this.folderId,
+    required this.uid,
+  });
+
+  final String accountId;
+  final String folderId;
+  final String uid;
+
+  @override
+  bool operator ==(Object other) {
+    return other is _HomeMailDetailKey &&
+        other.accountId == accountId &&
+        other.folderId == folderId &&
+        other.uid == uid;
+  }
+
+  @override
+  int get hashCode => Object.hash(accountId, folderId, uid);
+}
+
+class _MailboxDetailError extends StatelessWidget {
+  const _MailboxDetailError();
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: AppSpacing.small),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 72,
-            child: Text(label, style: Theme.of(context).textTheme.labelLarge),
-          ),
-          Expanded(child: Text(value)),
-        ],
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.large),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.error_outline, size: 48),
+            const SizedBox(height: AppSpacing.medium),
+            Text(AppLocalizations.of(context).messageLoadFailed),
+          ],
+        ),
       ),
     );
   }
@@ -508,7 +591,7 @@ class _MailboxDetailEmptyState extends StatelessWidget {
   }
 }
 
-class _MailboxNavigation extends StatelessWidget {
+class _MailboxNavigation extends ConsumerWidget {
   const _MailboxNavigation({
     required this.accounts,
     required this.scope,
@@ -526,14 +609,43 @@ class _MailboxNavigation extends StatelessWidget {
   final ValueChanged<MailboxFilter> onFilterSelected;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
+    final groups = ref.watch(accountRepositoryProvider).watchAccountGroups();
 
     return ListView(
       shrinkWrap: !scrollable,
       physics: scrollable ? null : const NeverScrollableScrollPhysics(),
       padding: const EdgeInsets.all(AppSpacing.medium),
       children: [
+        Row(
+          children: [
+            CircleAvatar(
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              child: Text(
+                'M',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onPrimary,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ),
+            const SizedBox(width: AppSpacing.small),
+            Expanded(
+              child: Text(
+                l10n.appTitle,
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: AppSpacing.medium),
+        FilledButton.icon(
+          onPressed: () => context.push('/compose'),
+          icon: const Icon(Icons.edit_outlined),
+          label: Text(l10n.composeMail),
+        ),
+        const SizedBox(height: AppSpacing.large),
         Text(l10n.mailboxes, style: Theme.of(context).textTheme.titleMedium),
         const SizedBox(height: AppSpacing.small),
         _NavigationTile(
@@ -541,6 +653,39 @@ class _MailboxNavigation extends StatelessWidget {
           title: l10n.unifiedInbox,
           selected: scope is UnifiedMailboxScope && filter == MailboxFilter.all,
           onTap: () => onScopeSelected(const UnifiedMailboxScope()),
+        ),
+        const SizedBox(height: AppSpacing.medium),
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                l10n.accountGroups,
+                style: Theme.of(context).textTheme.titleSmall,
+              ),
+            ),
+            _GroupActionsMenu(accounts: accounts),
+          ],
+        ),
+        const SizedBox(height: AppSpacing.small),
+        StreamBuilder<List<AccountGroup>>(
+          stream: groups,
+          builder: (context, snapshot) {
+            final groupNames = _mergedGroupNames(snapshot.data);
+            return Column(
+              children: [
+                for (final groupName in groupNames) ...[
+                  _NavigationTile(
+                    icon: Icons.folder_shared_outlined,
+                    title: groupName,
+                    selected: _isGroupSelected(groupName),
+                    trailing: _GroupMenu(groupName: groupName),
+                    onTap: () => onScopeSelected(GroupMailboxScope(groupName)),
+                  ),
+                  const SizedBox(height: AppSpacing.small),
+                ],
+              ],
+            );
+          },
         ),
         const SizedBox(height: AppSpacing.medium),
         Text(l10n.filters, style: Theme.of(context).textTheme.titleSmall),
@@ -584,6 +729,13 @@ class _MailboxNavigation extends StatelessWidget {
         const SizedBox(height: AppSpacing.medium),
         Text(l10n.accounts, style: Theme.of(context).textTheme.titleSmall),
         const SizedBox(height: AppSpacing.small),
+        _NavigationTile(
+          icon: Icons.person_add_outlined,
+          title: l10n.addEmailAccount,
+          selected: false,
+          onTap: () => context.push('/accounts/add'),
+        ),
+        const SizedBox(height: AppSpacing.small),
         for (final account in accounts) ...[
           _AccountNavigationTile(
             account: account,
@@ -599,7 +751,7 @@ class _MailboxNavigation extends StatelessWidget {
                   _NavigationTile(
                     dense: true,
                     icon: _folderIcon(folder.type),
-                    title: folder.name,
+                    title: _folderName(l10n, folder),
                     selected: _isFolderSelected(account.id, folder.id),
                     onTap: () => onScopeSelected(
                       FolderMailboxScope(
@@ -625,6 +777,14 @@ class _MailboxNavigation extends StatelessWidget {
     };
   }
 
+  bool _isGroupSelected(String groupName) {
+    return switch (scope) {
+      GroupMailboxScope(groupName: final selectedGroupName) =>
+        selectedGroupName == groupName && filter == MailboxFilter.all,
+      _ => false,
+    };
+  }
+
   bool _isFolderSelected(String accountId, String folderId) {
     return switch (scope) {
       FolderMailboxScope(
@@ -638,12 +798,36 @@ class _MailboxNavigation extends StatelessWidget {
     };
   }
 
+  List<String> _mergedGroupNames(List<AccountGroup>? persistedGroups) {
+    final groupNames = <String>[];
+    for (final group in persistedGroups ?? const <AccountGroup>[]) {
+      if (!groupNames.contains(group.name)) {
+        groupNames.add(group.name);
+      }
+    }
+    for (final account in accounts) {
+      if (!groupNames.contains(account.groupName)) {
+        groupNames.add(account.groupName);
+      }
+    }
+    return groupNames;
+  }
+
   IconData _folderIcon(MailboxFolderType type) {
     return switch (type) {
       MailboxFolderType.inbox => Icons.inbox_outlined,
       MailboxFolderType.sent => Icons.send_outlined,
       MailboxFolderType.drafts => Icons.drafts_outlined,
       MailboxFolderType.trash => Icons.delete_outline,
+    };
+  }
+
+  String _folderName(AppLocalizations l10n, MailboxFolder folder) {
+    return switch (folder.type) {
+      MailboxFolderType.inbox => l10n.inbox,
+      MailboxFolderType.sent => l10n.sentMessages,
+      MailboxFolderType.drafts => l10n.drafts,
+      MailboxFolderType.trash => l10n.trash,
     };
   }
 }
@@ -655,6 +839,9 @@ class _MailboxList extends ConsumerWidget {
     required this.filter,
     required this.syncFuture,
     required this.onRefresh,
+    required this.selectedMessage,
+    required this.embedded,
+    required this.onMessageSelected,
   });
 
   final List<EmailAccount> accounts;
@@ -662,6 +849,9 @@ class _MailboxList extends ConsumerWidget {
   final MailboxFilter filter;
   final Future<void> syncFuture;
   final VoidCallback onRefresh;
+  final _SelectedMessage? selectedMessage;
+  final bool embedded;
+  final ValueChanged<MailboxMessage> onMessageSelected;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -711,6 +901,9 @@ class _MailboxList extends ConsumerWidget {
                     isLoading: isLoading && localMessages.isEmpty,
                     error: syncSnapshot.error,
                     onRefresh: onRefresh,
+                    selectedMessage: selectedMessage,
+                    embedded: embedded,
+                    onMessageSelected: onMessageSelected,
                   ),
                 ),
               ],
@@ -781,8 +974,9 @@ class _MailboxHeader extends StatelessWidget {
   String _scopeTitle(AppLocalizations l10n) {
     return switch (scope) {
       UnifiedMailboxScope() => l10n.unifiedInbox,
+      GroupMailboxScope(:final groupName) => groupName,
       AccountMailboxScope() => l10n.accountMailbox,
-      FolderMailboxScope(:final folderId) => _folderName(folderId),
+      FolderMailboxScope(:final folderId) => _folderName(l10n, folderId),
     };
   }
 
@@ -808,10 +1002,16 @@ class _MailboxHeader extends StatelessWidget {
     };
   }
 
-  String _folderName(String folderId) {
-    return standardMailboxFolders
-        .firstWhere((folder) => folder.id == folderId)
-        .name;
+  String _folderName(AppLocalizations l10n, String folderId) {
+    final folder = standardMailboxFolders.firstWhere(
+      (folder) => folder.id == folderId,
+    );
+    return switch (folder.type) {
+      MailboxFolderType.inbox => l10n.inbox,
+      MailboxFolderType.sent => l10n.sentMessages,
+      MailboxFolderType.drafts => l10n.drafts,
+      MailboxFolderType.trash => l10n.trash,
+    };
   }
 }
 
@@ -822,6 +1022,9 @@ class _MailboxContent extends StatelessWidget {
     required this.isLoading,
     required this.error,
     required this.onRefresh,
+    required this.selectedMessage,
+    required this.embedded,
+    required this.onMessageSelected,
   });
 
   final List<MailboxMessage> messages;
@@ -829,6 +1032,9 @@ class _MailboxContent extends StatelessWidget {
   final bool isLoading;
   final Object? error;
   final VoidCallback onRefresh;
+  final _SelectedMessage? selectedMessage;
+  final bool embedded;
+  final ValueChanged<MailboxMessage> onMessageSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -851,10 +1057,14 @@ class _MailboxContent extends StatelessWidget {
 
     return RefreshIndicator(
       onRefresh: () async => onRefresh(),
-      child: ListView.separated(
-        padding: const EdgeInsets.only(bottom: AppSpacing.xlarge * 4),
+      child: ListView.builder(
+        padding: EdgeInsets.only(
+          left: embedded ? AppSpacing.medium : 0,
+          right: embedded ? AppSpacing.medium : 0,
+          top: embedded ? AppSpacing.medium : 0,
+          bottom: AppSpacing.xlarge * 4,
+        ),
         itemCount: messages.length + (error == null ? 0 : 1),
-        separatorBuilder: (_, _) => const Divider(height: 1),
         itemBuilder: (context, index) {
           if (error != null && index == 0) {
             return _InlineMailboxError(
@@ -862,8 +1072,15 @@ class _MailboxContent extends StatelessWidget {
               onRefresh: onRefresh,
             );
           }
-          return _MessageTile(
-            message: messages[error == null ? index : index - 1],
+          final message = messages[error == null ? index : index - 1];
+          return Padding(
+            padding: EdgeInsets.only(bottom: embedded ? AppSpacing.small : 0),
+            child: _MessageTile(
+              message: message,
+              selected: selectedMessage?.matches(message) ?? false,
+              cardStyle: embedded,
+              onTap: () => onMessageSelected(message),
+            ),
           );
         },
       ),
@@ -962,70 +1179,535 @@ class _FilterChipButton extends StatelessWidget {
   }
 }
 
+class _GroupActionsMenu extends ConsumerWidget {
+  const _GroupActionsMenu({required this.accounts});
+
+  final List<EmailAccount> accounts;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    return PopupMenuButton<_GroupGlobalAction>(
+      tooltip: l10n.accountGroupActions,
+      icon: const Icon(Icons.more_horiz),
+      onSelected: (action) async {
+        switch (action) {
+          case _GroupGlobalAction.create:
+            await _showCreateGroupDialog(context, ref);
+          case _GroupGlobalAction.moveAccounts:
+            await _showMoveAccountsDialog(context, ref, accounts);
+        }
+      },
+      itemBuilder: (context) => [
+        PopupMenuItem(
+          value: _GroupGlobalAction.create,
+          child: ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.create_new_folder_outlined),
+            title: Text(l10n.addAccountGroup),
+          ),
+        ),
+        PopupMenuItem(
+          value: _GroupGlobalAction.moveAccounts,
+          child: ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.drive_file_move_outline),
+            title: Text(l10n.moveAccountsToGroup),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _GroupMenu extends ConsumerWidget {
+  const _GroupMenu({required this.groupName});
+
+  final String groupName;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    return PopupMenuButton<_GroupAction>(
+      tooltip: l10n.accountGroupActions,
+      icon: const Icon(Icons.more_vert),
+      onSelected: (action) async {
+        switch (action) {
+          case _GroupAction.rename:
+            await _showRenameGroupDialog(context, ref, groupName);
+          case _GroupAction.delete:
+            await _deleteGroup(context, ref, groupName);
+        }
+      },
+      itemBuilder: (context) => [
+        PopupMenuItem(
+          value: _GroupAction.rename,
+          child: ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.edit_outlined),
+            title: Text(l10n.renameAccountGroup),
+          ),
+        ),
+        PopupMenuItem(
+          value: _GroupAction.delete,
+          child: ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.delete_outline),
+            title: Text(l10n.deleteAccountGroup),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+enum _GroupGlobalAction { create, moveAccounts }
+
+enum _GroupAction { rename, delete }
+
+Future<void> _showCreateGroupDialog(BuildContext context, WidgetRef ref) async {
+  final l10n = AppLocalizations.of(context);
+  final controller = TextEditingController();
+  final name = await _showGroupNameDialog(
+    context: context,
+    title: l10n.addAccountGroup,
+    controller: controller,
+  );
+  controller.dispose();
+  if (name == null) {
+    return;
+  }
+  await ref.read(accountRepositoryProvider).createGroup(name);
+}
+
+Future<void> _showRenameGroupDialog(
+  BuildContext context,
+  WidgetRef ref,
+  String oldName,
+) async {
+  final l10n = AppLocalizations.of(context);
+  final controller = TextEditingController(text: oldName);
+  final newName = await _showGroupNameDialog(
+    context: context,
+    title: l10n.renameAccountGroup,
+    controller: controller,
+  );
+  controller.dispose();
+  if (newName == null || newName == oldName) {
+    return;
+  }
+  await ref
+      .read(accountRepositoryProvider)
+      .renameGroup(oldName: oldName, newName: newName);
+}
+
+Future<String?> _showGroupNameDialog({
+  required BuildContext context,
+  required String title,
+  required TextEditingController controller,
+}) {
+  final l10n = AppLocalizations.of(context);
+  return showDialog<String>(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: Text(title),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          decoration: InputDecoration(labelText: l10n.accountGroup),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(l10n.cancel),
+          ),
+          FilledButton(
+            onPressed: () {
+              final value = controller.text.trim();
+              if (value.isNotEmpty) {
+                Navigator.of(context).pop(value);
+              }
+            },
+            child: Text(l10n.ok),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+Future<void> _deleteGroup(
+  BuildContext context,
+  WidgetRef ref,
+  String groupName,
+) async {
+  final l10n = AppLocalizations.of(context);
+  final deleted = await ref
+      .read(accountRepositoryProvider)
+      .deleteGroupIfEmpty(groupName);
+  if (!context.mounted) {
+    return;
+  }
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(
+        deleted ? l10n.accountGroupDeleted : l10n.accountGroupDeleteBlocked,
+      ),
+    ),
+  );
+}
+
+Future<void> _showMoveAccountsDialog(
+  BuildContext context,
+  WidgetRef ref,
+  List<EmailAccount> accounts,
+) async {
+  final l10n = AppLocalizations.of(context);
+  final selectedIds = <String>{};
+  String? targetGroup = accounts.isEmpty ? null : accounts.first.groupName;
+  final groups = await ref
+      .read(accountRepositoryProvider)
+      .accountGroupsSnapshot();
+  if (!context.mounted) {
+    return;
+  }
+  final groupNames = <String>[
+    for (final group in groups) group.name,
+    for (final account in accounts)
+      if (!groups.any((group) => group.name == account.groupName))
+        account.groupName,
+  ];
+
+  final confirmed = await showDialog<bool>(
+    context: context,
+    builder: (context) {
+      return StatefulBuilder(
+        builder: (context, setState) {
+          return AlertDialog(
+            title: Text(l10n.moveAccountsToGroup),
+            content: SizedBox(
+              width: 420,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  DropdownButtonFormField<String>(
+                    initialValue: targetGroup,
+                    decoration: InputDecoration(labelText: l10n.accountGroup),
+                    items: [
+                      for (final groupName in groupNames)
+                        DropdownMenuItem(
+                          value: groupName,
+                          child: Text(groupName),
+                        ),
+                    ],
+                    onChanged: (value) => setState(() => targetGroup = value),
+                  ),
+                  const SizedBox(height: AppSpacing.medium),
+                  Flexible(
+                    child: ListView(
+                      shrinkWrap: true,
+                      children: [
+                        for (final account in accounts)
+                          CheckboxListTile(
+                            value: selectedIds.contains(account.id),
+                            title: Text(account.emailAddress),
+                            subtitle: Text(account.groupName),
+                            onChanged: (value) {
+                              setState(() {
+                                if (value == true) {
+                                  selectedIds.add(account.id);
+                                } else {
+                                  selectedIds.remove(account.id);
+                                }
+                              });
+                            },
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: Text(l10n.cancel),
+              ),
+              FilledButton(
+                onPressed: selectedIds.isEmpty || targetGroup == null
+                    ? null
+                    : () => Navigator.of(context).pop(true),
+                child: Text(l10n.ok),
+              ),
+            ],
+          );
+        },
+      );
+    },
+  );
+
+  if (confirmed != true || targetGroup == null) {
+    return;
+  }
+  await ref
+      .read(accountRepositoryProvider)
+      .moveAccountsToGroup(
+        accountIds: selectedIds.toList(growable: false),
+        groupName: targetGroup!,
+      );
+}
+
 class _MessageTile extends StatelessWidget {
-  const _MessageTile({required this.message});
+  const _MessageTile({
+    required this.message,
+    required this.selected,
+    required this.cardStyle,
+    required this.onTap,
+  });
 
   final MailboxMessage message;
+  final bool selected;
+  final bool cardStyle;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final header = message.header;
-    final unreadStyle = header.isRead
-        ? null
-        : const TextStyle(fontWeight: FontWeight.w700);
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final activeColor = selected
+        ? colorScheme.primary
+        : colorScheme.surfaceContainerLowest;
+    final subjectStyle = theme.textTheme.titleMedium?.copyWith(
+      fontWeight: header.isRead ? FontWeight.w600 : FontWeight.w800,
+      color: selected ? colorScheme.onPrimary : null,
+    );
+    final secondaryColor = selected
+        ? colorScheme.onPrimary.withValues(alpha: 0.78)
+        : colorScheme.onSurfaceVariant;
 
-    return ListTile(
-      enabled: _canOpenDetail(header.id),
-      onTap: _canOpenDetail(header.id)
-          ? () => context.push(
-              '/accounts/${Uri.encodeComponent(message.account.id)}'
-              '/folders/${Uri.encodeComponent(message.folder.id)}'
-              '/messages/${Uri.encodeComponent(header.id)}',
-            )
-          : null,
-      leading: Icon(
-        header.isRead ? Icons.mail_outline : Icons.mark_email_unread_outlined,
-      ),
-      title: Row(
-        children: [
-          Expanded(
-            child: Text(
-              header.subject,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: unreadStyle,
-            ),
+    if (!cardStyle) {
+      return ListTile(
+        enabled: _canOpenDetail(header.id),
+        onTap: _canOpenDetail(header.id) ? onTap : null,
+        leading: _SenderAvatar(sender: header.sender, selected: false),
+        title: Text(
+          header.subject,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: subjectStyle,
+        ),
+        subtitle: Text(
+          _subtitle(context),
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+        ),
+        trailing: _MessageMeta(
+          message: message,
+          selected: false,
+          compact: true,
+        ),
+      );
+    }
+
+    return Material(
+      color: activeColor,
+      borderRadius: BorderRadius.circular(8),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: _canOpenDetail(header.id) ? onTap : null,
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.medium),
+          child: Stack(
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _SenderAvatar(sender: header.sender, selected: selected),
+                      const SizedBox(width: AppSpacing.small),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              _senderName(header.sender),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: theme.textTheme.titleSmall?.copyWith(
+                                fontWeight: header.isRead
+                                    ? FontWeight.w600
+                                    : FontWeight.w800,
+                                color: selected ? colorScheme.onPrimary : null,
+                              ),
+                            ),
+                            const SizedBox(height: AppSpacing.xsmall),
+                            Text(
+                              header.subject,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: subjectStyle,
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.small),
+                      _MessageMeta(
+                        message: message,
+                        selected: selected,
+                        compact: false,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.small),
+                  Text(
+                    _subtitle(context),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: secondaryColor,
+                      height: 1.35,
+                    ),
+                  ),
+                ],
+              ),
+              if (!header.isRead)
+                Positioned(
+                  right: 0,
+                  top: 0,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: selected
+                          ? colorScheme.onPrimary
+                          : colorScheme.primary,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const SizedBox.square(dimension: 10),
+                  ),
+                ),
+            ],
           ),
-          if (header.isStarred)
-            Icon(
-              Icons.star,
-              size: 18,
-              color: Theme.of(context).colorScheme.tertiary,
-            ),
-        ],
+        ),
       ),
-      subtitle: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            '${message.folder.name} • ${message.account.emailAddress}',
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          if (header.preview != null)
-            Text(
-              '${header.sender}: ${header.preview}',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-        ],
-      ),
-      trailing: Text(_relativeDate(header.receivedAt)),
     );
   }
 
   bool _canOpenDetail(String uid) {
     return RegExp(r'^\d+$').hasMatch(uid);
+  }
+
+  String _subtitle(BuildContext context) {
+    final folder = _folderName(context);
+    final preview = message.header.preview;
+    if (preview == null || preview.trim().isEmpty) {
+      return '$folder • ${message.account.emailAddress}';
+    }
+    return '$folder • $preview';
+  }
+
+  String _senderName(String sender) {
+    final match = RegExp(r'^\s*([^<]+)').firstMatch(sender);
+    final name = match?.group(1)?.replaceAll('"', '').trim();
+    if (name != null && name.isNotEmpty) {
+      return name;
+    }
+    return sender;
+  }
+
+  String _folderName(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return switch (message.folder.type) {
+      MailboxFolderType.inbox => l10n.inbox,
+      MailboxFolderType.sent => l10n.sentMessages,
+      MailboxFolderType.drafts => l10n.drafts,
+      MailboxFolderType.trash => l10n.trash,
+    };
+  }
+}
+
+class _SenderAvatar extends StatelessWidget {
+  const _SenderAvatar({required this.sender, required this.selected});
+
+  final String sender;
+  final bool selected;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final label = _initial(sender);
+
+    return CircleAvatar(
+      radius: 18,
+      backgroundColor: selected
+          ? colorScheme.onPrimary.withValues(alpha: 0.18)
+          : colorScheme.secondaryContainer,
+      child: Text(
+        label,
+        style: TextStyle(
+          color: selected
+              ? colorScheme.onPrimary
+              : colorScheme.onSecondaryContainer,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
+    );
+  }
+
+  String _initial(String value) {
+    final trimmed = value.trim();
+    if (trimmed.isEmpty) {
+      return '?';
+    }
+    return trimmed.characters.first.toUpperCase();
+  }
+}
+
+class _MessageMeta extends StatelessWidget {
+  const _MessageMeta({
+    required this.message,
+    required this.selected,
+    required this.compact,
+  });
+
+  final MailboxMessage message;
+  final bool selected;
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final color = selected
+        ? colorScheme.onPrimary.withValues(alpha: 0.78)
+        : colorScheme.onSurfaceVariant;
+    final header = message.header;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          _relativeDate(header.receivedAt),
+          style: Theme.of(context).textTheme.labelSmall?.copyWith(color: color),
+        ),
+        if (!compact) const SizedBox(height: AppSpacing.xsmall),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (header.hasAttachments)
+              Icon(Icons.attach_file, size: 16, color: color),
+            if (header.isStarred)
+              Icon(
+                Icons.star,
+                size: 16,
+                color: selected ? color : colorScheme.tertiary,
+              ),
+          ],
+        ),
+      ],
+    );
   }
 
   String _relativeDate(DateTime dateTime) {

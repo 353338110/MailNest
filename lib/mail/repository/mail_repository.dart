@@ -1,9 +1,13 @@
+import 'dart:async';
+
 import 'package:drift/drift.dart';
 
 import '../../core/database/app_database.dart';
+import '../body/parsed_email_body.dart';
 import '../mime/mime_parser.dart';
 import '../models/mail_detail.dart';
 import '../models/mail_header.dart';
+import '../models/outgoing_message.dart';
 import '../provider/imap_smtp_mail_provider.dart';
 import 'account_repository.dart';
 
@@ -45,7 +49,8 @@ class MailRepository {
       uid: parsedUid,
     );
     final cachedBody = cached?.cachedBody;
-    if (cached != null && cachedBody != null) {
+    if (cached != null && cachedBody != null && !_hasBrokenEncoding(cached)) {
+      await _markRead(accountId: accountId, folderId: folderId, uid: parsedUid);
       return MailDetail(
         header: _headerFromLocal(cached),
         body: cachedBody,
@@ -55,6 +60,16 @@ class MailRepository {
           folderId: folderId,
           uid: parsedUid,
         ),
+        parsedBody: cached.cachedBodyIsHtml
+            ? ParsedEmailBody(
+                html: cachedBody,
+                hasRemoteImages: _hasRemoteImages(cachedBody),
+                rawPreview: cached.rawHeaders,
+              )
+            : ParsedEmailBody(
+                plainText: cachedBody,
+                rawPreview: cached.rawHeaders,
+              ),
         cachedAt: cached.bodyCachedAt,
       );
     }
@@ -76,7 +91,7 @@ class MailRepository {
       folderId: folderId,
       uid: uid,
     );
-    final parsed = mimeParser.parse(
+    final parsed = await mimeParser.parse(
       rawMessage: raw,
       uid: uid,
       folderId: folderId,
@@ -87,16 +102,16 @@ class MailRepository {
         accountId: Value(accountId),
         folderName: Value(folderId),
         uid: Value(parsedUid),
-        messageId: const Value.absent(),
+        messageId: Value(parsed.header.messageId),
         sender: Value(parsed.header.sender),
-        recipients: const Value(''),
+        recipients: Value(parsed.header.recipients.join(', ')),
         subject: Value(parsed.header.subject),
         summary: Value(parsed.header.preview),
-        cachedBody: Value(parsed.body),
+        cachedBody: Value(parsed.parsedBody.html ?? parsed.body),
         cachedBodyIsHtml: Value(parsed.isHtml),
         rawHeaders: Value(parsed.rawHeaders),
         bodyCachedAt: Value(now),
-        isRead: Value(parsed.header.isRead),
+        isRead: const Value(true),
         isStarred: Value(parsed.header.isStarred),
         hasAttachments: Value(parsed.attachments.isNotEmpty),
         receivedAt: Value(parsed.header.receivedAt),
@@ -116,13 +131,56 @@ class MailRepository {
           ),
       ],
     );
+    await _markRead(accountId: accountId, folderId: folderId, uid: parsedUid);
 
     return MailDetail(
       header: parsed.header,
       body: parsed.body,
       isHtml: parsed.isHtml,
       attachments: parsed.attachments,
+      parsedBody: parsed.parsedBody,
       cachedAt: now,
+    );
+  }
+
+  Future<void> sendMessage({
+    required String accountId,
+    required OutgoingMessage message,
+  }) {
+    return imapProvider.sendMessage(accountId: accountId, message: message);
+  }
+
+  Future<void> _markReadLocally({
+    required String accountId,
+    required String folderId,
+    required int uid,
+  }) {
+    return database.markLocalMailMessageRead(
+      accountId: accountId,
+      folderName: folderId,
+      uid: uid,
+      isRead: true,
+    );
+  }
+
+  Future<void> _markRead({
+    required String accountId,
+    required String folderId,
+    required int uid,
+  }) async {
+    await _markReadLocally(accountId: accountId, folderId: folderId, uid: uid);
+    unawaited(
+      imapProvider
+          .markMessageReadByUid(
+            accountId: accountId,
+            folderId: folderId,
+            uid: uid.toString(),
+            isRead: true,
+          )
+          .catchError((_) {
+            // Local read state should remain responsive even if the server
+            // rejects flag updates for a provider-specific reason.
+          }),
     );
   }
 
@@ -155,12 +213,62 @@ class MailRepository {
       uid: row.uid,
       subject: row.subject,
       sender: row.sender,
+      recipients: _splitRecipients(row.recipients),
       receivedAt: row.receivedAt,
       preview: row.summary,
       isRead: row.isRead,
       isStarred: row.isStarred,
       hasAttachments: row.hasAttachments,
     );
+  }
+
+  static bool _hasBrokenEncoding(LocalMailMessage row) {
+    return _looksMojibake(row.subject) ||
+        _looksMojibake(row.sender) ||
+        _looksMojibake(row.cachedBody) ||
+        (row.cachedBodyIsHtml && !_looksLikeHtml(row.cachedBody));
+  }
+
+  static bool _looksMojibake(String? value) {
+    if (value == null || value.isEmpty) {
+      return false;
+    }
+    return value.contains('�') ||
+        value.contains('ï¿½') ||
+        value.contains('Ã') ||
+        value.contains('Â') ||
+        value.contains('å') ||
+        value.contains('æ') ||
+        value.contains('ç');
+  }
+
+  static bool _looksLikeHtml(String? value) {
+    if (value == null) {
+      return false;
+    }
+    return RegExp(
+      r'<\s*(html|body|div|table|p|span|img|br)\b',
+      caseSensitive: false,
+    ).hasMatch(value);
+  }
+
+  static bool _hasRemoteImages(String html) {
+    return RegExp(
+      r'''<img\b[^>]*\bsrc\s*=\s*("|\')https?:\/\/''',
+      caseSensitive: false,
+    ).hasMatch(html);
+  }
+
+  static List<String> _splitRecipients(String value) {
+    final trimmed = value.trim();
+    if (trimmed.isEmpty) {
+      return const <String>[];
+    }
+    return trimmed
+        .split(RegExp(r',(?=(?:[^"]*"[^"]*")*[^"]*$)'))
+        .map((part) => part.trim())
+        .where((part) => part.isNotEmpty)
+        .toList(growable: false);
   }
 }
 

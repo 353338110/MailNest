@@ -7,6 +7,7 @@ class EmailAccounts extends Table {
   TextColumn get id => text()();
   TextColumn get emailAddress => text()();
   TextColumn get displayName => text().nullable()();
+  TextColumn get groupName => text().withDefault(const Constant('Personal'))();
   TextColumn get provider => text()();
   TextColumn get username => text()();
   TextColumn get authType => text()();
@@ -25,6 +26,15 @@ class EmailAccounts extends Table {
 
   @override
   Set<Column<Object>> get primaryKey => {id};
+}
+
+class AccountGroups extends Table {
+  TextColumn get name => text()();
+  DateTimeColumn get createdAt => dateTime()();
+  DateTimeColumn get updatedAt => dateTime()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {name};
 }
 
 class AppSettings extends Table {
@@ -131,6 +141,7 @@ class MailSyncCursors extends Table {
 @DriftDatabase(
   tables: [
     EmailAccounts,
+    AccountGroups,
     AppSettings,
     DraftMessages,
     SentMessages,
@@ -144,7 +155,7 @@ class AppDatabase extends _$AppDatabase {
     : super(executor ?? driftDatabase(name: 'mailnest'));
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 6;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -180,6 +191,19 @@ class AppDatabase extends _$AppDatabase {
         );
         await _createTableIfMissing(migrator, localMailAttachments);
       }
+      if (from < 5) {
+        if (await _tableExists(emailAccounts)) {
+          await _addColumnIfMissing(
+            migrator,
+            emailAccounts,
+            emailAccounts.groupName,
+          );
+        }
+      }
+      if (from < 6) {
+        await _createTableIfMissing(migrator, accountGroups);
+        await _backfillAccountGroups();
+      }
     },
   );
 
@@ -199,15 +223,19 @@ class AppDatabase extends _$AppDatabase {
     }
   }
 
-  Future<void> _createTableIfMissing(
-    Migrator migrator,
-    TableInfo<Table, Object?> table,
-  ) async {
+  Future<bool> _tableExists(TableInfo<Table, Object?> table) async {
     final rows = await customSelect(
       "SELECT name FROM sqlite_master WHERE type = 'table' AND name = ?",
       variables: [Variable<String>(table.actualTableName)],
     ).get();
-    if (rows.isEmpty) {
+    return rows.isNotEmpty;
+  }
+
+  Future<void> _createTableIfMissing(
+    Migrator migrator,
+    TableInfo<Table, Object?> table,
+  ) async {
+    if (!await _tableExists(table)) {
       await migrator.createTable(table);
     }
   }
@@ -230,6 +258,18 @@ class AppDatabase extends _$AppDatabase {
     )..orderBy([(table) => OrderingTerm.desc(table.createdAt)])).watch();
   }
 
+  Stream<List<AccountGroup>> watchAccountGroups() {
+    return (select(
+      accountGroups,
+    )..orderBy([(table) => OrderingTerm.asc(table.name)])).watch();
+  }
+
+  Future<List<AccountGroup>> accountGroupsSnapshot() {
+    return (select(
+      accountGroups,
+    )..orderBy([(table) => OrderingTerm.asc(table.name)])).get();
+  }
+
   Future<EmailAccount?> getAccount(String id) {
     return (select(
       emailAccounts,
@@ -238,6 +278,75 @@ class AppDatabase extends _$AppDatabase {
 
   Future<void> saveAccount(EmailAccountsCompanion account) {
     return into(emailAccounts).insertOnConflictUpdate(account);
+  }
+
+  Future<void> saveAccountGroup(String name) {
+    final now = DateTime.now();
+    return into(accountGroups).insertOnConflictUpdate(
+      AccountGroupsCompanion(
+        name: Value(name),
+        createdAt: Value(now),
+        updatedAt: Value(now),
+      ),
+    );
+  }
+
+  Future<int> countAccountsInGroup(String name) {
+    return (select(emailAccounts)
+          ..where((table) => table.groupName.equals(name)))
+        .get()
+        .then((accounts) => accounts.length);
+  }
+
+  Future<void> deleteAccountGroup(String name) {
+    return (delete(
+      accountGroups,
+    )..where((table) => table.name.equals(name))).go();
+  }
+
+  Future<void> renameAccountGroup({
+    required String oldName,
+    required String newName,
+  }) {
+    return transaction(() async {
+      final now = DateTime.now();
+      await into(accountGroups).insertOnConflictUpdate(
+        AccountGroupsCompanion(
+          name: Value(newName),
+          createdAt: Value(now),
+          updatedAt: Value(now),
+        ),
+      );
+      await (update(
+        emailAccounts,
+      )..where((table) => table.groupName.equals(oldName))).write(
+        EmailAccountsCompanion(
+          groupName: Value(newName),
+          updatedAt: Value(now),
+        ),
+      );
+      await deleteAccountGroup(oldName);
+    });
+  }
+
+  Future<void> moveAccountsToGroup({
+    required List<String> accountIds,
+    required String groupName,
+  }) {
+    return transaction(() async {
+      await saveAccountGroup(groupName);
+      final now = DateTime.now();
+      for (final accountId in accountIds) {
+        await (update(
+          emailAccounts,
+        )..where((table) => table.id.equals(accountId))).write(
+          EmailAccountsCompanion(
+            groupName: Value(groupName),
+            updatedAt: Value(now),
+          ),
+        );
+      }
+    });
   }
 
   Future<void> setAccountSyncEnabled(String id, bool enabled) {
@@ -262,6 +371,27 @@ class AppDatabase extends _$AppDatabase {
       )..where((table) => table.accountId.equals(id))).go();
       await (delete(emailAccounts)..where((table) => table.id.equals(id))).go();
     });
+  }
+
+  Future<void> _backfillAccountGroups() async {
+    if (!await _tableExists(emailAccounts)) {
+      return;
+    }
+    final accounts = await watchableAccountsSnapshot();
+    final names = accounts.map((account) => account.groupName).toSet();
+    if (names.isEmpty) {
+      names.add('Personal');
+    }
+    final now = DateTime.now();
+    for (final name in names) {
+      await into(accountGroups).insertOnConflictUpdate(
+        AccountGroupsCompanion(
+          name: Value(name),
+          createdAt: Value(now),
+          updatedAt: Value(now),
+        ),
+      );
+    }
   }
 
   Stream<List<DraftMessage>> watchDrafts() {
@@ -320,30 +450,54 @@ class AppDatabase extends _$AppDatabase {
   }
 
   Stream<List<LocalMailMessage>> watchLocalMailMessages() {
-    return (select(
-      localMailMessages,
-    )..orderBy([(table) => OrderingTerm.desc(table.receivedAt)])).watch();
+    return (select(localMailMessages)
+          ..orderBy([(table) => OrderingTerm.desc(table.receivedAt)]))
+        .watch()
+        .map(_deduplicateLocalMailMessages);
+  }
+
+  List<LocalMailMessage> _deduplicateLocalMailMessages(
+    List<LocalMailMessage> messages,
+  ) {
+    final byKey = <String, LocalMailMessage>{};
+    for (final message in messages) {
+      final key =
+          '${message.accountId}:${_normalizeFolderName(message.folderName)}:${message.uid}';
+      final existing = byKey[key];
+      if (existing == null || message.updatedAt.isAfter(existing.updatedAt)) {
+        byKey[key] = message;
+      }
+    }
+    final deduplicated = byKey.values.toList();
+    deduplicated.sort((a, b) => b.receivedAt.compareTo(a.receivedAt));
+    return deduplicated;
   }
 
   Future<LocalMailMessage?> getLocalMailMessage({
     required String accountId,
     required String folderName,
     required int uid,
-  }) {
-    return (select(localMailMessages)..where(
-          (table) =>
-              table.accountId.equals(accountId) &
-              table.folderName.equals(folderName) &
-              table.uid.equals(uid),
-        ))
-        .getSingleOrNull();
+  }) async {
+    final normalizedFolderName = _normalizeFolderName(folderName);
+    final matches = await _matchingLocalMailMessages(
+      accountId: accountId,
+      folderName: normalizedFolderName,
+      uid: uid,
+    ).get();
+    if (matches.isEmpty) {
+      return null;
+    }
+    matches.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+    return matches.first;
   }
 
   Future<void> saveLocalMailMessages(
     List<LocalMailMessagesCompanion> messages,
   ) {
-    return batch((batch) {
-      batch.insertAllOnConflictUpdate(localMailMessages, messages);
+    return transaction(() async {
+      for (final message in messages) {
+        await upsertLocalMailMessage(message);
+      }
     });
   }
 
@@ -352,11 +506,12 @@ class AppDatabase extends _$AppDatabase {
     required String folderName,
     required int uid,
   }) {
+    final normalizedFolderName = _normalizeFolderName(folderName);
     return (select(localMailAttachments)
           ..where(
             (table) =>
                 table.accountId.equals(accountId) &
-                table.folderName.equals(folderName) &
+                table.folderName.lower().equals(normalizedFolderName) &
                 table.messageUid.equals(uid),
           )
           ..orderBy([(table) => OrderingTerm.asc(table.fileName)]))
@@ -368,21 +523,99 @@ class AppDatabase extends _$AppDatabase {
     required List<LocalMailAttachmentsCompanion> attachments,
   }) {
     return transaction(() async {
-      await into(localMailMessages).insertOnConflictUpdate(message);
       final accountId = message.accountId.value;
-      final folderName = message.folderName.value;
+      final folderName = _normalizeFolderName(message.folderName.value);
       final uid = message.uid.value;
+      await upsertLocalMailMessage(
+        message.copyWith(folderName: Value(folderName)),
+      );
       await (delete(localMailAttachments)..where(
             (table) =>
                 table.accountId.equals(accountId) &
-                table.folderName.equals(folderName) &
+                table.folderName.lower().equals(folderName) &
                 table.messageUid.equals(uid),
           ))
           .go();
       for (final attachment in attachments) {
-        await into(localMailAttachments).insertOnConflictUpdate(attachment);
+        await into(localMailAttachments).insertOnConflictUpdate(
+          attachment.copyWith(folderName: Value(folderName)),
+        );
       }
     });
+  }
+
+  Future<void> markLocalMailMessageRead({
+    required String accountId,
+    required String folderName,
+    required int uid,
+    required bool isRead,
+  }) async {
+    final matches = await _matchingLocalMailMessages(
+      accountId: accountId,
+      folderName: folderName,
+      uid: uid,
+    ).get();
+    if (matches.isEmpty) {
+      return;
+    }
+    final now = DateTime.now();
+    await (update(localMailMessages)..where(
+          (table) => table.id.isIn(matches.map((message) => message.id)),
+        ))
+        .write(
+          LocalMailMessagesCompanion(
+            isRead: Value(isRead),
+            updatedAt: Value(now),
+          ),
+        );
+  }
+
+  Future<void> upsertLocalMailMessage(
+    LocalMailMessagesCompanion message,
+  ) async {
+    final accountId = message.accountId.value;
+    final folderName = _normalizeFolderName(message.folderName.value);
+    final uid = message.uid.value;
+    final normalizedMessage = message.copyWith(folderName: Value(folderName));
+    final matches = await _matchingLocalMailMessages(
+      accountId: accountId,
+      folderName: folderName,
+      uid: uid,
+    ).get();
+    if (matches.isEmpty) {
+      await into(localMailMessages).insert(normalizedMessage);
+      return;
+    }
+    matches.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+    final keep = matches.first;
+    final duplicateIds = matches.skip(1).map((message) => message.id).toList();
+    if (duplicateIds.isNotEmpty) {
+      await (delete(
+        localMailMessages,
+      )..where((table) => table.id.isIn(duplicateIds))).go();
+    }
+    await (update(
+      localMailMessages,
+    )..where((table) => table.id.equals(keep.id))).write(normalizedMessage);
+  }
+
+  SimpleSelectStatement<$LocalMailMessagesTable, LocalMailMessage>
+  _matchingLocalMailMessages({
+    required String accountId,
+    required String folderName,
+    required int uid,
+  }) {
+    final normalizedFolderName = _normalizeFolderName(folderName);
+    return select(localMailMessages)..where(
+      (table) =>
+          table.accountId.equals(accountId) &
+          table.folderName.lower().equals(normalizedFolderName) &
+          table.uid.equals(uid),
+    );
+  }
+
+  String _normalizeFolderName(String folderName) {
+    return folderName.trim().toLowerCase();
   }
 
   Future<MailSyncCursorEntry?> getMailSyncCursor({

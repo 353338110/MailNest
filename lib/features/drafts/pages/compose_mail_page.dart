@@ -7,8 +7,10 @@ import '../../../app/localization/app_language.dart';
 import '../../../app/theme/app_spacing.dart';
 import '../../../core/database/app_database.dart';
 import '../../../l10n/generated/app_localizations.dart';
+import '../../../mail/models/outgoing_message.dart';
 import '../../../mail/repository/account_repository_provider.dart';
 import '../../../mail/repository/draft_repository_provider.dart';
+import '../../../mail/repository/mail_repository_provider.dart';
 import '../../translation/widgets/translation_sheet.dart';
 
 class ComposeMailPage extends ConsumerStatefulWidget {
@@ -35,6 +37,7 @@ class _ComposeMailPageState extends ConsumerState<ComposeMailPage> {
   bool _isLoading = false;
   bool _isSaving = false;
   bool _isDeleting = false;
+  bool _isSending = false;
   bool _isInitializing = true;
   DateTime? _lastSavedAt;
 
@@ -83,18 +86,31 @@ class _ComposeMailPageState extends ConsumerState<ComposeMailPage> {
         title: Text(_draftId == null ? l10n.composeMail : l10n.editDraft),
         actions: [
           IconButton(
+            tooltip: l10n.send,
+            onPressed: _canSubmit ? _sendMessage : null,
+            icon: _isSending
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Icon(Icons.send_outlined),
+          ),
+          IconButton(
             tooltip: l10n.translateBody,
-            onPressed: _isLoading ? null : _showTranslationSheet,
+            onPressed: _isLoading || _isSending ? null : _showTranslationSheet,
             icon: const Icon(Icons.translate),
           ),
           IconButton(
             tooltip: l10n.deleteDraft,
-            onPressed: _draftId == null || _isDeleting ? null : _confirmDelete,
+            onPressed: _draftId == null || _isDeleting || _isSending
+                ? null
+                : _confirmDelete,
             icon: const Icon(Icons.delete_outline),
           ),
           IconButton(
             tooltip: l10n.saveDraft,
-            onPressed: _isSaving ? null : _saveDraftManually,
+            onPressed: _isSaving || _isSending ? null : _saveDraftManually,
             icon: const Icon(Icons.save_outlined),
           ),
         ],
@@ -172,13 +188,27 @@ class _ComposeMailPageState extends ConsumerState<ComposeMailPage> {
                 _SaveStatus(isSaving: _isSaving, lastSavedAt: _lastSavedAt),
                 const SizedBox(height: AppSpacing.large),
                 OutlinedButton.icon(
-                  onPressed: _showTranslationSheet,
+                  onPressed: _isSending ? null : _showTranslationSheet,
                   icon: const Icon(Icons.translate),
                   label: Text(l10n.translateBody),
                 ),
                 const SizedBox(height: AppSpacing.small),
                 FilledButton.icon(
-                  onPressed: _isSaving ? null : _saveDraftManually,
+                  onPressed: _canSubmit ? _sendMessage : null,
+                  icon: _isSending
+                      ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.send_outlined),
+                  label: Text(l10n.send),
+                ),
+                const SizedBox(height: AppSpacing.small),
+                FilledButton.tonalIcon(
+                  onPressed: _isSaving || _isSending
+                      ? null
+                      : _saveDraftManually,
                   icon: _isSaving
                       ? const SizedBox(
                           width: 18,
@@ -191,6 +221,10 @@ class _ComposeMailPageState extends ConsumerState<ComposeMailPage> {
               ],
             ),
     );
+  }
+
+  bool get _canSubmit {
+    return !_isLoading && !_isSaving && !_isSending && !_isDeleting;
   }
 
   Future<void> _showTranslationSheet() {
@@ -314,6 +348,64 @@ class _ComposeMailPageState extends ConsumerState<ComposeMailPage> {
     }
   }
 
+  Future<void> _sendMessage() async {
+    final l10n = AppLocalizations.of(context);
+    final accountId = _selectedAccountId;
+    final to = _splitRecipients(_toController.text);
+    final cc = _splitRecipients(_ccController.text);
+    final bcc = _splitRecipients(_bccController.text);
+
+    if (accountId == null || accountId.isEmpty) {
+      _showSnack(l10n.noAccountSelected);
+      return;
+    }
+    if (to.isEmpty && cc.isEmpty && bcc.isEmpty) {
+      _showSnack(l10n.requiredField);
+      return;
+    }
+    if (_subjectController.text.trim().isEmpty &&
+        _bodyController.text.trim().isEmpty) {
+      _showSnack(l10n.emptyDraft);
+      return;
+    }
+
+    _autosaveTimer?.cancel();
+    setState(() => _isSending = true);
+    try {
+      await ref
+          .read(mailRepositoryProvider)
+          .sendMessage(
+            accountId: accountId,
+            message: OutgoingMessage(
+              fromAccountId: accountId,
+              to: to,
+              cc: cc,
+              bcc: bcc,
+              subject: _subjectController.text.trim(),
+              body: _bodyController.text,
+            ),
+          );
+
+      final draftId = _draftId;
+      if (draftId != null) {
+        await ref.read(draftRepositoryProvider).deleteDraft(draftId);
+      }
+      if (!mounted) {
+        return;
+      }
+      _showSnack(l10n.sentMessages);
+      Navigator.of(context).pop();
+    } on Object catch (error) {
+      if (mounted) {
+        _showSnack('${l10n.send}: $error');
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isSending = false);
+      }
+    }
+  }
+
   Future<void> _confirmDelete() async {
     final l10n = AppLocalizations.of(context);
     final shouldDelete = await showDialog<bool>(
@@ -353,6 +445,20 @@ class _ComposeMailPageState extends ConsumerState<ComposeMailPage> {
       ).showSnackBar(SnackBar(content: Text(l10n.draftDeleted)));
       Navigator.of(context).pop();
     }
+  }
+
+  List<String> _splitRecipients(String value) {
+    return value
+        .split(RegExp(r'[,;\\s]+'))
+        .map((part) => part.trim())
+        .where((part) => part.isNotEmpty)
+        .toList(growable: false);
+  }
+
+  void _showSnack(String message) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 }
 

@@ -40,6 +40,18 @@ class $EmailAccountsTable extends EmailAccounts
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _groupNameMeta = const VerificationMeta(
+    'groupName',
+  );
+  @override
+  late final GeneratedColumn<String> groupName = GeneratedColumn<String>(
+    'group_name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('Personal'),
+  );
   static const VerificationMeta _providerMeta = const VerificationMeta(
     'provider',
   );
@@ -218,6 +230,7 @@ class $EmailAccountsTable extends EmailAccounts
     id,
     emailAddress,
     displayName,
+    groupName,
     provider,
     username,
     authType,
@@ -269,6 +282,12 @@ class $EmailAccountsTable extends EmailAccounts
           data['display_name']!,
           _displayNameMeta,
         ),
+      );
+    }
+    if (data.containsKey('group_name')) {
+      context.handle(
+        _groupNameMeta,
+        groupName.isAcceptableOrUnknown(data['group_name']!, _groupNameMeta),
       );
     }
     if (data.containsKey('provider')) {
@@ -419,6 +438,10 @@ class $EmailAccountsTable extends EmailAccounts
         DriftSqlType.string,
         data['${effectivePrefix}display_name'],
       ),
+      groupName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}group_name'],
+      )!,
       provider: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}provider'],
@@ -492,6 +515,7 @@ class EmailAccount extends DataClass implements Insertable<EmailAccount> {
   final String id;
   final String emailAddress;
   final String? displayName;
+  final String groupName;
   final String provider;
   final String username;
   final String authType;
@@ -511,6 +535,7 @@ class EmailAccount extends DataClass implements Insertable<EmailAccount> {
     required this.id,
     required this.emailAddress,
     this.displayName,
+    required this.groupName,
     required this.provider,
     required this.username,
     required this.authType,
@@ -535,6 +560,7 @@ class EmailAccount extends DataClass implements Insertable<EmailAccount> {
     if (!nullToAbsent || displayName != null) {
       map['display_name'] = Variable<String>(displayName);
     }
+    map['group_name'] = Variable<String>(groupName);
     map['provider'] = Variable<String>(provider);
     map['username'] = Variable<String>(username);
     map['auth_type'] = Variable<String>(authType);
@@ -564,6 +590,7 @@ class EmailAccount extends DataClass implements Insertable<EmailAccount> {
       displayName: displayName == null && nullToAbsent
           ? const Value.absent()
           : Value(displayName),
+      groupName: Value(groupName),
       provider: Value(provider),
       username: Value(username),
       authType: Value(authType),
@@ -595,6 +622,7 @@ class EmailAccount extends DataClass implements Insertable<EmailAccount> {
       id: serializer.fromJson<String>(json['id']),
       emailAddress: serializer.fromJson<String>(json['emailAddress']),
       displayName: serializer.fromJson<String?>(json['displayName']),
+      groupName: serializer.fromJson<String>(json['groupName']),
       provider: serializer.fromJson<String>(json['provider']),
       username: serializer.fromJson<String>(json['username']),
       authType: serializer.fromJson<String>(json['authType']),
@@ -619,6 +647,7 @@ class EmailAccount extends DataClass implements Insertable<EmailAccount> {
       'id': serializer.toJson<String>(id),
       'emailAddress': serializer.toJson<String>(emailAddress),
       'displayName': serializer.toJson<String?>(displayName),
+      'groupName': serializer.toJson<String>(groupName),
       'provider': serializer.toJson<String>(provider),
       'username': serializer.toJson<String>(username),
       'authType': serializer.toJson<String>(authType),
@@ -641,6 +670,7 @@ class EmailAccount extends DataClass implements Insertable<EmailAccount> {
     String? id,
     String? emailAddress,
     Value<String?> displayName = const Value.absent(),
+    String? groupName,
     String? provider,
     String? username,
     String? authType,
@@ -660,6 +690,7 @@ class EmailAccount extends DataClass implements Insertable<EmailAccount> {
     id: id ?? this.id,
     emailAddress: emailAddress ?? this.emailAddress,
     displayName: displayName.present ? displayName.value : this.displayName,
+    groupName: groupName ?? this.groupName,
     provider: provider ?? this.provider,
     username: username ?? this.username,
     authType: authType ?? this.authType,
@@ -687,6 +718,7 @@ class EmailAccount extends DataClass implements Insertable<EmailAccount> {
       displayName: data.displayName.present
           ? data.displayName.value
           : this.displayName,
+      groupName: data.groupName.present ? data.groupName.value : this.groupName,
       provider: data.provider.present ? data.provider.value : this.provider,
       username: data.username.present ? data.username.value : this.username,
       authType: data.authType.present ? data.authType.value : this.authType,
@@ -721,6 +753,7 @@ class EmailAccount extends DataClass implements Insertable<EmailAccount> {
           ..write('id: $id, ')
           ..write('emailAddress: $emailAddress, ')
           ..write('displayName: $displayName, ')
+          ..write('groupName: $groupName, ')
           ..write('provider: $provider, ')
           ..write('username: $username, ')
           ..write('authType: $authType, ')
@@ -745,6 +778,7 @@ class EmailAccount extends DataClass implements Insertable<EmailAccount> {
     id,
     emailAddress,
     displayName,
+    groupName,
     provider,
     username,
     authType,
@@ -768,6 +802,7 @@ class EmailAccount extends DataClass implements Insertable<EmailAccount> {
           other.id == this.id &&
           other.emailAddress == this.emailAddress &&
           other.displayName == this.displayName &&
+          other.groupName == this.groupName &&
           other.provider == this.provider &&
           other.username == this.username &&
           other.authType == this.authType &&
@@ -789,6 +824,7 @@ class EmailAccountsCompanion extends UpdateCompanion<EmailAccount> {
   final Value<String> id;
   final Value<String> emailAddress;
   final Value<String?> displayName;
+  final Value<String> groupName;
   final Value<String> provider;
   final Value<String> username;
   final Value<String> authType;
@@ -809,6 +845,7 @@ class EmailAccountsCompanion extends UpdateCompanion<EmailAccount> {
     this.id = const Value.absent(),
     this.emailAddress = const Value.absent(),
     this.displayName = const Value.absent(),
+    this.groupName = const Value.absent(),
     this.provider = const Value.absent(),
     this.username = const Value.absent(),
     this.authType = const Value.absent(),
@@ -830,6 +867,7 @@ class EmailAccountsCompanion extends UpdateCompanion<EmailAccount> {
     required String id,
     required String emailAddress,
     this.displayName = const Value.absent(),
+    this.groupName = const Value.absent(),
     required String provider,
     required String username,
     required String authType,
@@ -863,6 +901,7 @@ class EmailAccountsCompanion extends UpdateCompanion<EmailAccount> {
     Expression<String>? id,
     Expression<String>? emailAddress,
     Expression<String>? displayName,
+    Expression<String>? groupName,
     Expression<String>? provider,
     Expression<String>? username,
     Expression<String>? authType,
@@ -884,6 +923,7 @@ class EmailAccountsCompanion extends UpdateCompanion<EmailAccount> {
       if (id != null) 'id': id,
       if (emailAddress != null) 'email_address': emailAddress,
       if (displayName != null) 'display_name': displayName,
+      if (groupName != null) 'group_name': groupName,
       if (provider != null) 'provider': provider,
       if (username != null) 'username': username,
       if (authType != null) 'auth_type': authType,
@@ -907,6 +947,7 @@ class EmailAccountsCompanion extends UpdateCompanion<EmailAccount> {
     Value<String>? id,
     Value<String>? emailAddress,
     Value<String?>? displayName,
+    Value<String>? groupName,
     Value<String>? provider,
     Value<String>? username,
     Value<String>? authType,
@@ -928,6 +969,7 @@ class EmailAccountsCompanion extends UpdateCompanion<EmailAccount> {
       id: id ?? this.id,
       emailAddress: emailAddress ?? this.emailAddress,
       displayName: displayName ?? this.displayName,
+      groupName: groupName ?? this.groupName,
       provider: provider ?? this.provider,
       username: username ?? this.username,
       authType: authType ?? this.authType,
@@ -958,6 +1000,9 @@ class EmailAccountsCompanion extends UpdateCompanion<EmailAccount> {
     }
     if (displayName.present) {
       map['display_name'] = Variable<String>(displayName.value);
+    }
+    if (groupName.present) {
+      map['group_name'] = Variable<String>(groupName.value);
     }
     if (provider.present) {
       map['provider'] = Variable<String>(provider.value);
@@ -1016,6 +1061,7 @@ class EmailAccountsCompanion extends UpdateCompanion<EmailAccount> {
           ..write('id: $id, ')
           ..write('emailAddress: $emailAddress, ')
           ..write('displayName: $displayName, ')
+          ..write('groupName: $groupName, ')
           ..write('provider: $provider, ')
           ..write('username: $username, ')
           ..write('authType: $authType, ')
@@ -1029,6 +1075,273 @@ class EmailAccountsCompanion extends UpdateCompanion<EmailAccount> {
           ..write('secretRef: $secretRef, ')
           ..write('oauthTokenRef: $oauthTokenRef, ')
           ..write('syncEnabled: $syncEnabled, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $AccountGroupsTable extends AccountGroups
+    with TableInfo<$AccountGroupsTable, AccountGroup> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AccountGroupsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [name, createdAt, updatedAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'account_groups';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<AccountGroup> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {name};
+  @override
+  AccountGroup map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return AccountGroup(
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $AccountGroupsTable createAlias(String alias) {
+    return $AccountGroupsTable(attachedDatabase, alias);
+  }
+}
+
+class AccountGroup extends DataClass implements Insertable<AccountGroup> {
+  final String name;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const AccountGroup({
+    required this.name,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['name'] = Variable<String>(name);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  AccountGroupsCompanion toCompanion(bool nullToAbsent) {
+    return AccountGroupsCompanion(
+      name: Value(name),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory AccountGroup.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return AccountGroup(
+      name: serializer.fromJson<String>(json['name']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'name': serializer.toJson<String>(name),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  AccountGroup copyWith({
+    String? name,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) => AccountGroup(
+    name: name ?? this.name,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  AccountGroup copyWithCompanion(AccountGroupsCompanion data) {
+    return AccountGroup(
+      name: data.name.present ? data.name.value : this.name,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AccountGroup(')
+          ..write('name: $name, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(name, createdAt, updatedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is AccountGroup &&
+          other.name == this.name &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class AccountGroupsCompanion extends UpdateCompanion<AccountGroup> {
+  final Value<String> name;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<int> rowid;
+  const AccountGroupsCompanion({
+    this.name = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  AccountGroupsCompanion.insert({
+    required String name,
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.rowid = const Value.absent(),
+  }) : name = Value(name),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<AccountGroup> custom({
+    Expression<String>? name,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (name != null) 'name': name,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  AccountGroupsCompanion copyWith({
+    Value<String>? name,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return AccountGroupsCompanion(
+      name: name ?? this.name,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AccountGroupsCompanion(')
+          ..write('name: $name, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('rowid: $rowid')
@@ -4700,6 +5013,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $EmailAccountsTable emailAccounts = $EmailAccountsTable(this);
+  late final $AccountGroupsTable accountGroups = $AccountGroupsTable(this);
   late final $AppSettingsTable appSettings = $AppSettingsTable(this);
   late final $DraftMessagesTable draftMessages = $DraftMessagesTable(this);
   late final $SentMessagesTable sentMessages = $SentMessagesTable(this);
@@ -4716,6 +5030,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities => [
     emailAccounts,
+    accountGroups,
     appSettings,
     draftMessages,
     sentMessages,
@@ -4730,6 +5045,7 @@ typedef $$EmailAccountsTableCreateCompanionBuilder =
       required String id,
       required String emailAddress,
       Value<String?> displayName,
+      Value<String> groupName,
       required String provider,
       required String username,
       required String authType,
@@ -4752,6 +5068,7 @@ typedef $$EmailAccountsTableUpdateCompanionBuilder =
       Value<String> id,
       Value<String> emailAddress,
       Value<String?> displayName,
+      Value<String> groupName,
       Value<String> provider,
       Value<String> username,
       Value<String> authType,
@@ -4791,6 +5108,11 @@ class $$EmailAccountsTableFilterComposer
 
   ColumnFilters<String> get displayName => $composableBuilder(
     column: $table.displayName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get groupName => $composableBuilder(
+    column: $table.groupName,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -4894,6 +5216,11 @@ class $$EmailAccountsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get groupName => $composableBuilder(
+    column: $table.groupName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get provider => $composableBuilder(
     column: $table.provider,
     builder: (column) => ColumnOrderings(column),
@@ -4992,6 +5319,9 @@ class $$EmailAccountsTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumn<String> get groupName =>
+      $composableBuilder(column: $table.groupName, builder: (column) => column);
+
   GeneratedColumn<String> get provider =>
       $composableBuilder(column: $table.provider, builder: (column) => column);
 
@@ -5082,6 +5412,7 @@ class $$EmailAccountsTableTableManager
                 Value<String> id = const Value.absent(),
                 Value<String> emailAddress = const Value.absent(),
                 Value<String?> displayName = const Value.absent(),
+                Value<String> groupName = const Value.absent(),
                 Value<String> provider = const Value.absent(),
                 Value<String> username = const Value.absent(),
                 Value<String> authType = const Value.absent(),
@@ -5102,6 +5433,7 @@ class $$EmailAccountsTableTableManager
                 id: id,
                 emailAddress: emailAddress,
                 displayName: displayName,
+                groupName: groupName,
                 provider: provider,
                 username: username,
                 authType: authType,
@@ -5124,6 +5456,7 @@ class $$EmailAccountsTableTableManager
                 required String id,
                 required String emailAddress,
                 Value<String?> displayName = const Value.absent(),
+                Value<String> groupName = const Value.absent(),
                 required String provider,
                 required String username,
                 required String authType,
@@ -5144,6 +5477,7 @@ class $$EmailAccountsTableTableManager
                 id: id,
                 emailAddress: emailAddress,
                 displayName: displayName,
+                groupName: groupName,
                 provider: provider,
                 username: username,
                 authType: authType,
@@ -5184,6 +5518,168 @@ typedef $$EmailAccountsTableProcessedTableManager =
         BaseReferences<_$AppDatabase, $EmailAccountsTable, EmailAccount>,
       ),
       EmailAccount,
+      PrefetchHooks Function()
+    >;
+typedef $$AccountGroupsTableCreateCompanionBuilder =
+    AccountGroupsCompanion Function({
+      required String name,
+      required DateTime createdAt,
+      required DateTime updatedAt,
+      Value<int> rowid,
+    });
+typedef $$AccountGroupsTableUpdateCompanionBuilder =
+    AccountGroupsCompanion Function({
+      Value<String> name,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<int> rowid,
+    });
+
+class $$AccountGroupsTableFilterComposer
+    extends Composer<_$AppDatabase, $AccountGroupsTable> {
+  $$AccountGroupsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$AccountGroupsTableOrderingComposer
+    extends Composer<_$AppDatabase, $AccountGroupsTable> {
+  $$AccountGroupsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$AccountGroupsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $AccountGroupsTable> {
+  $$AccountGroupsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$AccountGroupsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $AccountGroupsTable,
+          AccountGroup,
+          $$AccountGroupsTableFilterComposer,
+          $$AccountGroupsTableOrderingComposer,
+          $$AccountGroupsTableAnnotationComposer,
+          $$AccountGroupsTableCreateCompanionBuilder,
+          $$AccountGroupsTableUpdateCompanionBuilder,
+          (
+            AccountGroup,
+            BaseReferences<_$AppDatabase, $AccountGroupsTable, AccountGroup>,
+          ),
+          AccountGroup,
+          PrefetchHooks Function()
+        > {
+  $$AccountGroupsTableTableManager(_$AppDatabase db, $AccountGroupsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$AccountGroupsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$AccountGroupsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$AccountGroupsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> name = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => AccountGroupsCompanion(
+                name: name,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String name,
+                required DateTime createdAt,
+                required DateTime updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => AccountGroupsCompanion.insert(
+                name: name,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$AccountGroupsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $AccountGroupsTable,
+      AccountGroup,
+      $$AccountGroupsTableFilterComposer,
+      $$AccountGroupsTableOrderingComposer,
+      $$AccountGroupsTableAnnotationComposer,
+      $$AccountGroupsTableCreateCompanionBuilder,
+      $$AccountGroupsTableUpdateCompanionBuilder,
+      (
+        AccountGroup,
+        BaseReferences<_$AppDatabase, $AccountGroupsTable, AccountGroup>,
+      ),
+      AccountGroup,
       PrefetchHooks Function()
     >;
 typedef $$AppSettingsTableCreateCompanionBuilder =
@@ -7020,6 +7516,8 @@ class $AppDatabaseManager {
   $AppDatabaseManager(this._db);
   $$EmailAccountsTableTableManager get emailAccounts =>
       $$EmailAccountsTableTableManager(_db, _db.emailAccounts);
+  $$AccountGroupsTableTableManager get accountGroups =>
+      $$AccountGroupsTableTableManager(_db, _db.accountGroups);
   $$AppSettingsTableTableManager get appSettings =>
       $$AppSettingsTableTableManager(_db, _db.appSettings);
   $$DraftMessagesTableTableManager get draftMessages =>

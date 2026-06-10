@@ -80,6 +80,38 @@ class ImapSmtpMailProvider implements MailProvider {
     throw UnimplementedError('IMAP flags are planned for the IMAP/SMTP phase.');
   }
 
+  Future<void> markMessageReadByUid({
+    required String accountId,
+    required String folderId,
+    required String uid,
+    required bool isRead,
+  }) async {
+    final account = await accountRepository.getAccount(accountId);
+    if (account == null) {
+      throw const MailProtocolException('Account not found.');
+    }
+    final secret = await accountRepository.readSecretForAccount(account);
+    if (secret == null || secret.isEmpty) {
+      throw const MailProtocolException('Account secret is unavailable.');
+    }
+
+    _RawImapClient? client;
+    try {
+      client = await _RawImapClient.connect(
+        host: account.imapHost,
+        port: account.imapPort,
+        security: account.imapSecurity,
+        timeout: timeout,
+      );
+      await client.login(username: account.username, secret: secret);
+      await client.selectMailbox(_mailboxName(folderId));
+      await client.storeSeenFlag(uid: uid, isRead: isRead);
+      await client.logout();
+    } finally {
+      client?.close();
+    }
+  }
+
   @override
   Future<void> sendMessage({
     required String accountId,
@@ -301,6 +333,17 @@ class _RawImapClient {
     }
   }
 
+  Future<void> storeSeenFlag({
+    required String uid,
+    required bool isRead,
+  }) async {
+    final mode = isRead ? '+FLAGS.SILENT' : '-FLAGS.SILENT';
+    final response = await _command('UID STORE $uid $mode (\\Seen)');
+    if (!response.isOk) {
+      throw const MailProtocolException('IMAP flag update failed.');
+    }
+  }
+
   Future<void> logout() async {
     await _command('LOGOUT');
   }
@@ -328,7 +371,10 @@ class _RawImapClient {
 
   Future<String> _readLiteral(int byteCount) async {
     final literal = await _reader.readBytes(byteCount);
-    return utf8.decode(literal, allowMalformed: true);
+    // Preserve the raw 8-bit message bytes in a Dart string. MIME part
+    // charsets are decoded later by SimpleEmailBodyParser; decoding the whole
+    // literal as UTF-8 here would permanently turn GBK/GB2312 bytes into U+FFFD.
+    return latin1.decode(literal);
   }
 }
 
@@ -349,7 +395,7 @@ class _ImapByteReader {
         if (lineBytes.isNotEmpty && lineBytes.last == 0x0d) {
           lineBytes.removeLast();
         }
-        return utf8.decode(lineBytes, allowMalformed: true);
+        return latin1.decode(lineBytes);
       }
       await _readChunk();
     }

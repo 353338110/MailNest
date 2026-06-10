@@ -104,6 +104,39 @@ class AppLocalizationsZh extends AppLocalizations {
   String get displayName => '显示名称';
 
   @override
+  String get accountGroup => '账号分组';
+
+  @override
+  String get accountGroupHelp => '同一分组内的账号会一起查看。';
+
+  @override
+  String get accountGroups => '账号分组';
+
+  @override
+  String get defaultAccountGroup => '个人';
+
+  @override
+  String get accountGroupActions => '分组操作';
+
+  @override
+  String get addAccountGroup => '添加分组';
+
+  @override
+  String get renameAccountGroup => '重命名分组';
+
+  @override
+  String get deleteAccountGroup => '删除分组';
+
+  @override
+  String get moveAccountsToGroup => '批量修改账号分组';
+
+  @override
+  String get accountGroupDeleted => '分组已删除。';
+
+  @override
+  String get accountGroupDeleteBlocked => '此分组下还有账号，不能删除。';
+
+  @override
   String get username => '用户名';
 
   @override
@@ -563,6 +596,27 @@ class AppLocalizationsZh extends AppLocalizations {
   String get htmlShownAsSource => '当前以源码文本显示 HTML。不会加载远程图片。';
 
   @override
+  String get remoteImagesBlocked => '此邮件包含远程图片。为了保护隐私，已默认阻止加载。';
+
+  @override
+  String get loadRemoteImages => '加载图片';
+
+  @override
+  String get viewAsPlainText => '以纯文本查看';
+
+  @override
+  String get htmlSanitizedNotice => 'HTML 已经过安全清洗后显示。脚本和远程内容已被阻止。';
+
+  @override
+  String get unsupportedMessageFormat => '此邮件格式暂不完全支持。';
+
+  @override
+  String get encryptedMessageUnsupported => '此邮件为加密邮件，当前版本暂不支持解密。';
+
+  @override
+  String get signedMessageNotice => '签名验证功能将在后续版本支持。';
+
+  @override
   String get messageLoadFailed => '无法加载邮件。';
 
   @override
@@ -672,6 +726,39 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get displayName => '显示名称';
+
+  @override
+  String get accountGroup => '账号分组';
+
+  @override
+  String get accountGroupHelp => '同一分组内的账号会一起查看。';
+
+  @override
+  String get accountGroups => '账号分组';
+
+  @override
+  String get defaultAccountGroup => '个人';
+
+  @override
+  String get accountGroupActions => '分组操作';
+
+  @override
+  String get addAccountGroup => '添加分组';
+
+  @override
+  String get renameAccountGroup => '重命名分组';
+
+  @override
+  String get deleteAccountGroup => '删除分组';
+
+  @override
+  String get moveAccountsToGroup => '批量修改账号分组';
+
+  @override
+  String get accountGroupDeleted => '分组已删除。';
+
+  @override
+  String get accountGroupDeleteBlocked => '此分组下还有账号，不能删除。';
 
   @override
   String get username => '用户名';
@@ -1064,6 +1151,27 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get htmlShownAsSource => '当前以源码文本显示 HTML。不会加载远程图片。';
 
   @override
+  String get remoteImagesBlocked => '此邮件包含远程图片。为了保护隐私，已默认阻止加载。';
+
+  @override
+  String get loadRemoteImages => '加载图片';
+
+  @override
+  String get viewAsPlainText => '以纯文本查看';
+
+  @override
+  String get htmlSanitizedNotice => 'HTML 已经过安全清洗后显示。脚本和远程内容已被阻止。';
+
+  @override
+  String get unsupportedMessageFormat => '此邮件格式暂不完全支持。';
+
+  @override
+  String get encryptedMessageUnsupported => '此邮件为加密邮件，当前版本暂不支持解密。';
+
+  @override
+  String get signedMessageNotice => '签名验证功能将在后续版本支持。';
+
+  @override
   String get messageLoadFailed => '无法加载邮件。';
 
   @override
@@ -1173,6 +1281,39 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get displayName => '顯示名稱';
+
+  @override
+  String get accountGroup => '帳號分組';
+
+  @override
+  String get accountGroupHelp => '同一分組內的帳號會一起查看。';
+
+  @override
+  String get accountGroups => '帳號分組';
+
+  @override
+  String get defaultAccountGroup => '個人';
+
+  @override
+  String get accountGroupActions => '分組操作';
+
+  @override
+  String get addAccountGroup => '新增分組';
+
+  @override
+  String get renameAccountGroup => '重新命名分組';
+
+  @override
+  String get deleteAccountGroup => '刪除分組';
+
+  @override
+  String get moveAccountsToGroup => '批次修改帳號分組';
+
+  @override
+  String get accountGroupDeleted => '分組已刪除。';
+
+  @override
+  String get accountGroupDeleteBlocked => '此分組下仍有帳號，不能刪除。';
 
   @override
   String get username => '使用者名稱';
@@ -1562,6 +1703,27 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get htmlShownAsSource => '目前以原始碼文字顯示 HTML。不會載入遠端圖片。';
+
+  @override
+  String get remoteImagesBlocked => '此郵件包含遠端圖片。為了保護隱私，已預設阻止載入。';
+
+  @override
+  String get loadRemoteImages => '載入圖片';
+
+  @override
+  String get viewAsPlainText => '以純文字查看';
+
+  @override
+  String get htmlSanitizedNotice => 'HTML 已經過安全清理後顯示。腳本和遠端內容已被阻止。';
+
+  @override
+  String get unsupportedMessageFormat => '此郵件格式暫不完全支援。';
+
+  @override
+  String get encryptedMessageUnsupported => '此郵件為加密郵件，目前版本暫不支援解密。';
+
+  @override
+  String get signedMessageNotice => '簽名驗證功能將在後續版本支援。';
 
   @override
   String get messageLoadFailed => '無法載入郵件。';

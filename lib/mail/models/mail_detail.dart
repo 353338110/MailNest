@@ -1,4 +1,5 @@
 import 'mail_header.dart';
+import '../body/parsed_email_body.dart';
 
 /// Full message content loaded on demand to keep initial sync lightweight.
 class MailDetail {
@@ -7,6 +8,7 @@ class MailDetail {
     required this.body,
     this.isHtml = false,
     this.attachments = const [],
+    this.parsedBody,
     this.cachedAt,
   });
 
@@ -14,6 +16,7 @@ class MailDetail {
   final String body;
   final bool isHtml;
   final List<MailAttachmentInfo> attachments;
+  final ParsedEmailBody? parsedBody;
   final DateTime? cachedAt;
 }
 

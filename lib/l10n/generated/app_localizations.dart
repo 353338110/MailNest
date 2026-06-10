@@ -302,6 +302,72 @@ abstract class AppLocalizations {
   /// **'Display name'**
   String get displayName;
 
+  /// No description provided for @accountGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Account group'**
+  String get accountGroup;
+
+  /// No description provided for @accountGroupHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Accounts in the same group are viewed together.'**
+  String get accountGroupHelp;
+
+  /// No description provided for @accountGroups.
+  ///
+  /// In en, this message translates to:
+  /// **'Account groups'**
+  String get accountGroups;
+
+  /// No description provided for @defaultAccountGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Personal'**
+  String get defaultAccountGroup;
+
+  /// No description provided for @accountGroupActions.
+  ///
+  /// In en, this message translates to:
+  /// **'Group actions'**
+  String get accountGroupActions;
+
+  /// No description provided for @addAccountGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Add group'**
+  String get addAccountGroup;
+
+  /// No description provided for @renameAccountGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename group'**
+  String get renameAccountGroup;
+
+  /// No description provided for @deleteAccountGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete group'**
+  String get deleteAccountGroup;
+
+  /// No description provided for @moveAccountsToGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Move accounts to group'**
+  String get moveAccountsToGroup;
+
+  /// No description provided for @accountGroupDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Group deleted.'**
+  String get accountGroupDeleted;
+
+  /// No description provided for @accountGroupDeleteBlocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Move or delete the accounts in this group before deleting it.'**
+  String get accountGroupDeleteBlocked;
+
   /// No description provided for @username.
   ///
   /// In en, this message translates to:
@@ -1153,6 +1219,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'HTML is shown as source text for now. Remote images are not loaded.'**
   String get htmlShownAsSource;
+
+  /// No description provided for @remoteImagesBlocked.
+  ///
+  /// In en, this message translates to:
+  /// **'This email contains remote images. They are blocked by default to protect your privacy.'**
+  String get remoteImagesBlocked;
+
+  /// No description provided for @loadRemoteImages.
+  ///
+  /// In en, this message translates to:
+  /// **'Load images'**
+  String get loadRemoteImages;
+
+  /// No description provided for @viewAsPlainText.
+  ///
+  /// In en, this message translates to:
+  /// **'View as plain text'**
+  String get viewAsPlainText;
+
+  /// No description provided for @htmlSanitizedNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'HTML has been cleaned before display. Scripts and remote content are blocked.'**
+  String get htmlSanitizedNotice;
+
+  /// No description provided for @unsupportedMessageFormat.
+  ///
+  /// In en, this message translates to:
+  /// **'This email format is not fully supported yet.'**
+  String get unsupportedMessageFormat;
+
+  /// No description provided for @encryptedMessageUnsupported.
+  ///
+  /// In en, this message translates to:
+  /// **'This email is encrypted. Decryption is not supported in this version.'**
+  String get encryptedMessageUnsupported;
+
+  /// No description provided for @signedMessageNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Signature verification will be supported in a later version.'**
+  String get signedMessageNotice;
 
   /// No description provided for @messageLoadFailed.
   ///

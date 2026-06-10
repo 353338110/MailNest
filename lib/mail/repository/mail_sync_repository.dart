@@ -34,7 +34,7 @@ class MailSyncRepository {
   }
 
   Future<void> _syncInbox(EmailAccount account) async {
-    const folderName = 'Inbox';
+    const folderName = 'inbox';
     final cursor = await database.getMailSyncCursor(
       accountId: account.id,
       folderName: folderName,

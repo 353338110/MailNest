@@ -26,6 +26,7 @@ class _AddAccountPageState extends ConsumerState<AddAccountPage> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _nameController = TextEditingController();
+  final _groupController = TextEditingController();
   final _usernameController = TextEditingController();
   final _secretController = TextEditingController();
   final _imapHostController = TextEditingController();
@@ -57,6 +58,7 @@ class _AddAccountPageState extends ConsumerState<AddAccountPage> {
   void dispose() {
     _emailController.dispose();
     _nameController.dispose();
+    _groupController.dispose();
     _usernameController.dispose();
     _secretController.dispose();
     _imapHostController.dispose();
@@ -69,6 +71,9 @@ class _AddAccountPageState extends ConsumerState<AddAccountPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    if (!_isEditing && _groupController.text.isEmpty) {
+      _groupController.text = l10n.defaultAccountGroup;
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -109,6 +114,14 @@ class _AddAccountPageState extends ConsumerState<AddAccountPage> {
                         controller: _nameController,
                         decoration: InputDecoration(
                           labelText: l10n.displayName,
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.medium),
+                      TextFormField(
+                        controller: _groupController,
+                        decoration: InputDecoration(
+                          labelText: l10n.accountGroup,
+                          helperText: l10n.accountGroupHelp,
                         ),
                       ),
                       const SizedBox(height: AppSpacing.medium),
@@ -253,6 +266,7 @@ class _AddAccountPageState extends ConsumerState<AddAccountPage> {
     _editingAccount = account;
     _emailController.text = account.emailAddress;
     _nameController.text = account.displayName ?? '';
+    _groupController.text = account.groupName;
     _usernameController.text = account.username;
     _imapHostController.text = account.imapHost;
     _imapPortController.text = account.imapPort.toString();
@@ -347,6 +361,7 @@ class _AddAccountPageState extends ConsumerState<AddAccountPage> {
             displayName: _nameController.text.trim().isEmpty
                 ? null
                 : _nameController.text.trim(),
+            groupName: _groupController.text,
           );
       if (mounted) {
         ScaffoldMessenger.of(
@@ -379,6 +394,7 @@ class _AddAccountPageState extends ConsumerState<AddAccountPage> {
             displayName: _nameController.text.trim().isEmpty
                 ? null
                 : _nameController.text.trim(),
+            groupName: _groupController.text,
           );
       if (!mounted) {
         return;
@@ -426,6 +442,7 @@ class _AddAccountPageState extends ConsumerState<AddAccountPage> {
             displayName: _nameController.text.trim().isEmpty
                 ? null
                 : _nameController.text.trim(),
+            groupName: _groupController.text,
           );
       if (!mounted) {
         return;
@@ -580,6 +597,7 @@ class _AddAccountPageState extends ConsumerState<AddAccountPage> {
           displayName: _nameController.text.trim().isEmpty
               ? null
               : _nameController.text.trim(),
+          groupName: _groupController.text,
           newSecret: _secretController.text.trim().isEmpty
               ? null
               : _secretController.text,
@@ -609,6 +627,7 @@ class _AddAccountPageState extends ConsumerState<AddAccountPage> {
           displayName: _nameController.text.trim().isEmpty
               ? null
               : _nameController.text.trim(),
+          groupName: _groupController.text,
         );
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(

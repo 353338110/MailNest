@@ -33,9 +33,9 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Mail detail'), findsOneWidget);
-    expect(find.text('Translate message'), findsOneWidget);
+    expect(find.byTooltip('Translate'), findsOneWidget);
 
-    await tester.tap(find.text('Translate message'));
+    await tester.tap(find.byTooltip('Translate'));
     await tester.pumpAndSettle();
     await tester.tap(find.widgetWithText(OutlinedButton, 'Translate'));
     await tester.pumpAndSettle();

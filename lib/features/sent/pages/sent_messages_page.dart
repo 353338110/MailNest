@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -60,82 +62,99 @@ class _SentMessageTile extends ConsumerWidget {
       message.toRecipientsJson,
     );
 
+    final body = _decodeSentBody(message);
+
     return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.medium),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Icon(Icons.outbox_outlined),
-                const SizedBox(width: AppSpacing.medium),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        message.subject.isEmpty
-                            ? l10n.noSubject
-                            : message.subject,
-                        style: Theme.of(context).textTheme.titleMedium,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: AppSpacing.xsmall),
-                      Text(
-                        l10n.sentToRecipients(recipients.join(', ')),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            if (message.bodyPreview.isNotEmpty) ...[
-              const SizedBox(height: AppSpacing.small),
-              Text(
-                message.bodyPreview,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
-            const SizedBox(height: AppSpacing.small),
-            Wrap(
-              spacing: AppSpacing.small,
-              runSpacing: AppSpacing.xsmall,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              children: [
-                _StatusChip(status: status, folderName: message.sentFolderName),
-                Text(
-                  MaterialLocalizations.of(
-                    context,
-                  ).formatFullDate(message.sentAt),
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-                if (status != SentAppendStatus.appended)
-                  TextButton.icon(
-                    onPressed: () => _chooseSentFolder(context, ref),
-                    icon: const Icon(Icons.create_new_folder_outlined),
-                    label: Text(l10n.chooseSentFolder),
-                  ),
-              ],
-            ),
-            if (message.appendError != null) ...[
-              const SizedBox(height: AppSpacing.xsmall),
-              Text(
-                message.appendError!,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Theme.of(context).colorScheme.error,
-                ),
-              ),
-            ],
-          ],
+      child: ExpansionTile(
+        leading: const Icon(Icons.outbox_outlined),
+        title: Text(
+          message.subject.isEmpty ? l10n.noSubject : message.subject,
+          style: Theme.of(context).textTheme.titleMedium,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
         ),
+        subtitle: Text(
+          l10n.sentToRecipients(recipients.join(', ')),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        childrenPadding: const EdgeInsets.fromLTRB(
+          AppSpacing.medium,
+          0,
+          AppSpacing.medium,
+          AppSpacing.medium,
+        ),
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (body.isNotEmpty) ...[
+                const SizedBox(height: AppSpacing.small),
+                SelectableText(body),
+              ] else if (message.bodyPreview.isNotEmpty) ...[
+                const SizedBox(height: AppSpacing.small),
+                SelectableText(message.bodyPreview),
+              ],
+              const SizedBox(height: AppSpacing.small),
+              Wrap(
+                spacing: AppSpacing.small,
+                runSpacing: AppSpacing.xsmall,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  _StatusChip(
+                    status: status,
+                    folderName: message.sentFolderName,
+                  ),
+                  Text(
+                    MaterialLocalizations.of(
+                      context,
+                    ).formatFullDate(message.sentAt),
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                  if (status != SentAppendStatus.appended)
+                    TextButton.icon(
+                      onPressed: () => _chooseSentFolder(context, ref),
+                      icon: const Icon(Icons.create_new_folder_outlined),
+                      label: Text(l10n.chooseSentFolder),
+                    ),
+                ],
+              ),
+              if (message.appendError != null) ...[
+                const SizedBox(height: AppSpacing.xsmall),
+                Text(
+                  message.appendError!,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.error,
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ],
       ),
     );
+  }
+
+  String _decodeSentBody(SentMessage message) {
+    final normalized = message.rfc822Content.replaceAll('\r\n', '\n');
+    final splitIndex = normalized.indexOf('\n\n');
+    if (splitIndex < 0) {
+      return message.bodyPreview.trim();
+    }
+    final headers = normalized.substring(0, splitIndex).toLowerCase();
+    final rawBody = normalized.substring(splitIndex + 2).trim();
+    if (rawBody.isEmpty) {
+      return message.bodyPreview.trim();
+    }
+    if (headers.contains('content-transfer-encoding: base64')) {
+      try {
+        final compact = rawBody.replaceAll(RegExp(r'\s+'), '');
+        return utf8.decode(base64.decode(compact), allowMalformed: true).trim();
+      } on FormatException {
+        return message.bodyPreview.trim();
+      }
+    }
+    return rawBody.trim();
   }
 
   Future<void> _chooseSentFolder(BuildContext context, WidgetRef ref) async {

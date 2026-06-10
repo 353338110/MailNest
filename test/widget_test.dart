@@ -187,6 +187,7 @@ extension on WidgetTester {
 final _testAccount = EmailAccount(
   id: 'a@test.com',
   emailAddress: 'a@test.com',
+  groupName: 'Personal',
   provider: 'custom',
   username: 'a@test.com',
   authType: 'app_password',
@@ -212,6 +213,17 @@ class _FakeAccountRepository extends AccountRepository {
   @override
   Stream<List<EmailAccount>> watchAccounts() {
     return Stream.value([account]);
+  }
+
+  @override
+  Stream<List<AccountGroup>> watchAccountGroups() {
+    return Stream.value([
+      AccountGroup(
+        name: account.groupName,
+        createdAt: DateTime(2026),
+        updatedAt: DateTime(2026),
+      ),
+    ]);
   }
 
   @override

@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 
+import '../body/email_body_parser.dart';
 import '../models/mail_header.dart';
 import '../models/sync_cursor.dart';
 
@@ -482,7 +483,10 @@ Future<Socket> _openSocket({
 Stream<String> _lineStream(Socket socket) {
   return socket
       .cast<List<int>>()
-      .transform(utf8.decoder)
+      // IMAP protocol atoms are ASCII, while header literals may carry
+      // non-UTF-8 bytes. Latin-1 keeps bytes reversible until MIME charset
+      // decoding runs.
+      .transform(latin1.decoder)
       .transform(const LineSplitter())
       .map((line) => line.trimRight());
 }
@@ -579,17 +583,20 @@ List<int> _parseSearchUids(List<String> lines) {
   return const <int>[];
 }
 
-List<MailHeader> _parseFetchedHeaders(List<String> lines) {
+Future<List<MailHeader>> _parseFetchedHeaders(List<String> lines) async {
   final headers = <MailHeader>[];
   _FetchedHeaderBlock? current;
   final headerBuffer = StringBuffer();
 
-  void flush() {
+  Future<void> flush() async {
     if (current == null) {
       return;
     }
     headers.add(
-      _mailHeaderFromBlock(block: current!, rawHeader: headerBuffer.toString()),
+      await _mailHeaderFromBlock(
+        block: current!,
+        rawHeader: headerBuffer.toString(),
+      ),
     );
     current = null;
     headerBuffer.clear();
@@ -597,31 +604,37 @@ List<MailHeader> _parseFetchedHeaders(List<String> lines) {
 
   for (final line in lines) {
     if (line.startsWith('* ') && line.contains(' FETCH ')) {
-      flush();
+      await flush();
       current = _FetchedHeaderBlock.fromLine(line);
       continue;
     }
     if (line == ')') {
-      flush();
+      await flush();
       continue;
     }
     if (current != null) {
       headerBuffer.writeln(line);
     }
   }
-  flush();
+  await flush();
 
   return headers;
 }
 
-MailHeader _mailHeaderFromBlock({
+Future<MailHeader> _mailHeaderFromBlock({
   required _FetchedHeaderBlock block,
   required String rawHeader,
-}) {
+}) async {
   final fields = _parseHeaderFields(rawHeader);
-  final subject = _decodeMimeHeader(fields['subject'] ?? '').trim();
-  final sender = _decodeMimeHeader(fields['from'] ?? '').trim();
-  final recipients = _splitAddresses(_decodeMimeHeader(fields['to'] ?? ''));
+  final subject = (await SimpleEmailBodyParser.decodeHeader(
+    fields['subject'],
+  )).trim();
+  final sender = (await SimpleEmailBodyParser.decodeAddressHeader(
+    fields['from'],
+  )).trim();
+  final recipients = _splitAddresses(
+    await SimpleEmailBodyParser.decodeHeader(fields['to']),
+  );
   final receivedAt =
       parseMailHeaderDate(fields['date']) ??
       block.internalDate ??
@@ -779,48 +792,6 @@ List<String> _splitAddresses(String value) {
       .map((address) => address.trim())
       .where((address) => address.isNotEmpty)
       .toList(growable: false);
-}
-
-String _decodeMimeHeader(String value) {
-  return value.replaceAllMapped(RegExp(r'=\?([^?]+)\?([bBqQ])\?([^?]+)\?='), (
-    match,
-  ) {
-    final charset = match.group(1)!.toLowerCase();
-    final encoding = match.group(2)!.toLowerCase();
-    final payload = match.group(3)!;
-    try {
-      final bytes = encoding == 'b'
-          ? base64Decode(payload)
-          : _decodeQuotedPrintableHeader(payload);
-      if (charset == 'utf-8' || charset == 'utf8') {
-        return utf8.decode(bytes, allowMalformed: true);
-      }
-      if (charset == 'us-ascii') {
-        return ascii.decode(bytes, allowInvalid: true);
-      }
-    } on FormatException {
-      return match.group(0)!;
-    }
-    return match.group(0)!;
-  });
-}
-
-List<int> _decodeQuotedPrintableHeader(String payload) {
-  final normalized = payload.replaceAll('_', ' ');
-  final bytes = <int>[];
-  for (var i = 0; i < normalized.length; i++) {
-    final char = normalized[i];
-    if (char == '=' && i + 2 < normalized.length) {
-      final byte = int.tryParse(normalized.substring(i + 1, i + 3), radix: 16);
-      if (byte != null) {
-        bytes.add(byte);
-        i += 2;
-        continue;
-      }
-    }
-    bytes.add(char.codeUnitAt(0));
-  }
-  return bytes;
 }
 
 String _collapseUidSet(List<int> uids) {
