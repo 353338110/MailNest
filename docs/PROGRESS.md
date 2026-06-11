@@ -152,7 +152,7 @@ flutter test
 ## 开放 PR
 
 - PR #18：Dependabot，`app_links` 7.0.0 -> 7.1.1，待处理。
-- 待 PR：`codex/mail-folder-sync-next`，IMAP 文件夹列表同步和本地保存。
+- PR #20：IMAP 文件夹列表同步和本地保存，待合并。
 
 ## 注意事项
 
