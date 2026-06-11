@@ -736,35 +736,53 @@ class _MailboxNavigation extends ConsumerWidget {
           onTap: () => context.push('/accounts/add'),
         ),
         const SizedBox(height: AppSpacing.small),
-        for (final account in accounts) ...[
-          _AccountNavigationTile(
-            account: account,
-            selected: _isAccountSelected(account.id),
-            onTap: () => onScopeSelected(AccountMailboxScope(account.id)),
-          ),
-          const SizedBox(height: AppSpacing.small),
-          Padding(
-            padding: const EdgeInsets.only(left: AppSpacing.medium),
-            child: Column(
-              children: [
-                for (final folder in standardMailboxFolders)
-                  _NavigationTile(
-                    dense: true,
-                    icon: _folderIcon(folder.type),
-                    title: _folderName(l10n, folder),
-                    selected: _isFolderSelected(account.id, folder.id),
-                    onTap: () => onScopeSelected(
-                      FolderMailboxScope(
-                        accountId: account.id,
-                        folderId: folder.id,
+        if (accounts.isNotEmpty)
+          StreamBuilder<List<LocalMailFolder>>(
+            stream: ref.watch(mailSyncRepositoryProvider).watchFolders(),
+            builder: (context, snapshot) {
+              final folders = snapshot.data ?? const <LocalMailFolder>[];
+              return Column(
+                children: [
+                  for (final account in accounts) ...[
+                    _AccountNavigationTile(
+                      account: account,
+                      selected: _isAccountSelected(account.id),
+                      onTap: () =>
+                          onScopeSelected(AccountMailboxScope(account.id)),
+                    ),
+                    const SizedBox(height: AppSpacing.small),
+                    Padding(
+                      padding: const EdgeInsets.only(left: AppSpacing.medium),
+                      child: Column(
+                        children: [
+                          for (final folder in _foldersForAccount(
+                            account,
+                            folders,
+                          ))
+                            _NavigationTile(
+                              dense: true,
+                              icon: _folderIcon(folder.type),
+                              title: _folderName(l10n, folder),
+                              selected: _isFolderSelected(
+                                account.id,
+                                folder.id,
+                              ),
+                              onTap: () => onScopeSelected(
+                                FolderMailboxScope(
+                                  accountId: account.id,
+                                  folderId: folder.id,
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
                     ),
-                  ),
-              ],
-            ),
+                    const SizedBox(height: AppSpacing.small),
+                  ],
+                ],
+              );
+            },
           ),
-          const SizedBox(height: AppSpacing.small),
-        ],
       ],
     );
   }
@@ -819,6 +837,7 @@ class _MailboxNavigation extends ConsumerWidget {
       MailboxFolderType.sent => Icons.send_outlined,
       MailboxFolderType.drafts => Icons.drafts_outlined,
       MailboxFolderType.trash => Icons.delete_outline,
+      MailboxFolderType.custom => Icons.folder_outlined,
     };
   }
 
@@ -828,6 +847,47 @@ class _MailboxNavigation extends ConsumerWidget {
       MailboxFolderType.sent => l10n.sentMessages,
       MailboxFolderType.drafts => l10n.drafts,
       MailboxFolderType.trash => l10n.trash,
+      MailboxFolderType.custom => folder.name,
+    };
+  }
+
+  List<MailboxFolder> _foldersForAccount(
+    EmailAccount account,
+    List<LocalMailFolder> folders,
+  ) {
+    final synced = folders
+        .where((folder) => folder.accountId == account.id)
+        .map(_mailboxFolderFromLocal)
+        .toList();
+    if (synced.isEmpty) {
+      return standardMailboxFolders;
+    }
+    synced.sort((a, b) => _folderSortKey(a).compareTo(_folderSortKey(b)));
+    return synced;
+  }
+
+  MailboxFolder _mailboxFolderFromLocal(LocalMailFolder folder) {
+    return MailboxFolder(
+      id: folder.folderId,
+      name: folder.name,
+      type: _folderTypeFromStorage(folder.type),
+    );
+  }
+
+  MailboxFolderType _folderTypeFromStorage(String value) {
+    return MailboxFolderType.values.firstWhere(
+      (type) => type.name == value,
+      orElse: () => MailboxFolderType.custom,
+    );
+  }
+
+  int _folderSortKey(MailboxFolder folder) {
+    return switch (folder.type) {
+      MailboxFolderType.inbox => 0,
+      MailboxFolderType.sent => 1,
+      MailboxFolderType.drafts => 2,
+      MailboxFolderType.trash => 3,
+      MailboxFolderType.custom => 10,
     };
   }
 }
@@ -1005,12 +1065,18 @@ class _MailboxHeader extends StatelessWidget {
   String _folderName(AppLocalizations l10n, String folderId) {
     final folder = standardMailboxFolders.firstWhere(
       (folder) => folder.id == folderId,
+      orElse: () => MailboxFolder(
+        id: folderId,
+        name: folderId,
+        type: MailboxFolderType.custom,
+      ),
     );
     return switch (folder.type) {
       MailboxFolderType.inbox => l10n.inbox,
       MailboxFolderType.sent => l10n.sentMessages,
       MailboxFolderType.drafts => l10n.drafts,
       MailboxFolderType.trash => l10n.trash,
+      MailboxFolderType.custom => folder.name,
     };
   }
 }
@@ -1624,6 +1690,7 @@ class _MessageTile extends StatelessWidget {
       MailboxFolderType.sent => l10n.sentMessages,
       MailboxFolderType.drafts => l10n.drafts,
       MailboxFolderType.trash => l10n.trash,
+      MailboxFolderType.custom => message.folder.name,
     };
   }
 }

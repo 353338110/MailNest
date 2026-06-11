@@ -63,6 +63,19 @@ void main() {
     );
     expect(cursor?.lastUid, 42);
     expect(cursor?.syncedAt, now);
+
+    final folders = await database.localMailFoldersSnapshot(
+      accountId: 'user@example.com',
+    );
+    expect(folders, hasLength(2));
+    expect(
+      folders.firstWhere((folder) => folder.folderId == 'inbox').type,
+      'inbox',
+    );
+    expect(
+      folders.firstWhere((folder) => folder.folderId == 'sent messages').type,
+      'sent',
+    );
   });
 }
 
@@ -91,7 +104,13 @@ class _FakeMailProvider implements MailProvider {
         id: 'inbox',
         name: 'Inbox',
         path: 'INBOX',
-        flags: const [r'\HasNoChildren'],
+        flags: const [r'\Inbox', r'\HasNoChildren'],
+      ),
+      MailFolder(
+        id: 'sent messages',
+        name: 'Sent Messages',
+        path: 'Sent Messages',
+        flags: const [r'\Sent', r'\HasNoChildren'],
       ),
     ];
   }

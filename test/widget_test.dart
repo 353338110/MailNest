@@ -242,6 +242,11 @@ class _FakeMailSyncRepository extends MailSyncRepository {
   }
 
   @override
+  Stream<List<LocalMailFolder>> watchFolders() {
+    return Stream.value(const <LocalMailFolder>[]);
+  }
+
+  @override
   Future<void> syncRecentHeaders() async {}
 }
 

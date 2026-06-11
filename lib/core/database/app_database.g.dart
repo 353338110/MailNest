@@ -4594,6 +4594,608 @@ class LocalMailAttachmentsCompanion
   }
 }
 
+class $LocalMailFoldersTable extends LocalMailFolders
+    with TableInfo<$LocalMailFoldersTable, LocalMailFolder> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $LocalMailFoldersTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _accountIdMeta = const VerificationMeta(
+    'accountId',
+  );
+  @override
+  late final GeneratedColumn<String> accountId = GeneratedColumn<String>(
+    'account_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _folderIdMeta = const VerificationMeta(
+    'folderId',
+  );
+  @override
+  late final GeneratedColumn<String> folderId = GeneratedColumn<String>(
+    'folder_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _pathMeta = const VerificationMeta('path');
+  @override
+  late final GeneratedColumn<String> path = GeneratedColumn<String>(
+    'path',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _delimiterMeta = const VerificationMeta(
+    'delimiter',
+  );
+  @override
+  late final GeneratedColumn<String> delimiter = GeneratedColumn<String>(
+    'delimiter',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _flagsJsonMeta = const VerificationMeta(
+    'flagsJson',
+  );
+  @override
+  late final GeneratedColumn<String> flagsJson = GeneratedColumn<String>(
+    'flags_json',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('[]'),
+  );
+  static const VerificationMeta _typeMeta = const VerificationMeta('type');
+  @override
+  late final GeneratedColumn<String> type = GeneratedColumn<String>(
+    'type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('custom'),
+  );
+  static const VerificationMeta _syncedAtMeta = const VerificationMeta(
+    'syncedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> syncedAt = GeneratedColumn<DateTime>(
+    'synced_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    accountId,
+    folderId,
+    name,
+    path,
+    delimiter,
+    flagsJson,
+    type,
+    syncedAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'local_mail_folders';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<LocalMailFolder> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('account_id')) {
+      context.handle(
+        _accountIdMeta,
+        accountId.isAcceptableOrUnknown(data['account_id']!, _accountIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_accountIdMeta);
+    }
+    if (data.containsKey('folder_id')) {
+      context.handle(
+        _folderIdMeta,
+        folderId.isAcceptableOrUnknown(data['folder_id']!, _folderIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_folderIdMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('path')) {
+      context.handle(
+        _pathMeta,
+        path.isAcceptableOrUnknown(data['path']!, _pathMeta),
+      );
+    }
+    if (data.containsKey('delimiter')) {
+      context.handle(
+        _delimiterMeta,
+        delimiter.isAcceptableOrUnknown(data['delimiter']!, _delimiterMeta),
+      );
+    }
+    if (data.containsKey('flags_json')) {
+      context.handle(
+        _flagsJsonMeta,
+        flagsJson.isAcceptableOrUnknown(data['flags_json']!, _flagsJsonMeta),
+      );
+    }
+    if (data.containsKey('type')) {
+      context.handle(
+        _typeMeta,
+        type.isAcceptableOrUnknown(data['type']!, _typeMeta),
+      );
+    }
+    if (data.containsKey('synced_at')) {
+      context.handle(
+        _syncedAtMeta,
+        syncedAt.isAcceptableOrUnknown(data['synced_at']!, _syncedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_syncedAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {accountId, folderId},
+  ];
+  @override
+  LocalMailFolder map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return LocalMailFolder(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      accountId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}account_id'],
+      )!,
+      folderId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}folder_id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      path: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}path'],
+      ),
+      delimiter: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}delimiter'],
+      ),
+      flagsJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}flags_json'],
+      )!,
+      type: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}type'],
+      )!,
+      syncedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}synced_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $LocalMailFoldersTable createAlias(String alias) {
+    return $LocalMailFoldersTable(attachedDatabase, alias);
+  }
+}
+
+class LocalMailFolder extends DataClass implements Insertable<LocalMailFolder> {
+  final String id;
+  final String accountId;
+  final String folderId;
+  final String name;
+  final String? path;
+  final String? delimiter;
+  final String flagsJson;
+  final String type;
+  final DateTime syncedAt;
+  final DateTime updatedAt;
+  const LocalMailFolder({
+    required this.id,
+    required this.accountId,
+    required this.folderId,
+    required this.name,
+    this.path,
+    this.delimiter,
+    required this.flagsJson,
+    required this.type,
+    required this.syncedAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['account_id'] = Variable<String>(accountId);
+    map['folder_id'] = Variable<String>(folderId);
+    map['name'] = Variable<String>(name);
+    if (!nullToAbsent || path != null) {
+      map['path'] = Variable<String>(path);
+    }
+    if (!nullToAbsent || delimiter != null) {
+      map['delimiter'] = Variable<String>(delimiter);
+    }
+    map['flags_json'] = Variable<String>(flagsJson);
+    map['type'] = Variable<String>(type);
+    map['synced_at'] = Variable<DateTime>(syncedAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  LocalMailFoldersCompanion toCompanion(bool nullToAbsent) {
+    return LocalMailFoldersCompanion(
+      id: Value(id),
+      accountId: Value(accountId),
+      folderId: Value(folderId),
+      name: Value(name),
+      path: path == null && nullToAbsent ? const Value.absent() : Value(path),
+      delimiter: delimiter == null && nullToAbsent
+          ? const Value.absent()
+          : Value(delimiter),
+      flagsJson: Value(flagsJson),
+      type: Value(type),
+      syncedAt: Value(syncedAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory LocalMailFolder.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return LocalMailFolder(
+      id: serializer.fromJson<String>(json['id']),
+      accountId: serializer.fromJson<String>(json['accountId']),
+      folderId: serializer.fromJson<String>(json['folderId']),
+      name: serializer.fromJson<String>(json['name']),
+      path: serializer.fromJson<String?>(json['path']),
+      delimiter: serializer.fromJson<String?>(json['delimiter']),
+      flagsJson: serializer.fromJson<String>(json['flagsJson']),
+      type: serializer.fromJson<String>(json['type']),
+      syncedAt: serializer.fromJson<DateTime>(json['syncedAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'accountId': serializer.toJson<String>(accountId),
+      'folderId': serializer.toJson<String>(folderId),
+      'name': serializer.toJson<String>(name),
+      'path': serializer.toJson<String?>(path),
+      'delimiter': serializer.toJson<String?>(delimiter),
+      'flagsJson': serializer.toJson<String>(flagsJson),
+      'type': serializer.toJson<String>(type),
+      'syncedAt': serializer.toJson<DateTime>(syncedAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  LocalMailFolder copyWith({
+    String? id,
+    String? accountId,
+    String? folderId,
+    String? name,
+    Value<String?> path = const Value.absent(),
+    Value<String?> delimiter = const Value.absent(),
+    String? flagsJson,
+    String? type,
+    DateTime? syncedAt,
+    DateTime? updatedAt,
+  }) => LocalMailFolder(
+    id: id ?? this.id,
+    accountId: accountId ?? this.accountId,
+    folderId: folderId ?? this.folderId,
+    name: name ?? this.name,
+    path: path.present ? path.value : this.path,
+    delimiter: delimiter.present ? delimiter.value : this.delimiter,
+    flagsJson: flagsJson ?? this.flagsJson,
+    type: type ?? this.type,
+    syncedAt: syncedAt ?? this.syncedAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  LocalMailFolder copyWithCompanion(LocalMailFoldersCompanion data) {
+    return LocalMailFolder(
+      id: data.id.present ? data.id.value : this.id,
+      accountId: data.accountId.present ? data.accountId.value : this.accountId,
+      folderId: data.folderId.present ? data.folderId.value : this.folderId,
+      name: data.name.present ? data.name.value : this.name,
+      path: data.path.present ? data.path.value : this.path,
+      delimiter: data.delimiter.present ? data.delimiter.value : this.delimiter,
+      flagsJson: data.flagsJson.present ? data.flagsJson.value : this.flagsJson,
+      type: data.type.present ? data.type.value : this.type,
+      syncedAt: data.syncedAt.present ? data.syncedAt.value : this.syncedAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LocalMailFolder(')
+          ..write('id: $id, ')
+          ..write('accountId: $accountId, ')
+          ..write('folderId: $folderId, ')
+          ..write('name: $name, ')
+          ..write('path: $path, ')
+          ..write('delimiter: $delimiter, ')
+          ..write('flagsJson: $flagsJson, ')
+          ..write('type: $type, ')
+          ..write('syncedAt: $syncedAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    accountId,
+    folderId,
+    name,
+    path,
+    delimiter,
+    flagsJson,
+    type,
+    syncedAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is LocalMailFolder &&
+          other.id == this.id &&
+          other.accountId == this.accountId &&
+          other.folderId == this.folderId &&
+          other.name == this.name &&
+          other.path == this.path &&
+          other.delimiter == this.delimiter &&
+          other.flagsJson == this.flagsJson &&
+          other.type == this.type &&
+          other.syncedAt == this.syncedAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class LocalMailFoldersCompanion extends UpdateCompanion<LocalMailFolder> {
+  final Value<String> id;
+  final Value<String> accountId;
+  final Value<String> folderId;
+  final Value<String> name;
+  final Value<String?> path;
+  final Value<String?> delimiter;
+  final Value<String> flagsJson;
+  final Value<String> type;
+  final Value<DateTime> syncedAt;
+  final Value<DateTime> updatedAt;
+  final Value<int> rowid;
+  const LocalMailFoldersCompanion({
+    this.id = const Value.absent(),
+    this.accountId = const Value.absent(),
+    this.folderId = const Value.absent(),
+    this.name = const Value.absent(),
+    this.path = const Value.absent(),
+    this.delimiter = const Value.absent(),
+    this.flagsJson = const Value.absent(),
+    this.type = const Value.absent(),
+    this.syncedAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  LocalMailFoldersCompanion.insert({
+    required String id,
+    required String accountId,
+    required String folderId,
+    required String name,
+    this.path = const Value.absent(),
+    this.delimiter = const Value.absent(),
+    this.flagsJson = const Value.absent(),
+    this.type = const Value.absent(),
+    required DateTime syncedAt,
+    required DateTime updatedAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       accountId = Value(accountId),
+       folderId = Value(folderId),
+       name = Value(name),
+       syncedAt = Value(syncedAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<LocalMailFolder> custom({
+    Expression<String>? id,
+    Expression<String>? accountId,
+    Expression<String>? folderId,
+    Expression<String>? name,
+    Expression<String>? path,
+    Expression<String>? delimiter,
+    Expression<String>? flagsJson,
+    Expression<String>? type,
+    Expression<DateTime>? syncedAt,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (accountId != null) 'account_id': accountId,
+      if (folderId != null) 'folder_id': folderId,
+      if (name != null) 'name': name,
+      if (path != null) 'path': path,
+      if (delimiter != null) 'delimiter': delimiter,
+      if (flagsJson != null) 'flags_json': flagsJson,
+      if (type != null) 'type': type,
+      if (syncedAt != null) 'synced_at': syncedAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  LocalMailFoldersCompanion copyWith({
+    Value<String>? id,
+    Value<String>? accountId,
+    Value<String>? folderId,
+    Value<String>? name,
+    Value<String?>? path,
+    Value<String?>? delimiter,
+    Value<String>? flagsJson,
+    Value<String>? type,
+    Value<DateTime>? syncedAt,
+    Value<DateTime>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return LocalMailFoldersCompanion(
+      id: id ?? this.id,
+      accountId: accountId ?? this.accountId,
+      folderId: folderId ?? this.folderId,
+      name: name ?? this.name,
+      path: path ?? this.path,
+      delimiter: delimiter ?? this.delimiter,
+      flagsJson: flagsJson ?? this.flagsJson,
+      type: type ?? this.type,
+      syncedAt: syncedAt ?? this.syncedAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (accountId.present) {
+      map['account_id'] = Variable<String>(accountId.value);
+    }
+    if (folderId.present) {
+      map['folder_id'] = Variable<String>(folderId.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (path.present) {
+      map['path'] = Variable<String>(path.value);
+    }
+    if (delimiter.present) {
+      map['delimiter'] = Variable<String>(delimiter.value);
+    }
+    if (flagsJson.present) {
+      map['flags_json'] = Variable<String>(flagsJson.value);
+    }
+    if (type.present) {
+      map['type'] = Variable<String>(type.value);
+    }
+    if (syncedAt.present) {
+      map['synced_at'] = Variable<DateTime>(syncedAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LocalMailFoldersCompanion(')
+          ..write('id: $id, ')
+          ..write('accountId: $accountId, ')
+          ..write('folderId: $folderId, ')
+          ..write('name: $name, ')
+          ..write('path: $path, ')
+          ..write('delimiter: $delimiter, ')
+          ..write('flagsJson: $flagsJson, ')
+          ..write('type: $type, ')
+          ..write('syncedAt: $syncedAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $MailSyncCursorsTable extends MailSyncCursors
     with TableInfo<$MailSyncCursorsTable, MailSyncCursorEntry> {
   @override
@@ -5021,6 +5623,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       $LocalMailMessagesTable(this);
   late final $LocalMailAttachmentsTable localMailAttachments =
       $LocalMailAttachmentsTable(this);
+  late final $LocalMailFoldersTable localMailFolders = $LocalMailFoldersTable(
+    this,
+  );
   late final $MailSyncCursorsTable mailSyncCursors = $MailSyncCursorsTable(
     this,
   );
@@ -5036,6 +5641,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     sentMessages,
     localMailMessages,
     localMailAttachments,
+    localMailFolders,
     mailSyncCursors,
   ];
 }
@@ -7279,6 +7885,307 @@ typedef $$LocalMailAttachmentsTableProcessedTableManager =
       LocalMailAttachment,
       PrefetchHooks Function()
     >;
+typedef $$LocalMailFoldersTableCreateCompanionBuilder =
+    LocalMailFoldersCompanion Function({
+      required String id,
+      required String accountId,
+      required String folderId,
+      required String name,
+      Value<String?> path,
+      Value<String?> delimiter,
+      Value<String> flagsJson,
+      Value<String> type,
+      required DateTime syncedAt,
+      required DateTime updatedAt,
+      Value<int> rowid,
+    });
+typedef $$LocalMailFoldersTableUpdateCompanionBuilder =
+    LocalMailFoldersCompanion Function({
+      Value<String> id,
+      Value<String> accountId,
+      Value<String> folderId,
+      Value<String> name,
+      Value<String?> path,
+      Value<String?> delimiter,
+      Value<String> flagsJson,
+      Value<String> type,
+      Value<DateTime> syncedAt,
+      Value<DateTime> updatedAt,
+      Value<int> rowid,
+    });
+
+class $$LocalMailFoldersTableFilterComposer
+    extends Composer<_$AppDatabase, $LocalMailFoldersTable> {
+  $$LocalMailFoldersTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get accountId => $composableBuilder(
+    column: $table.accountId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get folderId => $composableBuilder(
+    column: $table.folderId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get path => $composableBuilder(
+    column: $table.path,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get delimiter => $composableBuilder(
+    column: $table.delimiter,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get flagsJson => $composableBuilder(
+    column: $table.flagsJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get type => $composableBuilder(
+    column: $table.type,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get syncedAt => $composableBuilder(
+    column: $table.syncedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$LocalMailFoldersTableOrderingComposer
+    extends Composer<_$AppDatabase, $LocalMailFoldersTable> {
+  $$LocalMailFoldersTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get accountId => $composableBuilder(
+    column: $table.accountId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get folderId => $composableBuilder(
+    column: $table.folderId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get path => $composableBuilder(
+    column: $table.path,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get delimiter => $composableBuilder(
+    column: $table.delimiter,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get flagsJson => $composableBuilder(
+    column: $table.flagsJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get type => $composableBuilder(
+    column: $table.type,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get syncedAt => $composableBuilder(
+    column: $table.syncedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$LocalMailFoldersTableAnnotationComposer
+    extends Composer<_$AppDatabase, $LocalMailFoldersTable> {
+  $$LocalMailFoldersTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get accountId =>
+      $composableBuilder(column: $table.accountId, builder: (column) => column);
+
+  GeneratedColumn<String> get folderId =>
+      $composableBuilder(column: $table.folderId, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get path =>
+      $composableBuilder(column: $table.path, builder: (column) => column);
+
+  GeneratedColumn<String> get delimiter =>
+      $composableBuilder(column: $table.delimiter, builder: (column) => column);
+
+  GeneratedColumn<String> get flagsJson =>
+      $composableBuilder(column: $table.flagsJson, builder: (column) => column);
+
+  GeneratedColumn<String> get type =>
+      $composableBuilder(column: $table.type, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get syncedAt =>
+      $composableBuilder(column: $table.syncedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$LocalMailFoldersTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $LocalMailFoldersTable,
+          LocalMailFolder,
+          $$LocalMailFoldersTableFilterComposer,
+          $$LocalMailFoldersTableOrderingComposer,
+          $$LocalMailFoldersTableAnnotationComposer,
+          $$LocalMailFoldersTableCreateCompanionBuilder,
+          $$LocalMailFoldersTableUpdateCompanionBuilder,
+          (
+            LocalMailFolder,
+            BaseReferences<
+              _$AppDatabase,
+              $LocalMailFoldersTable,
+              LocalMailFolder
+            >,
+          ),
+          LocalMailFolder,
+          PrefetchHooks Function()
+        > {
+  $$LocalMailFoldersTableTableManager(
+    _$AppDatabase db,
+    $LocalMailFoldersTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$LocalMailFoldersTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$LocalMailFoldersTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$LocalMailFoldersTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> accountId = const Value.absent(),
+                Value<String> folderId = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<String?> path = const Value.absent(),
+                Value<String?> delimiter = const Value.absent(),
+                Value<String> flagsJson = const Value.absent(),
+                Value<String> type = const Value.absent(),
+                Value<DateTime> syncedAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => LocalMailFoldersCompanion(
+                id: id,
+                accountId: accountId,
+                folderId: folderId,
+                name: name,
+                path: path,
+                delimiter: delimiter,
+                flagsJson: flagsJson,
+                type: type,
+                syncedAt: syncedAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String accountId,
+                required String folderId,
+                required String name,
+                Value<String?> path = const Value.absent(),
+                Value<String?> delimiter = const Value.absent(),
+                Value<String> flagsJson = const Value.absent(),
+                Value<String> type = const Value.absent(),
+                required DateTime syncedAt,
+                required DateTime updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => LocalMailFoldersCompanion.insert(
+                id: id,
+                accountId: accountId,
+                folderId: folderId,
+                name: name,
+                path: path,
+                delimiter: delimiter,
+                flagsJson: flagsJson,
+                type: type,
+                syncedAt: syncedAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$LocalMailFoldersTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $LocalMailFoldersTable,
+      LocalMailFolder,
+      $$LocalMailFoldersTableFilterComposer,
+      $$LocalMailFoldersTableOrderingComposer,
+      $$LocalMailFoldersTableAnnotationComposer,
+      $$LocalMailFoldersTableCreateCompanionBuilder,
+      $$LocalMailFoldersTableUpdateCompanionBuilder,
+      (
+        LocalMailFolder,
+        BaseReferences<_$AppDatabase, $LocalMailFoldersTable, LocalMailFolder>,
+      ),
+      LocalMailFolder,
+      PrefetchHooks Function()
+    >;
 typedef $$MailSyncCursorsTableCreateCompanionBuilder =
     MailSyncCursorsCompanion Function({
       required String id,
@@ -7528,6 +8435,8 @@ class $AppDatabaseManager {
       $$LocalMailMessagesTableTableManager(_db, _db.localMailMessages);
   $$LocalMailAttachmentsTableTableManager get localMailAttachments =>
       $$LocalMailAttachmentsTableTableManager(_db, _db.localMailAttachments);
+  $$LocalMailFoldersTableTableManager get localMailFolders =>
+      $$LocalMailFoldersTableTableManager(_db, _db.localMailFolders);
   $$MailSyncCursorsTableTableManager get mailSyncCursors =>
       $$MailSyncCursorsTableTableManager(_db, _db.mailSyncCursors);
 }
