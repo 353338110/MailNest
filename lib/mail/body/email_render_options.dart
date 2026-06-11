@@ -1,7 +1,7 @@
 /// Controls how a parsed email body is rendered for one detail view.
 class EmailRenderOptions {
   const EmailRenderOptions({
-    this.allowRemoteImages = false,
+    this.allowRemoteImages = true,
     this.allowExternalLinks = true,
     this.preferPlainText = false,
     this.enableSelection = true,

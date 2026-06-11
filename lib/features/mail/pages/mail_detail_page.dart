@@ -137,7 +137,7 @@ class _MailDetailScaffold extends StatefulWidget {
 
 class _MailDetailScaffoldState extends State<_MailDetailScaffold> {
   bool _preferPlainText = false;
-  bool _remoteImagesAllowed = false;
+  bool _remoteImagesAllowed = true;
 
   @override
   Widget build(BuildContext context) {
@@ -172,7 +172,7 @@ class _MailDetailInteractiveBody extends StatefulWidget {
 
 class _MailDetailInteractiveBodyState
     extends State<_MailDetailInteractiveBody> {
-  bool _remoteImagesAllowed = false;
+  bool _remoteImagesAllowed = true;
 
   @override
   Widget build(BuildContext context) {
@@ -189,7 +189,7 @@ class _MailDetailInteractiveBodyState
 class _MailDetailBody extends StatelessWidget {
   const _MailDetailBody({
     required this.detail,
-    this.remoteImagesAllowed = false,
+    this.remoteImagesAllowed = true,
     this.preferPlainText = false,
     this.onLoadRemoteImages,
     this.onTogglePlainText,
