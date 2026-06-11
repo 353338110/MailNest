@@ -63,7 +63,11 @@ class BasicEmailBodyRenderer implements EmailBodyRenderer {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             if (body.hasRemoteImages && !options.allowRemoteImages)
-              _InlineNotice(text: l10n.remoteImagesBlocked),
+              _InlineNotice(
+                text: l10n.remoteImagesBlocked,
+                actionLabel: l10n.loadRemoteImages,
+                onAction: options.onLoadRemoteImages,
+              ),
             if (body.isSigned) _InlineNotice(text: l10n.signedMessageNotice),
             _EmailHtmlCanvas(width: canvasWidth, children: widgets),
           ],
@@ -1030,9 +1034,11 @@ class _TextBody extends StatelessWidget {
 }
 
 class _InlineNotice extends StatelessWidget {
-  const _InlineNotice({required this.text});
+  const _InlineNotice({required this.text, this.actionLabel, this.onAction});
 
   final String text;
+  final String? actionLabel;
+  final VoidCallback? onAction;
 
   @override
   Widget build(BuildContext context) {
@@ -1045,12 +1051,18 @@ class _InlineNotice extends StatelessWidget {
         ),
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.medium),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Wrap(
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: AppSpacing.small,
+            runSpacing: AppSpacing.small,
             children: [
               const Icon(Icons.privacy_tip_outlined),
-              const SizedBox(width: AppSpacing.small),
-              Expanded(child: Text(text)),
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 520),
+                child: Text(text),
+              ),
+              if (actionLabel != null && onAction != null)
+                TextButton(onPressed: onAction, child: Text(actionLabel!)),
             ],
           ),
         ),

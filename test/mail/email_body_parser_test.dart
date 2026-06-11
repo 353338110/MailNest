@@ -175,11 +175,23 @@ encrypted
       html: '<p>Hello</p><img src="https://example.com/logo.png">',
       hasRemoteImages: true,
     );
+    var loadRequested = false;
 
-    await tester.pumpWidget(_RendererHost(body: body));
+    await tester.pumpWidget(
+      _RendererHost(
+        body: body,
+        options: EmailRenderOptions(
+          onLoadRemoteImages: () => loadRequested = true,
+        ),
+      ),
+    );
 
     expect(find.byType(Image), findsNothing);
     expect(find.textContaining('remote images'), findsWidgets);
+    expect(find.text('Load images'), findsOneWidget);
+
+    await tester.tap(find.text('Load images'));
+    expect(loadRequested, isTrue);
   });
 
   testWidgets('renderer loads remote images when allowed', (tester) async {

@@ -50,6 +50,10 @@
 - 本 PR：打开邮件后本地立即标记已读，并尽力同步 IMAP `\Seen` 标记。
 - 本 PR：已发送邮件支持展开查看完整正文，正文从本地保存的 RFC822 内容解码。
 
+### 邮件详情与 HTML
+
+- 本 PR：远程图片默认保护隐私不加载，提示条提供“加载图片”操作，点击后仅当前邮件详情加载远程图片。
+
 ## 已验证
 
 最近一次功能 PR 合并前，本地和 GitHub Actions 均通过：
@@ -73,7 +77,7 @@ flutter test
 
 ### 邮件详情与 HTML
 
-- “加载远程图片”交互。
+- 远程图片加载偏好记忆和按发件人信任策略。
 
 ### 附件
 
@@ -137,19 +141,20 @@ flutter test
 建议按以下顺序继续，每项一个 PR：
 
 1. `codex/mail-folder-sync`：IMAP 文件夹列表同步和本地保存。
-2. `codex/html-rendering-privacy`：加载远程图片交互和渲染细节继续完善。
-3. `codex/attachments-cache`：附件下载、缓存和打开。
-4. `codex/reply-forward`：回复、回复全部、转发。
-5. `codex/backup-import`：配置导入和冲突处理。
-6. `codex/gmail-mail-provider`：Gmail 邮件列表、详情和发信。
-7. `codex/outlook-oauth`：Outlook OAuth。
-8. `codex/outlook-mail-provider`：Outlook 邮件列表、详情和发信。
-9. `codex/translation-provider`：真实翻译服务和隐私确认。
-10. `codex/release-workflow`：发布流程和 tag 自动化。
+2. `codex/attachments-cache`：附件下载、缓存和打开。
+3. `codex/reply-forward`：回复、回复全部、转发。
+4. `codex/backup-import`：配置导入和冲突处理。
+5. `codex/gmail-mail-provider`：Gmail 邮件列表、详情和发信。
+6. `codex/outlook-oauth`：Outlook OAuth。
+7. `codex/outlook-mail-provider`：Outlook 邮件列表、详情和发信。
+8. `codex/translation-provider`：真实翻译服务和隐私确认。
+9. `codex/release-workflow`：发布流程和 tag 自动化。
 
 ## 开放 PR
 
-- 当前无开放 PR。
+- PR #18：Dependabot，`app_links` 7.0.0 -> 7.1.1，待处理。
+- PR #20：IMAP 文件夹列表同步和本地保存，CI 等待中。
+- 待 PR：`codex/html-rendering-privacy-next`，加载远程图片交互。
 
 ## 注意事项
 
