@@ -16,6 +16,8 @@ class MailboxRepository {
       UnifiedMailboxScope() => accounts,
       AccountMailboxScope(:final accountId) =>
         accounts.where((account) => account.id == accountId).toList(),
+      GroupMailboxScope(:final groupName) =>
+        accounts.where((account) => account.groupName == groupName).toList(),
       FolderMailboxScope(:final accountId) =>
         accounts.where((account) => account.id == accountId).toList(),
     };
@@ -78,7 +80,7 @@ class MailboxRepository {
       account: account,
       folder: folder,
       header: MailHeader(
-        id: message.id.toString(),
+        id: message.uid.toString(),
         uid: message.uid,
         messageId: message.messageId,
         sender: message.sender,

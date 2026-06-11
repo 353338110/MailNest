@@ -1,6 +1,6 @@
 # MailNest 开发进度
 
-更新时间：2026-06-09
+更新时间：2026-06-10
 
 ## 维护规则
 
@@ -40,6 +40,16 @@
 - PR #16：Gmail OAuth，已合并。
 - PR #17：邮件详情和写信翻译 UI，已合并。
 
+### 本轮修复与增强
+
+- 本 PR：多账号分组管理，支持首页新增、编辑、删除空分组，以及账号批量移动分组。
+- 本 PR：邮件正文兼容渲染，已支持安全清洗、HTML 表格/按钮/链接渲染、内联图片、远程图片加载、GBK/GB2312 等常见编码解码。
+- 本 PR：固定宽度 HTML 邮件按原始画布整体缩放，避免放大或窄屏后表格、页脚和验证码卡片重新排版。
+- 本 PR：邮件详情头部格式优化，补齐主题、发件人、代发、收件人、日期等展示，并修复发件人/标题解码。
+- 本 PR：写信页接入 SMTP 发信，发送成功后保存本地 Sent 记录并清理草稿。
+- 本 PR：打开邮件后本地立即标记已读，并尽力同步 IMAP `\Seen` 标记。
+- 本 PR：已发送邮件支持展开查看完整正文，正文从本地保存的 RFC822 内容解码。
+
 ## 已验证
 
 最近一次功能 PR 合并前，本地和 GitHub Actions 均通过：
@@ -63,10 +73,7 @@ flutter test
 
 ### 邮件详情与 HTML
 
-- HTML 正文安全渲染。
-- 远程图片默认拦截。
 - “加载远程图片”交互。
-- 外部链接使用系统浏览器打开。
 
 ### 附件
 
@@ -78,10 +85,9 @@ flutter test
 
 ### 写邮件与发信
 
-- SMTP 发信主流程接入写邮件页。
 - 回复、回复全部、转发。
 - 添加/删除附件。
-- 发送草稿。
+- 发送草稿的远端草稿箱同步。
 
 ### 配置导入导出
 
@@ -131,16 +137,15 @@ flutter test
 建议按以下顺序继续，每项一个 PR：
 
 1. `codex/mail-folder-sync`：IMAP 文件夹列表同步和本地保存。
-2. `codex/html-rendering-privacy`：HTML 渲染、远程图片拦截、外部链接处理。
+2. `codex/html-rendering-privacy`：加载远程图片交互和渲染细节继续完善。
 3. `codex/attachments-cache`：附件下载、缓存和打开。
-4. `codex/composer-smtp-send`：写邮件页接入 SMTP 发信。
-5. `codex/reply-forward`：回复、回复全部、转发。
-6. `codex/backup-import`：配置导入和冲突处理。
-7. `codex/gmail-mail-provider`：Gmail 邮件列表、详情和发信。
-8. `codex/outlook-oauth`：Outlook OAuth。
-9. `codex/outlook-mail-provider`：Outlook 邮件列表、详情和发信。
-10. `codex/translation-provider`：真实翻译服务和隐私确认。
-11. `codex/release-workflow`：发布流程和 tag 自动化。
+4. `codex/reply-forward`：回复、回复全部、转发。
+5. `codex/backup-import`：配置导入和冲突处理。
+6. `codex/gmail-mail-provider`：Gmail 邮件列表、详情和发信。
+7. `codex/outlook-oauth`：Outlook OAuth。
+8. `codex/outlook-mail-provider`：Outlook 邮件列表、详情和发信。
+9. `codex/translation-provider`：真实翻译服务和隐私确认。
+10. `codex/release-workflow`：发布流程和 tag 自动化。
 
 ## 开放 PR
 

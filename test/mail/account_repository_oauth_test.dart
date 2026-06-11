@@ -68,6 +68,58 @@ void main() {
       isNull,
     );
   });
+
+  test('blocks deleting groups that still contain accounts', () async {
+    await repository.savePasswordAccount(
+      emailAddress: 'user@example.com',
+      username: 'user@example.com',
+      secret: 'secret',
+      provider: EmailProviderType.custom,
+      imapHost: 'imap.example.com',
+      imapPort: 993,
+      imapSecurity: 'ssl',
+      smtpHost: 'smtp.example.com',
+      smtpPort: 465,
+      smtpSecurity: 'ssl',
+      smtpStartTls: false,
+      groupName: 'Work',
+    );
+
+    expect(await repository.deleteGroupIfEmpty('Work'), isFalse);
+
+    await repository.deleteAccount('user@example.com');
+
+    expect(await repository.deleteGroupIfEmpty('Work'), isTrue);
+  });
+
+  test('moves multiple accounts to another group', () async {
+    for (final emailAddress in ['a@example.com', 'b@example.com']) {
+      await repository.savePasswordAccount(
+        emailAddress: emailAddress,
+        username: emailAddress,
+        secret: 'secret',
+        provider: EmailProviderType.custom,
+        imapHost: 'imap.example.com',
+        imapPort: 993,
+        imapSecurity: 'ssl',
+        smtpHost: 'smtp.example.com',
+        smtpPort: 465,
+        smtpSecurity: 'ssl',
+        smtpStartTls: false,
+        groupName: 'Personal',
+      );
+    }
+
+    await repository.moveAccountsToGroup(
+      accountIds: const ['a@example.com', 'b@example.com'],
+      groupName: 'Work',
+    );
+
+    final first = await repository.getAccount('a@example.com');
+    final second = await repository.getAccount('b@example.com');
+    expect(first?.groupName, 'Work');
+    expect(second?.groupName, 'Work');
+  });
 }
 
 class MemorySecureStorage extends SecureStorageService {

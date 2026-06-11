@@ -107,6 +107,40 @@ class AppLocalizationsJa extends AppLocalizations {
   String get displayName => 'Display name';
 
   @override
+  String get accountGroup => 'アカウントグループ';
+
+  @override
+  String get accountGroupHelp => '同じグループのアカウントをまとめて表示します。';
+
+  @override
+  String get accountGroups => 'アカウントグループ';
+
+  @override
+  String get defaultAccountGroup => '個人';
+
+  @override
+  String get accountGroupActions => 'Group actions';
+
+  @override
+  String get addAccountGroup => 'Add group';
+
+  @override
+  String get renameAccountGroup => 'Rename group';
+
+  @override
+  String get deleteAccountGroup => 'Delete group';
+
+  @override
+  String get moveAccountsToGroup => 'Move accounts to group';
+
+  @override
+  String get accountGroupDeleted => 'Group deleted.';
+
+  @override
+  String get accountGroupDeleteBlocked =>
+      'Move or delete the accounts in this group before deleting it.';
+
+  @override
   String get username => 'Username';
 
   @override
@@ -580,6 +614,32 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get htmlShownAsSource =>
       'HTML is shown as source text for now. Remote images are not loaded.';
+
+  @override
+  String get remoteImagesBlocked =>
+      'This email contains remote images. They are blocked by default to protect your privacy.';
+
+  @override
+  String get loadRemoteImages => 'Load images';
+
+  @override
+  String get viewAsPlainText => 'View as plain text';
+
+  @override
+  String get htmlSanitizedNotice =>
+      'HTML has been cleaned before display. Scripts and remote content are blocked.';
+
+  @override
+  String get unsupportedMessageFormat =>
+      'This email format is not fully supported yet.';
+
+  @override
+  String get encryptedMessageUnsupported =>
+      'This email is encrypted. Decryption is not supported in this version.';
+
+  @override
+  String get signedMessageNotice =>
+      'Signature verification will be supported in a later version.';
 
   @override
   String get messageLoadFailed => 'Could not load message.';

@@ -30,6 +30,12 @@ class AccountMailboxScope extends MailboxScope {
   final String accountId;
 }
 
+class GroupMailboxScope extends MailboxScope {
+  const GroupMailboxScope(this.groupName);
+
+  final String groupName;
+}
+
 class FolderMailboxScope extends MailboxScope {
   const FolderMailboxScope({required this.accountId, required this.folderId});
 
