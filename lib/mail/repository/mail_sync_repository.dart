@@ -1,7 +1,10 @@
+import 'dart:convert';
+
 import 'package:drift/drift.dart';
 
 import '../../core/database/app_database.dart';
 import '../../features/accounts/models/email_provider_type.dart';
+import '../models/mail_folder.dart';
 import '../models/mailbox_folder.dart';
 import '../models/sync_cursor.dart';
 import '../provider/mail_provider.dart';
@@ -21,6 +24,10 @@ class MailSyncRepository {
     return database.watchLocalMailMessages();
   }
 
+  Stream<List<LocalMailFolder>> watchFolders() {
+    return database.watchLocalMailFolders();
+  }
+
   Future<void> syncRecentHeaders() async {
     final accounts = await database.watchableAccountsSnapshot();
     final enabledAccounts = accounts.where((account) => account.syncEnabled);
@@ -29,8 +36,59 @@ class MailSyncRepository {
       if (!_supportsImap(account.provider)) {
         continue;
       }
+      await _syncFolders(account);
       await _syncInbox(account);
     }
+  }
+
+  Future<void> syncFolders() async {
+    final accounts = await database.watchableAccountsSnapshot();
+    final enabledAccounts = accounts.where((account) => account.syncEnabled);
+
+    for (final account in enabledAccounts) {
+      if (!_supportsImap(account.provider)) {
+        continue;
+      }
+      await _syncFolders(account);
+    }
+  }
+
+  Future<void> _syncFolders(EmailAccount account) async {
+    final folders = await imapProvider.listFolders(account.id);
+    if (folders.isEmpty) {
+      return;
+    }
+
+    final now = _now();
+    await database.saveLocalMailFolders(
+      folders.map((folder) => _folderCompanion(account, folder, now)).toList(),
+    );
+  }
+
+  LocalMailFoldersCompanion _folderCompanion(
+    EmailAccount account,
+    MailFolder folder,
+    DateTime now,
+  ) {
+    final folderId = folder.id.trim().toLowerCase();
+    final type = mailboxFolderTypeFor(folderId, folder.flags).name;
+    return LocalMailFoldersCompanion(
+      id: Value(
+        AppDatabase.localMailFolderId(
+          accountId: account.id,
+          folderId: folderId,
+        ),
+      ),
+      accountId: Value(account.id),
+      folderId: Value(folderId),
+      name: Value(folder.name),
+      path: Value(folder.path),
+      delimiter: Value(folder.delimiter),
+      flagsJson: Value(jsonEncode(folder.flags)),
+      type: Value(type),
+      syncedAt: Value(now),
+      updatedAt: Value(now),
+    );
   }
 
   Future<void> _syncInbox(EmailAccount account) async {
