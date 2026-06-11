@@ -71,7 +71,7 @@ class MailDetailPage extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: Text(AppLocalizations.of(context).mailDetail)),
       body: future.when(
-        data: (detail) => _MailDetailBody(detail: detail),
+        data: (detail) => _MailDetailInteractiveBody(detail: detail),
         error: (error, _) => const _DetailError(),
         loading: () => const Center(child: CircularProgressIndicator()),
       ),
@@ -99,11 +99,7 @@ class MailDetailEmbeddedView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _MailDetailBody(
-      detail: detail,
-      remoteImagesAllowed: true,
-      preferPlainText: false,
-    );
+    return _MailDetailInteractiveBody(detail: detail);
   }
 }
 
@@ -141,6 +137,7 @@ class _MailDetailScaffold extends StatefulWidget {
 
 class _MailDetailScaffoldState extends State<_MailDetailScaffold> {
   bool _preferPlainText = false;
+  bool _remoteImagesAllowed = true;
 
   @override
   Widget build(BuildContext context) {
@@ -150,8 +147,11 @@ class _MailDetailScaffoldState extends State<_MailDetailScaffold> {
       appBar: AppBar(title: Text(l10n.mailDetail)),
       body: _MailDetailBody(
         detail: widget.detail,
-        remoteImagesAllowed: true,
+        remoteImagesAllowed: _remoteImagesAllowed,
         preferPlainText: _preferPlainText,
+        onLoadRemoteImages: () {
+          setState(() => _remoteImagesAllowed = true);
+        },
         onTogglePlainText: () {
           setState(() => _preferPlainText = !_preferPlainText);
         },
@@ -160,17 +160,45 @@ class _MailDetailScaffoldState extends State<_MailDetailScaffold> {
   }
 }
 
+class _MailDetailInteractiveBody extends StatefulWidget {
+  const _MailDetailInteractiveBody({required this.detail});
+
+  final MailDetail detail;
+
+  @override
+  State<_MailDetailInteractiveBody> createState() =>
+      _MailDetailInteractiveBodyState();
+}
+
+class _MailDetailInteractiveBodyState
+    extends State<_MailDetailInteractiveBody> {
+  bool _remoteImagesAllowed = true;
+
+  @override
+  Widget build(BuildContext context) {
+    return _MailDetailBody(
+      detail: widget.detail,
+      remoteImagesAllowed: _remoteImagesAllowed,
+      onLoadRemoteImages: () {
+        setState(() => _remoteImagesAllowed = true);
+      },
+    );
+  }
+}
+
 class _MailDetailBody extends StatelessWidget {
   const _MailDetailBody({
     required this.detail,
-    this.remoteImagesAllowed = false,
+    this.remoteImagesAllowed = true,
     this.preferPlainText = false,
+    this.onLoadRemoteImages,
     this.onTogglePlainText,
   });
 
   final MailDetail detail;
   final bool remoteImagesAllowed;
   final bool preferPlainText;
+  final VoidCallback? onLoadRemoteImages;
   final VoidCallback? onTogglePlainText;
 
   @override
@@ -224,6 +252,7 @@ class _MailDetailBody extends StatelessWidget {
                                 options: EmailRenderOptions(
                                   allowRemoteImages: remoteImagesAllowed,
                                   preferPlainText: preferPlainText,
+                                  onLoadRemoteImages: onLoadRemoteImages,
                                 ),
                               ),
                               if (detail.attachments.isNotEmpty) ...[

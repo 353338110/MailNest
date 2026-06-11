@@ -170,33 +170,42 @@ encrypted
     expect(find.text('Hello'), findsOneWidget);
   });
 
-  testWidgets('renderer blocks remote images by default', (tester) async {
+  testWidgets('renderer loads remote images by default', (tester) async {
     const body = ParsedEmailBody(
       html: '<p>Hello</p><img src="https://example.com/logo.png">',
       hasRemoteImages: true,
     );
 
-    await tester.pumpWidget(_RendererHost(body: body));
-
-    expect(find.byType(Image), findsNothing);
-    expect(find.textContaining('remote images'), findsWidgets);
-  });
-
-  testWidgets('renderer loads remote images when allowed', (tester) async {
-    const body = ParsedEmailBody(
-      html: '<p>Hello</p><img src="https://example.com/logo.png">',
-      hasRemoteImages: true,
-    );
-
-    await tester.pumpWidget(
-      const _RendererHost(
-        body: body,
-        options: EmailRenderOptions(allowRemoteImages: true),
-      ),
-    );
+    await tester.pumpWidget(const _RendererHost(body: body));
 
     expect(find.byType(Image), findsOneWidget);
     expect(find.textContaining('remote images'), findsNothing);
+    expect(find.text('Load images'), findsNothing);
+  });
+
+  testWidgets('renderer can explicitly block remote images', (tester) async {
+    const body = ParsedEmailBody(
+      html: '<p>Hello</p><img src="https://example.com/logo.png">',
+      hasRemoteImages: true,
+    );
+    var loadRequested = false;
+
+    await tester.pumpWidget(
+      _RendererHost(
+        body: body,
+        options: EmailRenderOptions(
+          allowRemoteImages: false,
+          onLoadRemoteImages: () => loadRequested = true,
+        ),
+      ),
+    );
+
+    expect(find.byType(Image), findsNothing);
+    expect(find.textContaining('remote images'), findsWidgets);
+    expect(find.text('Load images'), findsOneWidget);
+
+    await tester.tap(find.text('Load images'));
+    expect(loadRequested, isTrue);
   });
 
   testWidgets('renderer respects explicit image dimensions', (tester) async {
