@@ -58,13 +58,14 @@ class BasicEmailBodyRenderer implements EmailBodyRenderer {
         options: options,
       ).build(context);
       if (widgets.isNotEmpty) {
+        final canvasWidth = _EmailHtmlCanvasWidth.detect(sanitized);
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             if (body.hasRemoteImages && !options.allowRemoteImages)
               _InlineNotice(text: l10n.remoteImagesBlocked),
             if (body.isSigned) _InlineNotice(text: l10n.signedMessageNotice),
-            ...widgets,
+            _EmailHtmlCanvas(width: canvasWidth, children: widgets),
           ],
         );
       }
@@ -75,6 +76,91 @@ class BasicEmailBodyRenderer implements EmailBodyRenderer {
     }
 
     return EmailBodyFallbackView(body: body);
+  }
+}
+
+class _EmailHtmlCanvas extends StatelessWidget {
+  const _EmailHtmlCanvas({required this.width, required this.children});
+
+  final double? width;
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    final canvasWidth = width;
+    final content = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: children,
+    );
+
+    if (canvasWidth == null) {
+      return content;
+    }
+
+    final canvas = MediaQuery(
+      data: MediaQuery.of(context).copyWith(textScaler: TextScaler.noScaling),
+      child: SizedBox(width: canvasWidth, child: content),
+    );
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final availableWidth = constraints.maxWidth;
+        if (!availableWidth.isFinite || availableWidth >= canvasWidth) {
+          return Align(alignment: Alignment.topCenter, child: canvas);
+        }
+
+        return FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment: Alignment.topCenter,
+          child: canvas,
+        );
+      },
+    );
+  }
+}
+
+class _EmailHtmlCanvasWidth {
+  const _EmailHtmlCanvasWidth._();
+
+  static double? detect(String html) {
+    final widths = <double>[
+      ..._styleWidths(html),
+      ..._attributeWidths(html),
+    ].where(_isUsefulEmailWidth).toList(growable: false);
+    if (widths.isEmpty) {
+      return null;
+    }
+    return widths.reduce((a, b) => a > b ? a : b);
+  }
+
+  static Iterable<double> _styleWidths(String html) sync* {
+    final matches = RegExp(
+      r'(?:max-)?width\s*:\s*([0-9]+(?:\.[0-9]+)?)px',
+      caseSensitive: false,
+    ).allMatches(html);
+    for (final match in matches) {
+      final width = double.tryParse(match.group(1) ?? '');
+      if (width != null) {
+        yield width;
+      }
+    }
+  }
+
+  static Iterable<double> _attributeWidths(String html) sync* {
+    final matches = RegExp(
+      r'''\bwidth\s*=\s*["']?([0-9]+(?:\.[0-9]+)?)''',
+      caseSensitive: false,
+    ).allMatches(html);
+    for (final match in matches) {
+      final width = double.tryParse(match.group(1) ?? '');
+      if (width != null) {
+        yield width;
+      }
+    }
+  }
+
+  static bool _isUsefulEmailWidth(double width) {
+    return width >= 320 && width <= 900;
   }
 }
 

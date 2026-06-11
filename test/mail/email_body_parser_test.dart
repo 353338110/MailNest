@@ -282,6 +282,34 @@ encrypted
     );
   });
 
+  testWidgets('renderer scales fixed-width email canvas without reflowing', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(360, 800);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    const body = ParsedEmailBody(
+      html:
+          '<div style="max-width:600px; margin:0 auto;">'
+          '<p>输入此临时验证码以继续:</p>'
+          '<table width="600"><tr><td>ChatGPT</td><td>帮助中心</td></tr></table>'
+          '</div>',
+    );
+
+    await tester.pumpWidget(const _RendererHost(body: body));
+
+    expect(find.byType(FittedBox), findsOneWidget);
+    expect(
+      find.byWidgetPredicate(
+        (widget) => widget is SizedBox && widget.width == 600,
+      ),
+      findsOneWidget,
+    );
+    expect(find.text('ChatGPT'), findsOneWidget);
+    expect(find.text('帮助中心'), findsOneWidget);
+  });
+
   testWidgets('renderer makes text and button links clickable', (tester) async {
     const body = ParsedEmailBody(
       html:
