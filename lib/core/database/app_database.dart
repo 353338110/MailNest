@@ -125,6 +125,27 @@ class LocalMailAttachments extends Table {
   Set<Column<Object>> get primaryKey => {id};
 }
 
+class LocalMailFolders extends Table {
+  TextColumn get id => text()();
+  TextColumn get accountId => text()();
+  TextColumn get folderId => text()();
+  TextColumn get name => text()();
+  TextColumn get path => text().nullable()();
+  TextColumn get delimiter => text().nullable()();
+  TextColumn get flagsJson => text().withDefault(const Constant('[]'))();
+  TextColumn get type => text().withDefault(const Constant('custom'))();
+  DateTimeColumn get syncedAt => dateTime()();
+  DateTimeColumn get updatedAt => dateTime()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+
+  @override
+  List<Set<Column<Object>>> get uniqueKeys => [
+    {accountId, folderId},
+  ];
+}
+
 @DataClassName('MailSyncCursorEntry')
 class MailSyncCursors extends Table {
   TextColumn get id => text()();
@@ -147,6 +168,7 @@ class MailSyncCursors extends Table {
     SentMessages,
     LocalMailMessages,
     LocalMailAttachments,
+    LocalMailFolders,
     MailSyncCursors,
   ],
 )
@@ -155,7 +177,7 @@ class AppDatabase extends _$AppDatabase {
     : super(executor ?? driftDatabase(name: 'mailnest'));
 
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 7;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -203,6 +225,9 @@ class AppDatabase extends _$AppDatabase {
       if (from < 6) {
         await _createTableIfMissing(migrator, accountGroups);
         await _backfillAccountGroups();
+      }
+      if (from < 7) {
+        await _createTableIfMissing(migrator, localMailFolders);
       }
     },
   );
@@ -367,6 +392,9 @@ class AppDatabase extends _$AppDatabase {
         localMailAttachments,
       )..where((table) => table.accountId.equals(id))).go();
       await (delete(
+        localMailFolders,
+      )..where((table) => table.accountId.equals(id))).go();
+      await (delete(
         sentMessages,
       )..where((table) => table.accountId.equals(id))).go();
       await (delete(emailAccounts)..where((table) => table.id.equals(id))).go();
@@ -454,6 +482,31 @@ class AppDatabase extends _$AppDatabase {
           ..orderBy([(table) => OrderingTerm.desc(table.receivedAt)]))
         .watch()
         .map(_deduplicateLocalMailMessages);
+  }
+
+  Stream<List<LocalMailFolder>> watchLocalMailFolders() {
+    return (select(localMailFolders)..orderBy([
+          (table) => OrderingTerm.asc(table.accountId),
+          (table) => OrderingTerm.asc(table.name),
+        ]))
+        .watch();
+  }
+
+  Future<List<LocalMailFolder>> localMailFoldersSnapshot({
+    required String accountId,
+  }) {
+    return (select(localMailFolders)
+          ..where((table) => table.accountId.equals(accountId))
+          ..orderBy([(table) => OrderingTerm.asc(table.name)]))
+        .get();
+  }
+
+  Future<void> saveLocalMailFolders(List<LocalMailFoldersCompanion> folders) {
+    return transaction(() async {
+      for (final folder in folders) {
+        await into(localMailFolders).insertOnConflictUpdate(folder);
+      }
+    });
   }
 
   List<LocalMailMessage> _deduplicateLocalMailMessages(
@@ -815,6 +868,13 @@ class AppDatabase extends _$AppDatabase {
     required String folderName,
   }) {
     return '$accountId:${folderName.toLowerCase()}';
+  }
+
+  static String localMailFolderId({
+    required String accountId,
+    required String folderId,
+  }) {
+    return '$accountId:${folderId.trim().toLowerCase()}';
   }
 }
 

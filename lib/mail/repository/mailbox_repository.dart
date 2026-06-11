@@ -99,7 +99,11 @@ class MailboxRepository {
     final normalized = folderName.toLowerCase();
     return standardMailboxFolders.firstWhere(
       (folder) => folder.id == normalized,
-      orElse: () => standardMailboxFolders.first,
+      orElse: () => MailboxFolder(
+        id: normalized,
+        name: folderName,
+        type: mailboxFolderTypeFor(normalized, const []),
+      ),
     );
   }
 
