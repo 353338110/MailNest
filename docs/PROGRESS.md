@@ -154,7 +154,7 @@ flutter test
 
 - PR #18：Dependabot，`app_links` 7.0.0 -> 7.1.1，待处理。
 - PR #20：IMAP 文件夹列表同步和本地保存，CI 等待中。
-- 待 PR：`codex/html-rendering-privacy-next`，加载远程图片交互。
+- PR #21：加载远程图片交互，待合并。
 
 ## 注意事项
 
