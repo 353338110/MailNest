@@ -164,6 +164,120 @@ abstract class AppLocalizations {
   /// **'The first release only includes translation entry points and a mock service.'**
   String get translationMockOnly;
 
+  /// No description provided for @translate.
+  ///
+  /// In en, this message translates to:
+  /// **'Translate'**
+  String get translate;
+
+  /// No description provided for @targetLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'Target language'**
+  String get targetLanguage;
+
+  /// No description provided for @translationSourceEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'There is no text to translate.'**
+  String get translationSourceEmpty;
+
+  /// No description provided for @translationFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Translation failed: {reason}'**
+  String translationFailed(String reason);
+
+  /// No description provided for @translationCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Translation copied.'**
+  String get translationCopied;
+
+  /// No description provided for @translatedText.
+  ///
+  /// In en, this message translates to:
+  /// **'Translation'**
+  String get translatedText;
+
+  /// No description provided for @originalText.
+  ///
+  /// In en, this message translates to:
+  /// **'Original'**
+  String get originalText;
+
+  /// No description provided for @translateAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Translate again'**
+  String get translateAgain;
+
+  /// No description provided for @copyTranslation.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy translation'**
+  String get copyTranslation;
+
+  /// No description provided for @useTranslation.
+  ///
+  /// In en, this message translates to:
+  /// **'Use translation'**
+  String get useTranslation;
+
+  /// No description provided for @mailDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Mail detail'**
+  String get mailDetail;
+
+  /// No description provided for @from.
+  ///
+  /// In en, this message translates to:
+  /// **'From'**
+  String get from;
+
+  /// No description provided for @received.
+  ///
+  /// In en, this message translates to:
+  /// **'Received'**
+  String get received;
+
+  /// No description provided for @translateMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Translate message'**
+  String get translateMessage;
+
+  /// No description provided for @translateBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Translate body'**
+  String get translateBody;
+
+  /// No description provided for @to.
+  ///
+  /// In en, this message translates to:
+  /// **'To'**
+  String get to;
+
+  /// No description provided for @body.
+  ///
+  /// In en, this message translates to:
+  /// **'Body'**
+  String get body;
+
+  /// No description provided for @send.
+  ///
+  /// In en, this message translates to:
+  /// **'Send'**
+  String get send;
+
+  /// No description provided for @openMailDetailPreview.
+  ///
+  /// In en, this message translates to:
+  /// **'Open mail detail preview'**
+  String get openMailDetailPreview;
+
   /// No description provided for @addEmailAccount.
   ///
   /// In en, this message translates to:
@@ -187,6 +301,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Display name'**
   String get displayName;
+
+  /// No description provided for @accountGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Account group'**
+  String get accountGroup;
+
+  /// No description provided for @accountGroupHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Accounts in the same group are viewed together.'**
+  String get accountGroupHelp;
+
+  /// No description provided for @accountGroups.
+  ///
+  /// In en, this message translates to:
+  /// **'Account groups'**
+  String get accountGroups;
+
+  /// No description provided for @defaultAccountGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Personal'**
+  String get defaultAccountGroup;
+
+  /// No description provided for @accountGroupActions.
+  ///
+  /// In en, this message translates to:
+  /// **'Group actions'**
+  String get accountGroupActions;
+
+  /// No description provided for @addAccountGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Add group'**
+  String get addAccountGroup;
+
+  /// No description provided for @renameAccountGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename group'**
+  String get renameAccountGroup;
+
+  /// No description provided for @deleteAccountGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete group'**
+  String get deleteAccountGroup;
+
+  /// No description provided for @moveAccountsToGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Move accounts to group'**
+  String get moveAccountsToGroup;
+
+  /// No description provided for @accountGroupDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Group deleted.'**
+  String get accountGroupDeleted;
+
+  /// No description provided for @accountGroupDeleteBlocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Move or delete the accounts in this group before deleting it.'**
+  String get accountGroupDeleteBlocked;
 
   /// No description provided for @username.
   ///
@@ -265,6 +445,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Real OAuth authorization will be supported in a later version.'**
   String get oauthFutureNotice;
+
+  /// No description provided for @gmailOAuthTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in with Google'**
+  String get gmailOAuthTitle;
+
+  /// No description provided for @gmailOAuthSystemBrowserNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'MailNest opens Google authorization in your system browser and stores tokens only in secure storage.'**
+  String get gmailOAuthSystemBrowserNotice;
+
+  /// No description provided for @authorizeGmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Authorize Gmail'**
+  String get authorizeGmail;
+
+  /// No description provided for @reauthorizeGmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Reauthorize Gmail'**
+  String get reauthorizeGmail;
+
+  /// No description provided for @gmailOAuthConnected.
+  ///
+  /// In en, this message translates to:
+  /// **'Gmail authorization is connected.'**
+  String get gmailOAuthConnected;
+
+  /// No description provided for @gmailReauthorizeHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Use reauthorization if Google access was revoked or token refresh fails.'**
+  String get gmailReauthorizeHelp;
+
+  /// No description provided for @gmailAuthorizationSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Gmail authorization saved.'**
+  String get gmailAuthorizationSaved;
+
+  /// No description provided for @gmailAuthorizationCanceled.
+  ///
+  /// In en, this message translates to:
+  /// **'Gmail authorization canceled.'**
+  String get gmailAuthorizationCanceled;
+
+  /// No description provided for @gmailAuthorizationFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Gmail authorization failed: {reason}'**
+  String gmailAuthorizationFailed(String reason);
+
+  /// No description provided for @gmailReauthorizeEmailMismatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Reauthorize with the same Gmail address.'**
+  String get gmailReauthorizeEmailMismatch;
+
+  /// No description provided for @gmailReauthorizationRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Gmail reauthorization is required.'**
+  String get gmailReauthorizationRequired;
 
   /// No description provided for @ok.
   ///
@@ -397,6 +643,642 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Unknown error'**
   String get unknownError;
+
+  /// No description provided for @searchMail.
+  ///
+  /// In en, this message translates to:
+  /// **'Search mail'**
+  String get searchMail;
+
+  /// No description provided for @searchMailHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Sender, recipient, subject, summary, or cached body'**
+  String get searchMailHint;
+
+  /// No description provided for @clearSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear search'**
+  String get clearSearch;
+
+  /// No description provided for @localSearchLocalOnlyNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Search only covers mail already synced to this device. Mail that has not been synced locally will not appear.'**
+  String get localSearchLocalOnlyNotice;
+
+  /// No description provided for @searchMailEmptyPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Search local synced mail.'**
+  String get searchMailEmptyPrompt;
+
+  /// No description provided for @searchMailFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Search failed. Try again.'**
+  String get searchMailFailed;
+
+  /// No description provided for @noLocalSearchResults.
+  ///
+  /// In en, this message translates to:
+  /// **'No local results for “{query}”.'**
+  String noLocalSearchResults(String query);
+
+  /// No description provided for @localSearchResultCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} local results'**
+  String localSearchResultCount(int count);
+
+  /// No description provided for @noSubject.
+  ///
+  /// In en, this message translates to:
+  /// **'(No subject)'**
+  String get noSubject;
+
+  /// No description provided for @backupAndMigration.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup and migration'**
+  String get backupAndMigration;
+
+  /// No description provided for @backupAndMigrationSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Export an encrypted configuration backup.'**
+  String get backupAndMigrationSubtitle;
+
+  /// No description provided for @exportConfiguration.
+  ///
+  /// In en, this message translates to:
+  /// **'Export configuration'**
+  String get exportConfiguration;
+
+  /// No description provided for @backupExportDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Create an encrypted backup of account configuration, server settings, and app preferences. Import will be added later.'**
+  String get backupExportDescription;
+
+  /// No description provided for @backupIncludes.
+  ///
+  /// In en, this message translates to:
+  /// **'Included'**
+  String get backupIncludes;
+
+  /// No description provided for @backupIncludesAccounts.
+  ///
+  /// In en, this message translates to:
+  /// **'Account configuration'**
+  String get backupIncludesAccounts;
+
+  /// No description provided for @backupIncludesServerSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'IMAP and SMTP configuration'**
+  String get backupIncludesServerSettings;
+
+  /// No description provided for @backupIncludesUserSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'User settings'**
+  String get backupIncludesUserSettings;
+
+  /// No description provided for @backupIncludesLanguageSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Language settings'**
+  String get backupIncludesLanguageSettings;
+
+  /// No description provided for @backupIncludesTranslationSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Translation settings'**
+  String get backupIncludesTranslationSettings;
+
+  /// No description provided for @backupExcludes.
+  ///
+  /// In en, this message translates to:
+  /// **'Not included by default'**
+  String get backupExcludes;
+
+  /// No description provided for @backupExcludesMailBodies.
+  ///
+  /// In en, this message translates to:
+  /// **'Email bodies'**
+  String get backupExcludesMailBodies;
+
+  /// No description provided for @backupExcludesHeaderCache.
+  ///
+  /// In en, this message translates to:
+  /// **'Email header cache'**
+  String get backupExcludesHeaderCache;
+
+  /// No description provided for @backupExcludesAttachmentCache.
+  ///
+  /// In en, this message translates to:
+  /// **'Attachment cache'**
+  String get backupExcludesAttachmentCache;
+
+  /// No description provided for @backupExcludesSearchIndex.
+  ///
+  /// In en, this message translates to:
+  /// **'Search index'**
+  String get backupExcludesSearchIndex;
+
+  /// No description provided for @exportPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Export password'**
+  String get exportPassword;
+
+  /// No description provided for @confirmExportPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm export password'**
+  String get confirmExportPassword;
+
+  /// No description provided for @exportPasswordsDoNotMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords do not match.'**
+  String get exportPasswordsDoNotMatch;
+
+  /// No description provided for @exportPasswordNotSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'This password encrypts the export file and is not saved by MailNest.'**
+  String get exportPasswordNotSaved;
+
+  /// No description provided for @exportBackup.
+  ///
+  /// In en, this message translates to:
+  /// **'Export backup'**
+  String get exportBackup;
+
+  /// No description provided for @exportingBackup.
+  ///
+  /// In en, this message translates to:
+  /// **'Exporting...'**
+  String get exportingBackup;
+
+  /// No description provided for @backupExported.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup exported: {fileName}'**
+  String backupExported(String fileName);
+
+  /// No description provided for @backupExportedTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved to {filePath}'**
+  String backupExportedTo(String filePath);
+
+  /// No description provided for @backupExportFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup export failed.'**
+  String get backupExportFailed;
+
+  /// No description provided for @composeMail.
+  ///
+  /// In en, this message translates to:
+  /// **'Compose'**
+  String get composeMail;
+
+  /// No description provided for @drafts.
+  ///
+  /// In en, this message translates to:
+  /// **'Drafts'**
+  String get drafts;
+
+  /// No description provided for @editDraft.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit draft'**
+  String get editDraft;
+
+  /// No description provided for @saveDraft.
+  ///
+  /// In en, this message translates to:
+  /// **'Save draft'**
+  String get saveDraft;
+
+  /// No description provided for @draftSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Draft saved.'**
+  String get draftSaved;
+
+  /// No description provided for @savingDraft.
+  ///
+  /// In en, this message translates to:
+  /// **'Saving draft...'**
+  String get savingDraft;
+
+  /// No description provided for @draftAutosaveReady.
+  ///
+  /// In en, this message translates to:
+  /// **'Autosave is ready.'**
+  String get draftAutosaveReady;
+
+  /// No description provided for @draftLastSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Last saved at {time}'**
+  String draftLastSaved(String time);
+
+  /// No description provided for @deleteDraft.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete draft'**
+  String get deleteDraft;
+
+  /// No description provided for @deleteDraftTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete draft?'**
+  String get deleteDraftTitle;
+
+  /// No description provided for @deleteDraftMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this local draft from this device?'**
+  String get deleteDraftMessage;
+
+  /// No description provided for @draftDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Draft deleted.'**
+  String get draftDeleted;
+
+  /// No description provided for @draftNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Draft not found.'**
+  String get draftNotFound;
+
+  /// No description provided for @emptyDraft.
+  ///
+  /// In en, this message translates to:
+  /// **'Write something before saving a draft.'**
+  String get emptyDraft;
+
+  /// No description provided for @fromAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'From account'**
+  String get fromAccount;
+
+  /// No description provided for @noAccountSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'No account selected'**
+  String get noAccountSelected;
+
+  /// No description provided for @toRecipients.
+  ///
+  /// In en, this message translates to:
+  /// **'To'**
+  String get toRecipients;
+
+  /// No description provided for @ccRecipients.
+  ///
+  /// In en, this message translates to:
+  /// **'Cc'**
+  String get ccRecipients;
+
+  /// No description provided for @bccRecipients.
+  ///
+  /// In en, this message translates to:
+  /// **'Bcc'**
+  String get bccRecipients;
+
+  /// No description provided for @subject.
+  ///
+  /// In en, this message translates to:
+  /// **'Subject'**
+  String get subject;
+
+  /// No description provided for @messageBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Message'**
+  String get messageBody;
+
+  /// No description provided for @noDraftsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No drafts yet.'**
+  String get noDraftsYet;
+
+  /// No description provided for @untitledDraft.
+  ///
+  /// In en, this message translates to:
+  /// **'Untitled draft'**
+  String get untitledDraft;
+
+  /// No description provided for @toLine.
+  ///
+  /// In en, this message translates to:
+  /// **'To: {recipients}'**
+  String toLine(String recipients);
+
+  /// No description provided for @sentMessages.
+  ///
+  /// In en, this message translates to:
+  /// **'Sent'**
+  String get sentMessages;
+
+  /// No description provided for @noSentMessagesYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No sent messages yet.'**
+  String get noSentMessagesYet;
+
+  /// No description provided for @sentToRecipients.
+  ///
+  /// In en, this message translates to:
+  /// **'To: {recipients}'**
+  String sentToRecipients(String recipients);
+
+  /// No description provided for @chooseSentFolder.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose Sent folder'**
+  String get chooseSentFolder;
+
+  /// No description provided for @sentFolderOnlyLocalRecord.
+  ///
+  /// In en, this message translates to:
+  /// **'Only the local sent record is saved for this message.'**
+  String get sentFolderOnlyLocalRecord;
+
+  /// No description provided for @sentFolderSavePending.
+  ///
+  /// In en, this message translates to:
+  /// **'Saving to Sent'**
+  String get sentFolderSavePending;
+
+  /// No description provided for @sentFolderSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved to {folderName}'**
+  String sentFolderSaved(String folderName);
+
+  /// No description provided for @sentFolderSelectionRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a Sent folder'**
+  String get sentFolderSelectionRequired;
+
+  /// No description provided for @sentFolderSaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Sent folder save failed'**
+  String get sentFolderSaveFailed;
+
+  /// No description provided for @sentFolderAppendSucceeded.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved to {folderName}.'**
+  String sentFolderAppendSucceeded(String folderName);
+
+  /// No description provided for @sentFolderAppendFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save to Sent: {reason}'**
+  String sentFolderAppendFailed(String reason);
+
+  /// No description provided for @inbox.
+  ///
+  /// In en, this message translates to:
+  /// **'Inbox'**
+  String get inbox;
+
+  /// No description provided for @folders.
+  ///
+  /// In en, this message translates to:
+  /// **'Folders'**
+  String get folders;
+
+  /// No description provided for @accounts.
+  ///
+  /// In en, this message translates to:
+  /// **'Accounts'**
+  String get accounts;
+
+  /// No description provided for @composeEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Compose email'**
+  String get composeEmail;
+
+  /// No description provided for @composeFutureNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Email composing will be available in a later version.'**
+  String get composeFutureNotice;
+
+  /// No description provided for @foldersFutureNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Folder navigation will be available after mail sync is added.'**
+  String get foldersFutureNotice;
+
+  /// No description provided for @syncMail.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync mail'**
+  String get syncMail;
+
+  /// No description provided for @mailSyncFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Mail sync failed: {reason}'**
+  String mailSyncFailed(String reason);
+
+  /// No description provided for @retry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get retry;
+
+  /// No description provided for @mailboxes.
+  ///
+  /// In en, this message translates to:
+  /// **'Mailboxes'**
+  String get mailboxes;
+
+  /// No description provided for @unifiedInbox.
+  ///
+  /// In en, this message translates to:
+  /// **'Unified inbox'**
+  String get unifiedInbox;
+
+  /// No description provided for @filters.
+  ///
+  /// In en, this message translates to:
+  /// **'Filters'**
+  String get filters;
+
+  /// No description provided for @unread.
+  ///
+  /// In en, this message translates to:
+  /// **'Unread'**
+  String get unread;
+
+  /// No description provided for @starred.
+  ///
+  /// In en, this message translates to:
+  /// **'Starred'**
+  String get starred;
+
+  /// No description provided for @trash.
+  ///
+  /// In en, this message translates to:
+  /// **'Trash'**
+  String get trash;
+
+  /// No description provided for @account.
+  ///
+  /// In en, this message translates to:
+  /// **'Account'**
+  String get account;
+
+  /// No description provided for @folder.
+  ///
+  /// In en, this message translates to:
+  /// **'Folder'**
+  String get folder;
+
+  /// No description provided for @fullMessageBodiesFutureNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Full message bodies will appear in a later PR.'**
+  String get fullMessageBodiesFutureNotice;
+
+  /// No description provided for @noMessageSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'No message selected'**
+  String get noMessageSelected;
+
+  /// No description provided for @messageContentsPlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Message contents will appear here on wide desktop windows.'**
+  String get messageContentsPlaceholder;
+
+  /// No description provided for @accountMailbox.
+  ///
+  /// In en, this message translates to:
+  /// **'Account mailbox'**
+  String get accountMailbox;
+
+  /// No description provided for @allMessages.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get allMessages;
+
+  /// No description provided for @mailMessageCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} messages'**
+  String mailMessageCount(int count);
+
+  /// No description provided for @noMessagesMatchFilter.
+  ///
+  /// In en, this message translates to:
+  /// **'No messages match this filter.'**
+  String get noMessagesMatchFilter;
+
+  /// No description provided for @noMessages.
+  ///
+  /// In en, this message translates to:
+  /// **'No messages.'**
+  String get noMessages;
+
+  /// No description provided for @attachments.
+  ///
+  /// In en, this message translates to:
+  /// **'Attachments'**
+  String get attachments;
+
+  /// No description provided for @emptyMessageBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This message has no readable body.'**
+  String get emptyMessageBody;
+
+  /// No description provided for @htmlShownAsSource.
+  ///
+  /// In en, this message translates to:
+  /// **'HTML is shown as source text for now. Remote images are not loaded.'**
+  String get htmlShownAsSource;
+
+  /// No description provided for @remoteImagesBlocked.
+  ///
+  /// In en, this message translates to:
+  /// **'This email contains remote images. They are currently blocked.'**
+  String get remoteImagesBlocked;
+
+  /// No description provided for @loadRemoteImages.
+  ///
+  /// In en, this message translates to:
+  /// **'Load images'**
+  String get loadRemoteImages;
+
+  /// No description provided for @viewAsPlainText.
+  ///
+  /// In en, this message translates to:
+  /// **'View as plain text'**
+  String get viewAsPlainText;
+
+  /// No description provided for @htmlSanitizedNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'HTML has been cleaned before display. Scripts and unsafe content are blocked.'**
+  String get htmlSanitizedNotice;
+
+  /// No description provided for @unsupportedMessageFormat.
+  ///
+  /// In en, this message translates to:
+  /// **'This email format is not fully supported yet.'**
+  String get unsupportedMessageFormat;
+
+  /// No description provided for @encryptedMessageUnsupported.
+  ///
+  /// In en, this message translates to:
+  /// **'This email is encrypted. Decryption is not supported in this version.'**
+  String get encryptedMessageUnsupported;
+
+  /// No description provided for @signedMessageNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Signature verification will be supported in a later version.'**
+  String get signedMessageNotice;
+
+  /// No description provided for @messageLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load message.'**
+  String get messageLoadFailed;
+
+  /// No description provided for @formValidationFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Please complete the required account fields.'**
+  String get formValidationFailed;
+
+  /// No description provided for @accountSaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Account save failed: {reason}'**
+  String accountSaveFailed(String reason);
 }
 
 class _AppLocalizationsDelegate
