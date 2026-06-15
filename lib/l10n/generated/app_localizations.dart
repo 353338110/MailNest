@@ -1223,7 +1223,7 @@ abstract class AppLocalizations {
   /// No description provided for @remoteImagesBlocked.
   ///
   /// In en, this message translates to:
-  /// **'This email contains remote images. They are blocked by default to protect your privacy.'**
+  /// **'This email contains remote images. They are currently blocked.'**
   String get remoteImagesBlocked;
 
   /// No description provided for @loadRemoteImages.
@@ -1241,7 +1241,7 @@ abstract class AppLocalizations {
   /// No description provided for @htmlSanitizedNotice.
   ///
   /// In en, this message translates to:
-  /// **'HTML has been cleaned before display. Scripts and remote content are blocked.'**
+  /// **'HTML has been cleaned before display. Scripts and unsafe content are blocked.'**
   String get htmlSanitizedNotice;
 
   /// No description provided for @unsupportedMessageFormat.

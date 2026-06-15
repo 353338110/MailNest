@@ -6,7 +6,7 @@ class EmailBodyDisplayState {
     this.showTranslated = false,
     this.translatedText,
     this.targetLanguage,
-    this.remoteImagesAllowed = false,
+    this.remoteImagesAllowed = true,
     this.preferPlainText = false,
   });
 

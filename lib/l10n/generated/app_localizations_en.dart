@@ -618,7 +618,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get remoteImagesBlocked =>
-      'This email contains remote images. They are blocked by default to protect your privacy.';
+      'This email contains remote images. They are currently blocked.';
 
   @override
   String get loadRemoteImages => 'Load images';
@@ -628,7 +628,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get htmlSanitizedNotice =>
-      'HTML has been cleaned before display. Scripts and remote content are blocked.';
+      'HTML has been cleaned before display. Scripts and unsafe content are blocked.';
 
   @override
   String get unsupportedMessageFormat =>
