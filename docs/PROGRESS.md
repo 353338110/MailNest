@@ -1,6 +1,6 @@
 # MailNest 开发进度
 
-更新时间：2026-06-11
+更新时间：2026-06-15
 
 ## 维护规则
 
@@ -49,10 +49,19 @@
 - 本 PR：写信页接入 SMTP 发信，发送成功后保存本地 Sent 记录并清理草稿。
 - 本 PR：打开邮件后本地立即标记已读，并尽力同步 IMAP `\Seen` 标记。
 - 本 PR：已发送邮件支持展开查看完整正文，正文从本地保存的 RFC822 内容解码。
+- 本 PR：添加账号页的分组字段改为可输入下拉选项，支持选择已有分组或输入新分组并在保存时自动创建。
 
 ### 邮件详情与 HTML
 
 - PR #21：远程图片默认加载，不再默认阻止；保留显式关闭远程图片时的“加载图片”操作入口。
+- 本 PR：统一远程图片默认加载策略，修正旧的“默认阻止”文案和显示状态默认值。
+
+### 附件
+
+- 本 PR：附件下载功能，支持从 IMAP 服务器下载附件到本地缓存。
+- 本 PR：附件类型图标，根据 MIME 类型和文件扩展名显示对应图标（图片、PDF、文档、压缩包等）。
+- 本 PR：附件本地缓存管理，支持查看缓存大小、清理全部缓存、清理 30 天前的旧缓存。
+- 本 PR：使用系统方式打开附件，下载后可用系统默认应用打开。
 
 ### 文件夹同步
 
@@ -72,6 +81,11 @@ flutter test
 
 ## 未完成
 
+### 附件
+
+- 附件下载失败占位和重试体验。
+- 附件 MIME 解析（当前使用占位实现）。
+
 ### 邮件同步
 
 - 更完整的真实同步状态持久化。
@@ -81,14 +95,6 @@ flutter test
 ### 邮件详情与 HTML
 
 - 远程图片加载失败占位和重试体验。
-
-### 附件
-
-- 附件类型图标。
-- 附件下载。
-- 附件本地缓存。
-- 使用系统方式打开附件。
-- 附件缓存清理。
 
 ### 写邮件与发信
 
@@ -143,21 +149,26 @@ flutter test
 
 建议按以下顺序继续，每项一个 PR：
 
-1. `codex/attachments-cache`：附件下载、缓存和打开。
+1. `codex/attachments-polish`：附件 MIME 解析、下载失败占位和重试体验。
 2. `codex/reply-forward`：回复、回复全部、转发。
-3. `codex/backup-import`：配置导入和冲突处理。
-4. `codex/gmail-mail-provider`：Gmail 邮件列表、详情和发信。
-5. `codex/outlook-oauth`：Outlook OAuth。
-6. `codex/outlook-mail-provider`：Outlook 邮件列表、详情和发信。
-7. `codex/translation-provider`：真实翻译服务和隐私确认。
-8. `codex/release-workflow`：发布流程和 tag 自动化。
+3. `codex/compose-attachments`：写邮件添加/删除附件和 SMTP 附件发送。
+4. `codex/backup-import`：配置导入和冲突处理。
+5. `codex/sync-state`：同步状态持久化、多文件夹增量同步和 UIDVALIDITY 处理。
+6. `codex/mail-actions`：删除、星标、标记未读、移动文件夹和批量操作。
+7. `codex/gmail-mail-provider`：Gmail 邮件列表、详情和发信。
+8. `codex/outlook-oauth`：Outlook OAuth。
+9. `codex/outlook-mail-provider`：Outlook 邮件列表、详情和发信。
+10. `codex/translation-provider`：真实翻译服务和隐私确认。
+11. `codex/desktop-mobile-polish`：键盘快捷键、右键菜单和更完整的加载/确认状态。
+12. `codex/release-workflow`：发布流程和 tag 自动化。
 
 ## 开放 PR
 
-- PR #18：Dependabot，`app_links` 7.0.0 -> 7.1.1，待处理。
-- PR #21：加载远程图片交互，待合并。
+- 当前 GitHub 无开放 PR。
+- 本 PR：PR 状态整理，并确认远程图片默认加载策略。
 
 ## 注意事项
 
 - 当前需求文档 `MailNest 项目规划与需求文档.docx` 仍未跟踪，默认不纳入代码 PR。
 - 合并 PR 前需要重新确认 `gh` 可访问 GitHub，并检查 CI 状态。
+- 远程图片策略以用户最新要求为准：默认加载远程图片；仅在显式关闭远程图片时显示“加载图片”入口。

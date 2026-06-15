@@ -596,7 +596,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get htmlShownAsSource => '当前以源码文本显示 HTML。不会加载远程图片。';
 
   @override
-  String get remoteImagesBlocked => '此邮件包含远程图片。为了保护隐私，已默认阻止加载。';
+  String get remoteImagesBlocked => '此邮件包含远程图片，当前已阻止加载。';
 
   @override
   String get loadRemoteImages => '加载图片';
@@ -605,7 +605,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get viewAsPlainText => '以纯文本查看';
 
   @override
-  String get htmlSanitizedNotice => 'HTML 已经过安全清洗后显示。脚本和远程内容已被阻止。';
+  String get htmlSanitizedNotice => 'HTML 已经过安全清洗后显示。脚本和不安全内容已被阻止。';
 
   @override
   String get unsupportedMessageFormat => '此邮件格式暂不完全支持。';
@@ -1151,7 +1151,7 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get htmlShownAsSource => '当前以源码文本显示 HTML。不会加载远程图片。';
 
   @override
-  String get remoteImagesBlocked => '此邮件包含远程图片。为了保护隐私，已默认阻止加载。';
+  String get remoteImagesBlocked => '此邮件包含远程图片，当前已阻止加载。';
 
   @override
   String get loadRemoteImages => '加载图片';
@@ -1160,7 +1160,7 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get viewAsPlainText => '以纯文本查看';
 
   @override
-  String get htmlSanitizedNotice => 'HTML 已经过安全清洗后显示。脚本和远程内容已被阻止。';
+  String get htmlSanitizedNotice => 'HTML 已经过安全清洗后显示。脚本和不安全内容已被阻止。';
 
   @override
   String get unsupportedMessageFormat => '此邮件格式暂不完全支持。';
@@ -1705,7 +1705,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get htmlShownAsSource => '目前以原始碼文字顯示 HTML。不會載入遠端圖片。';
 
   @override
-  String get remoteImagesBlocked => '此郵件包含遠端圖片。為了保護隱私，已預設阻止載入。';
+  String get remoteImagesBlocked => '此郵件包含遠端圖片，目前已阻止載入。';
 
   @override
   String get loadRemoteImages => '載入圖片';
@@ -1714,7 +1714,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get viewAsPlainText => '以純文字查看';
 
   @override
-  String get htmlSanitizedNotice => 'HTML 已經過安全清理後顯示。腳本和遠端內容已被阻止。';
+  String get htmlSanitizedNotice => 'HTML 已經過安全清理後顯示。腳本和不安全內容已被阻止。';
 
   @override
   String get unsupportedMessageFormat => '此郵件格式暫不完全支援。';
