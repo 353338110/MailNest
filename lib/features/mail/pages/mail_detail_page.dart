@@ -12,7 +12,10 @@ import '../../../mail/body/parsed_email_body.dart';
 import '../../../mail/models/mail_detail.dart';
 import '../../../mail/models/mail_header.dart';
 import '../../../mail/repository/mail_repository_provider.dart';
+import '../../../mail/services/attachment_opener.dart';
+import '../../../mail/services/attachment_service_provider.dart';
 import '../../translation/widgets/translation_sheet.dart';
+import '../widgets/attachment_icon_helper.dart';
 
 class MailDetailPage extends ConsumerWidget {
   const MailDetailPage({
@@ -52,7 +55,12 @@ class MailDetailPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final explicitDetail = detail;
     if (explicitDetail != null) {
-      return _MailDetailScaffold(detail: explicitDetail);
+      return _MailDetailScaffold(
+        detail: explicitDetail,
+        accountId: accountId,
+        folderId: folderId,
+        uid: uid,
+      );
     }
 
     final account = accountId;
@@ -71,7 +79,12 @@ class MailDetailPage extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: Text(AppLocalizations.of(context).mailDetail)),
       body: future.when(
-        data: (detail) => _MailDetailInteractiveBody(detail: detail),
+        data: (detail) => _MailDetailInteractiveBody(
+          detail: detail,
+          accountId: account,
+          folderId: folder,
+          uid: messageUid,
+        ),
         error: (error, _) => const _DetailError(),
         loading: () => const Center(child: CircularProgressIndicator()),
       ),
@@ -127,9 +140,17 @@ class _MailDetailKey {
 }
 
 class _MailDetailScaffold extends StatefulWidget {
-  const _MailDetailScaffold({required this.detail});
+  const _MailDetailScaffold({
+    required this.detail,
+    this.accountId,
+    this.folderId,
+    this.uid,
+  });
 
   final MailDetail detail;
+  final String? accountId;
+  final String? folderId;
+  final String? uid;
 
   @override
   State<_MailDetailScaffold> createState() => _MailDetailScaffoldState();
@@ -149,6 +170,9 @@ class _MailDetailScaffoldState extends State<_MailDetailScaffold> {
         detail: widget.detail,
         remoteImagesAllowed: _remoteImagesAllowed,
         preferPlainText: _preferPlainText,
+        accountId: widget.accountId,
+        folderId: widget.folderId,
+        uid: widget.uid,
         onLoadRemoteImages: () {
           setState(() => _remoteImagesAllowed = true);
         },
@@ -161,9 +185,17 @@ class _MailDetailScaffoldState extends State<_MailDetailScaffold> {
 }
 
 class _MailDetailInteractiveBody extends StatefulWidget {
-  const _MailDetailInteractiveBody({required this.detail});
+  const _MailDetailInteractiveBody({
+    required this.detail,
+    this.accountId,
+    this.folderId,
+    this.uid,
+  });
 
   final MailDetail detail;
+  final String? accountId;
+  final String? folderId;
+  final String? uid;
 
   @override
   State<_MailDetailInteractiveBody> createState() =>
@@ -179,6 +211,9 @@ class _MailDetailInteractiveBodyState
     return _MailDetailBody(
       detail: widget.detail,
       remoteImagesAllowed: _remoteImagesAllowed,
+      accountId: widget.accountId,
+      folderId: widget.folderId,
+      uid: widget.uid,
       onLoadRemoteImages: () {
         setState(() => _remoteImagesAllowed = true);
       },
@@ -193,6 +228,9 @@ class _MailDetailBody extends StatelessWidget {
     this.preferPlainText = false,
     this.onLoadRemoteImages,
     this.onTogglePlainText,
+    this.accountId,
+    this.folderId,
+    this.uid,
   });
 
   final MailDetail detail;
@@ -200,6 +238,9 @@ class _MailDetailBody extends StatelessWidget {
   final bool preferPlainText;
   final VoidCallback? onLoadRemoteImages;
   final VoidCallback? onTogglePlainText;
+  final String? accountId;
+  final String? folderId;
+  final String? uid;
 
   @override
   Widget build(BuildContext context) {
@@ -260,6 +301,9 @@ class _MailDetailBody extends StatelessWidget {
                                 _AttachmentSection(
                                   attachments: detail.attachments,
                                   subtitleBuilder: _attachmentSubtitle,
+                                  accountId: accountId,
+                                  folderId: folderId,
+                                  uid: uid,
                                 ),
                               ],
                             ],
@@ -286,21 +330,8 @@ class _MailDetailBody extends StatelessWidget {
   }
 
   String _attachmentSubtitle(MailAttachmentInfo attachment) {
-    final size = attachment.size;
-    if (size == null) {
-      return attachment.mimeType;
-    }
-    return '${attachment.mimeType} - ${_formatBytes(size)}';
-  }
-
-  String _formatBytes(int bytes) {
-    if (bytes < 1024) {
-      return '$bytes B';
-    }
-    if (bytes < 1024 * 1024) {
-      return '${(bytes / 1024).toStringAsFixed(1)} KB';
-    }
-    return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+    final sizeStr = AttachmentIconHelper.formatFileSize(attachment.size);
+    return '${attachment.mimeType} · $sizeStr';
   }
 }
 
@@ -609,10 +640,16 @@ class _AttachmentSection extends StatelessWidget {
   const _AttachmentSection({
     required this.attachments,
     required this.subtitleBuilder,
+    this.accountId,
+    this.folderId,
+    this.uid,
   });
 
   final List<MailAttachmentInfo> attachments;
   final String Function(MailAttachmentInfo attachment) subtitleBuilder;
+  final String? accountId;
+  final String? folderId;
+  final String? uid;
 
   @override
   Widget build(BuildContext context) {
@@ -657,6 +694,9 @@ class _AttachmentSection extends StatelessWidget {
                 return _AttachmentCard(
                   attachment: attachment,
                   subtitle: subtitleBuilder(attachment),
+                  accountId: accountId,
+                  folderId: folderId,
+                  uid: uid,
                 );
               },
             );
@@ -667,48 +707,162 @@ class _AttachmentSection extends StatelessWidget {
   }
 }
 
-class _AttachmentCard extends StatelessWidget {
-  const _AttachmentCard({required this.attachment, required this.subtitle});
+class _AttachmentCard extends ConsumerStatefulWidget {
+  const _AttachmentCard({
+    required this.attachment,
+    required this.subtitle,
+    this.accountId,
+    this.folderId,
+    this.uid,
+  });
 
   final MailAttachmentInfo attachment;
   final String subtitle;
+  final String? accountId;
+  final String? folderId;
+  final String? uid;
+
+  @override
+  ConsumerState<_AttachmentCard> createState() => _AttachmentCardState();
+}
+
+class _AttachmentCardState extends ConsumerState<_AttachmentCard> {
+  bool _isDownloading = false;
+
+  Future<void> _handleTap() async {
+    if (_isDownloading) {
+      return;
+    }
+
+    // If already downloaded, try to open it
+    if (widget.attachment.downloaded && widget.attachment.localPath != null) {
+      try {
+        await AttachmentOpener.openFile(widget.attachment.localPath!);
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Failed to open file: $e')));
+        }
+      }
+      return;
+    }
+
+    // Get context from attachment or widget params
+    final accountId = widget.attachment.accountId ?? widget.accountId;
+    final folderId = widget.attachment.folderId ?? widget.folderId;
+    final uid =
+        widget.attachment.messageUid ??
+        (widget.uid != null ? int.tryParse(widget.uid!) : null);
+
+    if (accountId == null || folderId == null || uid == null) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Cannot download: missing context')),
+        );
+      }
+      return;
+    }
+
+    setState(() => _isDownloading = true);
+
+    try {
+      final attachmentService = ref.read(attachmentServiceProvider);
+      final localPath = await attachmentService.downloadAttachment(
+        accountId: accountId,
+        folderId: folderId,
+        uid: uid,
+        attachment: widget.attachment,
+      );
+
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Download completed')));
+
+        // Try to open the file after download
+        try {
+          await AttachmentOpener.openFile(localPath);
+        } catch (e) {
+          if (mounted) {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text('Failed to open file: $e')));
+          }
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Download failed: $e')));
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isDownloading = false);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.medium),
-        child: Row(
-          children: [
-            Icon(Icons.insert_drive_file_outlined, color: colorScheme.primary),
-            const SizedBox(width: AppSpacing.small),
-            Expanded(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    attachment.fileName,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontWeight: FontWeight.w600),
-                  ),
-                  const SizedBox(height: AppSpacing.xsmall),
-                  Text(
-                    subtitle,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                ],
+    final icon = AttachmentIconHelper.getIcon(
+      widget.attachment.mimeType,
+      widget.attachment.fileName,
+    );
+
+    return InkWell(
+      onTap: _handleTap,
+      borderRadius: BorderRadius.circular(8),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: colorScheme.surfaceContainerHighest,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.medium),
+          child: Row(
+            children: [
+              Icon(icon, color: colorScheme.primary),
+              const SizedBox(width: AppSpacing.small),
+              Expanded(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.attachment.fileName,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                    const SizedBox(height: AppSpacing.xsmall),
+                    Text(
+                      widget.subtitle,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+              if (_isDownloading)
+                const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              else if (widget.attachment.downloaded)
+                Icon(Icons.check_circle, color: colorScheme.primary, size: 20)
+              else
+                Icon(
+                  Icons.download_outlined,
+                  color: colorScheme.onSurfaceVariant,
+                  size: 20,
+                ),
+            ],
+          ),
         ),
       ),
     );

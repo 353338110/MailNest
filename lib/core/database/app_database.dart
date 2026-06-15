@@ -120,6 +120,8 @@ class LocalMailAttachments extends Table {
   TextColumn get mimeType => text()();
   IntColumn get size => integer().nullable()();
   TextColumn get contentId => text().nullable()();
+  BoolColumn get downloaded => boolean().withDefault(const Constant(false))();
+  TextColumn get localPath => text().nullable()();
 
   @override
   Set<Column<Object>> get primaryKey => {id};
@@ -177,7 +179,7 @@ class AppDatabase extends _$AppDatabase {
     : super(executor ?? driftDatabase(name: 'mailnest'));
 
   @override
-  int get schemaVersion => 7;
+  int get schemaVersion => 8;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -228,6 +230,18 @@ class AppDatabase extends _$AppDatabase {
       }
       if (from < 7) {
         await _createTableIfMissing(migrator, localMailFolders);
+      }
+      if (from < 8) {
+        await _addColumnIfMissing(
+          migrator,
+          localMailAttachments,
+          localMailAttachments.downloaded,
+        );
+        await _addColumnIfMissing(
+          migrator,
+          localMailAttachments,
+          localMailAttachments.localPath,
+        );
       }
     },
   );
@@ -623,6 +637,28 @@ class AppDatabase extends _$AppDatabase {
         );
   }
 
+  Future<void> clearMailDetailCache({
+    required String accountId,
+    required String folderName,
+    required int uid,
+  }) async {
+    await (update(localMailMessages)..where(
+          (table) =>
+              table.accountId.equals(accountId) &
+              table.folderName.lower().equals(
+                _normalizeFolderName(folderName),
+              ) &
+              table.uid.equals(uid),
+        ))
+        .write(
+          LocalMailMessagesCompanion(
+            cachedBody: const Value(null),
+            bodyCachedAt: const Value(null),
+            updatedAt: Value(DateTime.now()),
+          ),
+        );
+  }
+
   Future<void> upsertLocalMailMessage(
     LocalMailMessagesCompanion message,
   ) async {
@@ -942,5 +978,44 @@ class LocalMailSearchResult {
     }
 
     return recipients;
+  }
+}
+
+extension AttachmentExtensions on AppDatabase {
+  Future<void> updateAttachmentDownloadStatus({
+    required String id,
+    required String localPath,
+    required bool downloaded,
+  }) {
+    return (update(
+      localMailAttachments,
+    )..where((table) => table.id.equals(id))).write(
+      LocalMailAttachmentsCompanion(
+        downloaded: Value(downloaded),
+        localPath: Value(localPath),
+      ),
+    );
+  }
+
+  Future<void> clearAllAttachmentDownloadStatus() {
+    return (update(
+      localMailAttachments,
+    )..where((table) => table.downloaded.equals(true))).write(
+      const LocalMailAttachmentsCompanion(
+        downloaded: Value(false),
+        localPath: Value(null),
+      ),
+    );
+  }
+
+  Future<void> clearAttachmentDownloadStatusByPath(String path) {
+    return (update(
+      localMailAttachments,
+    )..where((table) => table.localPath.equals(path))).write(
+      const LocalMailAttachmentsCompanion(
+        downloaded: Value(false),
+        localPath: Value(null),
+      ),
+    );
   }
 }

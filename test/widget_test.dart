@@ -1,13 +1,14 @@
-import 'dart:ui';
-
 import 'package:drift/native.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mailnest_app/app/app.dart';
 import 'package:mailnest_app/core/database/app_database.dart';
 import 'package:mailnest_app/core/database/database_providers.dart';
 import 'package:mailnest_app/core/secure_storage/secure_storage_service.dart';
+import 'package:mailnest_app/features/accounts/pages/add_account_page.dart';
+import 'package:mailnest_app/l10n/generated/app_localizations.dart';
 import 'package:mailnest_app/mail/repository/account_repository.dart';
 import 'package:mailnest_app/mail/repository/account_repository_provider.dart';
 import 'package:mailnest_app/mail/repository/mail_sync_repository.dart';
@@ -39,6 +40,43 @@ void main() {
     expect(find.text('Accounts'), findsWidgets);
     expect(find.text('Settings'), findsOneWidget);
     expect(find.text('Message detail'), findsNothing);
+  });
+
+  testWidgets('account group field offers existing groups and accepts typing', (
+    tester,
+  ) async {
+    final database = AppDatabase(NativeDatabase.memory());
+    final repository = _FakeAccountRepository(
+      _testAccount,
+      database: database,
+      groupNames: const ['Personal', 'Work'],
+    );
+    addTearDown(database.close);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          appDatabaseProvider.overrideWithValue(database),
+          accountRepositoryProvider.overrideWithValue(repository),
+        ],
+        child: MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: const AddAccountPage(),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byIcon(Icons.arrow_drop_down).first);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Work'), findsOneWidget);
+
+    await tester.enterText(find.byType(EditableText).at(2), 'Family');
+    await tester.pumpAndSettle();
+
+    expect(find.text('Family'), findsOneWidget);
   });
 
   group('responsive desktop home layout', () {
@@ -205,10 +243,14 @@ final _testAccount = EmailAccount(
 );
 
 class _FakeAccountRepository extends AccountRepository {
-  _FakeAccountRepository(this.account, {required super.database})
-    : super(secureStorage: const SecureStorageService());
+  _FakeAccountRepository(
+    this.account, {
+    required super.database,
+    this.groupNames = const <String>[],
+  }) : super(secureStorage: const SecureStorageService());
 
   final EmailAccount account;
+  final List<String> groupNames;
 
   @override
   Stream<List<EmailAccount>> watchAccounts() {
@@ -217,12 +259,14 @@ class _FakeAccountRepository extends AccountRepository {
 
   @override
   Stream<List<AccountGroup>> watchAccountGroups() {
+    final names = <String>{account.groupName, ...groupNames};
     return Stream.value([
-      AccountGroup(
-        name: account.groupName,
-        createdAt: DateTime(2026),
-        updatedAt: DateTime(2026),
-      ),
+      for (final name in names)
+        AccountGroup(
+          name: name,
+          createdAt: DateTime(2026),
+          updatedAt: DateTime(2026),
+        ),
     ]);
   }
 

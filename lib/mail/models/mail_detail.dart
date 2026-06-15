@@ -27,6 +27,11 @@ class MailAttachmentInfo {
     required this.mimeType,
     this.size,
     this.contentId,
+    this.downloaded = false,
+    this.localPath,
+    this.accountId,
+    this.folderId,
+    this.messageUid,
   });
 
   final String id;
@@ -34,4 +39,9 @@ class MailAttachmentInfo {
   final String mimeType;
   final int? size;
   final String? contentId;
+  final bool downloaded;
+  final String? localPath;
+  final String? accountId;
+  final String? folderId;
+  final int? messageUid;
 }

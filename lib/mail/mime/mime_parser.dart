@@ -56,6 +56,7 @@ class MimeParser {
     final recipients = _splitAddresses(
       await SimpleEmailBodyParser.decodeHeader(headers.value('to')),
     );
+    final parsedUid = int.tryParse(uid) ?? 0;
     final attachments = parsedBody.attachments
         .map(
           (attachment) => MailAttachmentInfo(
@@ -64,6 +65,7 @@ class MimeParser {
             mimeType: attachment.mimeType ?? 'application/octet-stream',
             size: attachment.size,
             contentId: attachment.contentId,
+            messageUid: parsedUid,
           ),
         )
         .toList(growable: false);
