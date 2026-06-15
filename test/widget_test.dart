@@ -19,6 +19,9 @@ import 'package:mailnest_app/mail/models/mail_header.dart';
 import 'package:mailnest_app/mail/models/outgoing_message.dart';
 import 'package:mailnest_app/mail/models/sync_cursor.dart';
 import 'package:mailnest_app/mail/provider/mail_provider.dart';
+import 'package:mailnest_app/translation/mock_translation_service.dart';
+import 'package:mailnest_app/translation/models/translation_provider_config.dart';
+import 'package:mailnest_app/translation/translation_service_provider.dart';
 
 void main() {
   testWidgets('shows onboarding entry point', (tester) async {
@@ -186,6 +189,12 @@ extension on WidgetTester {
             accountRepositoryProvider.overrideWithValue(repository),
             mailSyncRepositoryProvider.overrideWithValue(
               _FakeMailSyncRepository(database),
+            ),
+            translationProviderConfigProvider.overrideWith(
+              (ref) async => TranslationProviderConfig.disabled(),
+            ),
+            translationServiceProvider.overrideWith(
+              (ref) async => MockTranslationService(),
             ),
           ],
           child: const MailNestApp(),
