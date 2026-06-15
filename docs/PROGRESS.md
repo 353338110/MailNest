@@ -68,6 +68,24 @@
 
 - PR #20：IMAP 文件夹列表同步和本地保存，首页账号下优先展示真实远端文件夹，未同步时回退标准文件夹，已合并。
 
+### PR #19：Outlook 邮件列表、详情和发信
+
+链接：待创建
+
+状态：分支 `codex/outlook-mail-provider` 开发中
+
+已完成内容：
+
+- 基于 Microsoft Graph 实现 `OutlookMailProvider`。
+- 支持 Outlook/Microsoft 365 文件夹列表、邮件头列表、邮件详情和发信。
+- 支持已读标记和删除接口，复用统一 `MailProvider` 边界。
+- 从 SecureStorage 中的 OAuth token 引用读取 Outlook token，不把 token 存入 SQLite。
+- Access token 过期时使用 refresh token 刷新，Graph 返回 401 时刷新并重试一次。
+- Refresh token 缺失或刷新失败时抛出重新授权异常，供 UI 提示重新授权。
+- 发信通过 Graph `sendMail` 保存到已发送邮件，不记录邮件正文。
+- 不实现 Gmail，不实现真实翻译。
+- 增加 Outlook Graph 映射、token 刷新和重新授权异常测试。
+
 ## 已验证
 
 最近一次功能 PR 合并前，本地和 GitHub Actions 均通过：
@@ -123,10 +141,7 @@ flutter test
 ### Outlook
 
 - Outlook OAuth 授权。
-- Token 保存和刷新。
-- Outlook 邮件列表。
-- Outlook 邮件详情。
-- Outlook 发信。
+- Token 保存。
 
 ### 翻译
 
