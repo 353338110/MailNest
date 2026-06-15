@@ -1279,6 +1279,126 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Account save failed: {reason}'**
   String accountSaveFailed(String reason);
+
+  /// No description provided for @translationSettingsLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Translation settings could not be loaded.'**
+  String get translationSettingsLoadFailed;
+
+  /// No description provided for @translationProviderEnabledTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Use third-party translation provider'**
+  String get translationProviderEnabledTitle;
+
+  /// No description provided for @translationProviderEnabledSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'When enabled, selected email content may be sent to the configured provider.'**
+  String get translationProviderEnabledSubtitle;
+
+  /// No description provided for @translationProviderLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Provider'**
+  String get translationProviderLabel;
+
+  /// No description provided for @translationHttpsEndpointLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'HTTPS endpoint'**
+  String get translationHttpsEndpointLabel;
+
+  /// No description provided for @translationHttpsEndpointHint.
+  ///
+  /// In en, this message translates to:
+  /// **'https://example.com/translate'**
+  String get translationHttpsEndpointHint;
+
+  /// No description provided for @translationEndpointValidation.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid HTTPS endpoint.'**
+  String get translationEndpointValidation;
+
+  /// No description provided for @translationApiKeyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'API key'**
+  String get translationApiKeyLabel;
+
+  /// No description provided for @translationApiKeySavedHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'A saved API key will be kept unless replaced.'**
+  String get translationApiKeySavedHelper;
+
+  /// No description provided for @translationApiKeyStorageHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'Stored securely outside the MailNest database.'**
+  String get translationApiKeyStorageHelper;
+
+  /// No description provided for @translationApiKeyValidation.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter an API key.'**
+  String get translationApiKeyValidation;
+
+  /// No description provided for @translationClearSavedApiKey.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear saved API key'**
+  String get translationClearSavedApiKey;
+
+  /// No description provided for @translationPrivacyConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'I understand the privacy impact'**
+  String get translationPrivacyConfirmTitle;
+
+  /// No description provided for @translationPrivacyConfirmSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Mail content is sent only after this confirmation and can be disabled here at any time.'**
+  String get translationPrivacyConfirmSubtitle;
+
+  /// No description provided for @translationPrivacyDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Send email content to a provider?'**
+  String get translationPrivacyDialogTitle;
+
+  /// No description provided for @translationPrivacyDialogBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Translation requires sending the selected email text to the provider you configure. MailNest will not log the email text, translation result, or API key.'**
+  String get translationPrivacyDialogBody;
+
+  /// No description provided for @translationIUnderstand.
+  ///
+  /// In en, this message translates to:
+  /// **'I understand'**
+  String get translationIUnderstand;
+
+  /// No description provided for @translationSaveProvider.
+  ///
+  /// In en, this message translates to:
+  /// **'Save translation provider'**
+  String get translationSaveProvider;
+
+  /// No description provided for @translationSettingsSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Translation settings saved.'**
+  String get translationSettingsSaved;
+
+  /// No description provided for @translationSettingsSaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save translation settings.'**
+  String get translationSettingsSaveFailed;
 }
 
 class _AppLocalizationsDelegate

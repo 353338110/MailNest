@@ -653,4 +653,74 @@ class AppLocalizationsDe extends AppLocalizations {
   String accountSaveFailed(String reason) {
     return 'Account save failed: $reason';
   }
+
+  @override
+  String get translationSettingsLoadFailed =>
+      'Translation settings could not be loaded.';
+
+  @override
+  String get translationProviderEnabledTitle =>
+      'Use third-party translation provider';
+
+  @override
+  String get translationProviderEnabledSubtitle =>
+      'When enabled, selected email content may be sent to the configured provider.';
+
+  @override
+  String get translationProviderLabel => 'Provider';
+
+  @override
+  String get translationHttpsEndpointLabel => 'HTTPS endpoint';
+
+  @override
+  String get translationHttpsEndpointHint => 'https://example.com/translate';
+
+  @override
+  String get translationEndpointValidation => 'Enter a valid HTTPS endpoint.';
+
+  @override
+  String get translationApiKeyLabel => 'API key';
+
+  @override
+  String get translationApiKeySavedHelper =>
+      'A saved API key will be kept unless replaced.';
+
+  @override
+  String get translationApiKeyStorageHelper =>
+      'Stored securely outside the MailNest database.';
+
+  @override
+  String get translationApiKeyValidation => 'Enter an API key.';
+
+  @override
+  String get translationClearSavedApiKey => 'Clear saved API key';
+
+  @override
+  String get translationPrivacyConfirmTitle =>
+      'I understand the privacy impact';
+
+  @override
+  String get translationPrivacyConfirmSubtitle =>
+      'Mail content is sent only after this confirmation and can be disabled here at any time.';
+
+  @override
+  String get translationPrivacyDialogTitle =>
+      'Send email content to a provider?';
+
+  @override
+  String get translationPrivacyDialogBody =>
+      'Translation requires sending the selected email text to the provider you configure. MailNest will not log the email text, translation result, or API key.';
+
+  @override
+  String get translationIUnderstand => 'I understand';
+
+  @override
+  String get translationSaveProvider => 'Save translation provider';
+
+  @override
+  String get translationSettingsSaved => 'Translation settings saved.';
+
+  @override
+  String get translationSettingsSaveFailed =>
+      'Could not save translation settings.';
 }

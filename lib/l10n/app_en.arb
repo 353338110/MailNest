@@ -311,5 +311,25 @@
         "type": "String"
       }
     }
-  }
+  },
+  "translationSettingsLoadFailed": "Translation settings could not be loaded.",
+  "translationProviderEnabledTitle": "Use third-party translation provider",
+  "translationProviderEnabledSubtitle": "When enabled, selected email content may be sent to the configured provider.",
+  "translationProviderLabel": "Provider",
+  "translationHttpsEndpointLabel": "HTTPS endpoint",
+  "translationHttpsEndpointHint": "https://example.com/translate",
+  "translationEndpointValidation": "Enter a valid HTTPS endpoint.",
+  "translationApiKeyLabel": "API key",
+  "translationApiKeySavedHelper": "A saved API key will be kept unless replaced.",
+  "translationApiKeyStorageHelper": "Stored securely outside the MailNest database.",
+  "translationApiKeyValidation": "Enter an API key.",
+  "translationClearSavedApiKey": "Clear saved API key",
+  "translationPrivacyConfirmTitle": "I understand the privacy impact",
+  "translationPrivacyConfirmSubtitle": "Mail content is sent only after this confirmation and can be disabled here at any time.",
+  "translationPrivacyDialogTitle": "Send email content to a provider?",
+  "translationPrivacyDialogBody": "Translation requires sending the selected email text to the provider you configure. MailNest will not log the email text, translation result, or API key.",
+  "translationIUnderstand": "I understand",
+  "translationSaveProvider": "Save translation provider",
+  "translationSettingsSaved": "Translation settings saved.",
+  "translationSettingsSaveFailed": "Could not save translation settings."
 }

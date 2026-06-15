@@ -39,6 +39,7 @@
 
 - PR #16：Gmail OAuth，已合并。
 - PR #17：邮件详情和写信翻译 UI，已合并。
+- 本 PR：真实翻译服务和隐私确认，支持可配置 HTTPS Provider、自定义 API Key 和安全存储。
 
 ### 本轮修复与增强
 
@@ -144,9 +145,6 @@ flutter test
 
 ### 翻译
 
-- 真实翻译 Provider。
-- 翻译隐私确认流程。
-- 用户自定义 API Key。
 - 翻译结果缓存，可选。
 
 ### 桌面和移动端体验
@@ -173,9 +171,8 @@ flutter test
 7. `codex/gmail-mail-provider`：Gmail 邮件列表、详情和发信。
 8. `codex/outlook-oauth`：Outlook OAuth。
 9. `codex/outlook-mail-provider`：Outlook 邮件列表、详情和发信。
-10. `codex/translation-provider`：真实翻译服务和隐私确认。
-11. `codex/desktop-mobile-polish`：键盘快捷键、右键菜单和更完整的加载/确认状态。
-12. `codex/release-workflow`：发布流程和 tag 自动化。
+10. `codex/desktop-mobile-polish`：键盘快捷键、右键菜单和更完整的加载/确认状态。
+11. `codex/release-workflow`：发布流程和 tag 自动化。
 
 ## 开放 PR
 

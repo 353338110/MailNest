@@ -60,7 +60,7 @@ class _TranslationSheetState extends ConsumerState<TranslationSheet> {
     });
 
     try {
-      final service = ref.read(translationServiceProvider);
+      final service = await ref.read(translationServiceProvider.future);
       final sourceLanguage =
           await service.detectLanguage(text: text) ?? AppLanguage.en;
       final result = await service.translate(

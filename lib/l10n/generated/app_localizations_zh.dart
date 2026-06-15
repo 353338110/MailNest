@@ -626,6 +626,67 @@ class AppLocalizationsZh extends AppLocalizations {
   String accountSaveFailed(String reason) {
     return '账号保存失败：$reason';
   }
+
+  @override
+  String get translationSettingsLoadFailed => '无法加载翻译设置。';
+
+  @override
+  String get translationProviderEnabledTitle => '使用第三方翻译服务';
+
+  @override
+  String get translationProviderEnabledSubtitle => '启用后，选中的邮件内容可能会发送到你配置的服务。';
+
+  @override
+  String get translationProviderLabel => '服务商';
+
+  @override
+  String get translationHttpsEndpointLabel => 'HTTPS 地址';
+
+  @override
+  String get translationHttpsEndpointHint => 'https://example.com/translate';
+
+  @override
+  String get translationEndpointValidation => '请输入有效的 HTTPS 地址。';
+
+  @override
+  String get translationApiKeyLabel => 'API Key';
+
+  @override
+  String get translationApiKeySavedHelper => '已保存的 API Key 会继续保留，除非替换。';
+
+  @override
+  String get translationApiKeyStorageHelper => '安全保存，不写入 MailNest 数据库。';
+
+  @override
+  String get translationApiKeyValidation => '请输入 API Key。';
+
+  @override
+  String get translationClearSavedApiKey => '清除已保存的 API Key';
+
+  @override
+  String get translationPrivacyConfirmTitle => '我理解隐私影响';
+
+  @override
+  String get translationPrivacyConfirmSubtitle => '只有确认后才会发送邮件内容，可随时在此关闭。';
+
+  @override
+  String get translationPrivacyDialogTitle => '要把邮件内容发送给服务商吗？';
+
+  @override
+  String get translationPrivacyDialogBody =>
+      '翻译需要把选中的邮件文本发送到你配置的服务。MailNest 不会记录邮件文本、翻译结果或 API Key。';
+
+  @override
+  String get translationIUnderstand => '我理解';
+
+  @override
+  String get translationSaveProvider => '保存翻译服务';
+
+  @override
+  String get translationSettingsSaved => '翻译设置已保存。';
+
+  @override
+  String get translationSettingsSaveFailed => '无法保存翻译设置。';
 }
 
 /// The translations for Chinese, as used in China (`zh_CN`).
@@ -1181,6 +1242,67 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String accountSaveFailed(String reason) {
     return '账号保存失败：$reason';
   }
+
+  @override
+  String get translationSettingsLoadFailed => '无法加载翻译设置。';
+
+  @override
+  String get translationProviderEnabledTitle => '使用第三方翻译服务';
+
+  @override
+  String get translationProviderEnabledSubtitle => '启用后，选中的邮件内容可能会发送到你配置的服务。';
+
+  @override
+  String get translationProviderLabel => '服务商';
+
+  @override
+  String get translationHttpsEndpointLabel => 'HTTPS 地址';
+
+  @override
+  String get translationHttpsEndpointHint => 'https://example.com/translate';
+
+  @override
+  String get translationEndpointValidation => '请输入有效的 HTTPS 地址。';
+
+  @override
+  String get translationApiKeyLabel => 'API Key';
+
+  @override
+  String get translationApiKeySavedHelper => '已保存的 API Key 会继续保留，除非替换。';
+
+  @override
+  String get translationApiKeyStorageHelper => '安全保存，不写入 MailNest 数据库。';
+
+  @override
+  String get translationApiKeyValidation => '请输入 API Key。';
+
+  @override
+  String get translationClearSavedApiKey => '清除已保存的 API Key';
+
+  @override
+  String get translationPrivacyConfirmTitle => '我理解隐私影响';
+
+  @override
+  String get translationPrivacyConfirmSubtitle => '只有确认后才会发送邮件内容，可随时在此关闭。';
+
+  @override
+  String get translationPrivacyDialogTitle => '要把邮件内容发送给服务商吗？';
+
+  @override
+  String get translationPrivacyDialogBody =>
+      '翻译需要把选中的邮件文本发送到你配置的服务。MailNest 不会记录邮件文本、翻译结果或 API Key。';
+
+  @override
+  String get translationIUnderstand => '我理解';
+
+  @override
+  String get translationSaveProvider => '保存翻译服务';
+
+  @override
+  String get translationSettingsSaved => '翻译设置已保存。';
+
+  @override
+  String get translationSettingsSaveFailed => '无法保存翻译设置。';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -1735,4 +1857,65 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String accountSaveFailed(String reason) {
     return '帳號儲存失敗：$reason';
   }
+
+  @override
+  String get translationSettingsLoadFailed => '無法載入翻譯設定。';
+
+  @override
+  String get translationProviderEnabledTitle => '使用第三方翻譯服務';
+
+  @override
+  String get translationProviderEnabledSubtitle => '啟用後，選取的郵件內容可能會傳送到你設定的服務。';
+
+  @override
+  String get translationProviderLabel => '服務商';
+
+  @override
+  String get translationHttpsEndpointLabel => 'HTTPS 位址';
+
+  @override
+  String get translationHttpsEndpointHint => 'https://example.com/translate';
+
+  @override
+  String get translationEndpointValidation => '請輸入有效的 HTTPS 位址。';
+
+  @override
+  String get translationApiKeyLabel => 'API Key';
+
+  @override
+  String get translationApiKeySavedHelper => '已儲存的 API Key 會繼續保留，除非替換。';
+
+  @override
+  String get translationApiKeyStorageHelper => '安全儲存，不寫入 MailNest 資料庫。';
+
+  @override
+  String get translationApiKeyValidation => '請輸入 API Key。';
+
+  @override
+  String get translationClearSavedApiKey => '清除已儲存的 API Key';
+
+  @override
+  String get translationPrivacyConfirmTitle => '我理解隱私影響';
+
+  @override
+  String get translationPrivacyConfirmSubtitle => '只有確認後才會傳送郵件內容，可隨時在此關閉。';
+
+  @override
+  String get translationPrivacyDialogTitle => '要將郵件內容傳送給服務商嗎？';
+
+  @override
+  String get translationPrivacyDialogBody =>
+      '翻譯需要將選取的郵件文字傳送到你設定的服務。MailNest 不會記錄郵件文字、翻譯結果或 API Key。';
+
+  @override
+  String get translationIUnderstand => '我理解';
+
+  @override
+  String get translationSaveProvider => '儲存翻譯服務';
+
+  @override
+  String get translationSettingsSaved => '翻譯設定已儲存。';
+
+  @override
+  String get translationSettingsSaveFailed => '無法儲存翻譯設定。';
 }

@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mailnest_app/features/drafts/pages/compose_mail_page.dart';
 import 'package:mailnest_app/features/mail/pages/mail_detail_page.dart';
 import 'package:mailnest_app/l10n/generated/app_localizations.dart';
+import 'package:mailnest_app/translation/mock_translation_service.dart';
+import 'package:mailnest_app/translation/translation_service_provider.dart';
 
 void main() {
   String? copiedText;
@@ -92,6 +94,11 @@ void main() {
 
 Widget _testApp(Widget child) {
   return ProviderScope(
+    overrides: [
+      translationServiceProvider.overrideWith(
+        (ref) async => MockTranslationService(),
+      ),
+    ],
     child: MaterialApp(
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,

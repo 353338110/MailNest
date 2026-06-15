@@ -234,5 +234,25 @@
         "type": "String"
       }
     }
-  }
+  },
+  "translationSettingsLoadFailed": "无法加载翻译设置。",
+  "translationProviderEnabledTitle": "使用第三方翻译服务",
+  "translationProviderEnabledSubtitle": "启用后，选中的邮件内容可能会发送到你配置的服务。",
+  "translationProviderLabel": "服务商",
+  "translationHttpsEndpointLabel": "HTTPS 地址",
+  "translationHttpsEndpointHint": "https://example.com/translate",
+  "translationEndpointValidation": "请输入有效的 HTTPS 地址。",
+  "translationApiKeyLabel": "API Key",
+  "translationApiKeySavedHelper": "已保存的 API Key 会继续保留，除非替换。",
+  "translationApiKeyStorageHelper": "安全保存，不写入 MailNest 数据库。",
+  "translationApiKeyValidation": "请输入 API Key。",
+  "translationClearSavedApiKey": "清除已保存的 API Key",
+  "translationPrivacyConfirmTitle": "我理解隐私影响",
+  "translationPrivacyConfirmSubtitle": "只有确认后才会发送邮件内容，可随时在此关闭。",
+  "translationPrivacyDialogTitle": "要把邮件内容发送给服务商吗？",
+  "translationPrivacyDialogBody": "翻译需要把选中的邮件文本发送到你配置的服务。MailNest 不会记录邮件文本、翻译结果或 API Key。",
+  "translationIUnderstand": "我理解",
+  "translationSaveProvider": "保存翻译服务",
+  "translationSettingsSaved": "翻译设置已保存。",
+  "translationSettingsSaveFailed": "无法保存翻译设置。"
 }
