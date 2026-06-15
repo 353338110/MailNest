@@ -72,6 +72,25 @@
 - 不记录密码、授权码、Token 或认证响应。
 - 增加连接测试结果模型测试。
 
+### PR #4：真实翻译服务和隐私确认
+
+链接：待创建
+
+状态：本分支 `codex/translation-provider`
+
+已完成内容：
+
+- 新增翻译 Provider 配置入口。
+- 支持用户主动启用第三方翻译。
+- 支持可配置 HTTPS 翻译 endpoint，避免 UI 硬编码单一服务。
+- 支持用户自定义 API Key，API Key 保存到 SecureStorage，不进入 SQLite。
+- 发送邮件内容到第三方 Provider 前必须确认隐私边界。
+- 翻译设置可关闭，关闭后不会保留隐私确认状态。
+- 翻译服务边界再次校验启用状态、隐私确认、endpoint 和 API Key。
+- 增加明确翻译错误状态。
+- 翻译请求边界保留注释，明确不得记录请求正文、响应正文或 API Key。
+- 增加翻译服务隐私边界和错误状态测试。
+
 ## 已验证
 
 最近一次验证命令：
@@ -172,9 +191,6 @@ flutter test
 
 - 邮件详情页翻译结果展示。
 - 写邮件页翻译入口。
-- 真实翻译 Provider。
-- 翻译隐私确认流程。
-- 用户自定义 API Key。
 - 翻译结果缓存，可选。
 
 ### 桌面和移动端体验
@@ -222,9 +238,8 @@ flutter test
 18. `codex/outlook-oauth`：Outlook OAuth。
 19. `codex/outlook-mail-provider`：Outlook 邮件列表、详情和发信。
 20. `codex/translation-ui`：邮件详情和写信翻译 UI。
-21. `codex/translation-provider`：真实翻译服务和隐私确认。
-22. `codex/multiplatform-ci`：多平台构建 CI。
-23. `codex/release-workflow`：发布流程和 tag 自动化。
+21. `codex/multiplatform-ci`：多平台构建 CI。
+22. `codex/release-workflow`：发布流程和 tag 自动化。
 
 ## 注意事项
 
