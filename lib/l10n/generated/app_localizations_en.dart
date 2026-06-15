@@ -158,5 +158,62 @@ class AppLocalizationsEn extends AppLocalizations {
       'Enter a password or app password before testing.';
 
   @override
+  String get backupAndMigration => 'Backup and migration';
+
+  @override
+  String get importEncryptedConfigSubtitle =>
+      'Import encrypted .enc configuration files.';
+
+  @override
+  String get importConfig => 'Import configuration';
+
+  @override
+  String get importConfigDescription =>
+      'Choose an encrypted MailNest configuration file and enter its backup password to import accounts and settings.';
+
+  @override
+  String get importConfigExclusionNote =>
+      'Email bodies, attachment cache, and search indexes are not imported.';
+
+  @override
+  String get chooseEncConfigFile => 'Choose .enc file';
+
+  @override
+  String get backupPassword => 'Backup password';
+
+  @override
+  String get decryptAndPreview => 'Decrypt and preview';
+
+  @override
+  String get unableToReadConfigFile =>
+      'Unable to read the selected configuration file.';
+
+  @override
+  String importConfigSucceeded(int importedAccounts, int skippedAccounts) {
+    return 'Imported $importedAccounts account(s), skipped $skippedAccounts. Please test imported account connections.';
+  }
+
+  @override
+  String get importPreviewTitle => 'Import preview';
+
+  @override
+  String importPreviewSummary(int accounts, int settings, int conflicts) {
+    return '$accounts account(s), $settings setting(s), $conflicts conflict(s).';
+  }
+
+  @override
+  String get noImportConflicts => 'No account conflicts found.';
+
+  @override
+  String get importConflictPrompt =>
+      'Choose whether to overwrite or skip accounts already using the same email address.';
+
+  @override
+  String get skip => 'Skip';
+
+  @override
+  String get overwrite => 'Overwrite';
+
+  @override
   String get unknownError => 'Unknown error';
 }

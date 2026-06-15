@@ -392,6 +392,102 @@ abstract class AppLocalizations {
   /// **'Enter a password or app password before testing.'**
   String get passwordRequiredForConnectionTest;
 
+  /// No description provided for @backupAndMigration.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup and migration'**
+  String get backupAndMigration;
+
+  /// No description provided for @importEncryptedConfigSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Import encrypted .enc configuration files.'**
+  String get importEncryptedConfigSubtitle;
+
+  /// No description provided for @importConfig.
+  ///
+  /// In en, this message translates to:
+  /// **'Import configuration'**
+  String get importConfig;
+
+  /// No description provided for @importConfigDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose an encrypted MailNest configuration file and enter its backup password to import accounts and settings.'**
+  String get importConfigDescription;
+
+  /// No description provided for @importConfigExclusionNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Email bodies, attachment cache, and search indexes are not imported.'**
+  String get importConfigExclusionNote;
+
+  /// No description provided for @chooseEncConfigFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose .enc file'**
+  String get chooseEncConfigFile;
+
+  /// No description provided for @backupPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup password'**
+  String get backupPassword;
+
+  /// No description provided for @decryptAndPreview.
+  ///
+  /// In en, this message translates to:
+  /// **'Decrypt and preview'**
+  String get decryptAndPreview;
+
+  /// No description provided for @unableToReadConfigFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to read the selected configuration file.'**
+  String get unableToReadConfigFile;
+
+  /// No description provided for @importConfigSucceeded.
+  ///
+  /// In en, this message translates to:
+  /// **'Imported {importedAccounts} account(s), skipped {skippedAccounts}. Please test imported account connections.'**
+  String importConfigSucceeded(int importedAccounts, int skippedAccounts);
+
+  /// No description provided for @importPreviewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Import preview'**
+  String get importPreviewTitle;
+
+  /// No description provided for @importPreviewSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'{accounts} account(s), {settings} setting(s), {conflicts} conflict(s).'**
+  String importPreviewSummary(int accounts, int settings, int conflicts);
+
+  /// No description provided for @noImportConflicts.
+  ///
+  /// In en, this message translates to:
+  /// **'No account conflicts found.'**
+  String get noImportConflicts;
+
+  /// No description provided for @importConflictPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose whether to overwrite or skip accounts already using the same email address.'**
+  String get importConflictPrompt;
+
+  /// No description provided for @skip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get skip;
+
+  /// No description provided for @overwrite.
+  ///
+  /// In en, this message translates to:
+  /// **'Overwrite'**
+  String get overwrite;
+
   /// No description provided for @unknownError.
   ///
   /// In en, this message translates to:

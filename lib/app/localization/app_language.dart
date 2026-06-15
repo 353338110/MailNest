@@ -19,4 +19,23 @@ enum AppLanguage {
 
   final Locale? locale;
   final String displayName;
+
+  String get storageValue {
+    final locale = this.locale;
+    if (locale == null) {
+      return 'system';
+    }
+    final countryCode = locale.countryCode;
+    if (countryCode == null || countryCode.isEmpty) {
+      return locale.languageCode;
+    }
+    return '${locale.languageCode}_$countryCode';
+  }
+
+  static AppLanguage fromStorageValue(String value) {
+    return AppLanguage.values.firstWhere(
+      (language) => language.storageValue == value,
+      orElse: () => AppLanguage.system,
+    );
+  }
 }

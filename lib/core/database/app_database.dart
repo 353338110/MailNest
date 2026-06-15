@@ -66,6 +66,20 @@ class AppDatabase extends _$AppDatabase {
     return into(emailAccounts).insertOnConflictUpdate(account);
   }
 
+  Future<List<AppSetting>> allSettingsSnapshot() {
+    return select(appSettings).get();
+  }
+
+  Future<AppSetting?> getSetting(String key) {
+    return (select(
+      appSettings,
+    )..where((table) => table.key.equals(key))).getSingleOrNull();
+  }
+
+  Future<void> saveSetting(AppSettingsCompanion setting) {
+    return into(appSettings).insertOnConflictUpdate(setting);
+  }
+
   Future<void> setAccountSyncEnabled(String id, bool enabled) {
     return (update(emailAccounts)..where((table) => table.id.equals(id))).write(
       EmailAccountsCompanion(

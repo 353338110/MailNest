@@ -59,5 +59,44 @@
     }
   },
   "passwordRequiredForConnectionTest": "Enter a password or app password before testing.",
+  "backupAndMigration": "Backup and migration",
+  "importEncryptedConfigSubtitle": "Import encrypted .enc configuration files.",
+  "importConfig": "Import configuration",
+  "importConfigDescription": "Choose an encrypted MailNest configuration file and enter its backup password to import accounts and settings.",
+  "importConfigExclusionNote": "Email bodies, attachment cache, and search indexes are not imported.",
+  "chooseEncConfigFile": "Choose .enc file",
+  "backupPassword": "Backup password",
+  "decryptAndPreview": "Decrypt and preview",
+  "unableToReadConfigFile": "Unable to read the selected configuration file.",
+  "importConfigSucceeded": "Imported {importedAccounts} account(s), skipped {skippedAccounts}. Please test imported account connections.",
+  "@importConfigSucceeded": {
+    "placeholders": {
+      "importedAccounts": {
+        "type": "int"
+      },
+      "skippedAccounts": {
+        "type": "int"
+      }
+    }
+  },
+  "importPreviewTitle": "Import preview",
+  "importPreviewSummary": "{accounts} account(s), {settings} setting(s), {conflicts} conflict(s).",
+  "@importPreviewSummary": {
+    "placeholders": {
+      "accounts": {
+        "type": "int"
+      },
+      "settings": {
+        "type": "int"
+      },
+      "conflicts": {
+        "type": "int"
+      }
+    }
+  },
+  "noImportConflicts": "No account conflicts found.",
+  "importConflictPrompt": "Choose whether to overwrite or skip accounts already using the same email address.",
+  "skip": "Skip",
+  "overwrite": "Overwrite",
   "unknownError": "Unknown error"
 }

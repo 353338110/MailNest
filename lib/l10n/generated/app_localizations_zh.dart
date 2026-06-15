@@ -151,6 +151,58 @@ class AppLocalizationsZh extends AppLocalizations {
   String get passwordRequiredForConnectionTest => '请先输入密码或授权码再测试。';
 
   @override
+  String get backupAndMigration => '备份与迁移';
+
+  @override
+  String get importEncryptedConfigSubtitle => '导入加密的 .enc 配置文件。';
+
+  @override
+  String get importConfig => '导入配置';
+
+  @override
+  String get importConfigDescription => '选择加密的 MailNest 配置文件，并输入备份密码以导入账号和设置。';
+
+  @override
+  String get importConfigExclusionNote => '不会导入邮件正文、附件缓存和搜索索引。';
+
+  @override
+  String get chooseEncConfigFile => '选择 .enc 文件';
+
+  @override
+  String get backupPassword => '备份密码';
+
+  @override
+  String get decryptAndPreview => '解密并预览';
+
+  @override
+  String get unableToReadConfigFile => '无法读取所选配置文件。';
+
+  @override
+  String importConfigSucceeded(int importedAccounts, int skippedAccounts) {
+    return '已导入 $importedAccounts 个账号，跳过 $skippedAccounts 个。请测试已导入账号的连接。';
+  }
+
+  @override
+  String get importPreviewTitle => '导入预览';
+
+  @override
+  String importPreviewSummary(int accounts, int settings, int conflicts) {
+    return '$accounts 个账号，$settings 项设置，$conflicts 个冲突。';
+  }
+
+  @override
+  String get noImportConflicts => '未发现账号冲突。';
+
+  @override
+  String get importConflictPrompt => '请选择覆盖或跳过已使用相同邮箱地址的账号。';
+
+  @override
+  String get skip => '跳过';
+
+  @override
+  String get overwrite => '覆盖';
+
+  @override
   String get unknownError => '未知错误';
 }
 
@@ -301,6 +353,58 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get passwordRequiredForConnectionTest => '请先输入密码或授权码再测试。';
 
   @override
+  String get backupAndMigration => '备份与迁移';
+
+  @override
+  String get importEncryptedConfigSubtitle => '导入加密的 .enc 配置文件。';
+
+  @override
+  String get importConfig => '导入配置';
+
+  @override
+  String get importConfigDescription => '选择加密的 MailNest 配置文件，并输入备份密码以导入账号和设置。';
+
+  @override
+  String get importConfigExclusionNote => '不会导入邮件正文、附件缓存和搜索索引。';
+
+  @override
+  String get chooseEncConfigFile => '选择 .enc 文件';
+
+  @override
+  String get backupPassword => '备份密码';
+
+  @override
+  String get decryptAndPreview => '解密并预览';
+
+  @override
+  String get unableToReadConfigFile => '无法读取所选配置文件。';
+
+  @override
+  String importConfigSucceeded(int importedAccounts, int skippedAccounts) {
+    return '已导入 $importedAccounts 个账号，跳过 $skippedAccounts 个。请测试已导入账号的连接。';
+  }
+
+  @override
+  String get importPreviewTitle => '导入预览';
+
+  @override
+  String importPreviewSummary(int accounts, int settings, int conflicts) {
+    return '$accounts 个账号，$settings 项设置，$conflicts 个冲突。';
+  }
+
+  @override
+  String get noImportConflicts => '未发现账号冲突。';
+
+  @override
+  String get importConflictPrompt => '请选择覆盖或跳过已使用相同邮箱地址的账号。';
+
+  @override
+  String get skip => '跳过';
+
+  @override
+  String get overwrite => '覆盖';
+
+  @override
   String get unknownError => '未知错误';
 }
 
@@ -449,6 +553,58 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get passwordRequiredForConnectionTest => '請先輸入密碼或授權碼再測試。';
+
+  @override
+  String get backupAndMigration => '備份與遷移';
+
+  @override
+  String get importEncryptedConfigSubtitle => '匯入加密的 .enc 設定檔。';
+
+  @override
+  String get importConfig => '匯入設定';
+
+  @override
+  String get importConfigDescription => '選擇加密的 MailNest 設定檔，並輸入備份密碼以匯入帳號和設定。';
+
+  @override
+  String get importConfigExclusionNote => '不會匯入郵件本文、附件快取和搜尋索引。';
+
+  @override
+  String get chooseEncConfigFile => '選擇 .enc 檔案';
+
+  @override
+  String get backupPassword => '備份密碼';
+
+  @override
+  String get decryptAndPreview => '解密並預覽';
+
+  @override
+  String get unableToReadConfigFile => '無法讀取所選設定檔。';
+
+  @override
+  String importConfigSucceeded(int importedAccounts, int skippedAccounts) {
+    return '已匯入 $importedAccounts 個帳號，略過 $skippedAccounts 個。請測試已匯入帳號的連線。';
+  }
+
+  @override
+  String get importPreviewTitle => '匯入預覽';
+
+  @override
+  String importPreviewSummary(int accounts, int settings, int conflicts) {
+    return '$accounts 個帳號，$settings 項設定，$conflicts 個衝突。';
+  }
+
+  @override
+  String get noImportConflicts => '未發現帳號衝突。';
+
+  @override
+  String get importConflictPrompt => '請選擇覆蓋或略過已使用相同信箱地址的帳號。';
+
+  @override
+  String get skip => '略過';
+
+  @override
+  String get overwrite => '覆蓋';
 
   @override
   String get unknownError => '未知錯誤';
