@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import '../../../app/localization/app_language.dart';
 import '../../../app/localization/locale_controller.dart';
 import '../../../l10n/generated/app_localizations.dart';
+import '../../../mail/services/attachment_service_provider.dart';
+import '../widgets/attachment_cache_dialog.dart';
 
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
@@ -31,10 +33,22 @@ class SettingsPage extends ConsumerWidget {
             onTap: () => context.push('/settings/translation'),
           ),
           ListTile(
-            leading: const Icon(Icons.restore_outlined),
+            leading: const Icon(Icons.backup_outlined),
             title: Text(l10n.backupAndMigration),
+            subtitle: Text(l10n.backupAndMigrationSubtitle),
+            onTap: () => context.push('/settings/backup'),
+          ),
+          ListTile(
+            leading: const Icon(Icons.restore_outlined),
+            title: Text(l10n.importConfig),
             subtitle: Text(l10n.importEncryptedConfigSubtitle),
             onTap: () => context.push('/settings/backup/import'),
+          ),
+          ListTile(
+            leading: const Icon(Icons.attach_file),
+            title: const Text('Attachment Cache'),
+            subtitle: const Text('Manage downloaded attachments'),
+            onTap: () => _showAttachmentCacheDialog(context, ref),
           ),
         ],
       ),
@@ -72,6 +86,15 @@ class SettingsPage extends ConsumerWidget {
           ),
         );
       },
+    );
+  }
+
+  void _showAttachmentCacheDialog(BuildContext context, WidgetRef ref) {
+    showDialog<void>(
+      context: context,
+      builder: (context) => AttachmentCacheDialog(
+        attachmentService: ref.read(attachmentServiceProvider),
+      ),
     );
   }
 }

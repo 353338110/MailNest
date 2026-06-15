@@ -21,4 +21,16 @@ void main() {
     expect(result.isSuccess, isFalse);
     expect(result.firstError, 'IMAP failed.');
   });
+
+  test('parses IMAP internal date style returned by QQ mail headers', () {
+    final parsed = parseMailHeaderDate('28-May-2026 16:37:42 +0800');
+
+    expect(parsed?.toUtc(), DateTime.utc(2026, 5, 28, 8, 37, 42));
+  });
+
+  test('parses RFC mail date headers', () {
+    final parsed = parseMailHeaderDate('Thu, 28 May 2026 16:37:42 +0800');
+
+    expect(parsed?.toUtc(), DateTime.utc(2026, 5, 28, 8, 37, 42));
+  });
 }
