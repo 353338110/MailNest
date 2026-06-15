@@ -1,16 +1,27 @@
 import 'package:go_router/go_router.dart';
 
 import '../features/accounts/pages/add_account_page.dart';
+import '../features/backup/pages/backup_export_page.dart';
+import '../features/drafts/pages/compose_mail_page.dart';
+import '../features/drafts/pages/drafts_page.dart';
 import '../features/home/pages/home_page.dart';
+import '../features/mail/pages/mail_detail_page.dart';
 import '../features/onboarding/pages/onboarding_page.dart';
+import '../features/search/pages/local_search_page.dart';
+import '../features/sent/pages/sent_messages_page.dart';
 import '../features/settings/pages/settings_page.dart';
 import '../features/translation/pages/translation_settings_page.dart';
+import '../mail/models/mail_detail.dart';
 
 final appRouter = GoRouter(
   initialLocation: '/',
   routes: [
     GoRoute(path: '/', builder: (context, state) => const OnboardingPage()),
     GoRoute(path: '/home', builder: (context, state) => const HomePage()),
+    GoRoute(
+      path: '/search',
+      builder: (context, state) => const LocalSearchPage(),
+    ),
     GoRoute(
       path: '/accounts/add',
       builder: (context, state) => const AddAccountPage(),
@@ -21,12 +32,45 @@ final appRouter = GoRouter(
           AddAccountPage(accountId: state.pathParameters['accountId']),
     ),
     GoRoute(
+      path: '/compose',
+      builder: (context, state) => const ComposeMailPage(),
+    ),
+    GoRoute(path: '/drafts', builder: (context, state) => const DraftsPage()),
+    GoRoute(
+      path: '/drafts/:draftId/edit',
+      builder: (context, state) =>
+          ComposeMailPage(draftId: state.pathParameters['draftId']),
+    ),
+    GoRoute(
+      path: '/sent',
+      builder: (context, state) => const SentMessagesPage(),
+    ),
+    GoRoute(
+      path: '/accounts/:accountId/folders/:folderId/messages/:uid',
+      builder: (context, state) => MailDetailPage(
+        accountId: state.pathParameters['accountId'] ?? '',
+        folderId: state.pathParameters['folderId'] ?? 'inbox',
+        uid: state.pathParameters['uid'] ?? '',
+      ),
+    ),
+    GoRoute(
       path: '/settings',
       builder: (context, state) => const SettingsPage(),
     ),
     GoRoute(
       path: '/settings/translation',
       builder: (context, state) => const TranslationSettingsPage(),
+    ),
+    GoRoute(
+      path: '/settings/backup',
+      builder: (context, state) => const BackupExportPage(),
+    ),
+    GoRoute(
+      path: '/mail/detail',
+      builder: (context, state) {
+        final extra = state.extra;
+        return MailDetailPage(detail: extra is MailDetail ? extra : null);
+      },
     ),
   ],
 );

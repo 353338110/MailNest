@@ -20,9 +20,8 @@ class TranslationSettingsPage extends ConsumerWidget {
       appBar: AppBar(title: Text(l10n.translationSettings)),
       body: config.when(
         data: (config) => TranslationSettingsForm(config: config),
-        error: (_, _) => const _StatusMessage(
-          message: 'Translation settings could not be loaded.',
-        ),
+        error: (_, _) =>
+            _StatusMessage(message: l10n.translationSettingsLoadFailed),
         loading: () => const Center(child: CircularProgressIndicator()),
       ),
     );
@@ -85,10 +84,8 @@ class _TranslationSettingsFormState
         const SizedBox(height: AppSpacing.medium),
         SwitchListTile(
           contentPadding: EdgeInsets.zero,
-          title: const Text('Use third-party translation provider'),
-          subtitle: const Text(
-            'When enabled, selected email content may be sent to the configured provider.',
-          ),
+          title: Text(l10n.translationProviderEnabledTitle),
+          subtitle: Text(l10n.translationProviderEnabledSubtitle),
           value: _enabled,
           onChanged: _saving ? null : _setEnabled,
         ),
@@ -100,7 +97,9 @@ class _TranslationSettingsFormState
             children: [
               DropdownButtonFormField<String>(
                 initialValue: _providerId,
-                decoration: const InputDecoration(labelText: 'Provider'),
+                decoration: InputDecoration(
+                  labelText: l10n.translationProviderLabel,
+                ),
                 items: [
                   for (final provider in TranslationProviderCatalog.providers)
                     DropdownMenuItem(
@@ -127,9 +126,9 @@ class _TranslationSettingsFormState
                   controller: _endpointController,
                   enabled: !_saving,
                   keyboardType: TextInputType.url,
-                  decoration: const InputDecoration(
-                    labelText: 'HTTPS endpoint',
-                    hintText: 'https://example.com/translate',
+                  decoration: InputDecoration(
+                    labelText: l10n.translationHttpsEndpointLabel,
+                    hintText: l10n.translationHttpsEndpointHint,
                   ),
                   validator: (value) {
                     if (!_enabled || !provider.requiresEndpoint) {
@@ -137,7 +136,7 @@ class _TranslationSettingsFormState
                     }
                     final uri = Uri.tryParse(value?.trim() ?? '');
                     if (uri == null || uri.scheme != 'https') {
-                      return 'Enter a valid HTTPS endpoint.';
+                      return l10n.translationEndpointValidation;
                     }
                     return null;
                   },
@@ -150,10 +149,10 @@ class _TranslationSettingsFormState
                   enabled: !_saving,
                   obscureText: true,
                   decoration: InputDecoration(
-                    labelText: 'API key',
+                    labelText: l10n.translationApiKeyLabel,
                     helperText: widget.config.hasApiKey && !_clearSavedApiKey
-                        ? 'A saved API key will be kept unless replaced.'
-                        : 'Stored securely outside the MailNest database.',
+                        ? l10n.translationApiKeySavedHelper
+                        : l10n.translationApiKeyStorageHelper,
                   ),
                   onChanged: (_) => setState(() {}),
                   validator: (_) {
@@ -161,7 +160,7 @@ class _TranslationSettingsFormState
                       return null;
                     }
                     if (!apiKeyAvailable) {
-                      return 'Enter an API key.';
+                      return l10n.translationApiKeyValidation;
                     }
                     return null;
                   },
@@ -179,7 +178,7 @@ class _TranslationSettingsFormState
                               });
                             },
                       icon: const Icon(Icons.key_off_outlined),
-                      label: const Text('Clear saved API key'),
+                      label: Text(l10n.translationClearSavedApiKey),
                     ),
                   ),
               ],
@@ -189,10 +188,8 @@ class _TranslationSettingsFormState
         const SizedBox(height: AppSpacing.medium),
         CheckboxListTile(
           contentPadding: EdgeInsets.zero,
-          title: const Text('I understand the privacy impact'),
-          subtitle: const Text(
-            'Mail content is sent only after this confirmation and can be disabled here at any time.',
-          ),
+          title: Text(l10n.translationPrivacyConfirmTitle),
+          subtitle: Text(l10n.translationPrivacyConfirmSubtitle),
           value: _privacyConfirmed,
           onChanged: !_enabled || _saving
               ? null
@@ -209,7 +206,7 @@ class _TranslationSettingsFormState
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
               : const Icon(Icons.save_outlined),
-          label: const Text('Save translation provider'),
+          label: Text(l10n.translationSaveProvider),
         ),
       ],
     );
@@ -239,22 +236,21 @@ class _TranslationSettingsFormState
   }
 
   Future<bool> _confirmPrivacyBoundary() async {
+    final l10n = AppLocalizations.of(context);
     final result = await showDialog<bool>(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Send email content to a provider?'),
-          content: const Text(
-            'Translation requires sending the selected email text to the provider you configure. MailNest will not log the email text, translation result, or API key.',
-          ),
+          title: Text(l10n.translationPrivacyDialogTitle),
+          content: Text(l10n.translationPrivacyDialogBody),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Cancel'),
+              child: Text(l10n.cancel),
             ),
             FilledButton(
               onPressed: () => Navigator.of(context).pop(true),
-              child: const Text('I understand'),
+              child: Text(l10n.translationIUnderstand),
             ),
           ],
         );
@@ -305,14 +301,20 @@ class _TranslationSettingsFormState
         return;
       }
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Translation settings saved.')),
+        SnackBar(
+          content: Text(AppLocalizations.of(context).translationSettingsSaved),
+        ),
       );
     } catch (_) {
       if (!mounted) {
         return;
       }
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Could not save translation settings.')),
+        SnackBar(
+          content: Text(
+            AppLocalizations.of(context).translationSettingsSaveFailed,
+          ),
+        ),
       );
     } finally {
       if (mounted) {
