@@ -357,6 +357,7 @@ class OutlookMailProvider implements MailProvider {
 
     return MailHeader(
       id: _readString(json, 'id'),
+      uid: _stableUid(_readString(json, 'id')),
       subject: _readString(json, 'subject', fallback: '(No subject)'),
       sender: _readString(
         sender,
@@ -414,6 +415,22 @@ class OutlookMailProvider implements MailProvider {
   static bool _readBool(Map<String, Object?> json, String key) {
     final value = json[key];
     return value is bool && value;
+  }
+
+  static int _stableUid(String id) {
+    if (id.isEmpty) {
+      return 0;
+    }
+    var hash = 0;
+    for (final codeUnit in id.codeUnits) {
+      hash = 0x1fffffff & (hash + codeUnit);
+      hash = 0x1fffffff & (hash + ((0x0007ffff & hash) << 10));
+      hash ^= hash >> 6;
+    }
+    hash = 0x1fffffff & (hash + ((0x03ffffff & hash) << 3));
+    hash ^= hash >> 11;
+    hash = 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
+    return hash;
   }
 }
 
