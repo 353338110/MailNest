@@ -4168,6 +4168,32 @@ class $LocalMailAttachmentsTable extends LocalMailAttachments
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _downloadedMeta = const VerificationMeta(
+    'downloaded',
+  );
+  @override
+  late final GeneratedColumn<bool> downloaded = GeneratedColumn<bool>(
+    'downloaded',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("downloaded" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _localPathMeta = const VerificationMeta(
+    'localPath',
+  );
+  @override
+  late final GeneratedColumn<String> localPath = GeneratedColumn<String>(
+    'local_path',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -4178,6 +4204,8 @@ class $LocalMailAttachmentsTable extends LocalMailAttachments
     mimeType,
     size,
     contentId,
+    downloaded,
+    localPath,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -4248,6 +4276,18 @@ class $LocalMailAttachmentsTable extends LocalMailAttachments
         contentId.isAcceptableOrUnknown(data['content_id']!, _contentIdMeta),
       );
     }
+    if (data.containsKey('downloaded')) {
+      context.handle(
+        _downloadedMeta,
+        downloaded.isAcceptableOrUnknown(data['downloaded']!, _downloadedMeta),
+      );
+    }
+    if (data.containsKey('local_path')) {
+      context.handle(
+        _localPathMeta,
+        localPath.isAcceptableOrUnknown(data['local_path']!, _localPathMeta),
+      );
+    }
     return context;
   }
 
@@ -4289,6 +4329,14 @@ class $LocalMailAttachmentsTable extends LocalMailAttachments
         DriftSqlType.string,
         data['${effectivePrefix}content_id'],
       ),
+      downloaded: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}downloaded'],
+      )!,
+      localPath: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}local_path'],
+      ),
     );
   }
 
@@ -4308,6 +4356,8 @@ class LocalMailAttachment extends DataClass
   final String mimeType;
   final int? size;
   final String? contentId;
+  final bool downloaded;
+  final String? localPath;
   const LocalMailAttachment({
     required this.id,
     required this.accountId,
@@ -4317,6 +4367,8 @@ class LocalMailAttachment extends DataClass
     required this.mimeType,
     this.size,
     this.contentId,
+    required this.downloaded,
+    this.localPath,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -4333,6 +4385,10 @@ class LocalMailAttachment extends DataClass
     if (!nullToAbsent || contentId != null) {
       map['content_id'] = Variable<String>(contentId);
     }
+    map['downloaded'] = Variable<bool>(downloaded);
+    if (!nullToAbsent || localPath != null) {
+      map['local_path'] = Variable<String>(localPath);
+    }
     return map;
   }
 
@@ -4348,6 +4404,10 @@ class LocalMailAttachment extends DataClass
       contentId: contentId == null && nullToAbsent
           ? const Value.absent()
           : Value(contentId),
+      downloaded: Value(downloaded),
+      localPath: localPath == null && nullToAbsent
+          ? const Value.absent()
+          : Value(localPath),
     );
   }
 
@@ -4365,6 +4425,8 @@ class LocalMailAttachment extends DataClass
       mimeType: serializer.fromJson<String>(json['mimeType']),
       size: serializer.fromJson<int?>(json['size']),
       contentId: serializer.fromJson<String?>(json['contentId']),
+      downloaded: serializer.fromJson<bool>(json['downloaded']),
+      localPath: serializer.fromJson<String?>(json['localPath']),
     );
   }
   @override
@@ -4379,6 +4441,8 @@ class LocalMailAttachment extends DataClass
       'mimeType': serializer.toJson<String>(mimeType),
       'size': serializer.toJson<int?>(size),
       'contentId': serializer.toJson<String?>(contentId),
+      'downloaded': serializer.toJson<bool>(downloaded),
+      'localPath': serializer.toJson<String?>(localPath),
     };
   }
 
@@ -4391,6 +4455,8 @@ class LocalMailAttachment extends DataClass
     String? mimeType,
     Value<int?> size = const Value.absent(),
     Value<String?> contentId = const Value.absent(),
+    bool? downloaded,
+    Value<String?> localPath = const Value.absent(),
   }) => LocalMailAttachment(
     id: id ?? this.id,
     accountId: accountId ?? this.accountId,
@@ -4400,6 +4466,8 @@ class LocalMailAttachment extends DataClass
     mimeType: mimeType ?? this.mimeType,
     size: size.present ? size.value : this.size,
     contentId: contentId.present ? contentId.value : this.contentId,
+    downloaded: downloaded ?? this.downloaded,
+    localPath: localPath.present ? localPath.value : this.localPath,
   );
   LocalMailAttachment copyWithCompanion(LocalMailAttachmentsCompanion data) {
     return LocalMailAttachment(
@@ -4415,6 +4483,10 @@ class LocalMailAttachment extends DataClass
       mimeType: data.mimeType.present ? data.mimeType.value : this.mimeType,
       size: data.size.present ? data.size.value : this.size,
       contentId: data.contentId.present ? data.contentId.value : this.contentId,
+      downloaded: data.downloaded.present
+          ? data.downloaded.value
+          : this.downloaded,
+      localPath: data.localPath.present ? data.localPath.value : this.localPath,
     );
   }
 
@@ -4428,7 +4500,9 @@ class LocalMailAttachment extends DataClass
           ..write('fileName: $fileName, ')
           ..write('mimeType: $mimeType, ')
           ..write('size: $size, ')
-          ..write('contentId: $contentId')
+          ..write('contentId: $contentId, ')
+          ..write('downloaded: $downloaded, ')
+          ..write('localPath: $localPath')
           ..write(')'))
         .toString();
   }
@@ -4443,6 +4517,8 @@ class LocalMailAttachment extends DataClass
     mimeType,
     size,
     contentId,
+    downloaded,
+    localPath,
   );
   @override
   bool operator ==(Object other) =>
@@ -4455,7 +4531,9 @@ class LocalMailAttachment extends DataClass
           other.fileName == this.fileName &&
           other.mimeType == this.mimeType &&
           other.size == this.size &&
-          other.contentId == this.contentId);
+          other.contentId == this.contentId &&
+          other.downloaded == this.downloaded &&
+          other.localPath == this.localPath);
 }
 
 class LocalMailAttachmentsCompanion
@@ -4468,6 +4546,8 @@ class LocalMailAttachmentsCompanion
   final Value<String> mimeType;
   final Value<int?> size;
   final Value<String?> contentId;
+  final Value<bool> downloaded;
+  final Value<String?> localPath;
   final Value<int> rowid;
   const LocalMailAttachmentsCompanion({
     this.id = const Value.absent(),
@@ -4478,6 +4558,8 @@ class LocalMailAttachmentsCompanion
     this.mimeType = const Value.absent(),
     this.size = const Value.absent(),
     this.contentId = const Value.absent(),
+    this.downloaded = const Value.absent(),
+    this.localPath = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   LocalMailAttachmentsCompanion.insert({
@@ -4489,6 +4571,8 @@ class LocalMailAttachmentsCompanion
     required String mimeType,
     this.size = const Value.absent(),
     this.contentId = const Value.absent(),
+    this.downloaded = const Value.absent(),
+    this.localPath = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
        accountId = Value(accountId),
@@ -4505,6 +4589,8 @@ class LocalMailAttachmentsCompanion
     Expression<String>? mimeType,
     Expression<int>? size,
     Expression<String>? contentId,
+    Expression<bool>? downloaded,
+    Expression<String>? localPath,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -4516,6 +4602,8 @@ class LocalMailAttachmentsCompanion
       if (mimeType != null) 'mime_type': mimeType,
       if (size != null) 'size': size,
       if (contentId != null) 'content_id': contentId,
+      if (downloaded != null) 'downloaded': downloaded,
+      if (localPath != null) 'local_path': localPath,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -4529,6 +4617,8 @@ class LocalMailAttachmentsCompanion
     Value<String>? mimeType,
     Value<int?>? size,
     Value<String?>? contentId,
+    Value<bool>? downloaded,
+    Value<String?>? localPath,
     Value<int>? rowid,
   }) {
     return LocalMailAttachmentsCompanion(
@@ -4540,6 +4630,8 @@ class LocalMailAttachmentsCompanion
       mimeType: mimeType ?? this.mimeType,
       size: size ?? this.size,
       contentId: contentId ?? this.contentId,
+      downloaded: downloaded ?? this.downloaded,
+      localPath: localPath ?? this.localPath,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -4571,6 +4663,12 @@ class LocalMailAttachmentsCompanion
     if (contentId.present) {
       map['content_id'] = Variable<String>(contentId.value);
     }
+    if (downloaded.present) {
+      map['downloaded'] = Variable<bool>(downloaded.value);
+    }
+    if (localPath.present) {
+      map['local_path'] = Variable<String>(localPath.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -4588,6 +4686,8 @@ class LocalMailAttachmentsCompanion
           ..write('mimeType: $mimeType, ')
           ..write('size: $size, ')
           ..write('contentId: $contentId, ')
+          ..write('downloaded: $downloaded, ')
+          ..write('localPath: $localPath, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -7618,6 +7718,8 @@ typedef $$LocalMailAttachmentsTableCreateCompanionBuilder =
       required String mimeType,
       Value<int?> size,
       Value<String?> contentId,
+      Value<bool> downloaded,
+      Value<String?> localPath,
       Value<int> rowid,
     });
 typedef $$LocalMailAttachmentsTableUpdateCompanionBuilder =
@@ -7630,6 +7732,8 @@ typedef $$LocalMailAttachmentsTableUpdateCompanionBuilder =
       Value<String> mimeType,
       Value<int?> size,
       Value<String?> contentId,
+      Value<bool> downloaded,
+      Value<String?> localPath,
       Value<int> rowid,
     });
 
@@ -7679,6 +7783,16 @@ class $$LocalMailAttachmentsTableFilterComposer
 
   ColumnFilters<String> get contentId => $composableBuilder(
     column: $table.contentId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get downloaded => $composableBuilder(
+    column: $table.downloaded,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get localPath => $composableBuilder(
+    column: $table.localPath,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -7731,6 +7845,16 @@ class $$LocalMailAttachmentsTableOrderingComposer
     column: $table.contentId,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<bool> get downloaded => $composableBuilder(
+    column: $table.downloaded,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get localPath => $composableBuilder(
+    column: $table.localPath,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$LocalMailAttachmentsTableAnnotationComposer
@@ -7769,6 +7893,14 @@ class $$LocalMailAttachmentsTableAnnotationComposer
 
   GeneratedColumn<String> get contentId =>
       $composableBuilder(column: $table.contentId, builder: (column) => column);
+
+  GeneratedColumn<bool> get downloaded => $composableBuilder(
+    column: $table.downloaded,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get localPath =>
+      $composableBuilder(column: $table.localPath, builder: (column) => column);
 }
 
 class $$LocalMailAttachmentsTableTableManager
@@ -7822,6 +7954,8 @@ class $$LocalMailAttachmentsTableTableManager
                 Value<String> mimeType = const Value.absent(),
                 Value<int?> size = const Value.absent(),
                 Value<String?> contentId = const Value.absent(),
+                Value<bool> downloaded = const Value.absent(),
+                Value<String?> localPath = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => LocalMailAttachmentsCompanion(
                 id: id,
@@ -7832,6 +7966,8 @@ class $$LocalMailAttachmentsTableTableManager
                 mimeType: mimeType,
                 size: size,
                 contentId: contentId,
+                downloaded: downloaded,
+                localPath: localPath,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -7844,6 +7980,8 @@ class $$LocalMailAttachmentsTableTableManager
                 required String mimeType,
                 Value<int?> size = const Value.absent(),
                 Value<String?> contentId = const Value.absent(),
+                Value<bool> downloaded = const Value.absent(),
+                Value<String?> localPath = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => LocalMailAttachmentsCompanion.insert(
                 id: id,
@@ -7854,6 +7992,8 @@ class $$LocalMailAttachmentsTableTableManager
                 mimeType: mimeType,
                 size: size,
                 contentId: contentId,
+                downloaded: downloaded,
+                localPath: localPath,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0

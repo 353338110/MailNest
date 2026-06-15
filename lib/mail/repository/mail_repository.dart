@@ -49,7 +49,15 @@ class MailRepository {
       uid: parsedUid,
     );
     final cachedBody = cached?.cachedBody;
-    if (cached != null && cachedBody != null && !_hasBrokenEncoding(cached)) {
+
+    // If cached but has broken encoding, clear cache and refetch
+    if (cached != null && _hasBrokenEncoding(cached)) {
+      await database.clearMailDetailCache(
+        accountId: accountId,
+        folderName: folderId,
+        uid: parsedUid,
+      );
+    } else if (cached != null && cachedBody != null) {
       await _markRead(accountId: accountId, folderId: folderId, uid: parsedUid);
       return MailDetail(
         header: _headerFromLocal(cached),
@@ -202,6 +210,11 @@ class MailRepository {
             mimeType: row.mimeType,
             size: row.size,
             contentId: row.contentId,
+            downloaded: row.downloaded,
+            localPath: row.localPath,
+            accountId: accountId,
+            folderId: folderId,
+            messageUid: uid,
           ),
         )
         .toList(growable: false);
@@ -225,31 +238,33 @@ class MailRepository {
   static bool _hasBrokenEncoding(LocalMailMessage row) {
     return _looksMojibake(row.subject) ||
         _looksMojibake(row.sender) ||
-        _looksMojibake(row.cachedBody) ||
-        (row.cachedBodyIsHtml && !_looksLikeHtml(row.cachedBody));
+        _looksMojibake(row.cachedBody);
   }
 
   static bool _looksMojibake(String? value) {
     if (value == null || value.isEmpty) {
       return false;
     }
-    return value.contains('�') ||
-        value.contains('ï¿½') ||
-        value.contains('Ã') ||
-        value.contains('Â') ||
-        value.contains('å') ||
-        value.contains('æ') ||
-        value.contains('ç');
-  }
-
-  static bool _looksLikeHtml(String? value) {
-    if (value == null) {
-      return false;
+    // Check for replacement character (indicates encoding failure)
+    if (value.contains('�')) {
+      return true;
     }
-    return RegExp(
-      r'<\s*(html|body|div|table|p|span|img|br)\b',
-      caseSensitive: false,
-    ).hasMatch(value);
+    // Check for common mojibake patterns (UTF-8 bytes interpreted as Latin-1)
+    // These patterns appear when GBK/GB2312 is incorrectly decoded as UTF-8
+    final mojibakePatterns = [
+      RegExp(r'[àáâãäå][^a-zA-Z\s]{2,}'), // Latin chars followed by symbols
+      RegExp(r'æ[^a-zA-Z\s]{2,}'),
+      RegExp(r'ç[^a-zA-Z\s]{2,}'),
+      RegExp(r'è[^a-zA-Z\s]{2,}'),
+      RegExp(r'é[^a-zA-Z\s]{2,}'),
+      RegExp(r'ï¿½'), // UTF-8 FFFD in Latin-1
+    ];
+    for (final pattern in mojibakePatterns) {
+      if (pattern.hasMatch(value)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   static bool _hasRemoteImages(String html) {

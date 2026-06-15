@@ -247,6 +247,47 @@ class ImapSmtpMailProvider implements MailProvider {
     }
   }
 
+  Future<List<int>> fetchAttachmentBytes({
+    required EmailAccount account,
+    required String secret,
+    required String folderId,
+    required String uid,
+    required String attachmentId,
+  }) async {
+    _RawImapClient? client;
+    try {
+      client = await _RawImapClient.connect(
+        host: account.imapHost,
+        port: account.imapPort,
+        security: account.imapSecurity,
+        timeout: timeout,
+      );
+      await client.login(username: account.username, secret: secret);
+      await client.selectMailbox(_mailboxName(folderId));
+      final raw = await client.fetchMessageBody(uid);
+      await client.logout();
+
+      final bytes = _extractAttachmentFromRaw(raw, attachmentId);
+      return bytes;
+    } on TimeoutException {
+      throw const MailProtocolException('IMAP fetch timed out.');
+    } on SocketException {
+      throw const MailProtocolException('Unable to reach IMAP server.');
+    } on TlsException {
+      throw const MailProtocolException('IMAP TLS handshake failed.');
+    } finally {
+      client?.close();
+    }
+  }
+
+  List<int> _extractAttachmentFromRaw(String raw, String attachmentId) {
+    // TODO: Implement proper MIME parsing to extract attachment by ID
+    // For now, this is a placeholder that should be replaced with actual MIME parsing
+    throw UnimplementedError(
+      'Attachment extraction requires full MIME parsing',
+    );
+  }
+
   static String _mailboxName(String folderId) {
     return folderId.toLowerCase() == 'inbox' ? 'INBOX' : folderId;
   }

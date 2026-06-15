@@ -52,33 +52,27 @@ class BasicEmailCharsetDecoder implements EmailCharsetDecoder {
   }
 
   Future<String> _decodeWithIconv(List<int> bytes, String charset) async {
-    final input = await File(
-      '${Directory.systemTemp.path}/mailnest-mime-'
-      '${DateTime.now().microsecondsSinceEpoch}.bin',
-    ).create();
+    final tempFile = File(
+      '${Directory.systemTemp.path}/mn-${DateTime.now().microsecondsSinceEpoch}.bin',
+    );
     try {
-      await input.writeAsBytes(bytes, flush: true);
-      for (final executable in const ['/usr/bin/iconv', 'iconv']) {
-        try {
-          final result = await Process.run(
-            executable,
-            ['-f', charset, '-t', 'utf-8', input.path],
-            stdoutEncoding: utf8,
-            stderrEncoding: utf8,
-          );
-          if (result.exitCode == 0) {
-            return result.stdout.toString();
-          }
-        } on Object {
-          continue;
-        }
+      await tempFile.writeAsBytes(bytes, flush: true);
+      final result = await Process.run('iconv', [
+        '-f',
+        charset,
+        '-t',
+        'utf-8',
+        tempFile.path,
+      ], stdoutEncoding: null).timeout(const Duration(seconds: 5));
+
+      if (result.exitCode == 0 && result.stdout is List<int>) {
+        return utf8.decode(result.stdout as List<int>, allowMalformed: true);
       }
     } on Object {
-      // Some sandboxed platforms may not expose iconv. Load the message with a
-      // lossy fallback rather than failing the detail page.
+      // iconv failed, use fallback
     } finally {
-      if (await input.exists()) {
-        await input.delete();
+      if (await tempFile.exists()) {
+        await tempFile.delete();
       }
     }
     return utf8.decode(bytes, allowMalformed: true);

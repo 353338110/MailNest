@@ -71,6 +71,7 @@ class _AddAccountPageState extends ConsumerState<AddAccountPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final accountRepository = ref.watch(accountRepositoryProvider);
     if (!_isEditing && _groupController.text.isEmpty) {
       _groupController.text = l10n.defaultAccountGroup;
     }
@@ -117,12 +118,19 @@ class _AddAccountPageState extends ConsumerState<AddAccountPage> {
                         ),
                       ),
                       const SizedBox(height: AppSpacing.medium),
-                      TextFormField(
-                        controller: _groupController,
-                        decoration: InputDecoration(
-                          labelText: l10n.accountGroup,
-                          helperText: l10n.accountGroupHelp,
-                        ),
+                      StreamBuilder<List<AccountGroup>>(
+                        stream: accountRepository.watchAccountGroups(),
+                        builder: (context, snapshot) {
+                          return _AccountGroupDropdown(
+                            controller: _groupController,
+                            groupNames: _accountGroupNames(
+                              snapshot.data,
+                              l10n.defaultAccountGroup,
+                            ),
+                            labelText: l10n.accountGroup,
+                            helperText: l10n.accountGroupHelp,
+                          );
+                        },
                       ),
                       const SizedBox(height: AppSpacing.medium),
                       if (_isGmailOAuth) ...[
@@ -232,6 +240,26 @@ class _AddAccountPageState extends ConsumerState<AddAccountPage> {
               ],
             ),
     );
+  }
+
+  List<String> _accountGroupNames(
+    List<AccountGroup>? groups,
+    String defaultGroupName,
+  ) {
+    final names = <String>[];
+    void addName(String value) {
+      final trimmed = value.trim();
+      if (trimmed.isNotEmpty && !names.contains(trimmed)) {
+        names.add(trimmed);
+      }
+    }
+
+    addName(defaultGroupName);
+    for (final group in groups ?? const <AccountGroup>[]) {
+      addName(group.name);
+    }
+    addName(_groupController.text);
+    return names;
   }
 
   String? _required(String? value) {
@@ -660,6 +688,41 @@ class _AddAccountPageState extends ConsumerState<AddAccountPage> {
             ),
           ],
         );
+      },
+    );
+  }
+}
+
+class _AccountGroupDropdown extends StatelessWidget {
+  const _AccountGroupDropdown({
+    required this.controller,
+    required this.groupNames,
+    required this.labelText,
+    required this.helperText,
+  });
+
+  final TextEditingController controller;
+  final List<String> groupNames;
+  final String labelText;
+  final String helperText;
+
+  @override
+  Widget build(BuildContext context) {
+    return DropdownMenu<String>(
+      controller: controller,
+      expandedInsets: EdgeInsets.zero,
+      enableFilter: true,
+      requestFocusOnTap: true,
+      label: Text(labelText),
+      helperText: helperText,
+      dropdownMenuEntries: [
+        for (final groupName in groupNames)
+          DropdownMenuEntry<String>(value: groupName, label: groupName),
+      ],
+      onSelected: (value) {
+        if (value != null) {
+          controller.text = value;
+        }
       },
     );
   }
