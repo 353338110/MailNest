@@ -134,9 +134,18 @@ class AccountRepository {
     required EmailProviderType provider,
     String? displayName,
     String? groupName,
+    String? username,
+    String imapHost = '',
+    int imapPort = 993,
+    String imapSecurity = 'ssl',
+    String smtpHost = '',
+    int smtpPort = 587,
+    String smtpSecurity = 'starttls',
+    bool smtpStartTls = true,
   }) async {
     final now = DateTime.now();
     final accountId = _accountId(emailAddress);
+    final current = await database.getAccount(accountId);
     final normalizedGroupName = _normalizedGroupName(groupName);
 
     await database.saveAccountGroup(normalizedGroupName);
@@ -147,22 +156,30 @@ class AccountRepository {
         displayName: Value(displayName),
         groupName: Value(normalizedGroupName),
         provider: Value(provider.storageValue),
-        username: Value(emailAddress),
+        username: Value(username ?? emailAddress),
         authType: const Value('oauth'),
-        imapHost: const Value(''),
-        imapPort: const Value(993),
-        imapSecurity: const Value('ssl'),
-        smtpHost: const Value(''),
-        smtpPort: const Value(587),
-        smtpSecurity: const Value('starttls'),
-        smtpStartTls: const Value(true),
+        imapHost: Value(imapHost),
+        imapPort: Value(imapPort),
+        imapSecurity: Value(imapSecurity),
+        smtpHost: Value(smtpHost),
+        smtpPort: Value(smtpPort),
+        smtpSecurity: Value(smtpSecurity),
+        smtpStartTls: Value(smtpStartTls),
         secretRef: const Value(null),
         oauthTokenRef: Value(tokenRef),
-        syncEnabled: const Value(true),
-        createdAt: Value(now),
+        syncEnabled: Value(current?.syncEnabled ?? true),
+        createdAt: Value(current?.createdAt ?? now),
         updatedAt: Value(now),
       ),
     );
+
+    if (current?.secretRef != null) {
+      await secureStorage.deleteSecret(current!.secretRef!);
+    }
+    final previousTokenRef = current?.oauthTokenRef;
+    if (previousTokenRef != null && previousTokenRef != tokenRef) {
+      await secureStorage.deleteSecret(previousTokenRef);
+    }
   }
 
   Future<void> updateOAuthAccount({
@@ -170,7 +187,17 @@ class AccountRepository {
     required String tokenRef,
     String? displayName,
     String? groupName,
+    EmailProviderType? provider,
+    String? username,
+    String? imapHost,
+    int? imapPort,
+    String? imapSecurity,
+    String? smtpHost,
+    int? smtpPort,
+    String? smtpSecurity,
+    bool? smtpStartTls,
   }) async {
+    final previousSecretRef = current.secretRef;
     if (current.oauthTokenRef != null && current.oauthTokenRef != tokenRef) {
       await secureStorage.deleteSecret(current.oauthTokenRef!);
     }
@@ -183,16 +210,18 @@ class AccountRepository {
         emailAddress: Value(current.emailAddress),
         displayName: Value(displayName),
         groupName: Value(normalizedGroupName),
-        provider: Value(EmailProviderType.gmail.storageValue),
-        username: Value(current.emailAddress),
+        provider: Value(
+          (provider ?? _providerFromAccount(current)).storageValue,
+        ),
+        username: Value(username ?? current.username),
         authType: const Value('oauth'),
-        imapHost: Value(current.imapHost),
-        imapPort: Value(current.imapPort),
-        imapSecurity: Value(current.imapSecurity),
-        smtpHost: Value(current.smtpHost),
-        smtpPort: Value(current.smtpPort),
-        smtpSecurity: Value(current.smtpSecurity),
-        smtpStartTls: Value(current.smtpStartTls),
+        imapHost: Value(imapHost ?? current.imapHost),
+        imapPort: Value(imapPort ?? current.imapPort),
+        imapSecurity: Value(imapSecurity ?? current.imapSecurity),
+        smtpHost: Value(smtpHost ?? current.smtpHost),
+        smtpPort: Value(smtpPort ?? current.smtpPort),
+        smtpSecurity: Value(smtpSecurity ?? current.smtpSecurity),
+        smtpStartTls: Value(smtpStartTls ?? current.smtpStartTls),
         secretRef: const Value(null),
         oauthTokenRef: Value(tokenRef),
         syncEnabled: Value(current.syncEnabled),
@@ -200,6 +229,10 @@ class AccountRepository {
         updatedAt: Value(DateTime.now()),
       ),
     );
+
+    if (previousSecretRef != null) {
+      await secureStorage.deleteSecret(previousSecretRef);
+    }
   }
 
   Future<void> setSyncEnabled({
@@ -260,6 +293,13 @@ class AccountRepository {
 
   String _accountId(String emailAddress) {
     return emailAddress.trim().toLowerCase();
+  }
+
+  EmailProviderType _providerFromAccount(EmailAccount account) {
+    return EmailProviderType.values.firstWhere(
+      (provider) => provider.storageValue == account.provider,
+      orElse: () => EmailProviderType.custom,
+    );
   }
 
   String _normalizedGroupName(String? groupName) {

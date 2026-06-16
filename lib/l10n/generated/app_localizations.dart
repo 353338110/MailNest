@@ -512,6 +512,60 @@ abstract class AppLocalizations {
   /// **'Gmail reauthorization is required.'**
   String get gmailReauthorizationRequired;
 
+  /// No description provided for @outlookOAuthTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in with Microsoft'**
+  String get outlookOAuthTitle;
+
+  /// No description provided for @outlookOAuthSystemBrowserNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'MailNest opens Microsoft authorization in your system browser and stores tokens only in secure storage.'**
+  String get outlookOAuthSystemBrowserNotice;
+
+  /// No description provided for @authorizeOutlook.
+  ///
+  /// In en, this message translates to:
+  /// **'Authorize Outlook'**
+  String get authorizeOutlook;
+
+  /// No description provided for @reauthorizeOutlook.
+  ///
+  /// In en, this message translates to:
+  /// **'Reauthorize Outlook'**
+  String get reauthorizeOutlook;
+
+  /// No description provided for @outlookOAuthConnected.
+  ///
+  /// In en, this message translates to:
+  /// **'Outlook authorization is connected.'**
+  String get outlookOAuthConnected;
+
+  /// No description provided for @outlookReauthorizeHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Use reauthorization if Microsoft access was revoked or token refresh fails.'**
+  String get outlookReauthorizeHelp;
+
+  /// No description provided for @outlookAuthorizationSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Outlook authorization saved.'**
+  String get outlookAuthorizationSaved;
+
+  /// No description provided for @outlookAuthorizationCanceled.
+  ///
+  /// In en, this message translates to:
+  /// **'Outlook authorization canceled.'**
+  String get outlookAuthorizationCanceled;
+
+  /// No description provided for @outlookAuthorizationFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Outlook authorization failed: {reason}'**
+  String outlookAuthorizationFailed(String reason);
+
   /// No description provided for @ok.
   ///
   /// In en, this message translates to:

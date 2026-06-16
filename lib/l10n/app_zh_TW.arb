@@ -74,6 +74,22 @@
   },
   "gmailReauthorizeEmailMismatch": "請使用同一個 Gmail 地址重新授權。",
   "gmailReauthorizationRequired": "需要重新授權 Gmail。",
+  "outlookOAuthTitle": "使用 Microsoft 登入",
+  "outlookOAuthSystemBrowserNotice": "MailNest 會在系統瀏覽器中開啟 Microsoft 授權，Token 只儲存到安全儲存空間。",
+  "authorizeOutlook": "授權 Outlook",
+  "reauthorizeOutlook": "重新授權 Outlook",
+  "outlookOAuthConnected": "Outlook 授權已連接。",
+  "outlookReauthorizeHelp": "如果 Microsoft 存取權遭撤銷或 Token 重新整理失敗，請重新授權。",
+  "outlookAuthorizationSaved": "Outlook 授權已儲存。",
+  "outlookAuthorizationCanceled": "Outlook 授權已取消。",
+  "outlookAuthorizationFailed": "Outlook 授權失敗：{reason}",
+  "@outlookAuthorizationFailed": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
   "ok": "確定",
   "qqMail": "QQ 信箱",
   "neteaseMail": "網易信箱",

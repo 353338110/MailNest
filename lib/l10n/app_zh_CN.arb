@@ -74,6 +74,22 @@
   },
   "gmailReauthorizeEmailMismatch": "请使用同一个 Gmail 地址重新授权。",
   "gmailReauthorizationRequired": "需要重新授权 Gmail。",
+  "outlookOAuthTitle": "使用 Microsoft 登录",
+  "outlookOAuthSystemBrowserNotice": "MailNest 会在系统浏览器中打开 Microsoft 授权，Token 只保存到安全存储。",
+  "authorizeOutlook": "授权 Outlook",
+  "reauthorizeOutlook": "重新授权 Outlook",
+  "outlookOAuthConnected": "Outlook 授权已连接。",
+  "outlookReauthorizeHelp": "如果 Microsoft 访问权限被撤销或 Token 刷新失败，请重新授权。",
+  "outlookAuthorizationSaved": "Outlook 授权已保存。",
+  "outlookAuthorizationCanceled": "Outlook 授权已取消。",
+  "outlookAuthorizationFailed": "Outlook 授权失败：{reason}",
+  "@outlookAuthorizationFailed": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
   "ok": "确定",
   "qqMail": "QQ 邮箱",
   "neteaseMail": "网易邮箱",

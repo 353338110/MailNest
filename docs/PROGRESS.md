@@ -40,6 +40,7 @@
 - PR #16：Gmail OAuth，已合并。
 - PR #17：邮件详情和写信翻译 UI，已合并。
 - 本 PR：真实翻译服务和隐私确认，支持可配置 HTTPS Provider、自定义 API Key 和安全存储。
+- 本 PR：Outlook OAuth 授权，支持系统浏览器授权、桌面 loopback 回调、移动端 deeplink 回调和 token 安全存储。
 
 ### 本轮修复与增强
 
@@ -75,9 +76,9 @@
 
 ### PR #19：Outlook 邮件列表、详情和发信
 
-链接：待创建
+链接：已合并
 
-状态：分支 `codex/outlook-mail-provider` 开发中
+状态：已合并
 
 已完成内容：
 
@@ -88,8 +89,8 @@
 - Access token 过期时使用 refresh token 刷新，Graph 返回 401 时刷新并重试一次。
 - Refresh token 缺失或刷新失败时抛出重新授权异常，供 UI 提示重新授权。
 - 发信通过 Graph `sendMail` 保存到已发送邮件，不记录邮件正文。
-- 不实现 Gmail，不实现真实翻译。
 - 增加 Outlook Graph 映射、token 刷新和重新授权异常测试。
+- Outlook OAuth token 仅写入 SecureStorage，SQLite 只保存 token 引用。
 
 ## 已验证
 
@@ -141,11 +142,6 @@ flutter test
 - Gmail 邮件详情。
 - Gmail 发信。
 
-### Outlook
-
-- Outlook OAuth 授权。
-- Token 保存。
-
 ### 翻译
 
 - 翻译结果缓存，可选。
@@ -171,9 +167,8 @@ flutter test
 4. `codex/sync-state`：同步状态持久化、多文件夹增量同步和 UIDVALIDITY 处理。
 5. `codex/mail-actions`：删除、星标、标记未读、移动文件夹和批量操作。
 6. `codex/gmail-mail-provider`：Gmail 邮件列表、详情和发信。
-7. `codex/outlook-oauth`：Outlook OAuth。
-8. `codex/desktop-mobile-polish`：键盘快捷键、右键菜单和更完整的加载/确认状态。
-9. `codex/release-workflow`：发布流程和 tag 自动化。
+7. `codex/desktop-mobile-polish`：键盘快捷键、右键菜单和更完整的加载/确认状态。
+8. `codex/release-workflow`：发布流程和 tag 自动化。
 
 ## 开放 PR
 

@@ -220,6 +220,37 @@ class AppLocalizationsEs extends AppLocalizations {
       'Gmail reauthorization is required.';
 
   @override
+  String get outlookOAuthTitle => 'Sign in with Microsoft';
+
+  @override
+  String get outlookOAuthSystemBrowserNotice =>
+      'MailNest opens Microsoft authorization in your system browser and stores tokens only in secure storage.';
+
+  @override
+  String get authorizeOutlook => 'Authorize Outlook';
+
+  @override
+  String get reauthorizeOutlook => 'Reauthorize Outlook';
+
+  @override
+  String get outlookOAuthConnected => 'Outlook authorization is connected.';
+
+  @override
+  String get outlookReauthorizeHelp =>
+      'Use reauthorization if Microsoft access was revoked or token refresh fails.';
+
+  @override
+  String get outlookAuthorizationSaved => 'Outlook authorization saved.';
+
+  @override
+  String get outlookAuthorizationCanceled => 'Outlook authorization canceled.';
+
+  @override
+  String outlookAuthorizationFailed(String reason) {
+    return 'Outlook authorization failed: $reason';
+  }
+
+  @override
   String get ok => 'OK';
 
   @override

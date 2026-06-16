@@ -212,6 +212,37 @@ class AppLocalizationsZh extends AppLocalizations {
   String get gmailReauthorizationRequired => '需要重新授权 Gmail。';
 
   @override
+  String get outlookOAuthTitle => '使用 Microsoft 登录';
+
+  @override
+  String get outlookOAuthSystemBrowserNotice =>
+      'MailNest 会在系统浏览器中打开 Microsoft 授权，Token 只保存到安全存储。';
+
+  @override
+  String get authorizeOutlook => '授权 Outlook';
+
+  @override
+  String get reauthorizeOutlook => '重新授权 Outlook';
+
+  @override
+  String get outlookOAuthConnected => 'Outlook 授权已连接。';
+
+  @override
+  String get outlookReauthorizeHelp =>
+      '如果 Microsoft 访问权限被撤销或 Token 刷新失败，请重新授权。';
+
+  @override
+  String get outlookAuthorizationSaved => 'Outlook 授权已保存。';
+
+  @override
+  String get outlookAuthorizationCanceled => 'Outlook 授权已取消。';
+
+  @override
+  String outlookAuthorizationFailed(String reason) {
+    return 'Outlook 授权失败：$reason';
+  }
+
+  @override
   String get ok => '确定';
 
   @override
@@ -950,6 +981,37 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get gmailReauthorizationRequired => '需要重新授权 Gmail。';
 
   @override
+  String get outlookOAuthTitle => '使用 Microsoft 登录';
+
+  @override
+  String get outlookOAuthSystemBrowserNotice =>
+      'MailNest 会在系统浏览器中打开 Microsoft 授权，Token 只保存到安全存储。';
+
+  @override
+  String get authorizeOutlook => '授权 Outlook';
+
+  @override
+  String get reauthorizeOutlook => '重新授权 Outlook';
+
+  @override
+  String get outlookOAuthConnected => 'Outlook 授权已连接。';
+
+  @override
+  String get outlookReauthorizeHelp =>
+      '如果 Microsoft 访问权限被撤销或 Token 刷新失败，请重新授权。';
+
+  @override
+  String get outlookAuthorizationSaved => 'Outlook 授权已保存。';
+
+  @override
+  String get outlookAuthorizationCanceled => 'Outlook 授权已取消。';
+
+  @override
+  String outlookAuthorizationFailed(String reason) {
+    return 'Outlook 授权失败：$reason';
+  }
+
+  @override
   String get ok => '确定';
 
   @override
@@ -1617,6 +1679,37 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get gmailReauthorizationRequired => '需要重新授權 Gmail。';
+
+  @override
+  String get outlookOAuthTitle => '使用 Microsoft 登入';
+
+  @override
+  String get outlookOAuthSystemBrowserNotice =>
+      'MailNest 會在系統瀏覽器中開啟 Microsoft 授權，Token 只儲存到安全儲存空間。';
+
+  @override
+  String get authorizeOutlook => '授權 Outlook';
+
+  @override
+  String get reauthorizeOutlook => '重新授權 Outlook';
+
+  @override
+  String get outlookOAuthConnected => 'Outlook 授權已連接。';
+
+  @override
+  String get outlookReauthorizeHelp =>
+      '如果 Microsoft 存取權遭撤銷或 Token 重新整理失敗，請重新授權。';
+
+  @override
+  String get outlookAuthorizationSaved => 'Outlook 授權已儲存。';
+
+  @override
+  String get outlookAuthorizationCanceled => 'Outlook 授權已取消。';
+
+  @override
+  String outlookAuthorizationFailed(String reason) {
+    return 'Outlook 授權失敗：$reason';
+  }
 
   @override
   String get ok => '確定';
