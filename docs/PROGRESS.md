@@ -92,6 +92,23 @@
 - 增加 Outlook Graph 映射、token 刷新和重新授权异常测试。
 - Outlook OAuth token 仅写入 SecureStorage，SQLite 只保存 token 引用。
 
+### PR #23：发布流程和 tag 自动化
+
+链接：待创建
+
+状态：本 PR 实现中
+
+已完成内容：
+
+- 新增 `Release` GitHub Actions workflow。
+- 支持 `vMAJOR.MINOR.PATCH` 格式 SemVer tag 触发，例如 `v0.1.0`、`v0.2.0`。
+- 支持手动输入已有 tag 触发发布。
+- 发布前校验 tag 与 `pubspec.yaml` 版本一致。
+- 发布前运行 format、analyze、test。
+- 生成 GitHub Release 和基础 release notes artifact。
+- 明确 Android、iOS、macOS、Windows、Linux 分阶段发布策略。
+- 不引入自动合并或自动商店发布。
+
 ## 已验证
 
 最近一次功能 PR 合并前，本地和 GitHub Actions 均通过：
@@ -152,11 +169,6 @@ flutter test
 - 右键菜单。
 - 更完整的取消、确认、加载状态。
 
-### CI 与发布
-
-- Release workflow。
-- SemVer tag 发布流程。
-
 ## 后续 PR 队列
 
 建议按以下顺序继续，每项一个 PR：
@@ -168,7 +180,6 @@ flutter test
 5. `codex/mail-actions`：删除、星标、标记未读、移动文件夹和批量操作。
 6. `codex/gmail-mail-provider`：Gmail 邮件列表、详情和发信。
 7. `codex/desktop-mobile-polish`：键盘快捷键、右键菜单和更完整的加载/确认状态。
-8. `codex/release-workflow`：发布流程和 tag 自动化。
 
 ## 开放 PR
 

@@ -23,6 +23,14 @@ flutter analyze
 flutter test
 ```
 
+## Releases
+
+MailNest releases use SemVer tags such as `v0.1.0` and `v0.2.0`.
+
+Pushing a matching tag, or manually running the `Release` workflow with an existing tag, creates a GitHub Release with release notes and the current staged platform publishing strategy. The workflow does not automatically merge branches or publish to app stores.
+
+See [docs/release/RELEASE.md](docs/release/RELEASE.md) for the release checklist, version requirements, and platform rollout strategy.
+
 ## Privacy baseline
 
 MailNest does not store account secrets in SQLite and does not send email content to third-party translation services by default.
