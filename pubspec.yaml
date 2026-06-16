@@ -23,7 +23,7 @@ dependencies:
   http: ^1.6.0
   intl: any
   path: ^1.9.1
-  path_provider: ^2.1.5
+  path_provider: ^2.1.6
   crypto: ^3.0.7
   url_launcher: ^6.3.2
   app_links: ^7.0.0
