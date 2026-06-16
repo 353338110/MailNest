@@ -19,9 +19,9 @@ void main() {
 
       await repository.saveOAuthAccount(
         emailAddress: 'User@Outlook.com',
-        username: 'User@Outlook.com',
+        tokenRef: 'account:user@outlook.com:outlook_oauth',
         provider: EmailProviderType.outlook,
-        oauthTokenRef: 'account:user@outlook.com:outlook_oauth',
+        username: 'User@Outlook.com',
         imapHost: 'outlook.office365.com',
         imapPort: 993,
         imapSecurity: 'ssl',

@@ -11,7 +11,7 @@ import '../../../core/platform/platform_info.dart';
 import '../../../core/platform/system_browser.dart';
 import '../../../core/secure_storage/secure_storage_service.dart';
 import 'oauth_exception.dart';
-import 'oauth_service.dart';
+import 'oauth_service.dart' show OAuthService;
 import 'oauth_token.dart';
 import 'pkce_pair.dart';
 
@@ -358,9 +358,11 @@ class OutlookOAuthService implements OAuthService {
       accessToken: json['access_token'] as String,
       refreshToken: refreshToken,
       expiresAt: DateTime.now().add(Duration(seconds: expiresIn)),
-      scopes: scope == null ? scopes : scope.split(' '),
+      scope: scope ?? scopes.join(' '),
       idToken: json['id_token'] as String?,
       tokenType: json['token_type'] as String? ?? 'Bearer',
+      clientId: _clientId,
+      tokenEndpoint: _tokenEndpoint.toString(),
     );
   }
 

@@ -2,6 +2,12 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
+
+import '../body/email_body_parser.dart';
+import '../models/mail_header.dart';
+import '../models/sync_cursor.dart';
+
 /// Tests IMAP and SMTP credentials without syncing or storing any mail data.
 ///
 /// The service intentionally returns compact user-facing failures and never
@@ -146,6 +152,21 @@ class MailProtocolException implements Exception {
   const MailProtocolException(this.message);
 
   final String message;
+
+  @override
+  String toString() => message;
+}
+
+class ImapFolderInfo {
+  const ImapFolderInfo({
+    required this.name,
+    required this.attributes,
+    this.delimiter,
+  });
+
+  final String name;
+  final List<String> attributes;
+  final String? delimiter;
 }
 
 class ImapClient {
@@ -201,6 +222,98 @@ class ImapClient {
     await _command('LOGOUT');
   }
 
+  Future<List<ImapFolderInfo>> listFolders() async {
+    final tag = 'mn${_tag++}';
+    _socket.write('$tag LIST "" "*"\r\n');
+    final folders = <ImapFolderInfo>[];
+
+    while (true) {
+      final line = await _readLine();
+      if (line.startsWith(tag)) {
+        final response = _TaggedResponse(line);
+        if (!response.isOk) {
+          throw const MailProtocolException('IMAP folder list failed.');
+        }
+        return folders;
+      }
+      final folder = _parseListFolder(line);
+      if (folder != null) {
+        folders.add(folder);
+      }
+    }
+  }
+
+  Future<List<MailHeader>> fetchHeaders({
+    required String folderName,
+    required DateTime since,
+    required SyncCursor cursor,
+  }) async {
+    final select = await _command('SELECT ${_imapQuote(folderName)}');
+    if (!select.isOk) {
+      throw const MailProtocolException('IMAP folder selection failed.');
+    }
+
+    final uidRange = cursor.lastUid == null
+        ? '1:*'
+        : '${cursor.lastUid! + 1}:*';
+    final search = await _command(
+      'UID SEARCH SINCE ${_imapSearchDate(since)} UID $uidRange',
+    );
+    if (!search.isOk) {
+      throw const MailProtocolException('IMAP header search failed.');
+    }
+
+    final uids = _parseSearchUids(search.lines);
+    if (uids.isEmpty) {
+      return const [];
+    }
+
+    final fetch = await _command(
+      'UID FETCH ${_collapseUidSet(uids)} '
+      '(UID FLAGS INTERNALDATE BODYSTRUCTURE '
+      'BODY.PEEK[HEADER.FIELDS (MESSAGE-ID DATE FROM TO SUBJECT)])',
+    );
+    if (!fetch.isOk) {
+      throw const MailProtocolException('IMAP header fetch failed.');
+    }
+    return _parseFetchedHeaders(fetch.lines);
+  }
+
+  Future<void> appendMessage({
+    required String folderName,
+    required String rfc822Content,
+    required DateTime sentAt,
+  }) async {
+    final tag = 'mn${_tag++}';
+    final bytes = utf8.encode(rfc822Content);
+    final flags = r'(\Seen)';
+    final date = _imapInternalDate(sentAt);
+    _socket.write(
+      '$tag APPEND ${_imapQuote(folderName)} $flags "$date" {${bytes.length}}\r\n',
+    );
+    await _socket.flush();
+
+    final continuation = await _readLine();
+    if (!continuation.startsWith('+')) {
+      throw const MailProtocolException('IMAP APPEND was rejected.');
+    }
+
+    _socket.add(bytes);
+    _socket.write('\r\n');
+    await _socket.flush();
+
+    while (true) {
+      final line = await _readLine();
+      if (line.startsWith(tag)) {
+        final response = _TaggedResponse(line);
+        if (!response.isOk) {
+          throw const MailProtocolException('IMAP APPEND failed.');
+        }
+        return;
+      }
+    }
+  }
+
   void close() {
     _socket.destroy();
   }
@@ -208,12 +321,15 @@ class ImapClient {
   Future<_TaggedResponse> _command(String command) async {
     final tag = 'mn${_tag++}';
     _socket.write('$tag $command\r\n');
+    await _socket.flush();
 
+    final lines = <String>[];
     while (true) {
       final line = await _readLine();
       if (line.startsWith(tag)) {
-        return _TaggedResponse(line);
+        return _TaggedResponse(line, lines);
       }
+      lines.add(line);
     }
   }
 
@@ -272,6 +388,29 @@ class SmtpClient {
     await _expectCode(334);
     await _writeCommand(base64Encode(utf8.encode(secret)));
     await _expectCode(235);
+  }
+
+  Future<void> sendMessage({
+    required String fromEmail,
+    required List<String> recipients,
+    required String rfc822Content,
+  }) async {
+    await _writeCommand('MAIL FROM:<$fromEmail>');
+    await _expectCode(250);
+    for (final recipient in recipients) {
+      await _writeCommand('RCPT TO:<$recipient>');
+      final response = await _readResponse();
+      if (response.code != 250 && response.code != 251) {
+        throw MailProtocolException(
+          'SMTP server rejected a recipient with ${response.code}.',
+        );
+      }
+    }
+    await _writeCommand('DATA');
+    await _expectCode(354);
+    _socket.write('${_dotStuff(rfc822Content)}\r\n.\r\n');
+    await _socket.flush();
+    await _expectCode(250);
   }
 
   Future<void> quit() async {
@@ -344,7 +483,10 @@ Future<Socket> _openSocket({
 Stream<String> _lineStream(Socket socket) {
   return socket
       .cast<List<int>>()
-      .transform(utf8.decoder)
+      // IMAP protocol atoms are ASCII, while header literals may carry
+      // non-UTF-8 bytes. Latin-1 keeps bytes reversible until MIME charset
+      // decoding runs.
+      .transform(latin1.decoder)
       .transform(const LineSplitter())
       .map((line) => line.trimRight());
 }
@@ -354,10 +496,390 @@ String _imapQuote(String value) {
   return '"$escaped"';
 }
 
+ImapFolderInfo? _parseListFolder(String line) {
+  final match = RegExp(
+    r'^\* LIST \(([^)]*)\) ("([^"]*)"|NIL) (.+)$',
+    caseSensitive: false,
+  ).firstMatch(line);
+  if (match == null) {
+    return null;
+  }
+
+  final attributes = match
+      .group(1)!
+      .split(' ')
+      .where((value) => value.isNotEmpty)
+      .toList(growable: false);
+  final delimiter = match.group(3);
+  final namePart = match.group(4)!.trim();
+  final name = _decodeImapListString(namePart);
+  if (name.isEmpty) {
+    return null;
+  }
+
+  return ImapFolderInfo(
+    name: name,
+    attributes: attributes,
+    delimiter: delimiter,
+  );
+}
+
+String _decodeImapListString(String value) {
+  if (value.startsWith('"') && value.endsWith('"')) {
+    return value
+        .substring(1, value.length - 1)
+        .replaceAll(r'\"', '"')
+        .replaceAll(r'\\', r'\');
+  }
+  return value;
+}
+
+String _imapInternalDate(DateTime dateTime) {
+  final utc = dateTime.toUtc();
+  const months = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+  ];
+  final day = utc.day.toString().padLeft(2, '0');
+  final month = months[utc.month - 1];
+  final hour = utc.hour.toString().padLeft(2, '0');
+  final minute = utc.minute.toString().padLeft(2, '0');
+  final second = utc.second.toString().padLeft(2, '0');
+  return '$day-$month-${utc.year} $hour:$minute:$second +0000';
+}
+
+String _dotStuff(String value) {
+  return value
+      .replaceAll('\r\n', '\n')
+      .split('\n')
+      .map((line) => line.startsWith('.') ? '.$line' : line)
+      .join('\r\n')
+      .trimRight();
+}
+
+List<int> _parseSearchUids(List<String> lines) {
+  for (final line in lines) {
+    if (!line.startsWith('* SEARCH')) {
+      continue;
+    }
+    return line
+        .substring('* SEARCH'.length)
+        .trim()
+        .split(RegExp(r'\s+'))
+        .map(int.tryParse)
+        .whereType<int>()
+        .toList(growable: false);
+  }
+  return const <int>[];
+}
+
+Future<List<MailHeader>> _parseFetchedHeaders(List<String> lines) async {
+  final headers = <MailHeader>[];
+  _FetchedHeaderBlock? current;
+  final headerBuffer = StringBuffer();
+
+  Future<void> flush() async {
+    if (current == null) {
+      return;
+    }
+    headers.add(
+      await _mailHeaderFromBlock(
+        block: current!,
+        rawHeader: headerBuffer.toString(),
+      ),
+    );
+    current = null;
+    headerBuffer.clear();
+  }
+
+  for (final line in lines) {
+    if (line.startsWith('* ') && line.contains(' FETCH ')) {
+      await flush();
+      current = _FetchedHeaderBlock.fromLine(line);
+      continue;
+    }
+    if (line == ')') {
+      await flush();
+      continue;
+    }
+    if (current != null) {
+      headerBuffer.writeln(line);
+    }
+  }
+  await flush();
+
+  return headers;
+}
+
+Future<MailHeader> _mailHeaderFromBlock({
+  required _FetchedHeaderBlock block,
+  required String rawHeader,
+}) async {
+  final fields = _parseHeaderFields(rawHeader);
+  final subject = (await SimpleEmailBodyParser.decodeHeader(
+    fields['subject'],
+  )).trim();
+  final sender = (await SimpleEmailBodyParser.decodeAddressHeader(
+    fields['from'],
+  )).trim();
+  final recipients = _splitAddresses(
+    await SimpleEmailBodyParser.decodeHeader(fields['to']),
+  );
+  final receivedAt =
+      parseMailHeaderDate(fields['date']) ??
+      block.internalDate ??
+      DateTime.now();
+
+  return MailHeader(
+    id: block.uid.toString(),
+    uid: block.uid,
+    messageId: fields['message-id']?.trim(),
+    subject: subject.isEmpty ? '(No subject)' : subject,
+    sender: sender.isEmpty ? 'Unknown sender' : sender,
+    recipients: recipients,
+    receivedAt: receivedAt,
+    preview: sender.isEmpty ? null : sender,
+    isRead: block.flags.any((flag) => flag.toLowerCase() == r'\seen'),
+    isStarred: block.flags.any((flag) => flag.toLowerCase() == r'\flagged'),
+    hasAttachments: block.hasAttachments,
+  );
+}
+
+Map<String, String> _parseHeaderFields(String rawHeader) {
+  final fields = <String, String>{};
+  String? currentKey;
+  final currentValue = StringBuffer();
+
+  void flush() {
+    final key = currentKey;
+    if (key == null) {
+      return;
+    }
+    fields[key] = currentValue.toString().trim();
+    currentValue.clear();
+  }
+
+  for (final rawLine in rawHeader.split('\n')) {
+    final line = rawLine.trimRight();
+    if (line.isEmpty || line == ')') {
+      continue;
+    }
+    if (line.startsWith(' ') || line.startsWith('\t')) {
+      currentValue.write(' ${line.trim()}');
+      continue;
+    }
+    final separator = line.indexOf(':');
+    if (separator <= 0) {
+      continue;
+    }
+    flush();
+    currentKey = line.substring(0, separator).toLowerCase();
+    currentValue.write(line.substring(separator + 1).trim());
+  }
+  flush();
+  return fields;
+}
+
+@visibleForTesting
+DateTime? parseMailHeaderDate(String? value) {
+  if (value == null || value.trim().isEmpty) {
+    return null;
+  }
+  final trimmed = value.trim();
+  try {
+    return HttpDate.parse(trimmed).toLocal();
+  } on FormatException {
+    return _parseFlexibleMailDate(trimmed);
+  } on HttpException {
+    return _parseFlexibleMailDate(trimmed);
+  }
+}
+
+DateTime? _parseFlexibleMailDate(String value) {
+  return _parseImapDateTime(value) ?? _parseRfc822DateTime(value);
+}
+
+DateTime? _parseImapDateTime(String value) {
+  final match = RegExp(
+    r'^(\d{1,2})-([A-Za-z]{3})-(\d{4}) '
+    r'(\d{2}):(\d{2}):(\d{2}) ([+-]\d{4})$',
+  ).firstMatch(value);
+  if (match == null) {
+    return null;
+  }
+
+  final month = _monthNumber(match.group(2)!);
+  if (month == null) {
+    return null;
+  }
+
+  final day = int.parse(match.group(1)!);
+  final year = int.parse(match.group(3)!);
+  final hour = int.parse(match.group(4)!);
+  final minute = int.parse(match.group(5)!);
+  final second = int.parse(match.group(6)!);
+  final offset = _parseTimeZoneOffset(match.group(7)!);
+  final localDate = DateTime.utc(year, month, day, hour, minute, second);
+  return localDate.subtract(offset).toLocal();
+}
+
+DateTime? _parseRfc822DateTime(String value) {
+  final normalized = value.replaceFirst(RegExp(r'^[A-Za-z]{3},\s*'), '');
+  final match = RegExp(
+    r'^(\d{1,2}) ([A-Za-z]{3}) (\d{4}) '
+    r'(\d{2}):(\d{2})(?::(\d{2}))? ([+-]\d{4})$',
+  ).firstMatch(normalized);
+  if (match == null) {
+    return null;
+  }
+
+  final month = _monthNumber(match.group(2)!);
+  if (month == null) {
+    return null;
+  }
+
+  final day = int.parse(match.group(1)!);
+  final year = int.parse(match.group(3)!);
+  final hour = int.parse(match.group(4)!);
+  final minute = int.parse(match.group(5)!);
+  final second = int.parse(match.group(6) ?? '0');
+  final offset = _parseTimeZoneOffset(match.group(7)!);
+  final localDate = DateTime.utc(year, month, day, hour, minute, second);
+  return localDate.subtract(offset).toLocal();
+}
+
+int? _monthNumber(String value) {
+  const months = {
+    'jan': 1,
+    'feb': 2,
+    'mar': 3,
+    'apr': 4,
+    'may': 5,
+    'jun': 6,
+    'jul': 7,
+    'aug': 8,
+    'sep': 9,
+    'oct': 10,
+    'nov': 11,
+    'dec': 12,
+  };
+  return months[value.toLowerCase()];
+}
+
+Duration _parseTimeZoneOffset(String value) {
+  final sign = value.startsWith('-') ? -1 : 1;
+  final hours = int.parse(value.substring(1, 3));
+  final minutes = int.parse(value.substring(3, 5));
+  return Duration(minutes: sign * (hours * 60 + minutes));
+}
+
+List<String> _splitAddresses(String value) {
+  if (value.trim().isEmpty) {
+    return const <String>[];
+  }
+  return value
+      .split(',')
+      .map((address) => address.trim())
+      .where((address) => address.isNotEmpty)
+      .toList(growable: false);
+}
+
+String _collapseUidSet(List<int> uids) {
+  if (uids.isEmpty) {
+    return '';
+  }
+  final sorted = [...uids]..sort();
+  final ranges = <String>[];
+  var start = sorted.first;
+  var end = sorted.first;
+  for (final uid in sorted.skip(1)) {
+    if (uid == end + 1) {
+      end = uid;
+      continue;
+    }
+    ranges.add(start == end ? '$start' : '$start:$end');
+    start = uid;
+    end = uid;
+  }
+  ranges.add(start == end ? '$start' : '$start:$end');
+  return ranges.join(',');
+}
+
+String _imapSearchDate(DateTime value) {
+  final utc = value.toUtc();
+  const months = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+  ];
+  return '${utc.day}-${months[utc.month - 1]}-${utc.year}';
+}
+
+class _FetchedHeaderBlock {
+  const _FetchedHeaderBlock({
+    required this.uid,
+    required this.flags,
+    required this.hasAttachments,
+    this.internalDate,
+  });
+
+  final int uid;
+  final List<String> flags;
+  final bool hasAttachments;
+  final DateTime? internalDate;
+
+  static _FetchedHeaderBlock fromLine(String line) {
+    final uid = int.tryParse(
+      RegExp(r'\bUID\s+(\d+)').firstMatch(line)?.group(1) ?? '',
+    );
+    if (uid == null) {
+      throw const MailProtocolException('IMAP response did not include a UID.');
+    }
+
+    final flagsText = RegExp(r'FLAGS\s+\(([^)]*)\)').firstMatch(line)?.group(1);
+    final flags = flagsText == null
+        ? const <String>[]
+        : flagsText
+              .split(RegExp(r'\s+'))
+              .where((flag) => flag.isNotEmpty)
+              .toList(growable: false);
+    final internalDateText = RegExp(
+      r'INTERNALDATE\s+"([^"]+)"',
+    ).firstMatch(line)?.group(1);
+
+    return _FetchedHeaderBlock(
+      uid: uid,
+      flags: flags,
+      internalDate: parseMailHeaderDate(internalDateText),
+      hasAttachments: line.toLowerCase().contains('attachment'),
+    );
+  }
+}
+
 class _TaggedResponse {
-  const _TaggedResponse(this.line);
+  const _TaggedResponse(this.line, [this.lines = const <String>[]]);
 
   final String line;
+  final List<String> lines;
 
   bool get isOk => line.contains(' OK ');
 }

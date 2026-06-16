@@ -16,7 +16,23 @@ class AccountRepository {
 
   Stream<List<EmailAccount>> watchAccounts() => database.watchAccounts();
 
+  Stream<List<AccountGroup>> watchAccountGroups() {
+    return database.watchAccountGroups();
+  }
+
+  Future<List<AccountGroup>> accountGroupsSnapshot() {
+    return database.accountGroupsSnapshot();
+  }
+
   Future<EmailAccount?> getAccount(String id) => database.getAccount(id);
+
+  Future<String?> readSecretForAccount(EmailAccount account) {
+    final secretRef = account.secretRef;
+    if (secretRef == null) {
+      return Future.value();
+    }
+    return secureStorage.readSecret(secretRef);
+  }
 
   Future<void> savePasswordAccount({
     required String emailAddress,
@@ -31,17 +47,21 @@ class AccountRepository {
     required String smtpSecurity,
     required bool smtpStartTls,
     String? displayName,
+    String? groupName,
   }) async {
     final now = DateTime.now();
     final accountId = _accountId(emailAddress);
     final secretRef = 'account:$accountId:password';
+    final normalizedGroupName = _normalizedGroupName(groupName);
 
     await secureStorage.writeSecret(ref: secretRef, value: secret);
+    await database.saveAccountGroup(normalizedGroupName);
     await database.saveAccount(
       EmailAccountsCompanion(
         id: Value(accountId),
         emailAddress: Value(emailAddress),
         displayName: Value(displayName),
+        groupName: Value(normalizedGroupName),
         provider: Value(provider.storageValue),
         username: Value(username),
         authType: const Value('app_password'),
@@ -73,18 +93,22 @@ class AccountRepository {
     required String smtpSecurity,
     required bool smtpStartTls,
     String? displayName,
+    String? groupName,
     String? newSecret,
   }) async {
     final secretRef = current.secretRef ?? 'account:${current.id}:password';
+    final normalizedGroupName = _normalizedGroupName(groupName);
     if (newSecret != null && newSecret.isNotEmpty) {
       await secureStorage.writeSecret(ref: secretRef, value: newSecret);
     }
 
+    await database.saveAccountGroup(normalizedGroupName);
     await database.saveAccount(
       EmailAccountsCompanion(
         id: Value(current.id),
         emailAddress: Value(current.emailAddress),
         displayName: Value(displayName),
+        groupName: Value(normalizedGroupName),
         provider: Value(provider.storageValue),
         username: Value(username),
         authType: Value(current.authType),
@@ -106,29 +130,33 @@ class AccountRepository {
 
   Future<void> saveOAuthAccount({
     required String emailAddress,
-    required String username,
+    required String tokenRef,
     required EmailProviderType provider,
-    required String oauthTokenRef,
-    required String imapHost,
-    required int imapPort,
-    required String imapSecurity,
-    required String smtpHost,
-    required int smtpPort,
-    required String smtpSecurity,
-    required bool smtpStartTls,
     String? displayName,
+    String? groupName,
+    String? username,
+    String imapHost = '',
+    int imapPort = 993,
+    String imapSecurity = 'ssl',
+    String smtpHost = '',
+    int smtpPort = 587,
+    String smtpSecurity = 'starttls',
+    bool smtpStartTls = true,
   }) async {
     final now = DateTime.now();
     final accountId = _accountId(emailAddress);
     final current = await database.getAccount(accountId);
+    final normalizedGroupName = _normalizedGroupName(groupName);
 
+    await database.saveAccountGroup(normalizedGroupName);
     await database.saveAccount(
       EmailAccountsCompanion(
         id: Value(accountId),
         emailAddress: Value(emailAddress),
         displayName: Value(displayName),
+        groupName: Value(normalizedGroupName),
         provider: Value(provider.storageValue),
-        username: Value(username),
+        username: Value(username ?? emailAddress),
         authType: const Value('oauth'),
         imapHost: Value(imapHost),
         imapPort: Value(imapPort),
@@ -138,7 +166,7 @@ class AccountRepository {
         smtpSecurity: Value(smtpSecurity),
         smtpStartTls: Value(smtpStartTls),
         secretRef: const Value(null),
-        oauthTokenRef: Value(oauthTokenRef),
+        oauthTokenRef: Value(tokenRef),
         syncEnabled: Value(current?.syncEnabled ?? true),
         createdAt: Value(current?.createdAt ?? now),
         updatedAt: Value(now),
@@ -149,45 +177,53 @@ class AccountRepository {
       await secureStorage.deleteSecret(current!.secretRef!);
     }
     final previousTokenRef = current?.oauthTokenRef;
-    if (previousTokenRef != null && previousTokenRef != oauthTokenRef) {
+    if (previousTokenRef != null && previousTokenRef != tokenRef) {
       await secureStorage.deleteSecret(previousTokenRef);
     }
   }
 
   Future<void> updateOAuthAccount({
     required EmailAccount current,
-    required String username,
-    required EmailProviderType provider,
-    required String oauthTokenRef,
-    required String imapHost,
-    required int imapPort,
-    required String imapSecurity,
-    required String smtpHost,
-    required int smtpPort,
-    required String smtpSecurity,
-    required bool smtpStartTls,
+    required String tokenRef,
     String? displayName,
+    String? groupName,
+    EmailProviderType? provider,
+    String? username,
+    String? imapHost,
+    int? imapPort,
+    String? imapSecurity,
+    String? smtpHost,
+    int? smtpPort,
+    String? smtpSecurity,
+    bool? smtpStartTls,
   }) async {
     final previousSecretRef = current.secretRef;
-    final previousTokenRef = current.oauthTokenRef;
+    if (current.oauthTokenRef != null && current.oauthTokenRef != tokenRef) {
+      await secureStorage.deleteSecret(current.oauthTokenRef!);
+    }
 
+    final normalizedGroupName = _normalizedGroupName(groupName);
+    await database.saveAccountGroup(normalizedGroupName);
     await database.saveAccount(
       EmailAccountsCompanion(
         id: Value(current.id),
         emailAddress: Value(current.emailAddress),
         displayName: Value(displayName),
-        provider: Value(provider.storageValue),
-        username: Value(username),
+        groupName: Value(normalizedGroupName),
+        provider: Value(
+          (provider ?? _providerFromAccount(current)).storageValue,
+        ),
+        username: Value(username ?? current.username),
         authType: const Value('oauth'),
-        imapHost: Value(imapHost),
-        imapPort: Value(imapPort),
-        imapSecurity: Value(imapSecurity),
-        smtpHost: Value(smtpHost),
-        smtpPort: Value(smtpPort),
-        smtpSecurity: Value(smtpSecurity),
-        smtpStartTls: Value(smtpStartTls),
+        imapHost: Value(imapHost ?? current.imapHost),
+        imapPort: Value(imapPort ?? current.imapPort),
+        imapSecurity: Value(imapSecurity ?? current.imapSecurity),
+        smtpHost: Value(smtpHost ?? current.smtpHost),
+        smtpPort: Value(smtpPort ?? current.smtpPort),
+        smtpSecurity: Value(smtpSecurity ?? current.smtpSecurity),
+        smtpStartTls: Value(smtpStartTls ?? current.smtpStartTls),
         secretRef: const Value(null),
-        oauthTokenRef: Value(oauthTokenRef),
+        oauthTokenRef: Value(tokenRef),
         syncEnabled: Value(current.syncEnabled),
         createdAt: Value(current.createdAt),
         updatedAt: Value(DateTime.now()),
@@ -196,9 +232,6 @@ class AccountRepository {
 
     if (previousSecretRef != null) {
       await secureStorage.deleteSecret(previousSecretRef);
-    }
-    if (previousTokenRef != null && previousTokenRef != oauthTokenRef) {
-      await secureStorage.deleteSecret(previousTokenRef);
     }
   }
 
@@ -228,7 +261,49 @@ class AccountRepository {
     }
   }
 
+  Future<void> createGroup(String name) {
+    return database.saveAccountGroup(_normalizedGroupName(name));
+  }
+
+  Future<void> renameGroup({required String oldName, required String newName}) {
+    return database.renameAccountGroup(
+      oldName: oldName,
+      newName: _normalizedGroupName(newName),
+    );
+  }
+
+  Future<bool> deleteGroupIfEmpty(String name) async {
+    final accountCount = await database.countAccountsInGroup(name);
+    if (accountCount > 0) {
+      return false;
+    }
+    await database.deleteAccountGroup(name);
+    return true;
+  }
+
+  Future<void> moveAccountsToGroup({
+    required List<String> accountIds,
+    required String groupName,
+  }) {
+    return database.moveAccountsToGroup(
+      accountIds: accountIds,
+      groupName: _normalizedGroupName(groupName),
+    );
+  }
+
   String _accountId(String emailAddress) {
     return emailAddress.trim().toLowerCase();
+  }
+
+  EmailProviderType _providerFromAccount(EmailAccount account) {
+    return EmailProviderType.values.firstWhere(
+      (provider) => provider.storageValue == account.provider,
+      orElse: () => EmailProviderType.custom,
+    );
+  }
+
+  String _normalizedGroupName(String? groupName) {
+    final trimmed = groupName?.trim();
+    return trimmed == null || trimmed.isEmpty ? 'Personal' : trimmed;
   }
 }

@@ -7,10 +7,42 @@
   "translationSettings": "翻譯設定",
   "translationPrivacyNote": "MailNest 預設不會把郵件內容傳送到第三方翻譯服務。",
   "translationMockOnly": "第一版只包含翻譯入口和 Mock 服務。",
+  "translate": "翻譯",
+  "targetLanguage": "目標語言",
+  "translationSourceEmpty": "沒有可翻譯的文字。",
+  "translationFailed": "翻譯失敗：{reason}",
+  "translationCopied": "譯文已複製。",
+  "translatedText": "譯文",
+  "originalText": "原文",
+  "translateAgain": "重新翻譯",
+  "copyTranslation": "複製譯文",
+  "useTranslation": "使用譯文",
+  "mailDetail": "郵件詳情",
+  "from": "寄件者",
+  "received": "接收時間",
+  "translateMessage": "翻譯郵件",
+  "composeMail": "寫郵件",
+  "translateBody": "翻譯正文",
+  "to": "收件者",
+  "subject": "主旨",
+  "body": "正文",
+  "send": "傳送",
+  "openMailDetailPreview": "開啟郵件詳情預覽",
   "addEmailAccount": "新增信箱帳號",
   "noAccountsYet": "尚無信箱帳號。",
   "emailAddress": "信箱地址",
   "displayName": "顯示名稱",
+  "accountGroup": "帳號分組",
+  "accountGroupHelp": "同一分組內的帳號會一起查看。",
+  "accountGroups": "帳號分組",
+  "defaultAccountGroup": "個人",
+  "accountGroupActions": "分組操作",
+  "addAccountGroup": "新增分組",
+  "renameAccountGroup": "重新命名分組",
+  "deleteAccountGroup": "刪除分組",
+  "moveAccountsToGroup": "批次修改帳號分組",
+  "accountGroupDeleted": "分組已刪除。",
+  "accountGroupDeleteBlocked": "此分組下仍有帳號，不能刪除。",
   "username": "使用者名稱",
   "passwordOrAppPassword": "密碼或授權碼",
   "imapSettings": "IMAP 設定",
@@ -24,6 +56,40 @@
   "requiredField": "此欄位必填。",
   "invalidPort": "請輸入有效連接埠。",
   "oauthFutureNotice": "真實 OAuth 授權將在後續版本支援。",
+  "gmailOAuthTitle": "使用 Google 登入",
+  "gmailOAuthSystemBrowserNotice": "MailNest 會在系統瀏覽器中開啟 Google 授權，Token 只儲存到安全儲存空間。",
+  "authorizeGmail": "授權 Gmail",
+  "reauthorizeGmail": "重新授權 Gmail",
+  "gmailOAuthConnected": "Gmail 授權已連接。",
+  "gmailReauthorizeHelp": "如果 Google 存取權遭撤銷或 Token 重新整理失敗，請重新授權。",
+  "gmailAuthorizationSaved": "Gmail 授權已儲存。",
+  "gmailAuthorizationCanceled": "Gmail 授權已取消。",
+  "gmailAuthorizationFailed": "Gmail 授權失敗：{reason}",
+  "@gmailAuthorizationFailed": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "gmailReauthorizeEmailMismatch": "請使用同一個 Gmail 地址重新授權。",
+  "gmailReauthorizationRequired": "需要重新授權 Gmail。",
+  "outlookOAuthTitle": "使用 Microsoft 登入",
+  "outlookOAuthSystemBrowserNotice": "MailNest 會在系統瀏覽器中開啟 Microsoft 授權，Token 只儲存到安全儲存空間。",
+  "authorizeOutlook": "授權 Outlook",
+  "reauthorizeOutlook": "重新授權 Outlook",
+  "outlookOAuthConnected": "Outlook 授權已連接。",
+  "outlookReauthorizeHelp": "如果 Microsoft 存取權遭撤銷或 Token 重新整理失敗，請重新授權。",
+  "outlookAuthorizationSaved": "Outlook 授權已儲存。",
+  "outlookAuthorizationCanceled": "Outlook 授權已取消。",
+  "outlookAuthorizationFailed": "Outlook 授權失敗：{reason}",
+  "@outlookAuthorizationFailed": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
   "ok": "確定",
   "qqMail": "QQ 信箱",
   "neteaseMail": "網易信箱",
@@ -45,5 +111,180 @@
   "connectionTestSucceeded": "IMAP 和 SMTP 連線測試通過。",
   "connectionTestFailed": "連線測試失敗：{reason}",
   "passwordRequiredForConnectionTest": "請先輸入密碼或授權碼再測試。",
-  "unknownError": "未知錯誤"
+  "unknownError": "未知錯誤",
+  "searchMail": "搜尋郵件",
+  "searchMailHint": "寄件人、收件人、主旨、摘要或已快取內文",
+  "clearSearch": "清除搜尋",
+  "localSearchLocalOnlyNotice": "搜尋只涵蓋已同步到此裝置的郵件。尚未同步到本機的郵件不會出現在結果中。",
+  "searchMailEmptyPrompt": "搜尋本機已同步郵件。",
+  "searchMailFailed": "搜尋失敗，請重試。",
+  "noLocalSearchResults": "沒有找到「{query}」的本機結果。",
+  "@noLocalSearchResults": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "localSearchResultCount": "{count} 筆本機結果",
+  "@localSearchResultCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noSubject": "（無主旨）",
+  "backupAndMigration": "備份與遷移",
+  "backupAndMigrationSubtitle": "匯出加密設定備份。",
+  "exportConfiguration": "匯出設定",
+  "backupExportDescription": "建立包含帳號設定、伺服器設定和應用程式偏好的加密備份。匯入功能將在後續版本加入。",
+  "backupIncludes": "匯出內容",
+  "backupIncludesAccounts": "帳號設定",
+  "backupIncludesServerSettings": "IMAP 和 SMTP 設定",
+  "backupIncludesUserSettings": "使用者設定",
+  "backupIncludesLanguageSettings": "語言設定",
+  "backupIncludesTranslationSettings": "翻譯設定",
+  "backupExcludes": "預設不匯出",
+  "backupExcludesMailBodies": "郵件正文",
+  "backupExcludesHeaderCache": "郵件標頭快取",
+  "backupExcludesAttachmentCache": "附件快取",
+  "backupExcludesSearchIndex": "搜尋索引",
+  "exportPassword": "匯出密碼",
+  "confirmExportPassword": "確認匯出密碼",
+  "exportPasswordsDoNotMatch": "兩次輸入的密碼不一致。",
+  "exportPasswordNotSaved": "此密碼只用於加密匯出檔案，MailNest 不會保存。",
+  "exportBackup": "匯出備份",
+  "exportingBackup": "正在匯出...",
+  "backupExported": "備份已匯出：{fileName}",
+  "backupExportedTo": "已保存到 {filePath}",
+  "backupExportFailed": "備份匯出失敗。",
+  "sentMessages": "已傳送",
+  "noSentMessagesYet": "尚無已傳送郵件。",
+  "sentToRecipients": "收件人：{recipients}",
+  "chooseSentFolder": "選擇 Sent 資料夾",
+  "sentFolderOnlyLocalRecord": "這封郵件僅儲存了本機傳送記錄。",
+  "sentFolderSavePending": "正在儲存到 Sent",
+  "sentFolderSaved": "已儲存到 {folderName}",
+  "sentFolderSelectionRequired": "請選擇 Sent 資料夾",
+  "sentFolderSaveFailed": "Sent 資料夾儲存失敗",
+  "sentFolderAppendSucceeded": "已儲存到 {folderName}。",
+  "sentFolderAppendFailed": "無法儲存到 Sent：{reason}",
+  "inbox": "收件匣",
+  "folders": "資料夾",
+  "accounts": "帳號",
+  "composeEmail": "寫郵件",
+  "composeFutureNotice": "寫郵件功能將在後續版本提供。",
+  "foldersFutureNotice": "加入郵件同步後將支援資料夾導覽。",
+  "syncMail": "同步邮件",
+  "mailSyncFailed": "邮件同步失败：{reason}",
+  "@mailSyncFailed": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "retry": "重试",
+  "mailboxes": "信箱",
+  "unifiedInbox": "統一收件匣",
+  "filters": "篩選",
+  "unread": "未讀",
+  "starred": "星標",
+  "trash": "垃圾桶",
+  "account": "帳號",
+  "folder": "資料夾",
+  "fullMessageBodiesFutureNotice": "完整郵件正文將在後續 PR 中顯示。",
+  "noMessageSelected": "未選擇郵件",
+  "messageContentsPlaceholder": "郵件內容會顯示在寬螢幕桌面的這裡。",
+  "accountMailbox": "帳號信箱",
+  "allMessages": "全部",
+  "mailMessageCount": "{count} 封郵件",
+  "@mailMessageCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noMessagesMatchFilter": "沒有符合此篩選條件的郵件。",
+  "noMessages": "沒有郵件。",
+  "attachments": "附件",
+  "emptyMessageBody": "這封郵件沒有可讀內文。",
+  "htmlShownAsSource": "目前以原始碼文字顯示 HTML。不會載入遠端圖片。",
+  "remoteImagesBlocked": "此郵件包含遠端圖片，目前已阻止載入。",
+  "loadRemoteImages": "載入圖片",
+  "viewAsPlainText": "以純文字查看",
+  "htmlSanitizedNotice": "HTML 已經過安全清理後顯示。腳本和不安全內容已被阻止。",
+  "unsupportedMessageFormat": "此郵件格式暫不完全支援。",
+  "encryptedMessageUnsupported": "此郵件為加密郵件，目前版本暫不支援解密。",
+  "signedMessageNotice": "簽名驗證功能將在後續版本支援。",
+  "messageLoadFailed": "無法載入郵件。",
+  "formValidationFailed": "請先補全帳號必填資訊。",
+  "accountSaveFailed": "帳號儲存失敗：{reason}",
+  "@accountSaveFailed": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "translationSettingsLoadFailed": "無法載入翻譯設定。",
+  "translationProviderEnabledTitle": "使用第三方翻譯服務",
+  "translationProviderEnabledSubtitle": "啟用後，選取的郵件內容可能會傳送到你設定的服務。",
+  "translationProviderLabel": "服務商",
+  "translationHttpsEndpointLabel": "HTTPS 位址",
+  "translationHttpsEndpointHint": "https://example.com/translate",
+  "translationEndpointValidation": "請輸入有效的 HTTPS 位址。",
+  "translationApiKeyLabel": "API Key",
+  "translationApiKeySavedHelper": "已儲存的 API Key 會繼續保留，除非替換。",
+  "translationApiKeyStorageHelper": "安全儲存，不寫入 MailNest 資料庫。",
+  "translationApiKeyValidation": "請輸入 API Key。",
+  "translationClearSavedApiKey": "清除已儲存的 API Key",
+  "translationPrivacyConfirmTitle": "我理解隱私影響",
+  "translationPrivacyConfirmSubtitle": "只有確認後才會傳送郵件內容，可隨時在此關閉。",
+  "translationPrivacyDialogTitle": "要將郵件內容傳送給服務商嗎？",
+  "translationPrivacyDialogBody": "翻譯需要將選取的郵件文字傳送到你設定的服務。MailNest 不會記錄郵件文字、翻譯結果或 API Key。",
+  "translationIUnderstand": "我理解",
+  "translationSaveProvider": "儲存翻譯服務",
+  "translationSettingsSaved": "翻譯設定已儲存。",
+  "translationSettingsSaveFailed": "無法儲存翻譯設定。",
+  "importConfig": "匯入設定",
+  "importConfigDescription": "從 .enc 檔案匯入加密的 MailNest 設定備份。",
+  "importConfigExclusionNote": "匯入帳號後請先測試連線。既有密鑰不會在畫面上顯示。",
+  "importEncryptedConfigSubtitle": "匯入加密的 .enc 設定檔。",
+  "chooseEncConfigFile": "選擇 .enc 檔案",
+  "backupPassword": "備份密碼",
+  "decryptAndPreview": "解密並預覽",
+  "unableToReadConfigFile": "無法讀取選取的設定檔。",
+  "importPreviewTitle": "匯入預覽",
+  "importPreviewSummary": "{accountCount} 個帳號，{settingsCount} 項設定，{conflictCount} 個衝突。",
+  "@importPreviewSummary": {
+    "placeholders": {
+      "accountCount": {
+        "type": "int"
+      },
+      "settingsCount": {
+        "type": "int"
+      },
+      "conflictCount": {
+        "type": "int"
+      }
+    }
+  },
+  "noImportConflicts": "未發現帳號衝突。",
+  "importConflictPrompt": "請選擇既有帳號的處理方式。",
+  "skip": "略過",
+  "overwrite": "覆蓋",
+  "importConfigSucceeded": "已匯入 {importedAccounts} 個帳號，略過 {skippedAccounts} 個。請測試匯入帳號的連線。",
+  "@importConfigSucceeded": {
+    "placeholders": {
+      "importedAccounts": {
+        "type": "int"
+      },
+      "skippedAccounts": {
+        "type": "int"
+      }
+    }
+  }
 }

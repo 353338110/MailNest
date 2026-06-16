@@ -2,7 +2,11 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 /// Stores credentials outside SQLite so backups and queries never expose them.
 class SecureStorageService {
-  const SecureStorageService({this.storage = const FlutterSecureStorage()});
+  const SecureStorageService({
+    this.storage = const FlutterSecureStorage(
+      mOptions: MacOsOptions(usesDataProtectionKeychain: false),
+    ),
+  });
 
   final FlutterSecureStorage storage;
 

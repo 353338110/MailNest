@@ -45,7 +45,9 @@ void main() {
         accessToken: 'old-access',
         refreshToken: 'old-refresh',
         expiresAt: DateTime.now().subtract(const Duration(minutes: 1)),
-        scopes: OutlookOAuthService.scopes,
+        scope: OutlookOAuthService.scopes.join(' '),
+        tokenType: 'Bearer',
+        clientId: 'client-id',
       ).toJsonString(),
     );
 
