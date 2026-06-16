@@ -72,6 +72,24 @@
 - 不记录密码、授权码、Token 或认证响应。
 - 增加连接测试结果模型测试。
 
+### PR #18：Outlook OAuth
+
+链接：待创建
+
+状态：本分支实现中，待创建 PR
+
+已完成内容：
+
+- 新增 Microsoft/Outlook OAuth 授权码 + PKCE 流程。
+- 移动端使用系统浏览器和自定义 scheme callback，不在 App WebView 输入 Microsoft 密码。
+- 桌面端使用 localhost loopback callback，不要求用户复制授权码。
+- OAuth access token、refresh token、过期时间和 scope 只写入 SecureStorage。
+- SQLite 账号表只保存 `oauth_token_ref`，不保存真实 token。
+- Outlook 账号新增、重新授权会清理旧密码 secret 或旧 token ref。
+- 支持 token 读取、临期刷新和刷新失败后删除失效 token，调用方需重新授权。
+- 支持授权取消、超时、配置缺失和授权服务错误提示。
+- 未实现 Outlook 邮件列表、邮件详情或发信。
+
 ## 已验证
 
 最近一次验证命令：
@@ -162,8 +180,6 @@ flutter test
 
 ### Outlook
 
-- Outlook OAuth 授权。
-- Token 保存和刷新。
 - Outlook 邮件列表。
 - Outlook 邮件详情。
 - Outlook 发信。
@@ -219,7 +235,7 @@ flutter test
 15. `codex/mobile-navigation`：移动端 Drawer/NavigationDrawer。
 16. `codex/gmail-oauth`：Gmail OAuth。
 17. `codex/gmail-mail-provider`：Gmail 邮件列表、详情和发信。
-18. `codex/outlook-oauth`：Outlook OAuth。
+18. `codex/outlook-oauth`：Outlook OAuth。（本 PR）
 19. `codex/outlook-mail-provider`：Outlook 邮件列表、详情和发信。
 20. `codex/translation-ui`：邮件详情和写信翻译 UI。
 21. `codex/translation-provider`：真实翻译服务和隐私确认。

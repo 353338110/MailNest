@@ -8,6 +8,8 @@ import '../../../mail/provider/mail_connection_tester.dart';
 import '../../../mail/provider/mail_connection_tester_provider.dart';
 import '../../../mail/repository/account_repository_provider.dart';
 import '../controllers/mail_config_detector.dart';
+import '../controllers/oauth_exception.dart';
+import '../controllers/outlook_oauth_provider.dart';
 import '../models/email_provider_type.dart';
 import '../models/mail_server_config.dart';
 
@@ -39,9 +41,12 @@ class _AddAccountPageState extends ConsumerState<AddAccountPage> {
   bool _isSaving = false;
   bool _isLoading = false;
   bool _isTesting = false;
+  bool _isAuthorizing = false;
   EmailAccount? _editingAccount;
 
   bool get _isEditing => widget.accountId != null;
+
+  bool get _usesOutlookOAuth => _provider == EmailProviderType.outlook;
 
   @override
   void initState() {
@@ -115,8 +120,22 @@ class _AddAccountPageState extends ConsumerState<AddAccountPage> {
                               : l10n.passwordOrAppPassword,
                         ),
                         obscureText: true,
-                        validator: _isEditing ? null : _required,
+                        enabled: !_usesOutlookOAuth,
+                        validator: _isEditing || _usesOutlookOAuth
+                            ? null
+                            : _required,
                       ),
+                      if (_usesOutlookOAuth) ...[
+                        const SizedBox(height: AppSpacing.medium),
+                        _OutlookOAuthSection(
+                          isEditing: _isEditing,
+                          hasToken: _editingAccount?.oauthTokenRef != null,
+                          isAuthorizing: _isAuthorizing,
+                          onAuthorize: _isSaving || _isAuthorizing
+                              ? null
+                              : _authorizeOutlook,
+                        ),
+                      ],
                       const SizedBox(height: AppSpacing.large),
                       _ServerSection(
                         title: l10n.imapSettings,
@@ -143,25 +162,29 @@ class _AddAccountPageState extends ConsumerState<AddAccountPage> {
                             setState(() => _smtpStartTls = value),
                       ),
                       const SizedBox(height: AppSpacing.large),
-                      OutlinedButton.icon(
-                        onPressed: _isSaving || _isTesting
-                            ? null
-                            : _testConnection,
-                        icon: _isTesting
-                            ? const SizedBox(
-                                width: 18,
-                                height: 18,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                ),
-                              )
-                            : const Icon(Icons.wifi_tethering_outlined),
-                        label: Text(l10n.testConnection),
-                      ),
-                      const SizedBox(height: AppSpacing.medium),
+                      if (!_usesOutlookOAuth) ...[
+                        OutlinedButton.icon(
+                          onPressed: _isSaving || _isTesting
+                              ? null
+                              : _testConnection,
+                          icon: _isTesting
+                              ? const SizedBox(
+                                  width: 18,
+                                  height: 18,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : const Icon(Icons.wifi_tethering_outlined),
+                          label: Text(l10n.testConnection),
+                        ),
+                        const SizedBox(height: AppSpacing.medium),
+                      ],
                       FilledButton.icon(
-                        onPressed: _isSaving ? null : _saveAccount,
-                        icon: _isSaving
+                        onPressed: _isSaving || _isAuthorizing
+                            ? null
+                            : _saveAccount,
+                        icon: _isSaving || _isAuthorizing
                             ? const SizedBox(
                                 width: 18,
                                 height: 18,
@@ -171,7 +194,11 @@ class _AddAccountPageState extends ConsumerState<AddAccountPage> {
                               )
                             : const Icon(Icons.save_outlined),
                         label: Text(
-                          _isEditing ? l10n.updateAccount : l10n.saveAccount,
+                          _usesOutlookOAuth
+                              ? 'Authorize with Microsoft'
+                              : _isEditing
+                              ? l10n.updateAccount
+                              : l10n.saveAccount,
                         ),
                       ),
                     ],
@@ -229,9 +256,14 @@ class _AddAccountPageState extends ConsumerState<AddAccountPage> {
   }
 
   void _selectProvider(EmailProviderType provider) {
-    if (provider == EmailProviderType.gmail ||
-        provider == EmailProviderType.outlook) {
+    if (provider == EmailProviderType.gmail) {
       _showFutureProviderMessage(provider);
+      return;
+    }
+
+    if (provider == EmailProviderType.outlook) {
+      _applyConfig(_detector.detect('user@outlook.com'));
+      _usernameController.text = _emailController.text.trim();
       return;
     }
 
@@ -275,6 +307,11 @@ class _AddAccountPageState extends ConsumerState<AddAccountPage> {
 
     setState(() => _isSaving = true);
     try {
+      if (_usesOutlookOAuth) {
+        await _authorizeAndSaveOutlook();
+        return;
+      }
+
       final editingAccount = _editingAccount;
       if (editingAccount != null) {
         await _updateAccount(editingAccount);
@@ -310,6 +347,94 @@ class _AddAccountPageState extends ConsumerState<AddAccountPage> {
         setState(() => _isSaving = false);
       }
     }
+  }
+
+  Future<void> _authorizeOutlook() async {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    await _authorizeAndSaveOutlook();
+  }
+
+  Future<void> _authorizeAndSaveOutlook() async {
+    setState(() {
+      _isSaving = true;
+      _isAuthorizing = true;
+    });
+
+    try {
+      final emailAddress = _emailController.text.trim();
+      final result = await ref
+          .read(outlookOAuthServiceProvider)
+          .authorizeAccount(
+            emailAddress: emailAddress,
+            displayName: _nameController.text.trim().isEmpty
+                ? null
+                : _nameController.text.trim(),
+          );
+      final editingAccount = _editingAccount;
+      final repository = ref.read(accountRepositoryProvider);
+
+      if (editingAccount == null) {
+        await repository.saveOAuthAccount(
+          emailAddress: result.emailAddress,
+          username: _usernameController.text.trim(),
+          provider: EmailProviderType.outlook,
+          oauthTokenRef: result.tokenRef,
+          imapHost: _imapHostController.text.trim(),
+          imapPort: int.parse(_imapPortController.text.trim()),
+          imapSecurity: _imapSecurity,
+          smtpHost: _smtpHostController.text.trim(),
+          smtpPort: int.parse(_smtpPortController.text.trim()),
+          smtpSecurity: _smtpSecurity,
+          smtpStartTls: _smtpStartTls,
+          displayName: result.displayName,
+        );
+      } else {
+        await repository.updateOAuthAccount(
+          current: editingAccount,
+          username: _usernameController.text.trim(),
+          provider: EmailProviderType.outlook,
+          oauthTokenRef: result.tokenRef,
+          imapHost: _imapHostController.text.trim(),
+          imapPort: int.parse(_imapPortController.text.trim()),
+          imapSecurity: _imapSecurity,
+          smtpHost: _smtpHostController.text.trim(),
+          smtpPort: int.parse(_smtpPortController.text.trim()),
+          smtpSecurity: _smtpSecurity,
+          smtpStartTls: _smtpStartTls,
+          displayName: result.displayName,
+        );
+      }
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Outlook authorization saved.')),
+        );
+        Navigator.of(context).pop();
+      }
+    } on OAuthAuthorizationCanceledException catch (error) {
+      _showOAuthError(error.message);
+    } on OAuthException catch (error) {
+      _showOAuthError(error.message);
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSaving = false;
+          _isAuthorizing = false;
+        });
+      }
+    }
+  }
+
+  void _showOAuthError(String message) {
+    if (!mounted) {
+      return;
+    }
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   Future<void> _testConnection() async {
@@ -438,6 +563,71 @@ class _AddAccountPageState extends ConsumerState<AddAccountPage> {
           ],
         );
       },
+    );
+  }
+}
+
+class _OutlookOAuthSection extends StatelessWidget {
+  const _OutlookOAuthSection({
+    required this.isEditing,
+    required this.hasToken,
+    required this.isAuthorizing,
+    required this.onAuthorize,
+  });
+
+  final bool isEditing;
+  final bool hasToken;
+  final bool isAuthorizing;
+  final VoidCallback? onAuthorize;
+
+  @override
+  Widget build(BuildContext context) {
+    final title = hasToken ? 'Outlook is authorized' : 'Outlook OAuth';
+    final body = isEditing
+        ? 'Use Microsoft in the system browser to reauthorize this account. MailNest stores only the token reference in its database.'
+        : 'Use Microsoft in the system browser. MailNest never asks for your Microsoft password inside the app.';
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.medium),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(Icons.verified_user_outlined),
+                const SizedBox(width: AppSpacing.small),
+                Expanded(
+                  child: Text(
+                    title,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.small),
+            Text(body),
+            if (isEditing) ...[
+              const SizedBox(height: AppSpacing.medium),
+              OutlinedButton.icon(
+                onPressed: onAuthorize,
+                icon: isAuthorizing
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.open_in_browser_outlined),
+                label: const Text('Reauthorize'),
+              ),
+            ],
+          ],
+        ),
+      ),
     );
   }
 }

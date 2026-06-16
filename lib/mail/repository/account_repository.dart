@@ -104,6 +104,104 @@ class AccountRepository {
     );
   }
 
+  Future<void> saveOAuthAccount({
+    required String emailAddress,
+    required String username,
+    required EmailProviderType provider,
+    required String oauthTokenRef,
+    required String imapHost,
+    required int imapPort,
+    required String imapSecurity,
+    required String smtpHost,
+    required int smtpPort,
+    required String smtpSecurity,
+    required bool smtpStartTls,
+    String? displayName,
+  }) async {
+    final now = DateTime.now();
+    final accountId = _accountId(emailAddress);
+    final current = await database.getAccount(accountId);
+
+    await database.saveAccount(
+      EmailAccountsCompanion(
+        id: Value(accountId),
+        emailAddress: Value(emailAddress),
+        displayName: Value(displayName),
+        provider: Value(provider.storageValue),
+        username: Value(username),
+        authType: const Value('oauth'),
+        imapHost: Value(imapHost),
+        imapPort: Value(imapPort),
+        imapSecurity: Value(imapSecurity),
+        smtpHost: Value(smtpHost),
+        smtpPort: Value(smtpPort),
+        smtpSecurity: Value(smtpSecurity),
+        smtpStartTls: Value(smtpStartTls),
+        secretRef: const Value(null),
+        oauthTokenRef: Value(oauthTokenRef),
+        syncEnabled: Value(current?.syncEnabled ?? true),
+        createdAt: Value(current?.createdAt ?? now),
+        updatedAt: Value(now),
+      ),
+    );
+
+    if (current?.secretRef != null) {
+      await secureStorage.deleteSecret(current!.secretRef!);
+    }
+    final previousTokenRef = current?.oauthTokenRef;
+    if (previousTokenRef != null && previousTokenRef != oauthTokenRef) {
+      await secureStorage.deleteSecret(previousTokenRef);
+    }
+  }
+
+  Future<void> updateOAuthAccount({
+    required EmailAccount current,
+    required String username,
+    required EmailProviderType provider,
+    required String oauthTokenRef,
+    required String imapHost,
+    required int imapPort,
+    required String imapSecurity,
+    required String smtpHost,
+    required int smtpPort,
+    required String smtpSecurity,
+    required bool smtpStartTls,
+    String? displayName,
+  }) async {
+    final previousSecretRef = current.secretRef;
+    final previousTokenRef = current.oauthTokenRef;
+
+    await database.saveAccount(
+      EmailAccountsCompanion(
+        id: Value(current.id),
+        emailAddress: Value(current.emailAddress),
+        displayName: Value(displayName),
+        provider: Value(provider.storageValue),
+        username: Value(username),
+        authType: const Value('oauth'),
+        imapHost: Value(imapHost),
+        imapPort: Value(imapPort),
+        imapSecurity: Value(imapSecurity),
+        smtpHost: Value(smtpHost),
+        smtpPort: Value(smtpPort),
+        smtpSecurity: Value(smtpSecurity),
+        smtpStartTls: Value(smtpStartTls),
+        secretRef: const Value(null),
+        oauthTokenRef: Value(oauthTokenRef),
+        syncEnabled: Value(current.syncEnabled),
+        createdAt: Value(current.createdAt),
+        updatedAt: Value(DateTime.now()),
+      ),
+    );
+
+    if (previousSecretRef != null) {
+      await secureStorage.deleteSecret(previousSecretRef);
+    }
+    if (previousTokenRef != null && previousTokenRef != oauthTokenRef) {
+      await secureStorage.deleteSecret(previousTokenRef);
+    }
+  }
+
   Future<void> setSyncEnabled({
     required String accountId,
     required bool enabled,
