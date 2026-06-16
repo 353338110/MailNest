@@ -7,10 +7,47 @@
   "translationSettings": "Translation settings",
   "translationPrivacyNote": "MailNest does not send email content to third-party translation services by default.",
   "translationMockOnly": "The first release only includes translation entry points and a mock service.",
+  "translate": "Translate",
+  "targetLanguage": "Target language",
+  "translationSourceEmpty": "There is no text to translate.",
+  "translationFailed": "Translation failed: {reason}",
+  "@translationFailed": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "translationCopied": "Translation copied.",
+  "translatedText": "Translation",
+  "originalText": "Original",
+  "translateAgain": "Translate again",
+  "copyTranslation": "Copy translation",
+  "useTranslation": "Use translation",
+  "mailDetail": "Mail detail",
+  "from": "From",
+  "received": "Received",
+  "translateMessage": "Translate message",
+  "translateBody": "Translate body",
+  "to": "To",
+  "body": "Body",
+  "send": "Send",
+  "openMailDetailPreview": "Open mail detail preview",
   "addEmailAccount": "Add email account",
   "noAccountsYet": "No email accounts yet.",
   "emailAddress": "Email address",
   "displayName": "Display name",
+  "accountGroup": "Account group",
+  "accountGroupHelp": "Accounts in the same group are viewed together.",
+  "accountGroups": "Account groups",
+  "defaultAccountGroup": "Personal",
+  "accountGroupActions": "Group actions",
+  "addAccountGroup": "Add group",
+  "renameAccountGroup": "Rename group",
+  "deleteAccountGroup": "Delete group",
+  "moveAccountsToGroup": "Move accounts to group",
+  "accountGroupDeleted": "Group deleted.",
+  "accountGroupDeleteBlocked": "Move or delete the accounts in this group before deleting it.",
   "username": "Username",
   "passwordOrAppPassword": "Password or app password",
   "imapSettings": "IMAP settings",
@@ -24,6 +61,40 @@
   "requiredField": "This field is required.",
   "invalidPort": "Enter a valid port.",
   "oauthFutureNotice": "Real OAuth authorization will be supported in a later version.",
+  "gmailOAuthTitle": "Sign in with Google",
+  "gmailOAuthSystemBrowserNotice": "MailNest opens Google authorization in your system browser and stores tokens only in secure storage.",
+  "authorizeGmail": "Authorize Gmail",
+  "reauthorizeGmail": "Reauthorize Gmail",
+  "gmailOAuthConnected": "Gmail authorization is connected.",
+  "gmailReauthorizeHelp": "Use reauthorization if Google access was revoked or token refresh fails.",
+  "gmailAuthorizationSaved": "Gmail authorization saved.",
+  "gmailAuthorizationCanceled": "Gmail authorization canceled.",
+  "gmailAuthorizationFailed": "Gmail authorization failed: {reason}",
+  "@gmailAuthorizationFailed": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "gmailReauthorizeEmailMismatch": "Reauthorize with the same Gmail address.",
+  "gmailReauthorizationRequired": "Gmail reauthorization is required.",
+  "outlookOAuthTitle": "Sign in with Microsoft",
+  "outlookOAuthSystemBrowserNotice": "MailNest opens Microsoft authorization in your system browser and stores tokens only in secure storage.",
+  "authorizeOutlook": "Authorize Outlook",
+  "reauthorizeOutlook": "Reauthorize Outlook",
+  "outlookOAuthConnected": "Outlook authorization is connected.",
+  "outlookReauthorizeHelp": "Use reauthorization if Microsoft access was revoked or token refresh fails.",
+  "outlookAuthorizationSaved": "Outlook authorization saved.",
+  "outlookAuthorizationCanceled": "Outlook authorization canceled.",
+  "outlookAuthorizationFailed": "Outlook authorization failed: {reason}",
+  "@outlookAuthorizationFailed": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
   "ok": "OK",
   "qqMail": "QQ Mail",
   "neteaseMail": "NetEase Mail",
@@ -59,5 +130,260 @@
     }
   },
   "passwordRequiredForConnectionTest": "Enter a password or app password before testing.",
-  "unknownError": "Unknown error"
+  "unknownError": "Unknown error",
+  "searchMail": "Search mail",
+  "searchMailHint": "Sender, recipient, subject, summary, or cached body",
+  "clearSearch": "Clear search",
+  "localSearchLocalOnlyNotice": "Search only covers mail already synced to this device. Mail that has not been synced locally will not appear.",
+  "searchMailEmptyPrompt": "Search local synced mail.",
+  "searchMailFailed": "Search failed. Try again.",
+  "noLocalSearchResults": "No local results for “{query}”.",
+  "@noLocalSearchResults": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "localSearchResultCount": "{count} local results",
+  "@localSearchResultCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noSubject": "(No subject)",
+  "backupAndMigration": "Backup and migration",
+  "backupAndMigrationSubtitle": "Export an encrypted configuration backup.",
+  "exportConfiguration": "Export configuration",
+  "backupExportDescription": "Create an encrypted backup of account configuration, server settings, and app preferences. Import will be added later.",
+  "backupIncludes": "Included",
+  "backupIncludesAccounts": "Account configuration",
+  "backupIncludesServerSettings": "IMAP and SMTP configuration",
+  "backupIncludesUserSettings": "User settings",
+  "backupIncludesLanguageSettings": "Language settings",
+  "backupIncludesTranslationSettings": "Translation settings",
+  "backupExcludes": "Not included by default",
+  "backupExcludesMailBodies": "Email bodies",
+  "backupExcludesHeaderCache": "Email header cache",
+  "backupExcludesAttachmentCache": "Attachment cache",
+  "backupExcludesSearchIndex": "Search index",
+  "exportPassword": "Export password",
+  "confirmExportPassword": "Confirm export password",
+  "exportPasswordsDoNotMatch": "Passwords do not match.",
+  "exportPasswordNotSaved": "This password encrypts the export file and is not saved by MailNest.",
+  "exportBackup": "Export backup",
+  "exportingBackup": "Exporting...",
+  "backupExported": "Backup exported: {fileName}",
+  "@backupExported": {
+    "placeholders": {
+      "fileName": {
+        "type": "String"
+      }
+    }
+  },
+  "backupExportedTo": "Saved to {filePath}",
+  "@backupExportedTo": {
+    "placeholders": {
+      "filePath": {
+        "type": "String"
+      }
+    }
+  },
+  "backupExportFailed": "Backup export failed.",
+  "composeMail": "Compose",
+  "drafts": "Drafts",
+  "editDraft": "Edit draft",
+  "saveDraft": "Save draft",
+  "draftSaved": "Draft saved.",
+  "savingDraft": "Saving draft...",
+  "draftAutosaveReady": "Autosave is ready.",
+  "draftLastSaved": "Last saved at {time}",
+  "@draftLastSaved": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteDraft": "Delete draft",
+  "deleteDraftTitle": "Delete draft?",
+  "deleteDraftMessage": "Delete this local draft from this device?",
+  "draftDeleted": "Draft deleted.",
+  "draftNotFound": "Draft not found.",
+  "emptyDraft": "Write something before saving a draft.",
+  "fromAccount": "From account",
+  "noAccountSelected": "No account selected",
+  "toRecipients": "To",
+  "ccRecipients": "Cc",
+  "bccRecipients": "Bcc",
+  "subject": "Subject",
+  "messageBody": "Message",
+  "noDraftsYet": "No drafts yet.",
+  "untitledDraft": "Untitled draft",
+  "toLine": "To: {recipients}",
+  "@toLine": {
+    "placeholders": {
+      "recipients": {
+        "type": "String"
+      }
+    }
+  },
+  "sentMessages": "Sent",
+  "noSentMessagesYet": "No sent messages yet.",
+  "sentToRecipients": "To: {recipients}",
+  "@sentToRecipients": {
+    "placeholders": {
+      "recipients": {
+        "type": "String"
+      }
+    }
+  },
+  "chooseSentFolder": "Choose Sent folder",
+  "sentFolderOnlyLocalRecord": "Only the local sent record is saved for this message.",
+  "sentFolderSavePending": "Saving to Sent",
+  "sentFolderSaved": "Saved to {folderName}",
+  "@sentFolderSaved": {
+    "placeholders": {
+      "folderName": {
+        "type": "String"
+      }
+    }
+  },
+  "sentFolderSelectionRequired": "Choose a Sent folder",
+  "sentFolderSaveFailed": "Sent folder save failed",
+  "sentFolderAppendSucceeded": "Saved to {folderName}.",
+  "@sentFolderAppendSucceeded": {
+    "placeholders": {
+      "folderName": {
+        "type": "String"
+      }
+    }
+  },
+  "sentFolderAppendFailed": "Could not save to Sent: {reason}",
+  "@sentFolderAppendFailed": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "inbox": "Inbox",
+  "folders": "Folders",
+  "accounts": "Accounts",
+  "composeEmail": "Compose email",
+  "composeFutureNotice": "Email composing will be available in a later version.",
+  "foldersFutureNotice": "Folder navigation will be available after mail sync is added.",
+  "syncMail": "Sync mail",
+  "mailSyncFailed": "Mail sync failed: {reason}",
+  "@mailSyncFailed": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "retry": "Retry",
+  "mailboxes": "Mailboxes",
+  "unifiedInbox": "Unified inbox",
+  "filters": "Filters",
+  "unread": "Unread",
+  "starred": "Starred",
+  "trash": "Trash",
+  "account": "Account",
+  "folder": "Folder",
+  "fullMessageBodiesFutureNotice": "Full message bodies will appear in a later PR.",
+  "noMessageSelected": "No message selected",
+  "messageContentsPlaceholder": "Message contents will appear here on wide desktop windows.",
+  "accountMailbox": "Account mailbox",
+  "allMessages": "All",
+  "mailMessageCount": "{count} messages",
+  "@mailMessageCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noMessagesMatchFilter": "No messages match this filter.",
+  "noMessages": "No messages.",
+  "attachments": "Attachments",
+  "emptyMessageBody": "This message has no readable body.",
+  "htmlShownAsSource": "HTML is shown as source text for now. Remote images are not loaded.",
+  "remoteImagesBlocked": "This email contains remote images. They are currently blocked.",
+  "loadRemoteImages": "Load images",
+  "viewAsPlainText": "View as plain text",
+  "htmlSanitizedNotice": "HTML has been cleaned before display. Scripts and unsafe content are blocked.",
+  "unsupportedMessageFormat": "This email format is not fully supported yet.",
+  "encryptedMessageUnsupported": "This email is encrypted. Decryption is not supported in this version.",
+  "signedMessageNotice": "Signature verification will be supported in a later version.",
+  "messageLoadFailed": "Could not load message.",
+  "formValidationFailed": "Please complete the required account fields.",
+  "accountSaveFailed": "Account save failed: {reason}",
+  "@accountSaveFailed": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "translationSettingsLoadFailed": "Translation settings could not be loaded.",
+  "translationProviderEnabledTitle": "Use third-party translation provider",
+  "translationProviderEnabledSubtitle": "When enabled, selected email content may be sent to the configured provider.",
+  "translationProviderLabel": "Provider",
+  "translationHttpsEndpointLabel": "HTTPS endpoint",
+  "translationHttpsEndpointHint": "https://example.com/translate",
+  "translationEndpointValidation": "Enter a valid HTTPS endpoint.",
+  "translationApiKeyLabel": "API key",
+  "translationApiKeySavedHelper": "A saved API key will be kept unless replaced.",
+  "translationApiKeyStorageHelper": "Stored securely outside the MailNest database.",
+  "translationApiKeyValidation": "Enter an API key.",
+  "translationClearSavedApiKey": "Clear saved API key",
+  "translationPrivacyConfirmTitle": "I understand the privacy impact",
+  "translationPrivacyConfirmSubtitle": "Mail content is sent only after this confirmation and can be disabled here at any time.",
+  "translationPrivacyDialogTitle": "Send email content to a provider?",
+  "translationPrivacyDialogBody": "Translation requires sending the selected email text to the provider you configure. MailNest will not log the email text, translation result, or API key.",
+  "translationIUnderstand": "I understand",
+  "translationSaveProvider": "Save translation provider",
+  "translationSettingsSaved": "Translation settings saved.",
+  "translationSettingsSaveFailed": "Could not save translation settings.",
+  "importConfig": "Import configuration",
+  "importConfigDescription": "Import an encrypted MailNest configuration backup from a .enc file.",
+  "importConfigExclusionNote": "Imported accounts must be tested before use. Existing secrets are never shown on screen.",
+  "importEncryptedConfigSubtitle": "Import encrypted .enc configuration files.",
+  "chooseEncConfigFile": "Choose .enc file",
+  "backupPassword": "Backup password",
+  "decryptAndPreview": "Decrypt and preview",
+  "unableToReadConfigFile": "Unable to read the selected configuration file.",
+  "importPreviewTitle": "Import preview",
+  "importPreviewSummary": "{accountCount} account(s), {settingsCount} setting(s), {conflictCount} conflict(s).",
+  "@importPreviewSummary": {
+    "placeholders": {
+      "accountCount": {
+        "type": "int"
+      },
+      "settingsCount": {
+        "type": "int"
+      },
+      "conflictCount": {
+        "type": "int"
+      }
+    }
+  },
+  "noImportConflicts": "No account conflicts found.",
+  "importConflictPrompt": "Choose how to handle accounts that already exist.",
+  "skip": "Skip",
+  "overwrite": "Overwrite",
+  "importConfigSucceeded": "Imported {importedAccounts} account(s), skipped {skippedAccounts}. Please test imported account connections.",
+  "@importConfigSucceeded": {
+    "placeholders": {
+      "importedAccounts": {
+        "type": "int"
+      },
+      "skippedAccounts": {
+        "type": "int"
+      }
+    }
+  }
 }
