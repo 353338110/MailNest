@@ -687,6 +687,59 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get translationSettingsSaveFailed => '无法保存翻译设置。';
+
+  @override
+  String get importConfig => '导入配置';
+
+  @override
+  String get importConfigDescription => '从 .enc 文件导入加密的 MailNest 配置备份。';
+
+  @override
+  String get importConfigExclusionNote => '导入账号后请先测试连接。已有密钥不会在界面上显示。';
+
+  @override
+  String get importEncryptedConfigSubtitle => '导入加密的 .enc 配置文件。';
+
+  @override
+  String get chooseEncConfigFile => '选择 .enc 文件';
+
+  @override
+  String get backupPassword => '备份密码';
+
+  @override
+  String get decryptAndPreview => '解密并预览';
+
+  @override
+  String get unableToReadConfigFile => '无法读取选择的配置文件。';
+
+  @override
+  String get importPreviewTitle => '导入预览';
+
+  @override
+  String importPreviewSummary(
+    int accountCount,
+    int settingsCount,
+    int conflictCount,
+  ) {
+    return '$accountCount 个账号，$settingsCount 项设置，$conflictCount 个冲突。';
+  }
+
+  @override
+  String get noImportConflicts => '未发现账号冲突。';
+
+  @override
+  String get importConflictPrompt => '请选择已存在账号的处理方式。';
+
+  @override
+  String get skip => '跳过';
+
+  @override
+  String get overwrite => '覆盖';
+
+  @override
+  String importConfigSucceeded(int importedAccounts, int skippedAccounts) {
+    return '已导入 $importedAccounts 个账号，跳过 $skippedAccounts 个。请测试导入账号的连接。';
+  }
 }
 
 /// The translations for Chinese, as used in China (`zh_CN`).
@@ -1303,6 +1356,59 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get translationSettingsSaveFailed => '无法保存翻译设置。';
+
+  @override
+  String get importConfig => '导入配置';
+
+  @override
+  String get importConfigDescription => '从 .enc 文件导入加密的 MailNest 配置备份。';
+
+  @override
+  String get importConfigExclusionNote => '导入账号后请先测试连接。已有密钥不会在界面上显示。';
+
+  @override
+  String get importEncryptedConfigSubtitle => '导入加密的 .enc 配置文件。';
+
+  @override
+  String get chooseEncConfigFile => '选择 .enc 文件';
+
+  @override
+  String get backupPassword => '备份密码';
+
+  @override
+  String get decryptAndPreview => '解密并预览';
+
+  @override
+  String get unableToReadConfigFile => '无法读取选择的配置文件。';
+
+  @override
+  String get importPreviewTitle => '导入预览';
+
+  @override
+  String importPreviewSummary(
+    int accountCount,
+    int settingsCount,
+    int conflictCount,
+  ) {
+    return '$accountCount 个账号，$settingsCount 项设置，$conflictCount 个冲突。';
+  }
+
+  @override
+  String get noImportConflicts => '未发现账号冲突。';
+
+  @override
+  String get importConflictPrompt => '请选择已存在账号的处理方式。';
+
+  @override
+  String get skip => '跳过';
+
+  @override
+  String get overwrite => '覆盖';
+
+  @override
+  String importConfigSucceeded(int importedAccounts, int skippedAccounts) {
+    return '已导入 $importedAccounts 个账号，跳过 $skippedAccounts 个。请测试导入账号的连接。';
+  }
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -1918,4 +2024,57 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get translationSettingsSaveFailed => '無法儲存翻譯設定。';
+
+  @override
+  String get importConfig => '匯入設定';
+
+  @override
+  String get importConfigDescription => '從 .enc 檔案匯入加密的 MailNest 設定備份。';
+
+  @override
+  String get importConfigExclusionNote => '匯入帳號後請先測試連線。既有密鑰不會在畫面上顯示。';
+
+  @override
+  String get importEncryptedConfigSubtitle => '匯入加密的 .enc 設定檔。';
+
+  @override
+  String get chooseEncConfigFile => '選擇 .enc 檔案';
+
+  @override
+  String get backupPassword => '備份密碼';
+
+  @override
+  String get decryptAndPreview => '解密並預覽';
+
+  @override
+  String get unableToReadConfigFile => '無法讀取選取的設定檔。';
+
+  @override
+  String get importPreviewTitle => '匯入預覽';
+
+  @override
+  String importPreviewSummary(
+    int accountCount,
+    int settingsCount,
+    int conflictCount,
+  ) {
+    return '$accountCount 個帳號，$settingsCount 項設定，$conflictCount 個衝突。';
+  }
+
+  @override
+  String get noImportConflicts => '未發現帳號衝突。';
+
+  @override
+  String get importConflictPrompt => '請選擇既有帳號的處理方式。';
+
+  @override
+  String get skip => '略過';
+
+  @override
+  String get overwrite => '覆蓋';
+
+  @override
+  String importConfigSucceeded(int importedAccounts, int skippedAccounts) {
+    return '已匯入 $importedAccounts 個帳號，略過 $skippedAccounts 個。請測試匯入帳號的連線。';
+  }
 }

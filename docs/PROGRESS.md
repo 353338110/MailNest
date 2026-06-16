@@ -64,6 +64,11 @@
 - 本 PR：附件本地缓存管理，支持查看缓存大小、清理全部缓存、清理 30 天前的旧缓存。
 - 本 PR：使用系统方式打开附件，下载后可用系统默认应用打开。
 
+### 配置导入导出
+
+- 本 PR：加密配置导入，支持 `.enc` 文件解密、导入预览、账号冲突跳过/覆盖和语言设置恢复。
+- 本 PR：导入账号时密码和 OAuth token 写入 SecureStorage，SQLite 只保存引用。
+
 ### 文件夹同步
 
 - PR #20：IMAP 文件夹列表同步和本地保存，首页账号下优先展示真实远端文件夹，未同步时回退标准文件夹，已合并。
@@ -123,8 +128,6 @@ flutter test
 
 ### 配置导入导出
 
-- 解密导入配置。
-- 导入冲突处理。
 - 导入后测试连接。
 - 导出同步设置。
 
@@ -165,14 +168,12 @@ flutter test
 1. `codex/attachments-polish`：附件 MIME 解析、下载失败占位和重试体验。
 2. `codex/reply-forward`：回复、回复全部、转发。
 3. `codex/compose-attachments`：写邮件添加/删除附件和 SMTP 附件发送。
-4. `codex/backup-import`：配置导入和冲突处理。
-5. `codex/sync-state`：同步状态持久化、多文件夹增量同步和 UIDVALIDITY 处理。
-6. `codex/mail-actions`：删除、星标、标记未读、移动文件夹和批量操作。
-7. `codex/gmail-mail-provider`：Gmail 邮件列表、详情和发信。
-8. `codex/outlook-oauth`：Outlook OAuth。
-9. `codex/outlook-mail-provider`：Outlook 邮件列表、详情和发信。
-10. `codex/desktop-mobile-polish`：键盘快捷键、右键菜单和更完整的加载/确认状态。
-11. `codex/release-workflow`：发布流程和 tag 自动化。
+4. `codex/sync-state`：同步状态持久化、多文件夹增量同步和 UIDVALIDITY 处理。
+5. `codex/mail-actions`：删除、星标、标记未读、移动文件夹和批量操作。
+6. `codex/gmail-mail-provider`：Gmail 邮件列表、详情和发信。
+7. `codex/outlook-oauth`：Outlook OAuth。
+8. `codex/desktop-mobile-polish`：键盘快捷键、右键菜单和更完整的加载/确认状态。
+9. `codex/release-workflow`：发布流程和 tag 自动化。
 
 ## 开放 PR
 

@@ -39,6 +39,12 @@ class SettingsPage extends ConsumerWidget {
             onTap: () => context.push('/settings/backup'),
           ),
           ListTile(
+            leading: const Icon(Icons.restore_outlined),
+            title: Text(l10n.importConfig),
+            subtitle: Text(l10n.importEncryptedConfigSubtitle),
+            onTap: () => context.push('/settings/backup/import'),
+          ),
+          ListTile(
             leading: const Icon(Icons.attach_file),
             title: const Text('Attachment Cache'),
             subtitle: const Text('Manage downloaded attachments'),

@@ -723,4 +723,62 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get translationSettingsSaveFailed =>
       'Could not save translation settings.';
+
+  @override
+  String get importConfig => 'Import configuration';
+
+  @override
+  String get importConfigDescription =>
+      'Import an encrypted MailNest configuration backup from a .enc file.';
+
+  @override
+  String get importConfigExclusionNote =>
+      'Imported accounts must be tested before use. Existing secrets are never shown on screen.';
+
+  @override
+  String get importEncryptedConfigSubtitle =>
+      'Import encrypted .enc configuration files.';
+
+  @override
+  String get chooseEncConfigFile => 'Choose .enc file';
+
+  @override
+  String get backupPassword => 'Backup password';
+
+  @override
+  String get decryptAndPreview => 'Decrypt and preview';
+
+  @override
+  String get unableToReadConfigFile =>
+      'Unable to read the selected configuration file.';
+
+  @override
+  String get importPreviewTitle => 'Import preview';
+
+  @override
+  String importPreviewSummary(
+    int accountCount,
+    int settingsCount,
+    int conflictCount,
+  ) {
+    return '$accountCount account(s), $settingsCount setting(s), $conflictCount conflict(s).';
+  }
+
+  @override
+  String get noImportConflicts => 'No account conflicts found.';
+
+  @override
+  String get importConflictPrompt =>
+      'Choose how to handle accounts that already exist.';
+
+  @override
+  String get skip => 'Skip';
+
+  @override
+  String get overwrite => 'Overwrite';
+
+  @override
+  String importConfigSucceeded(int importedAccounts, int skippedAccounts) {
+    return 'Imported $importedAccounts account(s), skipped $skippedAccounts. Please test imported account connections.';
+  }
 }

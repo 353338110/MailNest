@@ -260,5 +260,43 @@
   "translationIUnderstand": "I understand",
   "translationSaveProvider": "Save translation provider",
   "translationSettingsSaved": "Translation settings saved.",
-  "translationSettingsSaveFailed": "Could not save translation settings."
+  "translationSettingsSaveFailed": "Could not save translation settings.",
+  "importConfig": "Import configuration",
+  "importConfigDescription": "Import an encrypted MailNest configuration backup from a .enc file.",
+  "importConfigExclusionNote": "Imported accounts must be tested before use. Existing secrets are never shown on screen.",
+  "importEncryptedConfigSubtitle": "Import encrypted .enc configuration files.",
+  "chooseEncConfigFile": "Choose .enc file",
+  "backupPassword": "Backup password",
+  "decryptAndPreview": "Decrypt and preview",
+  "unableToReadConfigFile": "Unable to read the selected configuration file.",
+  "importPreviewTitle": "Import preview",
+  "importPreviewSummary": "{accountCount} account(s), {settingsCount} setting(s), {conflictCount} conflict(s).",
+  "@importPreviewSummary": {
+    "placeholders": {
+      "accountCount": {
+        "type": "int"
+      },
+      "settingsCount": {
+        "type": "int"
+      },
+      "conflictCount": {
+        "type": "int"
+      }
+    }
+  },
+  "noImportConflicts": "No account conflicts found.",
+  "importConflictPrompt": "Choose how to handle accounts that already exist.",
+  "skip": "Skip",
+  "overwrite": "Overwrite",
+  "importConfigSucceeded": "Imported {importedAccounts} account(s), skipped {skippedAccounts}. Please test imported account connections.",
+  "@importConfigSucceeded": {
+    "placeholders": {
+      "importedAccounts": {
+        "type": "int"
+      },
+      "skippedAccounts": {
+        "type": "int"
+      }
+    }
+  }
 }

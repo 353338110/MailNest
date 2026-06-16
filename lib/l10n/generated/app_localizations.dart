@@ -1399,6 +1399,100 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Could not save translation settings.'**
   String get translationSettingsSaveFailed;
+
+  /// No description provided for @importConfig.
+  ///
+  /// In en, this message translates to:
+  /// **'Import configuration'**
+  String get importConfig;
+
+  /// No description provided for @importConfigDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Import an encrypted MailNest configuration backup from a .enc file.'**
+  String get importConfigDescription;
+
+  /// No description provided for @importConfigExclusionNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Imported accounts must be tested before use. Existing secrets are never shown on screen.'**
+  String get importConfigExclusionNote;
+
+  /// No description provided for @importEncryptedConfigSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Import encrypted .enc configuration files.'**
+  String get importEncryptedConfigSubtitle;
+
+  /// No description provided for @chooseEncConfigFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose .enc file'**
+  String get chooseEncConfigFile;
+
+  /// No description provided for @backupPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup password'**
+  String get backupPassword;
+
+  /// No description provided for @decryptAndPreview.
+  ///
+  /// In en, this message translates to:
+  /// **'Decrypt and preview'**
+  String get decryptAndPreview;
+
+  /// No description provided for @unableToReadConfigFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to read the selected configuration file.'**
+  String get unableToReadConfigFile;
+
+  /// No description provided for @importPreviewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Import preview'**
+  String get importPreviewTitle;
+
+  /// No description provided for @importPreviewSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'{accountCount} account(s), {settingsCount} setting(s), {conflictCount} conflict(s).'**
+  String importPreviewSummary(
+    int accountCount,
+    int settingsCount,
+    int conflictCount,
+  );
+
+  /// No description provided for @noImportConflicts.
+  ///
+  /// In en, this message translates to:
+  /// **'No account conflicts found.'**
+  String get noImportConflicts;
+
+  /// No description provided for @importConflictPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose how to handle accounts that already exist.'**
+  String get importConflictPrompt;
+
+  /// No description provided for @skip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get skip;
+
+  /// No description provided for @overwrite.
+  ///
+  /// In en, this message translates to:
+  /// **'Overwrite'**
+  String get overwrite;
+
+  /// No description provided for @importConfigSucceeded.
+  ///
+  /// In en, this message translates to:
+  /// **'Imported {importedAccounts} account(s), skipped {skippedAccounts}. Please test imported account connections.'**
+  String importConfigSucceeded(int importedAccounts, int skippedAccounts);
 }
 
 class _AppLocalizationsDelegate

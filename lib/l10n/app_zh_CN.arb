@@ -274,5 +274,43 @@
   "translationIUnderstand": "我理解",
   "translationSaveProvider": "保存翻译服务",
   "translationSettingsSaved": "翻译设置已保存。",
-  "translationSettingsSaveFailed": "无法保存翻译设置。"
+  "translationSettingsSaveFailed": "无法保存翻译设置。",
+  "importConfig": "导入配置",
+  "importConfigDescription": "从 .enc 文件导入加密的 MailNest 配置备份。",
+  "importConfigExclusionNote": "导入账号后请先测试连接。已有密钥不会在界面上显示。",
+  "importEncryptedConfigSubtitle": "导入加密的 .enc 配置文件。",
+  "chooseEncConfigFile": "选择 .enc 文件",
+  "backupPassword": "备份密码",
+  "decryptAndPreview": "解密并预览",
+  "unableToReadConfigFile": "无法读取选择的配置文件。",
+  "importPreviewTitle": "导入预览",
+  "importPreviewSummary": "{accountCount} 个账号，{settingsCount} 项设置，{conflictCount} 个冲突。",
+  "@importPreviewSummary": {
+    "placeholders": {
+      "accountCount": {
+        "type": "int"
+      },
+      "settingsCount": {
+        "type": "int"
+      },
+      "conflictCount": {
+        "type": "int"
+      }
+    }
+  },
+  "noImportConflicts": "未发现账号冲突。",
+  "importConflictPrompt": "请选择已存在账号的处理方式。",
+  "skip": "跳过",
+  "overwrite": "覆盖",
+  "importConfigSucceeded": "已导入 {importedAccounts} 个账号，跳过 {skippedAccounts} 个。请测试导入账号的连接。",
+  "@importConfigSucceeded": {
+    "placeholders": {
+      "importedAccounts": {
+        "type": "int"
+      },
+      "skippedAccounts": {
+        "type": "int"
+      }
+    }
+  }
 }
