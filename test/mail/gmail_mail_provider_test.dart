@@ -102,6 +102,48 @@ void main() {
     expect(detail.isHtml, isFalse);
   });
 
+  test('fetchMessageDetail prefers html body when available', () async {
+    final transport = _FakeGmailTransport();
+    transport.getResponses['/gmail/v1/users/me/messages/msg-1'] = [
+      GmailHttpResponse(
+        statusCode: 200,
+        body: jsonEncode({
+          'id': 'msg-1',
+          'internalDate': '1780992000000',
+          'payload': {
+            'mimeType': 'multipart/alternative',
+            'headers': [
+              {'name': 'Subject', 'value': 'HTML test'},
+              {'name': 'From', 'value': 'sender@example.com'},
+            ],
+            'parts': [
+              {
+                'mimeType': 'text/plain',
+                'body': {'data': base64Url.encode(utf8.encode('Plain body'))},
+              },
+              {
+                'mimeType': 'text/html',
+                'body': {
+                  'data': base64Url.encode(utf8.encode('<b>HTML body</b>')),
+                },
+              },
+            ],
+          },
+        }),
+      ),
+    ];
+
+    final provider = _provider(transport);
+    final detail = await provider.fetchMessageDetail(
+      accountId: 'user@example.com',
+      folderId: 'INBOX',
+      messageLocalId: 'msg-1',
+    );
+
+    expect(detail.body, '<b>HTML body</b>');
+    expect(detail.isHtml, isTrue);
+  });
+
   test('sendMessage posts Gmail raw message', () async {
     final transport = _FakeGmailTransport();
     transport.postJsonResponses['/gmail/v1/users/me/messages/send'] = [

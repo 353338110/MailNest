@@ -389,14 +389,14 @@ class GmailMailProvider implements MailProvider {
   }
 
   (String, bool) _bodyFromPayload(Object? payload) {
-    final text = _findBody(payload, 'text/plain');
-    if (text != null) {
-      return (text, false);
-    }
-
     final html = _findBody(payload, 'text/html');
     if (html != null) {
       return (html, true);
+    }
+
+    final text = _findBody(payload, 'text/plain');
+    if (text != null) {
+      return (text, false);
     }
 
     return ('', false);

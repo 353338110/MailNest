@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/theme/app_spacing.dart';
+import '../../../mail/html/mail_html_text.dart';
 import '../../../mail/models/mail_detail.dart';
 import '../../../mail/provider/gmail_oauth_token.dart';
 import '../../../mail/provider/mail_provider_registry.dart';
@@ -60,12 +61,20 @@ class _MailDetailPageState extends ConsumerState<MailDetailPage> {
               const SizedBox(height: AppSpacing.small),
               Text(detail.header.sender),
               const SizedBox(height: AppSpacing.large),
-              SelectableText(detail.body),
+              SelectableText(_readableBody(detail)),
             ],
           );
         },
       ),
     );
+  }
+
+  String _readableBody(MailDetail detail) {
+    if (!detail.isHtml) {
+      return detail.body;
+    }
+    final readable = MailHtmlText.toReadableText(detail.body);
+    return readable.isEmpty ? detail.body : readable;
   }
 
   Future<MailDetail> _loadDetail() async {
