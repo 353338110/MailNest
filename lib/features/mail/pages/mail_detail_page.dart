@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 import '../../../app/theme/app_spacing.dart';
-import '../../../mail/html/mail_html_text.dart';
+import '../../../mail/html/mail_html_document.dart';
 import '../../../mail/models/mail_detail.dart';
 import '../../../mail/provider/gmail_oauth_token.dart';
 import '../../../mail/provider/mail_provider_registry.dart';
@@ -51,30 +52,10 @@ class _MailDetailPageState extends ConsumerState<MailDetailPage> {
           }
 
           final detail = snapshot.requireData;
-          return ListView(
-            padding: const EdgeInsets.all(AppSpacing.medium),
-            children: [
-              Text(
-                detail.header.subject,
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              const SizedBox(height: AppSpacing.small),
-              Text(detail.header.sender),
-              const SizedBox(height: AppSpacing.large),
-              SelectableText(_readableBody(detail)),
-            ],
-          );
+          return _MailDetailBody(detail: detail);
         },
       ),
     );
-  }
-
-  String _readableBody(MailDetail detail) {
-    if (!detail.isHtml) {
-      return detail.body;
-    }
-    final readable = MailHtmlText.toReadableText(detail.body);
-    return readable.isEmpty ? detail.body : readable;
   }
 
   Future<MailDetail> _loadDetail() async {
@@ -97,6 +78,125 @@ class _MailDetailPageState extends ConsumerState<MailDetailPage> {
       return 'Gmail authorization expired. Please authorize again.';
     }
     return 'Message could not be loaded.';
+  }
+}
+
+class _MailDetailBody extends StatefulWidget {
+  const _MailDetailBody({required this.detail});
+
+  final MailDetail detail;
+
+  @override
+  State<_MailDetailBody> createState() => _MailDetailBodyState();
+}
+
+class _MailDetailBodyState extends State<_MailDetailBody> {
+  WebViewController? _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadHtmlIfNeeded();
+  }
+
+  @override
+  void didUpdateWidget(covariant _MailDetailBody oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.detail.body != widget.detail.body ||
+        oldWidget.detail.isHtml != widget.detail.isHtml) {
+      _loadHtmlIfNeeded();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final detail = widget.detail;
+    final header = Padding(
+      padding: const EdgeInsets.all(AppSpacing.medium),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            detail.header.subject,
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+          const SizedBox(height: AppSpacing.small),
+          Text(detail.header.sender),
+        ],
+      ),
+    );
+
+    if (!detail.isHtml) {
+      return ListView(
+        padding: const EdgeInsets.all(AppSpacing.medium),
+        children: [
+          Text(
+            detail.header.subject,
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+          const SizedBox(height: AppSpacing.small),
+          Text(detail.header.sender),
+          const SizedBox(height: AppSpacing.large),
+          SelectableText(detail.body),
+        ],
+      );
+    }
+
+    final controller = _controller;
+    if (controller == null) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        header,
+        const Divider(height: 1),
+        Expanded(
+          child: ColoredBox(
+            color: Colors.white,
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final width = constraints.maxWidth < 576
+                    ? constraints.maxWidth
+                    : 576.0;
+                return Center(
+                  child: SizedBox(
+                    width: width,
+                    child: WebViewWidget(controller: controller),
+                  ),
+                );
+              },
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _loadHtmlIfNeeded() {
+    if (!widget.detail.isHtml) {
+      _controller = null;
+      return;
+    }
+
+    final controller = WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.disabled)
+      ..setBackgroundColor(Colors.white)
+      ..setNavigationDelegate(
+        NavigationDelegate(
+          onNavigationRequest: (request) {
+            final uri = Uri.tryParse(request.url);
+            if (uri == null || uri.scheme == 'about' || uri.scheme == 'data') {
+              return NavigationDecision.navigate;
+            }
+            return NavigationDecision.prevent;
+          },
+        ),
+      )
+      ..loadHtmlString(MailHtmlDocument.renderable(widget.detail.body));
+
+    _controller = controller;
   }
 }
 
