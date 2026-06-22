@@ -9,11 +9,13 @@ import '../../../mail/body/email_html_sanitizer.dart';
 import '../../../mail/body/email_render_options.dart';
 import '../../../mail/body/email_render_strategy.dart';
 import '../../../mail/body/parsed_email_body.dart';
+import '../../../mail/models/compose_context.dart';
 import '../../../mail/models/mail_detail.dart';
 import '../../../mail/models/mail_header.dart';
 import '../../../mail/repository/mail_repository_provider.dart';
 import '../../../mail/services/attachment_opener.dart';
 import '../../../mail/services/attachment_service_provider.dart';
+import '../../drafts/pages/compose_mail_page.dart';
 import '../../translation/widgets/translation_sheet.dart';
 import '../widgets/attachment_icon_helper.dart';
 
@@ -261,6 +263,10 @@ class _MailDetailBody extends StatelessWidget {
                 _showTranslationSheet(context, _textForTranslation(detail)),
             onTogglePlainText: onTogglePlainText,
             plainTextMode: preferPlainText,
+            detail: detail,
+            accountId: accountId,
+            folderId: folderId,
+            uid: uid,
           ),
           const Divider(height: 1),
           Expanded(
@@ -340,27 +346,44 @@ class _MailActionHeader extends StatelessWidget {
     required this.onTranslate,
     required this.onTogglePlainText,
     required this.plainTextMode,
+    required this.detail,
+    this.accountId,
+    this.folderId,
+    this.uid,
   });
 
   final VoidCallback onTranslate;
   final VoidCallback? onTogglePlainText;
   final bool plainTextMode;
+  final MailDetail detail;
+  final String? accountId;
+  final String? folderId;
+  final String? uid;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final hasContext = accountId != null && folderId != null && uid != null;
 
     return Padding(
       padding: const EdgeInsets.all(AppSpacing.medium),
       child: Row(
         children: [
-          IconButton(onPressed: null, icon: const Icon(Icons.delete_outline)),
-          IconButton(onPressed: null, icon: const Icon(Icons.reply_outlined)),
           IconButton(
-            onPressed: null,
-            icon: const Icon(Icons.reply_all_outlined),
+            onPressed: hasContext ? () => _handleReply(context) : null,
+            icon: const Icon(Icons.reply_outlined),
+            tooltip: l10n.reply,
           ),
-          IconButton(onPressed: null, icon: const Icon(Icons.forward_outlined)),
+          IconButton(
+            onPressed: hasContext ? () => _handleReplyAll(context) : null,
+            icon: const Icon(Icons.reply_all_outlined),
+            tooltip: l10n.replyAll,
+          ),
+          IconButton(
+            onPressed: hasContext ? () => _handleForward(context) : null,
+            icon: const Icon(Icons.forward_outlined),
+            tooltip: l10n.forward,
+          ),
           const Spacer(),
           IconButton(
             tooltip: l10n.viewAsPlainText,
@@ -378,6 +401,75 @@ class _MailActionHeader extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  void _handleReply(BuildContext context) {
+    final composeContext = ComposeContext.reply(
+      messageId: detail.header.messageId ?? detail.header.id,
+      subject: detail.header.subject,
+      sender: detail.header.sender,
+      date: detail.header.receivedAt,
+      body: _extractPlainText(detail),
+      accountId: accountId,
+      folderId: folderId,
+      uid: int.tryParse(uid ?? ''),
+    );
+
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (context) => ComposeMailPage(composeContext: composeContext),
+      ),
+    );
+  }
+
+  void _handleReplyAll(BuildContext context) {
+    final composeContext = ComposeContext.replyAll(
+      messageId: detail.header.messageId ?? detail.header.id,
+      subject: detail.header.subject,
+      sender: detail.header.sender,
+      recipients: detail.header.recipients,
+      cc: [], // TODO: Extract CC from parsed headers
+      date: detail.header.receivedAt,
+      body: _extractPlainText(detail),
+      accountId: accountId,
+      folderId: folderId,
+      uid: int.tryParse(uid ?? ''),
+    );
+
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (context) => ComposeMailPage(composeContext: composeContext),
+      ),
+    );
+  }
+
+  void _handleForward(BuildContext context) {
+    final composeContext = ComposeContext.forward(
+      messageId: detail.header.messageId ?? detail.header.id,
+      subject: detail.header.subject,
+      sender: detail.header.sender,
+      date: detail.header.receivedAt,
+      body: _extractPlainText(detail),
+      accountId: accountId,
+      folderId: folderId,
+      uid: int.tryParse(uid ?? ''),
+    );
+
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (context) => ComposeMailPage(composeContext: composeContext),
+      ),
+    );
+  }
+
+  String _extractPlainText(MailDetail detail) {
+    // Try to use plain text from parsed body first
+    final plainText = detail.parsedBody?.plainText;
+    if (plainText != null && plainText.isNotEmpty) {
+      return plainText;
+    }
+    // Fall back to raw body
+    return detail.body;
   }
 }
 

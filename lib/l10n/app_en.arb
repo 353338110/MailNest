@@ -385,5 +385,8 @@
         "type": "int"
       }
     }
-  }
+  },
+  "reply": "Reply",
+  "replyAll": "Reply all",
+  "forward": "Forward"
 }
