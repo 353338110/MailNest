@@ -6,7 +6,29 @@ import 'package:path_provider/path_provider.dart';
 import '../../core/database/app_database.dart';
 import '../models/mail_detail.dart';
 import '../provider/imap_smtp_mail_provider.dart';
+import '../provider/mail_connection_tester.dart';
 import '../repository/account_repository.dart';
+
+enum AttachmentDownloadErrorType {
+  accountNotFound,
+  noCredentials,
+  networkTimeout,
+  networkError,
+  parseError,
+  diskFull,
+  permissionDenied,
+  unknown,
+}
+
+class AttachmentDownloadException implements Exception {
+  const AttachmentDownloadException(this.type, this.message);
+
+  final AttachmentDownloadErrorType type;
+  final String message;
+
+  @override
+  String toString() => 'AttachmentDownloadException: $message';
+}
 
 class AttachmentService {
   const AttachmentService({
@@ -25,45 +47,99 @@ class AttachmentService {
     required int uid,
     required MailAttachmentInfo attachment,
   }) async {
-    final account = await accountRepository.getAccount(accountId);
-    if (account == null) {
-      throw Exception('Account not found');
+    try {
+      final account = await accountRepository.getAccount(accountId);
+      if (account == null) {
+        throw const AttachmentDownloadException(
+          AttachmentDownloadErrorType.accountNotFound,
+          'Account not found',
+        );
+      }
+
+      final secret = await accountRepository.readSecretForAccount(account);
+      if (secret == null || secret.isEmpty) {
+        throw const AttachmentDownloadException(
+          AttachmentDownloadErrorType.noCredentials,
+          'No credentials found for account',
+        );
+      }
+
+      final bytes = await imapProvider.fetchAttachmentBytes(
+        account: account,
+        secret: secret,
+        folderId: folderId,
+        uid: uid.toString(),
+        attachmentId: attachment.id,
+      );
+
+      final cacheDir = await _getAttachmentCacheDir();
+      final sanitizedFileName = _sanitizeFileName(attachment.fileName);
+      final filePath = path.join(
+        cacheDir.path,
+        accountId,
+        folderId,
+        uid.toString(),
+        sanitizedFileName,
+      );
+
+      final file = File(filePath);
+      await file.parent.create(recursive: true);
+      await file.writeAsBytes(bytes);
+
+      await database.updateAttachmentDownloadStatus(
+        id: attachment.id,
+        localPath: filePath,
+        downloaded: true,
+      );
+
+      return filePath;
+    } on AttachmentDownloadException {
+      rethrow;
+    } on MailProtocolException catch (e) {
+      if (e.message.contains('timed out')) {
+        throw AttachmentDownloadException(
+          AttachmentDownloadErrorType.networkTimeout,
+          'Download timed out: ${e.message}',
+        );
+      } else if (e.message.contains('not found')) {
+        throw AttachmentDownloadException(
+          AttachmentDownloadErrorType.parseError,
+          'Attachment not found: ${e.message}',
+        );
+      } else {
+        throw AttachmentDownloadException(
+          AttachmentDownloadErrorType.networkError,
+          'Network error: ${e.message}',
+        );
+      }
+    } on SocketException catch (e) {
+      throw AttachmentDownloadException(
+        AttachmentDownloadErrorType.networkError,
+        'Network error: ${e.message}',
+      );
+    } on FileSystemException catch (e) {
+      if (e.osError?.errorCode == 28) {
+        throw const AttachmentDownloadException(
+          AttachmentDownloadErrorType.diskFull,
+          'Not enough disk space',
+        );
+      } else if (e.osError?.errorCode == 13) {
+        throw const AttachmentDownloadException(
+          AttachmentDownloadErrorType.permissionDenied,
+          'Permission denied',
+        );
+      } else {
+        throw AttachmentDownloadException(
+          AttachmentDownloadErrorType.unknown,
+          'File system error: ${e.message}',
+        );
+      }
+    } on Object catch (e) {
+      throw AttachmentDownloadException(
+        AttachmentDownloadErrorType.unknown,
+        'Unexpected error: $e',
+      );
     }
-
-    final secret = await accountRepository.readSecretForAccount(account);
-    if (secret == null || secret.isEmpty) {
-      throw Exception('No credentials found for account');
-    }
-
-    final bytes = await imapProvider.fetchAttachmentBytes(
-      account: account,
-      secret: secret,
-      folderId: folderId,
-      uid: uid.toString(),
-      attachmentId: attachment.id,
-    );
-
-    final cacheDir = await _getAttachmentCacheDir();
-    final sanitizedFileName = _sanitizeFileName(attachment.fileName);
-    final filePath = path.join(
-      cacheDir.path,
-      accountId,
-      folderId,
-      uid.toString(),
-      sanitizedFileName,
-    );
-
-    final file = File(filePath);
-    await file.parent.create(recursive: true);
-    await file.writeAsBytes(bytes);
-
-    await database.updateAttachmentDownloadStatus(
-      id: attachment.id,
-      localPath: filePath,
-      downloaded: true,
-    );
-
-    return filePath;
   }
 
   Future<Directory> _getAttachmentCacheDir() async {

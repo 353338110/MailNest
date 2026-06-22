@@ -24,6 +24,49 @@ class MailRepository {
   final ImapSmtpMailProvider imapProvider;
   final MimeParser mimeParser;
 
+  Future<void> deleteMessage({
+    required String accountId,
+    required String folderId,
+    required int uid,
+  }) async {
+    // Delete from IMAP server
+    final messageId = '$accountId:$folderId:$uid';
+    await imapProvider.deleteMessage(
+      accountId: accountId,
+      messageId: messageId,
+    );
+
+    // Delete from local database
+    await database.deleteLocalMailMessage(
+      accountId: accountId,
+      folderName: folderId,
+      uid: uid,
+    );
+  }
+
+  Future<void> markAsRead({
+    required String accountId,
+    required String folderId,
+    required int uid,
+    required bool isRead,
+  }) async {
+    // Update on IMAP server
+    final messageId = '$accountId:$folderId:$uid';
+    await imapProvider.markAsRead(
+      accountId: accountId,
+      messageId: messageId,
+      isRead: isRead,
+    );
+
+    // Update local database
+    await database.updateMailMessageReadStatus(
+      accountId: accountId,
+      folderName: folderId,
+      uid: uid,
+      isRead: isRead,
+    );
+  }
+
   Stream<List<MailHeader>> watchCachedHeaders(String accountId) {
     return database.watchLocalMailMessages().map(
       (messages) => messages
