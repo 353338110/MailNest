@@ -104,7 +104,7 @@ jobs:
           path: release/mailnest-${{ steps.release_tag.outputs.tag }}-release-notes.md
 
       - name: Create GitHub release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ steps.release_tag.outputs.tag }}
           name: MailNest ${{ steps.release_tag.outputs.tag }}
