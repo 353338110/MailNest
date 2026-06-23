@@ -423,7 +423,6 @@ class _MailActionHeader extends ConsumerWidget {
   }
 
   Future<void> _handleToggleRead(BuildContext context, WidgetRef ref) async {
-    final l10n = AppLocalizations.of(context);
     final account = accountId;
     final folder = folderId;
     final messageUid = uid;
