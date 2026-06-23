@@ -812,4 +812,13 @@ class AppLocalizationsIt extends AppLocalizations {
   String importConfigSucceeded(int importedAccounts, int skippedAccounts) {
     return 'Imported $importedAccounts account(s), skipped $skippedAccounts. Please test imported account connections.';
   }
+
+  @override
+  String get reply => 'Reply';
+
+  @override
+  String get replyAll => 'Reply all';
+
+  @override
+  String get forward => 'Forward';
 }

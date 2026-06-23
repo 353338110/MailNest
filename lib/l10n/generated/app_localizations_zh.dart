@@ -771,6 +771,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String importConfigSucceeded(int importedAccounts, int skippedAccounts) {
     return '已导入 $importedAccounts 个账号，跳过 $skippedAccounts 个。请测试导入账号的连接。';
   }
+
+  @override
+  String get reply => '回复';
+
+  @override
+  String get replyAll => '回复全部';
+
+  @override
+  String get forward => '转发';
 }
 
 /// The translations for Chinese, as used in China (`zh_CN`).

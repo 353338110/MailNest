@@ -1547,6 +1547,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Imported {importedAccounts} account(s), skipped {skippedAccounts}. Please test imported account connections.'**
   String importConfigSucceeded(int importedAccounts, int skippedAccounts);
+
+  /// No description provided for @reply.
+  ///
+  /// In en, this message translates to:
+  /// **'Reply'**
+  String get reply;
+
+  /// No description provided for @replyAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Reply all'**
+  String get replyAll;
+
+  /// No description provided for @forward.
+  ///
+  /// In en, this message translates to:
+  /// **'Forward'**
+  String get forward;
 }
 
 class _AppLocalizationsDelegate
