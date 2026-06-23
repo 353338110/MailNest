@@ -111,18 +111,18 @@ class _BackupImportPageState extends ConsumerState<BackupImportPage> {
   }
 
   Future<void> _pickFile() async {
-    final result = await FilePicker.platform.pickFiles(
+    final file = await FilePicker.pickFile(
       type: FileType.custom,
       allowedExtensions: const ['enc'],
-      withData: true,
     );
-    final file = result?.files.single;
     if (file == null) {
       return;
     }
 
-    final bytes = file.bytes;
-    if (bytes == null) {
+    final Uint8List bytes;
+    try {
+      bytes = await _readPickedFileBytes(file);
+    } on Object {
       if (!mounted) {
         return;
       }
@@ -136,6 +136,18 @@ class _BackupImportPageState extends ConsumerState<BackupImportPage> {
       _preview = null;
       _conflictActions.clear();
     });
+  }
+
+  Future<Uint8List> _readPickedFileBytes(PlatformFile file) async {
+    final chunks = await file.readAsByteStream().toList();
+    final length = chunks.fold<int>(0, (total, chunk) => total + chunk.length);
+    final bytes = Uint8List(length);
+    var offset = 0;
+    for (final chunk in chunks) {
+      bytes.setRange(offset, offset + chunk.length, chunk);
+      offset += chunk.length;
+    }
+    return bytes;
   }
 
   Future<void> _decryptPreview() async {
