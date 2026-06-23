@@ -582,7 +582,9 @@ class _RawImapClient {
       'LOGIN ${_imapQuote(username)} ${_imapQuote(secret)}',
     );
     if (!response.isOk) {
-      throw const MailProtocolException('IMAP authentication failed.');
+      throw const MailProtocolException(
+        'IMAP authentication failed. Check the username and use the mailbox authorization code or app password instead of the web login password.',
+      );
     }
   }
 

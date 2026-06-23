@@ -9,6 +9,7 @@ import '../../../mail/provider/mail_connection_tester_provider.dart';
 import '../../../mail/repository/account_repository_provider.dart';
 import '../controllers/gmail_oauth_provider.dart';
 import '../controllers/mail_config_detector.dart';
+import '../controllers/mail_secret_sanitizer.dart';
 import '../controllers/oauth_exception.dart' as outlook_oauth;
 import '../controllers/oauth_service.dart';
 import '../controllers/outlook_oauth_provider.dart';
@@ -437,7 +438,7 @@ class _AddAccountPageState extends ConsumerState<AddAccountPage> {
           .savePasswordAccount(
             emailAddress: _emailController.text.trim(),
             username: _usernameController.text.trim(),
-            secret: _secretController.text,
+            secret: _enteredSecret(),
             provider: _provider,
             imapHost: _imapHostController.text.trim(),
             imapPort: int.parse(_imapPortController.text.trim()),
@@ -728,8 +729,9 @@ class _AddAccountPageState extends ConsumerState<AddAccountPage> {
   }
 
   Future<String?> _secretForConnectionTest() async {
-    if (_secretController.text.isNotEmpty) {
-      return _secretController.text;
+    final enteredSecret = _enteredSecret();
+    if (enteredSecret.isNotEmpty) {
+      return enteredSecret;
     }
 
     final secretRef = _editingAccount?.secretRef;
@@ -737,13 +739,21 @@ class _AddAccountPageState extends ConsumerState<AddAccountPage> {
       return null;
     }
 
-    return ref
+    final savedSecret = await ref
         .read(accountRepositoryProvider)
         .secureStorage
         .readSecret(secretRef);
+    return savedSecret == null
+        ? null
+        : sanitizeMailSecret(savedSecret, _provider);
+  }
+
+  String _enteredSecret() {
+    return sanitizeMailSecret(_secretController.text, _provider);
   }
 
   Future<void> _updateAccount(EmailAccount account) async {
+    final newSecret = _enteredSecret();
     await ref
         .read(accountRepositoryProvider)
         .updatePasswordAccount(
@@ -761,9 +771,7 @@ class _AddAccountPageState extends ConsumerState<AddAccountPage> {
               ? null
               : _nameController.text.trim(),
           groupName: _groupController.text,
-          newSecret: _secretController.text.trim().isEmpty
-              ? null
-              : _secretController.text,
+          newSecret: newSecret.isEmpty ? null : newSecret,
         );
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
