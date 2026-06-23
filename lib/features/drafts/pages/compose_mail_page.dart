@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:typed_data';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -8,6 +10,7 @@ import '../../../app/theme/app_spacing.dart';
 import '../../../core/database/app_database.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../../mail/models/compose_context.dart';
+import '../../../mail/models/outgoing_attachment.dart';
 import '../../../mail/models/outgoing_message.dart';
 import '../../../mail/repository/account_repository_provider.dart';
 import '../../../mail/repository/draft_repository_provider.dart';
@@ -42,6 +45,7 @@ class _ComposeMailPageState extends ConsumerState<ComposeMailPage> {
   bool _isSending = false;
   bool _isInitializing = true;
   DateTime? _lastSavedAt;
+  final List<OutgoingAttachment> _attachments = [];
 
   bool get _hasContent {
     return _toController.text.trim().isNotEmpty ||
@@ -189,6 +193,16 @@ class _ComposeMailPageState extends ConsumerState<ComposeMailPage> {
                   minLines: 12,
                   maxLines: 24,
                   keyboardType: TextInputType.multiline,
+                ),
+                const SizedBox(height: AppSpacing.medium),
+                _ComposeAttachmentSection(
+                  attachments: _attachments,
+                  onPickAttachments: _isSending ? null : _pickAttachments,
+                  onRemoveAttachment: _isSending
+                      ? null
+                      : (index) {
+                          setState(() => _attachments.removeAt(index));
+                        },
                 ),
                 const SizedBox(height: AppSpacing.medium),
                 _SaveStatus(isSaving: _isSaving, lastSavedAt: _lastSavedAt),
@@ -370,7 +384,8 @@ class _ComposeMailPageState extends ConsumerState<ComposeMailPage> {
       return;
     }
     if (_subjectController.text.trim().isEmpty &&
-        _bodyController.text.trim().isEmpty) {
+        _bodyController.text.trim().isEmpty &&
+        _attachments.isEmpty) {
       _showSnack(l10n.emptyDraft);
       return;
     }
@@ -389,6 +404,7 @@ class _ComposeMailPageState extends ConsumerState<ComposeMailPage> {
               bcc: bcc,
               subject: _subjectController.text.trim(),
               body: _bodyController.text,
+              attachments: List.unmodifiable(_attachments),
             ),
           );
 
@@ -451,6 +467,75 @@ class _ComposeMailPageState extends ConsumerState<ComposeMailPage> {
       ).showSnackBar(SnackBar(content: Text(l10n.draftDeleted)));
       Navigator.of(context).pop();
     }
+  }
+
+  Future<void> _pickAttachments() async {
+    final result = await FilePicker.pickFiles();
+    final files = result?.files;
+    if (files == null || files.isEmpty) {
+      return;
+    }
+
+    try {
+      final attachments = <OutgoingAttachment>[];
+      for (final file in files) {
+        attachments.add(
+          OutgoingAttachment(
+            fileName: file.name,
+            mimeType: _mimeTypeForFileName(file.name),
+            bytes: await _readPickedFileBytes(file),
+          ),
+        );
+      }
+      if (!mounted) {
+        return;
+      }
+      setState(() => _attachments.addAll(attachments));
+    } on Object catch (error) {
+      if (mounted) {
+        _showSnack('${AppLocalizations.of(context).attachments}: $error');
+      }
+    }
+  }
+
+  Future<Uint8List> _readPickedFileBytes(PlatformFile file) async {
+    final chunks = await file.readAsByteStream().toList();
+    final length = chunks.fold<int>(0, (total, chunk) => total + chunk.length);
+    final bytes = Uint8List(length);
+    var offset = 0;
+    for (final chunk in chunks) {
+      bytes.setRange(offset, offset + chunk.length, chunk);
+      offset += chunk.length;
+    }
+    return bytes;
+  }
+
+  String _mimeTypeForFileName(String fileName) {
+    final lower = fileName.toLowerCase();
+    final extension = lower.contains('.') ? lower.split('.').last : '';
+    return switch (extension) {
+      'txt' => 'text/plain',
+      'html' || 'htm' => 'text/html',
+      'csv' => 'text/csv',
+      'json' => 'application/json',
+      'pdf' => 'application/pdf',
+      'png' => 'image/png',
+      'jpg' || 'jpeg' => 'image/jpeg',
+      'gif' => 'image/gif',
+      'webp' => 'image/webp',
+      'svg' => 'image/svg+xml',
+      'zip' => 'application/zip',
+      'doc' => 'application/msword',
+      'docx' =>
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'xls' => 'application/vnd.ms-excel',
+      'xlsx' =>
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'ppt' => 'application/vnd.ms-powerpoint',
+      'pptx' =>
+        'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+      _ => 'application/octet-stream',
+    };
   }
 
   List<String> _splitRecipients(String value) {
@@ -529,6 +614,81 @@ class _ComposeMailPageState extends ConsumerState<ComposeMailPage> {
     setState(() {
       _isInitializing = false;
     });
+  }
+}
+
+class _ComposeAttachmentSection extends StatelessWidget {
+  const _ComposeAttachmentSection({
+    required this.attachments,
+    required this.onPickAttachments,
+    required this.onRemoveAttachment,
+  });
+
+  final List<OutgoingAttachment> attachments;
+  final VoidCallback? onPickAttachments;
+  final void Function(int index)? onRemoveAttachment;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Text(l10n.attachments, style: theme.textTheme.labelLarge),
+            const Spacer(),
+            OutlinedButton.icon(
+              onPressed: onPickAttachments,
+              icon: const Icon(Icons.attach_file_outlined),
+              label: Text(l10n.attachments),
+            ),
+          ],
+        ),
+        if (attachments.isNotEmpty) ...[
+          const SizedBox(height: AppSpacing.small),
+          for (final entry in attachments.indexed)
+            Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacing.xsmall),
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  border: Border.all(color: theme.colorScheme.outlineVariant),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: ListTile(
+                  dense: true,
+                  leading: const Icon(Icons.insert_drive_file_outlined),
+                  title: Text(
+                    entry.$2.fileName,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  subtitle: Text(_formatAttachmentSize(entry.$2.size)),
+                  trailing: IconButton(
+                    tooltip: 'Remove attachment',
+                    onPressed: onRemoveAttachment == null
+                        ? null
+                        : () => onRemoveAttachment!(entry.$1),
+                    icon: const Icon(Icons.close),
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ],
+    );
+  }
+
+  String _formatAttachmentSize(int bytes) {
+    if (bytes < 1024) {
+      return '$bytes B';
+    }
+    if (bytes < 1024 * 1024) {
+      return '${(bytes / 1024).toStringAsFixed(1)} KB';
+    }
+    return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
   }
 }
 

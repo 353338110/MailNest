@@ -151,6 +151,16 @@ class OutlookMailProvider implements MailProvider {
           'toRecipients': _recipients(message.to),
           if (message.cc.isNotEmpty) 'ccRecipients': _recipients(message.cc),
           if (message.bcc.isNotEmpty) 'bccRecipients': _recipients(message.bcc),
+          if (message.attachments.isNotEmpty)
+            'attachments': [
+              for (final attachment in message.attachments)
+                {
+                  '@odata.type': '#microsoft.graph.fileAttachment',
+                  'name': attachment.fileName,
+                  'contentType': attachment.mimeType,
+                  'contentBytes': base64Encode(attachment.bytes),
+                },
+            ],
         },
         'saveToSentItems': true,
       }),

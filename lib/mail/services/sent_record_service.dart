@@ -277,6 +277,25 @@ String buildRfc822Message({
   required OutgoingMessage message,
   required DateTime sentAt,
 }) {
+  if (message.attachments.isEmpty) {
+    return _buildPlainMessage(
+      fromEmail: fromEmail,
+      message: message,
+      sentAt: sentAt,
+    );
+  }
+  return _buildMultipartMessage(
+    fromEmail: fromEmail,
+    message: message,
+    sentAt: sentAt,
+  );
+}
+
+String _buildPlainMessage({
+  required String fromEmail,
+  required OutgoingMessage message,
+  required DateTime sentAt,
+}) {
   final headers = <String>[
     'Date: ${_formatRfc822Date(sentAt)}',
     'From: ${_formatAddress(fromEmail)}',
@@ -288,11 +307,62 @@ String buildRfc822Message({
     'Content-Type: text/plain; charset=utf-8',
     'Content-Transfer-Encoding: base64',
   ];
-  final body = base64
-      .encode(utf8.encode(message.body))
+  final body = _encodeBase64Lines(utf8.encode(message.body));
+  return '${headers.join('\r\n')}\r\n\r\n$body\r\n';
+}
+
+String _buildMultipartMessage({
+  required String fromEmail,
+  required OutgoingMessage message,
+  required DateTime sentAt,
+}) {
+  final boundary =
+      'MailNest_${sentAt.microsecondsSinceEpoch.toRadixString(16)}';
+  final headers = <String>[
+    'Date: ${_formatRfc822Date(sentAt)}',
+    'From: ${_formatAddress(fromEmail)}',
+    'To: ${message.to.map(_formatAddress).join(', ')}',
+    if (message.cc.isNotEmpty)
+      'Cc: ${message.cc.map(_formatAddress).join(', ')}',
+    'Subject: ${_encodeHeader(message.subject)}',
+    'MIME-Version: 1.0',
+    'Content-Type: multipart/mixed; boundary="$boundary"',
+  ];
+
+  final buffer = StringBuffer()
+    ..write(headers.join('\r\n'))
+    ..write('\r\n\r\n')
+    ..write('This is a multi-part message in MIME format.\r\n');
+
+  buffer
+    ..write('--$boundary\r\n')
+    ..write('Content-Type: text/plain; charset=utf-8\r\n')
+    ..write('Content-Transfer-Encoding: base64\r\n\r\n')
+    ..write(_encodeBase64Lines(utf8.encode(message.body)))
+    ..write('\r\n');
+
+  for (final attachment in message.attachments) {
+    final encodedName = _encodeHeader(attachment.fileName);
+    buffer
+      ..write('--$boundary\r\n')
+      ..write('Content-Type: ${attachment.mimeType}; name="$encodedName"\r\n')
+      ..write('Content-Transfer-Encoding: base64\r\n')
+      ..write(
+        'Content-Disposition: attachment; filename="$encodedName"\r\n\r\n',
+      )
+      ..write(_encodeBase64Lines(attachment.bytes))
+      ..write('\r\n');
+  }
+
+  buffer.write('--$boundary--\r\n');
+  return buffer.toString();
+}
+
+String _encodeBase64Lines(List<int> data) {
+  return base64
+      .encode(data)
       .replaceAllMapped(RegExp('.{1,76}'), (match) => '${match.group(0)}\r\n')
       .trimRight();
-  return '${headers.join('\r\n')}\r\n\r\n$body\r\n';
 }
 
 String _formatAddress(String email) {

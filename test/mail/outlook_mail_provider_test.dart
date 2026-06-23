@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mailnest_app/mail/models/outgoing_attachment.dart';
 import 'package:mailnest_app/mail/models/outgoing_message.dart';
 import 'package:mailnest_app/mail/models/sync_cursor.dart';
 import 'package:mailnest_app/mail/provider/outlook_mail_provider.dart';
@@ -113,6 +115,54 @@ void main() {
       'Bearer fresh-token',
     );
     expect(store.lastWritten?.accessToken, 'fresh-token');
+  });
+
+  test('sends Outlook attachments as Graph file attachments', () async {
+    final store = _FakeTokenStore(
+      OutlookOAuthToken(
+        accessToken: 'access-token',
+        expiresAt: now.add(const Duration(hours: 1)),
+        tokenEndpoint: Uri.parse('https://login.example/token'),
+      ),
+    );
+    final transport = _FakeTransport([
+      const _ResponsePlan(statusCode: HttpStatus.accepted, body: ''),
+    ]);
+    final provider = OutlookMailProvider(
+      outlookTokenStore: store,
+      transport: transport,
+      clock: () => now,
+    );
+
+    await provider.sendMessage(
+      accountId: 'account-1',
+      message: OutgoingMessage(
+        fromAccountId: 'account-1',
+        to: const ['to@example.com'],
+        subject: 'Hello',
+        body: 'Private body',
+        attachments: [
+          OutgoingAttachment(
+            fileName: 'report.txt',
+            mimeType: 'text/plain',
+            bytes: Uint8List.fromList(utf8.encode('hello attachment')),
+          ),
+        ],
+      ),
+    );
+
+    final body = jsonDecode(transport.requests.single.body!) as Map;
+    final message = body['message'] as Map;
+    final attachments = message['attachments'] as List;
+    final attachment = attachments.single as Map;
+
+    expect(attachment['@odata.type'], '#microsoft.graph.fileAttachment');
+    expect(attachment['name'], 'report.txt');
+    expect(attachment['contentType'], 'text/plain');
+    expect(
+      attachment['contentBytes'],
+      base64Encode(utf8.encode('hello attachment')),
+    );
   });
 
   test('asks caller to reauthorize when refresh fails', () async {

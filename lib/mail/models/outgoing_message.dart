@@ -1,3 +1,5 @@
+import 'outgoing_attachment.dart';
+
 /// Data needed to send a message through SMTP or a future provider API.
 class OutgoingMessage {
   const OutgoingMessage({
@@ -7,6 +9,7 @@ class OutgoingMessage {
     required this.body,
     this.cc = const [],
     this.bcc = const [],
+    this.attachments = const [],
   });
 
   final String fromAccountId;
@@ -15,4 +18,5 @@ class OutgoingMessage {
   final List<String> bcc;
   final String subject;
   final String body;
+  final List<OutgoingAttachment> attachments;
 }
