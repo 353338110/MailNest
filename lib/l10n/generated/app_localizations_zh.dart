@@ -621,6 +621,105 @@ class AppLocalizationsZh extends AppLocalizations {
   String get attachments => '附件';
 
   @override
+  String get addAttachments => '添加附件';
+
+  @override
+  String get removeAttachment => '移除附件';
+
+  @override
+  String attachmentOpenFailed(String reason) {
+    return '无法打开文件：$reason';
+  }
+
+  @override
+  String get attachmentContextMissing => '缺少上下文信息。';
+
+  @override
+  String get attachmentDownloadCompleted => '下载完成。';
+
+  @override
+  String attachmentDownloadFailed(String reason) {
+    return '下载失败：$reason';
+  }
+
+  @override
+  String get attachmentAccountNotFound => '找不到账号。';
+
+  @override
+  String get attachmentNoCredentials => '没有可用凭据。';
+
+  @override
+  String get attachmentDownloadTimedOut => '下载超时。';
+
+  @override
+  String get attachmentNetworkError => '发生网络错误。';
+
+  @override
+  String get attachmentParseFailed => '无法解析附件。';
+
+  @override
+  String get attachmentDiskFull => '磁盘空间不足。';
+
+  @override
+  String get attachmentPermissionDenied => '权限被拒绝。';
+
+  @override
+  String get attachmentUnknownError => '发生未知错误。';
+
+  @override
+  String get attachmentCacheTitle => '附件缓存';
+
+  @override
+  String get attachmentCacheSubtitle => '管理已下载附件。';
+
+  @override
+  String get attachmentCacheDescription => '已下载附件会存储在本地。你可以清理它们以释放空间。';
+
+  @override
+  String attachmentCacheSize(String size) {
+    return '缓存大小：$size';
+  }
+
+  @override
+  String attachmentCacheLoadFailed(String reason) {
+    return '无法加载缓存大小：$reason';
+  }
+
+  @override
+  String get clearAttachmentCache => '清理缓存';
+
+  @override
+  String get clearAttachmentCacheTitle => '清理缓存';
+
+  @override
+  String get clearAttachmentCacheMessage => '这会删除所有已下载附件。之后仍可重新下载。';
+
+  @override
+  String get attachmentCacheCleared => '缓存已清理。';
+
+  @override
+  String attachmentCacheClearFailed(String reason) {
+    return '清理缓存失败：$reason';
+  }
+
+  @override
+  String get clearOldAttachments => '清理旧附件';
+
+  @override
+  String get oldAttachmentsCleared => '已清理 30 天前的附件。';
+
+  @override
+  String oldAttachmentsClearFailed(String reason) {
+    return '清理旧缓存失败：$reason';
+  }
+
+  @override
+  String get clearAllAttachments => '全部清理';
+
+  @override
+  String get close => '关闭';
+
+  @override
   String get emptyMessageBody => '这封邮件没有可读正文。';
 
   @override

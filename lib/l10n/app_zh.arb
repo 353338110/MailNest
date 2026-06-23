@@ -232,6 +232,77 @@
   "noMessagesMatchFilter": "没有符合此筛选条件的邮件。",
   "noMessages": "没有邮件。",
   "attachments": "附件",
+  "addAttachments": "添加附件",
+  "removeAttachment": "移除附件",
+  "attachmentOpenFailed": "无法打开文件：{reason}",
+  "@attachmentOpenFailed": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "attachmentContextMissing": "缺少上下文信息。",
+  "attachmentDownloadCompleted": "下载完成。",
+  "attachmentDownloadFailed": "下载失败：{reason}",
+  "@attachmentDownloadFailed": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "attachmentAccountNotFound": "找不到账号。",
+  "attachmentNoCredentials": "没有可用凭据。",
+  "attachmentDownloadTimedOut": "下载超时。",
+  "attachmentNetworkError": "发生网络错误。",
+  "attachmentParseFailed": "无法解析附件。",
+  "attachmentDiskFull": "磁盘空间不足。",
+  "attachmentPermissionDenied": "权限被拒绝。",
+  "attachmentUnknownError": "发生未知错误。",
+  "attachmentCacheTitle": "附件缓存",
+  "attachmentCacheSubtitle": "管理已下载附件。",
+  "attachmentCacheDescription": "已下载附件会存储在本地。你可以清理它们以释放空间。",
+  "attachmentCacheSize": "缓存大小：{size}",
+  "@attachmentCacheSize": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "attachmentCacheLoadFailed": "无法加载缓存大小：{reason}",
+  "@attachmentCacheLoadFailed": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "clearAttachmentCache": "清理缓存",
+  "clearAttachmentCacheTitle": "清理缓存",
+  "clearAttachmentCacheMessage": "这会删除所有已下载附件。之后仍可重新下载。",
+  "attachmentCacheCleared": "缓存已清理。",
+  "attachmentCacheClearFailed": "清理缓存失败：{reason}",
+  "@attachmentCacheClearFailed": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "clearOldAttachments": "清理旧附件",
+  "oldAttachmentsCleared": "已清理 30 天前的附件。",
+  "oldAttachmentsClearFailed": "清理旧缓存失败：{reason}",
+  "@oldAttachmentsClearFailed": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "clearAllAttachments": "全部清理",
+  "close": "关闭",
   "emptyMessageBody": "这封邮件没有可读正文。",
   "htmlShownAsSource": "当前以源码文本显示 HTML。不会加载远程图片。",
   "remoteImagesBlocked": "此邮件包含远程图片，当前已阻止加载。",

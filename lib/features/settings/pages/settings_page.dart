@@ -46,8 +46,8 @@ class SettingsPage extends ConsumerWidget {
           ),
           ListTile(
             leading: const Icon(Icons.attach_file),
-            title: const Text('Attachment Cache'),
-            subtitle: const Text('Manage downloaded attachments'),
+            title: Text(l10n.attachmentCacheTitle),
+            subtitle: Text(l10n.attachmentCacheSubtitle),
             onTap: () => _showAttachmentCacheDialog(context, ref),
           ),
         ],

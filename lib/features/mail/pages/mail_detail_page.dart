@@ -937,6 +937,7 @@ class _AttachmentCardState extends ConsumerState<_AttachmentCard> {
   String? _errorMessage;
 
   Future<void> _handleTap() async {
+    final l10n = AppLocalizations.of(context);
     if (_isDownloading) {
       return;
     }
@@ -947,9 +948,9 @@ class _AttachmentCardState extends ConsumerState<_AttachmentCard> {
         await AttachmentOpener.openFile(widget.attachment.localPath!);
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text('Failed to open file: $e')));
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(l10n.attachmentOpenFailed('$e'))),
+          );
         }
       }
       return;
@@ -965,7 +966,7 @@ class _AttachmentCardState extends ConsumerState<_AttachmentCard> {
     if (accountId == null || folderId == null || uid == null) {
       if (mounted) {
         setState(() {
-          _errorMessage = 'Missing context information';
+          _errorMessage = l10n.attachmentContextMissing;
         });
       }
       return;
@@ -986,18 +987,18 @@ class _AttachmentCardState extends ConsumerState<_AttachmentCard> {
       );
 
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Download completed')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.attachmentDownloadCompleted)),
+        );
 
         // Try to open the file after download
         try {
           await AttachmentOpener.openFile(localPath);
         } catch (e) {
           if (mounted) {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(SnackBar(content: Text('Failed to open file: $e')));
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(l10n.attachmentOpenFailed('$e'))),
+            );
           }
         }
       }
@@ -1013,7 +1014,7 @@ class _AttachmentCardState extends ConsumerState<_AttachmentCard> {
     } catch (e) {
       if (mounted) {
         setState(() {
-          _errorMessage = 'Download failed: $e';
+          _errorMessage = l10n.attachmentDownloadFailed('$e');
         });
         ScaffoldMessenger.of(
           context,
@@ -1027,15 +1028,19 @@ class _AttachmentCardState extends ConsumerState<_AttachmentCard> {
   }
 
   String _getErrorMessage(AttachmentDownloadErrorType type) {
+    final l10n = AppLocalizations.of(context);
     return switch (type) {
-      AttachmentDownloadErrorType.accountNotFound => 'Account not found',
-      AttachmentDownloadErrorType.noCredentials => 'No credentials available',
-      AttachmentDownloadErrorType.networkTimeout => 'Download timed out',
-      AttachmentDownloadErrorType.networkError => 'Network error occurred',
-      AttachmentDownloadErrorType.parseError => 'Failed to parse attachment',
-      AttachmentDownloadErrorType.diskFull => 'Not enough disk space',
-      AttachmentDownloadErrorType.permissionDenied => 'Permission denied',
-      AttachmentDownloadErrorType.unknown => 'Unknown error occurred',
+      AttachmentDownloadErrorType.accountNotFound =>
+        l10n.attachmentAccountNotFound,
+      AttachmentDownloadErrorType.noCredentials => l10n.attachmentNoCredentials,
+      AttachmentDownloadErrorType.networkTimeout =>
+        l10n.attachmentDownloadTimedOut,
+      AttachmentDownloadErrorType.networkError => l10n.attachmentNetworkError,
+      AttachmentDownloadErrorType.parseError => l10n.attachmentParseFailed,
+      AttachmentDownloadErrorType.diskFull => l10n.attachmentDiskFull,
+      AttachmentDownloadErrorType.permissionDenied =>
+        l10n.attachmentPermissionDenied,
+      AttachmentDownloadErrorType.unknown => l10n.attachmentUnknownError,
     };
   }
 
@@ -1128,7 +1133,7 @@ class _AttachmentCardState extends ConsumerState<_AttachmentCard> {
                     ),
                     TextButton(
                       onPressed: _handleTap,
-                      child: const Text('Retry'),
+                      child: Text(AppLocalizations.of(context).retry),
                     ),
                   ],
                 ),
