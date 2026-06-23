@@ -339,7 +339,7 @@ class _MailboxWorkspaceState extends ConsumerState<_MailboxWorkspace> {
       selectedMessage: _selectedMessage,
       embedded: isMedium,
       onMessageSelected: (message) {
-        if (isMedium) {
+        if (isWide) {
           setState(() => _selectedMessage = _SelectedMessage.from(message));
           return;
         }

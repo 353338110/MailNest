@@ -42,7 +42,7 @@ void main() {
     expect(find.text('Folders'), findsOneWidget);
     expect(find.text('Accounts'), findsWidgets);
     expect(find.text('Settings'), findsOneWidget);
-    expect(find.text('Message detail'), findsNothing);
+    expect(find.text('Mail detail'), findsNothing);
   });
 
   testWidgets('account group field offers existing groups and accepts typing', (
@@ -96,7 +96,29 @@ void main() {
 
       expect(find.text('Mailboxes'), findsOneWidget);
       expect(find.text('Unified inbox'), findsWidgets);
-      expect(find.text('Message detail'), findsNothing);
+      expect(find.text('Mail detail'), findsNothing);
+    });
+
+    testWidgets('opens message detail and returns on medium desktop windows', (
+      tester,
+    ) async {
+      await tester.pumpHomeWithAccount(
+        width: 800,
+        messages: [_cachedMessage()],
+      );
+
+      await tester.tap(find.text('Window sizing regression'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Mail detail'), findsOneWidget);
+      expect(find.text('Body loaded from the local cache.'), findsOneWidget);
+      expect(find.byTooltip('Back'), findsOneWidget);
+
+      await tester.tap(find.byTooltip('Back'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Mailboxes'), findsOneWidget);
+      expect(find.text('Window sizing regression'), findsOneWidget);
     });
 
     testWidgets('keeps account editing reachable and returnable', (
@@ -167,6 +189,7 @@ extension on WidgetTester {
   Future<void> pumpHomeWithAccount({
     required double width,
     TargetPlatform platform = TargetPlatform.macOS,
+    List<LocalMailMessage> messages = const [],
   }) async {
     view.physicalSize = Size(width, 900);
     view.devicePixelRatio = 1;
@@ -176,6 +199,9 @@ extension on WidgetTester {
 
     final database = AppDatabase(NativeDatabase.memory());
     final repository = _FakeAccountRepository(_testAccount, database: database);
+    await database.saveLocalMailMessages(
+      messages.map((message) => message.toCompanion(false)).toList(),
+    );
     addTearDown(() async {
       debugDefaultTargetPlatformOverride = null;
       await database.close();
@@ -188,7 +214,7 @@ extension on WidgetTester {
             appDatabaseProvider.overrideWithValue(database),
             accountRepositoryProvider.overrideWithValue(repository),
             mailSyncRepositoryProvider.overrideWithValue(
-              _FakeMailSyncRepository(database),
+              _FakeMailSyncRepository(database, messages: messages),
             ),
             translationProviderConfigProvider.overrideWith(
               (ref) async => TranslationProviderConfig.disabled(),
@@ -251,6 +277,27 @@ final _testAccount = EmailAccount(
   updatedAt: DateTime(2026),
 );
 
+LocalMailMessage _cachedMessage() {
+  return LocalMailMessage(
+    id: 1,
+    accountId: _testAccount.id,
+    folderName: 'inbox',
+    uid: 42,
+    messageId: 'message-42@test.com',
+    sender: 'sender@test.com',
+    recipients: 'a@test.com',
+    subject: 'Window sizing regression',
+    summary: 'Tap should open the detail route.',
+    cachedBody: 'Body loaded from the local cache.',
+    cachedBodyIsHtml: false,
+    isRead: false,
+    isStarred: false,
+    hasAttachments: false,
+    receivedAt: DateTime(2026, 6, 23, 9),
+    updatedAt: DateTime(2026, 6, 23, 9),
+  );
+}
+
 class _FakeAccountRepository extends AccountRepository {
   _FakeAccountRepository(
     this.account, {
@@ -286,12 +333,16 @@ class _FakeAccountRepository extends AccountRepository {
 }
 
 class _FakeMailSyncRepository extends MailSyncRepository {
-  _FakeMailSyncRepository(AppDatabase database)
-    : super(database: database, imapProvider: const _NoopMailProvider());
+  _FakeMailSyncRepository(
+    AppDatabase database, {
+    this.messages = const <LocalMailMessage>[],
+  }) : super(database: database, imapProvider: const _NoopMailProvider());
+
+  final List<LocalMailMessage> messages;
 
   @override
   Stream<List<LocalMailMessage>> watchRecentHeaders() {
-    return Stream.value(const <LocalMailMessage>[]);
+    return Stream.value(messages);
   }
 
   @override
