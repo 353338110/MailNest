@@ -30,7 +30,68 @@ class ImapSmtpMailProvider implements MailProvider {
     required String accountId,
     required String messageId,
   }) async {
-    throw UnimplementedError('IMAP delete is planned for the IMAP/SMTP phase.');
+    // messageId format: "accountId:folderId:uid"
+    final parts = messageId.split(':');
+    if (parts.length != 3 || parts[0] != accountId) {
+      throw const MailProtocolException('Invalid message ID format.');
+    }
+
+    final folderId = parts[1];
+    final uid = parts[2];
+
+    final account = await accountRepository.getAccount(accountId);
+    if (account == null) {
+      throw const MailProtocolException('Account not found.');
+    }
+    final secret = await accountRepository.readSecretForAccount(account);
+    if (secret == null || secret.isEmpty) {
+      throw const MailProtocolException('Account secret is unavailable.');
+    }
+
+    _RawImapClient? client;
+    try {
+      client = await _RawImapClient.connect(
+        host: account.imapHost,
+        port: account.imapPort,
+        security: account.imapSecurity,
+        timeout: timeout,
+      );
+      await client.login(username: account.username, secret: secret);
+      await client.selectMailbox(_mailboxName(folderId));
+
+      // Mark as deleted
+      await client.storeFlags(uid: uid, flags: r'\Deleted', add: true);
+
+      // Permanently delete
+      await client.expunge();
+
+      await client.logout();
+    } finally {
+      client?.close();
+    }
+  }
+
+  @override
+  Future<void> markAsRead({
+    required String accountId,
+    required String messageId,
+    required bool isRead,
+  }) async {
+    // messageId format: "accountId:folderId:uid"
+    final parts = messageId.split(':');
+    if (parts.length != 3 || parts[0] != accountId) {
+      throw const MailProtocolException('Invalid message ID format.');
+    }
+
+    final folderId = parts[1];
+    final uid = parts[2];
+
+    await markMessageReadByUid(
+      accountId: accountId,
+      folderId: folderId,
+      uid: uid,
+      isRead: isRead,
+    );
   }
 
   @override
@@ -39,9 +100,9 @@ class ImapSmtpMailProvider implements MailProvider {
     required String folderId,
     required String messageLocalId,
   }) async {
-    throw UnimplementedError(
-      'IMAP body fetch is planned for the detail phase.',
-    );
+    // This is handled by MailRepository which caches and parses messages
+    // For IMAP provider, we delegate to fetchRawMessageByUid
+    throw UnimplementedError('Use MailRepository.fetchMessageDetail instead');
   }
 
   @override
@@ -71,13 +132,14 @@ class ImapSmtpMailProvider implements MailProvider {
     }
   }
 
-  @override
-  Future<void> markAsRead({
-    required String accountId,
-    required String messageId,
-    required bool isRead,
-  }) async {
-    throw UnimplementedError('IMAP flags are planned for the IMAP/SMTP phase.');
+  MailFolder _toMailFolder(ImapFolderInfo folder) {
+    return MailFolder(
+      id: folder.name.toLowerCase(),
+      name: folder.name,
+      path: folder.name,
+      delimiter: folder.delimiter,
+      flags: folder.attributes,
+    );
   }
 
   Future<void> markMessageReadByUid({
@@ -207,16 +269,6 @@ class ImapSmtpMailProvider implements MailProvider {
     }
   }
 
-  MailFolder _toMailFolder(ImapFolderInfo folder) {
-    return MailFolder(
-      id: folder.name.toLowerCase(),
-      name: folder.name,
-      path: folder.name,
-      delimiter: folder.delimiter,
-      flags: folder.attributes,
-    );
-  }
-
   Future<String> fetchRawMessageByUid({
     required EmailAccount account,
     required String secret,
@@ -281,11 +333,203 @@ class ImapSmtpMailProvider implements MailProvider {
   }
 
   List<int> _extractAttachmentFromRaw(String raw, String attachmentId) {
-    // TODO: Implement proper MIME parsing to extract attachment by ID
-    // For now, this is a placeholder that should be replaced with actual MIME parsing
-    throw UnimplementedError(
-      'Attachment extraction requires full MIME parsing',
+    // Parse the raw message to build MIME tree
+    final normalized = raw.replaceAll('\r\n', '\n');
+    final splitIndex = normalized.indexOf('\n\n');
+    final headerText = splitIndex == -1
+        ? normalized
+        : normalized.substring(0, splitIndex);
+    final bodyText = splitIndex == -1
+        ? ''
+        : normalized.substring(splitIndex + 2);
+
+    final headers = _MimeHeaders.parse(headerText);
+    final rootPart = _parseMimePart(headers, bodyText);
+
+    // Find attachment by ID in the MIME tree
+    final attachment = _findAttachmentById(rootPart, attachmentId);
+    if (attachment == null) {
+      throw MailProtocolException(
+        'Attachment with ID $attachmentId not found in message',
+      );
+    }
+
+    // Decode the attachment bytes
+    final transferEncoding = attachment.headers.value(
+      'content-transfer-encoding',
     );
+    return _decodeTransfer(attachment.body, transferEncoding);
+  }
+
+  _MimePartData? _findAttachmentById(_MimePartData part, String attachmentId) {
+    // Track attachment index
+    var attachmentIndex = 0;
+    return _findAttachmentByIdRecursive(part, attachmentId, attachmentIndex);
+  }
+
+  _MimePartData? _findAttachmentByIdRecursive(
+    _MimePartData part,
+    String attachmentId,
+    int attachmentIndex,
+  ) {
+    // If this part has children, search them first
+    if (part.children.isNotEmpty) {
+      var currentIndex = attachmentIndex;
+      for (final child in part.children) {
+        final result = _findAttachmentByIdRecursive(
+          child,
+          attachmentId,
+          currentIndex,
+        );
+        if (result != null) {
+          return result;
+        }
+        // Count attachments in this branch
+        currentIndex = _countAttachments(child, currentIndex);
+      }
+      return null;
+    }
+
+    // Check if this part is an attachment
+    final contentType = part.headers.contentType;
+    final disposition = part.headers.disposition;
+    final fileName = disposition.fileName ?? contentType.params['name'];
+    final contentId = _cleanAngle(part.headers.value('content-id'));
+    final isInline = disposition.kind == 'inline' || contentId != null;
+
+    if (fileName != null || disposition.kind == 'attachment' || isInline) {
+      // This is an attachment, check if it matches
+      final expectedId = 'att-${attachmentIndex + 1}';
+      if (expectedId == attachmentId) {
+        return part;
+      }
+    }
+
+    return null;
+  }
+
+  int _countAttachments(_MimePartData part, int currentIndex) {
+    var count = currentIndex;
+
+    if (part.children.isNotEmpty) {
+      for (final child in part.children) {
+        count = _countAttachments(child, count);
+      }
+      return count;
+    }
+
+    final contentType = part.headers.contentType;
+    final disposition = part.headers.disposition;
+    final fileName = disposition.fileName ?? contentType.params['name'];
+    final contentId = _cleanAngle(part.headers.value('content-id'));
+    final isInline = disposition.kind == 'inline' || contentId != null;
+
+    if (fileName != null || disposition.kind == 'attachment' || isInline) {
+      return count + 1;
+    }
+
+    return count;
+  }
+
+  _MimePartData _parseMimePart(_MimeHeaders headers, String body) {
+    final contentType = headers.contentType;
+    if (!contentType.mimeType.startsWith('multipart/')) {
+      return _MimePartData(headers: headers, body: body, children: const []);
+    }
+
+    final boundary = contentType.params['boundary'];
+    if (boundary == null || boundary.isEmpty) {
+      return _MimePartData(headers: headers, body: body, children: const []);
+    }
+
+    final children = <_MimePartData>[];
+    final boundaryLine = '--$boundary';
+    final endBoundaryLine = '--$boundary--';
+    final lines = body.split('\n');
+    final current = StringBuffer();
+    var inPart = false;
+
+    void addCurrent() {
+      final partText = current.toString();
+      current.clear();
+      final splitIndex = partText.indexOf('\n\n');
+      if (splitIndex == -1) {
+        return;
+      }
+      final partHeaders = _MimeHeaders.parse(partText.substring(0, splitIndex));
+      final partBody = partText.substring(splitIndex + 2);
+      children.add(_parseMimePart(partHeaders, partBody));
+    }
+
+    for (final line in lines) {
+      final trimmed = line.trimRight();
+      if (trimmed == boundaryLine || trimmed == endBoundaryLine) {
+        if (inPart) {
+          addCurrent();
+        }
+        if (trimmed == endBoundaryLine) {
+          inPart = false;
+          break;
+        }
+        inPart = true;
+        continue;
+      }
+      if (inPart) {
+        current.writeln(line);
+      }
+    }
+    if (inPart && current.isNotEmpty) {
+      addCurrent();
+    }
+
+    return _MimePartData(headers: headers, body: '', children: children);
+  }
+
+  static List<int> _decodeTransfer(String body, String? encoding) {
+    final normalized = body.trimRight();
+    return switch ((encoding ?? '').toLowerCase().trim()) {
+      'base64' => _safeBase64Decode(normalized.replaceAll(RegExp(r'\s+'), '')),
+      'quoted-printable' => _decodeQuotedPrintableBytes(normalized),
+      _ => latin1.encode(normalized),
+    };
+  }
+
+  static List<int> _safeBase64Decode(String value) {
+    try {
+      final padding = value.length % 4;
+      final padded = padding == 0
+          ? value
+          : value.padRight(value.length + 4 - padding, '=');
+      return base64.decode(padded);
+    } on FormatException {
+      return latin1.encode(value);
+    }
+  }
+
+  static List<int> _decodeQuotedPrintableBytes(String value) {
+    final output = <int>[];
+    final text = value.replaceAll(RegExp(r'=\r?\n'), '');
+    for (var index = 0; index < text.length; index++) {
+      final char = text.codeUnitAt(index);
+      if (char == 0x3d && index + 2 < text.length) {
+        final hex = text.substring(index + 1, index + 3);
+        final byte = int.tryParse(hex, radix: 16);
+        if (byte != null) {
+          output.add(byte);
+          index += 2;
+          continue;
+        }
+      }
+      output.add(char);
+    }
+    return output;
+  }
+
+  static String? _cleanAngle(String? value) {
+    if (value == null) {
+      return null;
+    }
+    return value.trim().replaceAll(RegExp(r'^<|>$'), '');
   }
 
   static String _mailboxName(String folderId) {
@@ -382,6 +626,25 @@ class _RawImapClient {
     final response = await _command('UID STORE $uid $mode (\\Seen)');
     if (!response.isOk) {
       throw const MailProtocolException('IMAP flag update failed.');
+    }
+  }
+
+  Future<void> storeFlags({
+    required String uid,
+    required String flags,
+    required bool add,
+  }) async {
+    final mode = add ? '+FLAGS.SILENT' : '-FLAGS.SILENT';
+    final response = await _command('UID STORE $uid $mode ($flags)');
+    if (!response.isOk) {
+      throw const MailProtocolException('IMAP flag update failed.');
+    }
+  }
+
+  Future<void> expunge() async {
+    final response = await _command('EXPUNGE');
+    if (!response.isOk) {
+      throw const MailProtocolException('IMAP expunge failed.');
     }
   }
 
@@ -489,4 +752,121 @@ class _TaggedResponse {
   final String line;
 
   bool get isOk => line.contains(RegExp(r'\sOK(?:\s|$)', caseSensitive: false));
+}
+
+// MIME parsing helper classes
+class _MimePartData {
+  const _MimePartData({
+    required this.headers,
+    required this.body,
+    required this.children,
+  });
+
+  final _MimeHeaders headers;
+  final String body;
+  final List<_MimePartData> children;
+}
+
+class _MimeHeaders {
+  const _MimeHeaders(this._values);
+
+  final Map<String, String> _values;
+
+  static _MimeHeaders parse(String text) {
+    final values = <String, String>{};
+    final lines = text.split('\n');
+    String? currentKey;
+    final currentValue = StringBuffer();
+
+    void flush() {
+      if (currentKey != null) {
+        values[currentKey.toLowerCase()] = currentValue.toString().trim();
+        currentValue.clear();
+      }
+    }
+
+    for (final line in lines) {
+      if (line.isEmpty) {
+        continue;
+      }
+      if (line.startsWith(' ') || line.startsWith('\t')) {
+        currentValue.write(' ${line.trim()}');
+      } else {
+        final colonIndex = line.indexOf(':');
+        if (colonIndex > 0) {
+          flush();
+          currentKey = line.substring(0, colonIndex).trim();
+          currentValue.write(line.substring(colonIndex + 1).trim());
+        }
+      }
+    }
+    flush();
+
+    return _MimeHeaders(values);
+  }
+
+  String value(String name) => _values[name.toLowerCase()] ?? '';
+
+  _ContentType get contentType {
+    final raw = value('content-type');
+    if (raw.isEmpty) {
+      return const _ContentType('text/plain', {});
+    }
+    final parts = raw.split(';');
+    final mimeType = parts.first.trim().toLowerCase();
+    final params = <String, String>{};
+    for (var i = 1; i < parts.length; i++) {
+      final param = parts[i];
+      final eqIndex = param.indexOf('=');
+      if (eqIndex > 0) {
+        final key = param.substring(0, eqIndex).trim().toLowerCase();
+        var val = param.substring(eqIndex + 1).trim();
+        if (val.startsWith('"') && val.endsWith('"')) {
+          val = val.substring(1, val.length - 1);
+        }
+        params[key] = val;
+      }
+    }
+    return _ContentType(mimeType, params);
+  }
+
+  _Disposition get disposition {
+    final raw = value('content-disposition');
+    if (raw.isEmpty) {
+      return const _Disposition('', null);
+    }
+    final parts = raw.split(';');
+    final kind = parts.first.trim().toLowerCase();
+    String? fileName;
+    for (var i = 1; i < parts.length; i++) {
+      final param = parts[i];
+      final eqIndex = param.indexOf('=');
+      if (eqIndex > 0) {
+        final key = param.substring(0, eqIndex).trim().toLowerCase();
+        if (key == 'filename') {
+          var val = param.substring(eqIndex + 1).trim();
+          if (val.startsWith('"') && val.endsWith('"')) {
+            val = val.substring(1, val.length - 1);
+          }
+          fileName = val;
+          break;
+        }
+      }
+    }
+    return _Disposition(kind, fileName);
+  }
+}
+
+class _ContentType {
+  const _ContentType(this.mimeType, this.params);
+
+  final String mimeType;
+  final Map<String, String> params;
+}
+
+class _Disposition {
+  const _Disposition(this.kind, this.fileName);
+
+  final String kind;
+  final String? fileName;
 }

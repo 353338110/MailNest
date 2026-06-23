@@ -14,6 +14,7 @@ import '../../../mail/models/mail_detail.dart';
 import '../../../mail/models/mail_header.dart';
 import '../../../mail/repository/mail_repository_provider.dart';
 import '../../../mail/services/attachment_opener.dart';
+import '../../../mail/services/attachment_service.dart';
 import '../../../mail/services/attachment_service_provider.dart';
 import '../../drafts/pages/compose_mail_page.dart';
 import '../../translation/widgets/translation_sheet.dart';
@@ -267,6 +268,7 @@ class _MailDetailBody extends StatelessWidget {
             accountId: accountId,
             folderId: folderId,
             uid: uid,
+            isRead: detail.header.isRead,
           ),
           const Divider(height: 1),
           Expanded(
@@ -341,7 +343,7 @@ class _MailDetailBody extends StatelessWidget {
   }
 }
 
-class _MailActionHeader extends StatelessWidget {
+class _MailActionHeader extends ConsumerWidget {
   const _MailActionHeader({
     required this.onTranslate,
     required this.onTogglePlainText,
@@ -350,6 +352,7 @@ class _MailActionHeader extends StatelessWidget {
     this.accountId,
     this.folderId,
     this.uid,
+    this.isRead = true,
   });
 
   final VoidCallback onTranslate;
@@ -359,9 +362,104 @@ class _MailActionHeader extends StatelessWidget {
   final String? accountId;
   final String? folderId;
   final String? uid;
+  final bool isRead;
+
+  Future<void> _handleDelete(BuildContext context, WidgetRef ref) async {
+    final l10n = AppLocalizations.of(context);
+
+    // Show confirmation dialog
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Delete Message'),
+        content: Text('Are you sure you want to delete this message?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(l10n.cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text('Delete'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true || !context.mounted) return;
+
+    final account = accountId;
+    final folder = folderId;
+    final messageUid = uid;
+
+    if (account == null || folder == null || messageUid == null) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Operation failed')));
+      }
+      return;
+    }
+
+    try {
+      final repository = ref.read(mailRepositoryProvider);
+      await repository.deleteMessage(
+        accountId: account,
+        folderId: folder,
+        uid: int.parse(messageUid),
+      );
+
+      if (context.mounted) {
+        Navigator.of(context).pop();
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Message deleted')));
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('${"Delete failed"}: $e')));
+      }
+    }
+  }
+
+  Future<void> _handleToggleRead(BuildContext context, WidgetRef ref) async {
+    final account = accountId;
+    final folder = folderId;
+    final messageUid = uid;
+
+    if (account == null || folder == null || messageUid == null) {
+      return;
+    }
+
+    try {
+      final repository = ref.read(mailRepositoryProvider);
+      await repository.markAsRead(
+        accountId: account,
+        folderId: folder,
+        uid: int.parse(messageUid),
+        isRead: !isRead,
+      );
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(isRead ? ('Marked as unread') : ('Marked as read')),
+          ),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('${"Operation failed"}: $e')));
+      }
+    }
+  }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final hasContext = accountId != null && folderId != null && uid != null;
 
@@ -369,6 +467,22 @@ class _MailActionHeader extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.medium),
       child: Row(
         children: [
+          IconButton(
+            onPressed: hasContext ? () => _handleDelete(context, ref) : null,
+            icon: const Icon(Icons.delete_outline),
+            tooltip: 'Delete',
+          ),
+          IconButton(
+            onPressed: hasContext
+                ? () => _handleToggleRead(context, ref)
+                : null,
+            icon: Icon(
+              isRead
+                  ? Icons.mark_email_unread_outlined
+                  : Icons.mark_email_read_outlined,
+            ),
+            tooltip: isRead ? ('Mark as unread') : ('Mark as read'),
+          ),
           IconButton(
             onPressed: hasContext ? () => _handleReply(context) : null,
             icon: const Icon(Icons.reply_outlined),
@@ -820,6 +934,7 @@ class _AttachmentCard extends ConsumerStatefulWidget {
 
 class _AttachmentCardState extends ConsumerState<_AttachmentCard> {
   bool _isDownloading = false;
+  String? _errorMessage;
 
   Future<void> _handleTap() async {
     if (_isDownloading) {
@@ -849,14 +964,17 @@ class _AttachmentCardState extends ConsumerState<_AttachmentCard> {
 
     if (accountId == null || folderId == null || uid == null) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Cannot download: missing context')),
-        );
+        setState(() {
+          _errorMessage = 'Missing context information';
+        });
       }
       return;
     }
 
-    setState(() => _isDownloading = true);
+    setState(() {
+      _isDownloading = true;
+      _errorMessage = null;
+    });
 
     try {
       final attachmentService = ref.read(attachmentServiceProvider);
@@ -883,17 +1001,42 @@ class _AttachmentCardState extends ConsumerState<_AttachmentCard> {
           }
         }
       }
-    } catch (e) {
+    } on AttachmentDownloadException catch (e) {
       if (mounted) {
+        setState(() {
+          _errorMessage = _getErrorMessage(e.type);
+        });
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Download failed: $e')));
+        ).showSnackBar(SnackBar(content: Text(_errorMessage!)));
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _errorMessage = 'Download failed: $e';
+        });
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(_errorMessage!)));
       }
     } finally {
       if (mounted) {
         setState(() => _isDownloading = false);
       }
     }
+  }
+
+  String _getErrorMessage(AttachmentDownloadErrorType type) {
+    return switch (type) {
+      AttachmentDownloadErrorType.accountNotFound => 'Account not found',
+      AttachmentDownloadErrorType.noCredentials => 'No credentials available',
+      AttachmentDownloadErrorType.networkTimeout => 'Download timed out',
+      AttachmentDownloadErrorType.networkError => 'Network error occurred',
+      AttachmentDownloadErrorType.parseError => 'Failed to parse attachment',
+      AttachmentDownloadErrorType.diskFull => 'Not enough disk space',
+      AttachmentDownloadErrorType.permissionDenied => 'Permission denied',
+      AttachmentDownloadErrorType.unknown => 'Unknown error occurred',
+    };
   }
 
   @override
@@ -911,48 +1054,85 @@ class _AttachmentCardState extends ConsumerState<_AttachmentCard> {
         decoration: BoxDecoration(
           color: colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(8),
+          border: _errorMessage != null
+              ? Border.all(color: colorScheme.error, width: 1)
+              : null,
         ),
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.medium),
-          child: Row(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, color: colorScheme.primary),
-              const SizedBox(width: AppSpacing.small),
-              Expanded(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      widget.attachment.fileName,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontWeight: FontWeight.w600),
+              Row(
+                children: [
+                  Icon(icon, color: colorScheme.primary),
+                  const SizedBox(width: AppSpacing.small),
+                  Expanded(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.attachment.fileName,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                        const SizedBox(height: AppSpacing.xsmall),
+                        Text(
+                          widget.subtitle,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: AppSpacing.xsmall),
-                    Text(
-                      widget.subtitle,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                  if (_isDownloading)
+                    const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  else if (_errorMessage != null)
+                    Icon(
+                      Icons.error_outline,
+                      color: colorScheme.error,
+                      size: 20,
+                    )
+                  else if (widget.attachment.downloaded)
+                    Icon(
+                      Icons.check_circle,
+                      color: colorScheme.primary,
+                      size: 20,
+                    )
+                  else
+                    Icon(
+                      Icons.download_outlined,
+                      color: colorScheme.onSurfaceVariant,
+                      size: 20,
+                    ),
+                ],
+              ),
+              if (_errorMessage != null) ...[
+                const SizedBox(height: AppSpacing.small),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        _errorMessage!,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: colorScheme.error,
+                        ),
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: _handleTap,
+                      child: const Text('Retry'),
                     ),
                   ],
                 ),
-              ),
-              if (_isDownloading)
-                const SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
-              else if (widget.attachment.downloaded)
-                Icon(Icons.check_circle, color: colorScheme.primary, size: 20)
-              else
-                Icon(
-                  Icons.download_outlined,
-                  color: colorScheme.onSurfaceVariant,
-                  size: 20,
-                ),
+              ],
             ],
           ),
         ),

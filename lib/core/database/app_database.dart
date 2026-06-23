@@ -669,6 +669,44 @@ class AppDatabase extends _$AppDatabase {
         );
   }
 
+  Future<void> deleteLocalMailMessage({
+    required String accountId,
+    required String folderName,
+    required int uid,
+  }) async {
+    final normalizedFolderName = _normalizeFolderName(folderName);
+    await (delete(localMailMessages)..where(
+          (table) =>
+              table.accountId.equals(accountId) &
+              table.folderName.lower().equals(normalizedFolderName) &
+              table.uid.equals(uid),
+        ))
+        .go();
+
+    // Also delete attachments
+    await (delete(localMailAttachments)..where(
+          (table) =>
+              table.accountId.equals(accountId) &
+              table.folderName.lower().equals(normalizedFolderName) &
+              table.messageUid.equals(uid),
+        ))
+        .go();
+  }
+
+  Future<void> updateMailMessageReadStatus({
+    required String accountId,
+    required String folderName,
+    required int uid,
+    required bool isRead,
+  }) async {
+    await markLocalMailMessageRead(
+      accountId: accountId,
+      folderName: folderName,
+      uid: uid,
+      isRead: isRead,
+    );
+  }
+
   Future<void> upsertLocalMailMessage(
     LocalMailMessagesCompanion message,
   ) async {
