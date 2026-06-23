@@ -45,6 +45,24 @@ void main() {
     expect(find.text('Mail detail'), findsNothing);
   });
 
+  testWidgets('opens message detail and returns on a narrow home screen', (
+    tester,
+  ) async {
+    await tester.pumpHomeWithAccount(width: 390, messages: [_cachedMessage()]);
+
+    await tester.tap(find.text('Window sizing regression'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Mail detail'), findsOneWidget);
+    expect(find.text('Body loaded from the local cache.'), findsOneWidget);
+    expect(find.byTooltip('Back'), findsOneWidget);
+
+    await tester.tap(find.byTooltip('Back'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Window sizing regression'), findsOneWidget);
+  });
+
   testWidgets('account group field offers existing groups and accepts typing', (
     tester,
   ) async {

@@ -77,7 +77,10 @@ class HomePage extends ConsumerWidget {
               : null,
           body: data.isEmpty
               ? _EmptyState(onAdd: () => context.push('/accounts/add'))
-              : _MailboxWorkspace(accounts: data),
+              : _MailboxWorkspace(
+                  accounts: data,
+                  showInlineNavigation: !useMobileNavigation,
+                ),
           floatingActionButton: _HomeFab(
             hasAccounts: data.isNotEmpty,
             onAddAccount: () => context.push('/accounts/add'),
@@ -249,9 +252,13 @@ class _HomeFab extends StatelessWidget {
 }
 
 class _MailboxWorkspace extends ConsumerStatefulWidget {
-  const _MailboxWorkspace({required this.accounts});
+  const _MailboxWorkspace({
+    required this.accounts,
+    required this.showInlineNavigation,
+  });
 
   final List<EmailAccount> accounts;
+  final bool showInlineNavigation;
 
   @override
   ConsumerState<_MailboxWorkspace> createState() => _MailboxWorkspaceState();
@@ -381,6 +388,10 @@ class _MailboxWorkspaceState extends ConsumerState<_MailboxWorkspace> {
           ],
         ),
       );
+    }
+
+    if (!widget.showInlineNavigation) {
+      return mailbox;
     }
 
     return ListView(

@@ -462,57 +462,74 @@ class _MailActionHeader extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final hasContext = accountId != null && folderId != null && uid != null;
+    final primaryActions = [
+      IconButton(
+        onPressed: hasContext ? () => _handleDelete(context, ref) : null,
+        icon: const Icon(Icons.delete_outline),
+        tooltip: 'Delete',
+      ),
+      IconButton(
+        onPressed: hasContext ? () => _handleToggleRead(context, ref) : null,
+        icon: Icon(
+          isRead
+              ? Icons.mark_email_unread_outlined
+              : Icons.mark_email_read_outlined,
+        ),
+        tooltip: isRead ? ('Mark as unread') : ('Mark as read'),
+      ),
+      IconButton(
+        onPressed: hasContext ? () => _handleReply(context) : null,
+        icon: const Icon(Icons.reply_outlined),
+        tooltip: l10n.reply,
+      ),
+      IconButton(
+        onPressed: hasContext ? () => _handleReplyAll(context) : null,
+        icon: const Icon(Icons.reply_all_outlined),
+        tooltip: l10n.replyAll,
+      ),
+      IconButton(
+        onPressed: hasContext ? () => _handleForward(context) : null,
+        icon: const Icon(Icons.forward_outlined),
+        tooltip: l10n.forward,
+      ),
+    ];
+    final secondaryActions = [
+      IconButton(
+        tooltip: l10n.viewAsPlainText,
+        onPressed: onTogglePlainText,
+        icon: Icon(
+          plainTextMode ? Icons.web_asset_outlined : Icons.notes_outlined,
+        ),
+      ),
+      IconButton(
+        tooltip: l10n.translate,
+        onPressed: onTranslate,
+        icon: const Icon(Icons.translate),
+      ),
+      IconButton(onPressed: null, icon: const Icon(Icons.more_vert)),
+    ];
 
     return Padding(
       padding: const EdgeInsets.all(AppSpacing.medium),
-      child: Row(
-        children: [
-          IconButton(
-            onPressed: hasContext ? () => _handleDelete(context, ref) : null,
-            icon: const Icon(Icons.delete_outline),
-            tooltip: 'Delete',
-          ),
-          IconButton(
-            onPressed: hasContext
-                ? () => _handleToggleRead(context, ref)
-                : null,
-            icon: Icon(
-              isRead
-                  ? Icons.mark_email_unread_outlined
-                  : Icons.mark_email_read_outlined,
-            ),
-            tooltip: isRead ? ('Mark as unread') : ('Mark as read'),
-          ),
-          IconButton(
-            onPressed: hasContext ? () => _handleReply(context) : null,
-            icon: const Icon(Icons.reply_outlined),
-            tooltip: l10n.reply,
-          ),
-          IconButton(
-            onPressed: hasContext ? () => _handleReplyAll(context) : null,
-            icon: const Icon(Icons.reply_all_outlined),
-            tooltip: l10n.replyAll,
-          ),
-          IconButton(
-            onPressed: hasContext ? () => _handleForward(context) : null,
-            icon: const Icon(Icons.forward_outlined),
-            tooltip: l10n.forward,
-          ),
-          const Spacer(),
-          IconButton(
-            tooltip: l10n.viewAsPlainText,
-            onPressed: onTogglePlainText,
-            icon: Icon(
-              plainTextMode ? Icons.web_asset_outlined : Icons.notes_outlined,
-            ),
-          ),
-          IconButton(
-            tooltip: l10n.translate,
-            onPressed: onTranslate,
-            icon: const Icon(Icons.translate),
-          ),
-          IconButton(onPressed: null, icon: const Icon(Icons.more_vert)),
-        ],
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          if (constraints.maxWidth < 420) {
+            return SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  ...primaryActions,
+                  const SizedBox(width: AppSpacing.medium),
+                  ...secondaryActions,
+                ],
+              ),
+            );
+          }
+
+          return Row(
+            children: [...primaryActions, const Spacer(), ...secondaryActions],
+          );
+        },
       ),
     );
   }
@@ -626,65 +643,85 @@ class _MessageHeading extends StatelessWidget {
           ],
         ),
         const SizedBox(height: AppSpacing.medium),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            avatar,
-            const SizedBox(width: AppSpacing.medium),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text.rich(
-                    TextSpan(
-                      text: senderName,
-                      style: theme.textTheme.labelLarge,
-                      children: [
-                        if (senderAddress.isNotEmpty)
-                          TextSpan(
-                            text: ' <$senderAddress>',
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: theme.colorScheme.onSurfaceVariant,
-                            ),
-                          ),
-                      ],
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  if (delegatedSender != null) ...[
-                    const SizedBox(height: AppSpacing.xsmall),
-                    Text(
-                      _sentByText(l10n, delegatedSender),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                  if (recipients.isNotEmpty) ...[
-                    const SizedBox(height: AppSpacing.xsmall),
-                    Text(
-                      '${l10n.to} $recipients',
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-            const SizedBox(width: AppSpacing.medium),
-            Text(
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final showDateInline = constraints.maxWidth >= 420;
+            final dateText = Text(
               date,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
-            ),
-          ],
+            );
+
+            return Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                avatar,
+                const SizedBox(width: AppSpacing.medium),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text.rich(
+                        TextSpan(
+                          text: senderName,
+                          style: theme.textTheme.labelLarge,
+                          children: [
+                            if (senderAddress.isNotEmpty)
+                              TextSpan(
+                                text: ' <$senderAddress>',
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                          ],
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      if (delegatedSender != null) ...[
+                        const SizedBox(height: AppSpacing.xsmall),
+                        Text(
+                          _sentByText(l10n, delegatedSender),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                      if (recipients.isNotEmpty) ...[
+                        const SizedBox(height: AppSpacing.xsmall),
+                        Text(
+                          '${l10n.to} $recipients',
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                      if (!showDateInline) ...[
+                        const SizedBox(height: AppSpacing.xsmall),
+                        dateText,
+                      ],
+                    ],
+                  ),
+                ),
+                if (showDateInline) ...[
+                  const SizedBox(width: AppSpacing.medium),
+                  Flexible(
+                    child: Align(
+                      alignment: Alignment.topRight,
+                      child: dateText,
+                    ),
+                  ),
+                ],
+              ],
+            );
+          },
         ),
       ],
     );
