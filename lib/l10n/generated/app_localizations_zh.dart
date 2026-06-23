@@ -24,6 +24,24 @@ class AppLocalizationsZh extends AppLocalizations {
   String get language => '语言';
 
   @override
+  String get mailSyncRangeTitle => '邮件同步范围';
+
+  @override
+  String get mailSyncRange30Days => '最近 30 天';
+
+  @override
+  String get mailSyncRange90Days => '最近 90 天';
+
+  @override
+  String get mailSyncRange180Days => '最近 180 天';
+
+  @override
+  String get mailSyncRange365Days => '最近 1 年';
+
+  @override
+  String get mailSyncRangeAll => '全部邮件';
+
+  @override
   String get translationSettings => '翻译设置';
 
   @override

@@ -6,6 +6,7 @@ import 'package:mailnest_app/features/accounts/models/email_provider_type.dart';
 import 'package:mailnest_app/mail/models/mail_detail.dart';
 import 'package:mailnest_app/mail/models/mail_folder.dart';
 import 'package:mailnest_app/mail/models/mail_header.dart';
+import 'package:mailnest_app/mail/models/mail_sync_range.dart';
 import 'package:mailnest_app/mail/models/outgoing_message.dart';
 import 'package:mailnest_app/mail/models/sync_cursor.dart';
 import 'package:mailnest_app/mail/provider/mail_provider.dart';
@@ -77,9 +78,64 @@ void main() {
       'sent',
     );
   });
+
+  test(
+    'syncRecentHeaders passes the configured sync range to providers',
+    () async {
+      final database = AppDatabase(NativeDatabase.memory());
+      addTearDown(database.close);
+
+      final now = DateTime.utc(2026, 6, 9, 12);
+      await database.saveAccount(
+        EmailAccountsCompanion(
+          id: const Value('user@example.com'),
+          emailAddress: const Value('user@example.com'),
+          displayName: const Value(null),
+          provider: Value(EmailProviderType.custom.storageValue),
+          username: const Value('user@example.com'),
+          authType: const Value('app_password'),
+          imapHost: const Value('imap.example.com'),
+          imapPort: const Value(993),
+          imapSecurity: const Value('ssl'),
+          smtpHost: const Value('smtp.example.com'),
+          smtpPort: const Value(465),
+          smtpSecurity: const Value('ssl'),
+          smtpStartTls: const Value(false),
+          secretRef: const Value('secret-ref'),
+          oauthTokenRef: const Value(null),
+          syncEnabled: const Value(true),
+          createdAt: Value(now),
+          updatedAt: Value(now),
+        ),
+      );
+      await database.saveSetting(
+        AppSettingsCompanion(
+          key: const Value(mailSyncRangeSettingKey),
+          value: Value(MailSyncRange.days180.storageValue),
+          updatedAt: Value(now),
+        ),
+      );
+
+      final provider = _FakeMailProvider();
+      final repository = MailSyncRepository(
+        database: database,
+        imapProvider: provider,
+        now: () => now,
+      );
+
+      await repository.syncRecentHeaders();
+
+      expect(
+        provider.lastCursor?.since,
+        now.subtract(const Duration(days: 180)),
+      );
+    },
+  );
 }
 
 class _FakeMailProvider implements MailProvider {
+  SyncCursor? lastCursor;
+
   @override
   Future<void> deleteMessage({
     required String accountId,
@@ -138,6 +194,7 @@ class _FakeMailProvider implements MailProvider {
     required String folderId,
     required SyncCursor cursor,
   }) async {
+    lastCursor = cursor;
     return [
       MailHeader(
         id: '42',

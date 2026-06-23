@@ -146,6 +146,42 @@ abstract class AppLocalizations {
   /// **'Language'**
   String get language;
 
+  /// No description provided for @mailSyncRangeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Mail sync range'**
+  String get mailSyncRangeTitle;
+
+  /// No description provided for @mailSyncRange30Days.
+  ///
+  /// In en, this message translates to:
+  /// **'Last 30 days'**
+  String get mailSyncRange30Days;
+
+  /// No description provided for @mailSyncRange90Days.
+  ///
+  /// In en, this message translates to:
+  /// **'Last 90 days'**
+  String get mailSyncRange90Days;
+
+  /// No description provided for @mailSyncRange180Days.
+  ///
+  /// In en, this message translates to:
+  /// **'Last 180 days'**
+  String get mailSyncRange180Days;
+
+  /// No description provided for @mailSyncRange365Days.
+  ///
+  /// In en, this message translates to:
+  /// **'Last year'**
+  String get mailSyncRange365Days;
+
+  /// No description provided for @mailSyncRangeAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All mail'**
+  String get mailSyncRangeAll;
+
   /// No description provided for @translationSettings.
   ///
   /// In en, this message translates to:

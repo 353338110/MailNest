@@ -259,7 +259,7 @@ class ImapSmtpMailProvider implements MailProvider {
       final folderName = folderId.toLowerCase() == 'inbox' ? 'INBOX' : folderId;
       final headers = await client.fetchHeaders(
         folderName: folderName,
-        since: DateTime.now().toUtc().subtract(const Duration(days: 30)),
+        since: cursor.since,
         cursor: cursor,
       );
       await client.logout();

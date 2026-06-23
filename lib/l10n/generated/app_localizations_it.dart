@@ -25,6 +25,24 @@ class AppLocalizationsIt extends AppLocalizations {
   String get language => 'Language';
 
   @override
+  String get mailSyncRangeTitle => 'Mail sync range';
+
+  @override
+  String get mailSyncRange30Days => 'Last 30 days';
+
+  @override
+  String get mailSyncRange90Days => 'Last 90 days';
+
+  @override
+  String get mailSyncRange180Days => 'Last 180 days';
+
+  @override
+  String get mailSyncRange365Days => 'Last year';
+
+  @override
+  String get mailSyncRangeAll => 'All mail';
+
+  @override
   String get translationSettings => 'Translation settings';
 
   @override

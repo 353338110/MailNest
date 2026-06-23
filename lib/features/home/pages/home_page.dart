@@ -345,6 +345,7 @@ class _MailboxWorkspaceState extends ConsumerState<_MailboxWorkspace> {
       onRefresh: _refresh,
       selectedMessage: _selectedMessage,
       embedded: isMedium,
+      showAccountMarker: _showsAccountMarker(scope),
       onMessageSelected: (message) {
         if (isWide) {
           setState(() => _selectedMessage = _SelectedMessage.from(message));
@@ -434,6 +435,13 @@ class _MailboxWorkspaceState extends ConsumerState<_MailboxWorkspace> {
   }
 
   MailboxScope get _effectiveScope => _scope ?? _defaultScope();
+
+  bool _showsAccountMarker(MailboxScope scope) {
+    return switch (scope) {
+      UnifiedMailboxScope() || GroupMailboxScope() => true,
+      AccountMailboxScope() || FolderMailboxScope() => false,
+    };
+  }
 
   MailboxScope _defaultScope() {
     if (widget.accounts.isEmpty) {
@@ -912,6 +920,7 @@ class _MailboxList extends ConsumerWidget {
     required this.onRefresh,
     required this.selectedMessage,
     required this.embedded,
+    required this.showAccountMarker,
     required this.onMessageSelected,
   });
 
@@ -922,6 +931,7 @@ class _MailboxList extends ConsumerWidget {
   final VoidCallback onRefresh;
   final _SelectedMessage? selectedMessage;
   final bool embedded;
+  final bool showAccountMarker;
   final ValueChanged<MailboxMessage> onMessageSelected;
 
   @override
@@ -974,6 +984,7 @@ class _MailboxList extends ConsumerWidget {
                     onRefresh: onRefresh,
                     selectedMessage: selectedMessage,
                     embedded: embedded,
+                    showAccountMarker: showAccountMarker,
                     onMessageSelected: onMessageSelected,
                   ),
                 ),
@@ -1101,6 +1112,7 @@ class _MailboxContent extends StatelessWidget {
     required this.onRefresh,
     required this.selectedMessage,
     required this.embedded,
+    required this.showAccountMarker,
     required this.onMessageSelected,
   });
 
@@ -1111,6 +1123,7 @@ class _MailboxContent extends StatelessWidget {
   final VoidCallback onRefresh;
   final _SelectedMessage? selectedMessage;
   final bool embedded;
+  final bool showAccountMarker;
   final ValueChanged<MailboxMessage> onMessageSelected;
 
   @override
@@ -1156,6 +1169,7 @@ class _MailboxContent extends StatelessWidget {
               message: message,
               selected: selectedMessage?.matches(message) ?? false,
               cardStyle: embedded,
+              showAccountMarker: showAccountMarker,
               onTap: () => onMessageSelected(message),
             ),
           );
@@ -1540,12 +1554,14 @@ class _MessageTile extends StatelessWidget {
     required this.message,
     required this.selected,
     required this.cardStyle,
+    required this.showAccountMarker,
     required this.onTap,
   });
 
   final MailboxMessage message;
   final bool selected;
   final bool cardStyle;
+  final bool showAccountMarker;
   final VoidCallback onTap;
 
   @override
@@ -1679,10 +1695,13 @@ class _MessageTile extends StatelessWidget {
   String _subtitle(BuildContext context) {
     final folder = _folderName(context);
     final preview = message.header.preview;
+    final account = showAccountMarker
+        ? ' • ${message.account.emailAddress}'
+        : '';
     if (preview == null || preview.trim().isEmpty) {
-      return '$folder • ${message.account.emailAddress}';
+      return '$folder$account';
     }
-    return '$folder • $preview';
+    return '$folder$account • $preview';
   }
 
   String _senderName(String sender) {

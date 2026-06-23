@@ -5,6 +5,7 @@ import 'package:drift/drift.dart';
 import '../../core/database/app_database.dart';
 import '../../features/accounts/models/email_provider_type.dart';
 import '../models/mail_folder.dart';
+import '../models/mail_sync_range.dart';
 import '../models/mailbox_folder.dart';
 import '../models/sync_cursor.dart';
 import '../provider/mail_provider.dart';
@@ -97,6 +98,7 @@ class MailSyncRepository {
       accountId: account.id,
       folderName: folderName,
     );
+    final syncRange = await _loadSyncRange();
     final headers = await imapProvider.syncHeaders(
       accountId: account.id,
       folderId: standardMailboxFolders.first.id,
@@ -104,6 +106,7 @@ class MailSyncRepository {
         lastUid: cursor?.lastUid,
         pageToken: cursor?.pageToken,
         syncedAt: cursor?.syncedAt,
+        since: syncRange.since(_now()),
       ),
     );
 
@@ -155,5 +158,10 @@ class MailSyncRepository {
   bool _supportsImap(String provider) {
     return provider != EmailProviderType.gmail.storageValue &&
         provider != EmailProviderType.outlook.storageValue;
+  }
+
+  Future<MailSyncRange> _loadSyncRange() async {
+    final setting = await database.getSetting(mailSyncRangeSettingKey);
+    return MailSyncRange.fromStorageValue(setting?.value);
   }
 }

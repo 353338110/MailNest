@@ -68,7 +68,7 @@ void main() {
   ) async {
     final database = AppDatabase(NativeDatabase.memory());
     final repository = _FakeAccountRepository(
-      _testAccount,
+      [_testAccount],
       database: database,
       groupNames: const ['Personal', 'Work'],
     );
@@ -107,6 +107,32 @@ void main() {
       expect(find.text('Mailboxes'), findsOneWidget);
       expect(find.text('Unified inbox'), findsWidgets);
       expect(find.text('No message selected'), findsOneWidget);
+    });
+
+    testWidgets('shows account markers in unified message lists', (
+      tester,
+    ) async {
+      final secondAccount = _testAccount.copyWith(
+        id: 'b@test.com',
+        emailAddress: 'b@test.com',
+        username: 'b@test.com',
+      );
+      await tester.pumpHomeWithAccount(
+        width: 390,
+        accounts: [_testAccount, secondAccount],
+        messages: [
+          _cachedMessage(),
+          _cachedMessage(
+            id: 2,
+            accountId: secondAccount.id,
+            uid: 43,
+            subject: 'Second account message',
+          ),
+        ],
+      );
+
+      expect(find.textContaining('a@test.com'), findsWidgets);
+      expect(find.textContaining('b@test.com'), findsWidgets);
     });
 
     testWidgets('uses two panes on medium desktop windows', (tester) async {
@@ -207,6 +233,7 @@ extension on WidgetTester {
   Future<void> pumpHomeWithAccount({
     required double width,
     TargetPlatform platform = TargetPlatform.macOS,
+    List<EmailAccount>? accounts,
     List<LocalMailMessage> messages = const [],
   }) async {
     view.physicalSize = Size(width, 900);
@@ -216,7 +243,10 @@ extension on WidgetTester {
     addTearDown(view.resetDevicePixelRatio);
 
     final database = AppDatabase(NativeDatabase.memory());
-    final repository = _FakeAccountRepository(_testAccount, database: database);
+    final repository = _FakeAccountRepository(
+      accounts ?? [_testAccount],
+      database: database,
+    );
     await database.saveLocalMailMessages(
       messages.map((message) => message.toCompanion(false)).toList(),
     );
@@ -295,16 +325,21 @@ final _testAccount = EmailAccount(
   updatedAt: DateTime(2026),
 );
 
-LocalMailMessage _cachedMessage() {
+LocalMailMessage _cachedMessage({
+  int id = 1,
+  String? accountId,
+  int uid = 42,
+  String subject = 'Window sizing regression',
+}) {
   return LocalMailMessage(
-    id: 1,
-    accountId: _testAccount.id,
+    id: id,
+    accountId: accountId ?? _testAccount.id,
     folderName: 'inbox',
-    uid: 42,
-    messageId: 'message-42@test.com',
+    uid: uid,
+    messageId: 'message-$uid@test.com',
     sender: 'sender@test.com',
-    recipients: 'a@test.com',
-    subject: 'Window sizing regression',
+    recipients: accountId ?? _testAccount.id,
+    subject: subject,
     summary: 'Tap should open the detail route.',
     cachedBody: 'Body loaded from the local cache.',
     cachedBodyIsHtml: false,
@@ -318,22 +353,25 @@ LocalMailMessage _cachedMessage() {
 
 class _FakeAccountRepository extends AccountRepository {
   _FakeAccountRepository(
-    this.account, {
+    this.accounts, {
     required super.database,
     this.groupNames = const <String>[],
   }) : super(secureStorage: const SecureStorageService());
 
-  final EmailAccount account;
+  final List<EmailAccount> accounts;
   final List<String> groupNames;
 
   @override
   Stream<List<EmailAccount>> watchAccounts() {
-    return Stream.value([account]);
+    return Stream.value(accounts);
   }
 
   @override
   Stream<List<AccountGroup>> watchAccountGroups() {
-    final names = <String>{account.groupName, ...groupNames};
+    final names = <String>{
+      for (final account in accounts) account.groupName,
+      ...groupNames,
+    };
     return Stream.value([
       for (final name in names)
         AccountGroup(
@@ -346,7 +384,12 @@ class _FakeAccountRepository extends AccountRepository {
 
   @override
   Future<EmailAccount?> getAccount(String id) async {
-    return id == account.id ? account : null;
+    for (final account in accounts) {
+      if (id == account.id) {
+        return account;
+      }
+    }
+    return null;
   }
 }
 
