@@ -7,6 +7,7 @@ import '../../../app/localization/app_language.dart';
 import '../../../app/theme/app_spacing.dart';
 import '../../../core/database/app_database.dart';
 import '../../../l10n/generated/app_localizations.dart';
+import '../../../mail/models/compose_context.dart';
 import '../../../mail/models/outgoing_message.dart';
 import '../../../mail/repository/account_repository_provider.dart';
 import '../../../mail/repository/draft_repository_provider.dart';
@@ -14,9 +15,10 @@ import '../../../mail/repository/mail_repository_provider.dart';
 import '../../translation/widgets/translation_sheet.dart';
 
 class ComposeMailPage extends ConsumerStatefulWidget {
-  const ComposeMailPage({super.key, this.draftId});
+  const ComposeMailPage({super.key, this.draftId, this.composeContext});
 
   final String? draftId;
+  final ComposeContext? composeContext;
 
   @override
   ConsumerState<ComposeMailPage> createState() => _ComposeMailPageState();
@@ -53,7 +55,11 @@ class _ComposeMailPageState extends ConsumerState<ComposeMailPage> {
   void initState() {
     super.initState();
     _draftId = widget.draftId;
-    _loadDraft();
+    if (widget.composeContext != null) {
+      _initializeFromContext(widget.composeContext!);
+    } else {
+      _loadDraft();
+    }
     for (final controller in [
       _toController,
       _ccController,
@@ -83,7 +89,7 @@ class _ComposeMailPageState extends ConsumerState<ComposeMailPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(_draftId == null ? l10n.composeMail : l10n.editDraft),
+        title: Text(_getTitle(l10n)),
         actions: [
           IconButton(
             tooltip: l10n.send,
@@ -459,6 +465,70 @@ class _ComposeMailPageState extends ConsumerState<ComposeMailPage> {
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  String _getTitle(AppLocalizations l10n) {
+    final context = widget.composeContext;
+    if (context != null) {
+      return switch (context.mode) {
+        ComposeMode.reply => l10n.reply,
+        ComposeMode.replyAll => l10n.replyAll,
+        ComposeMode.forward => l10n.forward,
+        ComposeMode.compose => l10n.composeMail,
+      };
+    }
+    return _draftId == null ? l10n.composeMail : l10n.editDraft;
+  }
+
+  void _initializeFromContext(ComposeContext context) {
+    _isInitializing = true;
+
+    // Set account ID from original message if available
+    if (context.originalAccountId != null) {
+      _selectedAccountId = context.originalAccountId;
+    }
+
+    // Build subject
+    _subjectController.text = context.buildSubject();
+
+    // Build recipients based on mode
+    switch (context.mode) {
+      case ComposeMode.reply:
+        // Reply only to sender
+        if (context.originalSender != null) {
+          _toController.text = context.originalSender!;
+        }
+      case ComposeMode.replyAll:
+        // Reply to sender and all recipients
+        if (context.originalSender != null) {
+          _toController.text = context.originalSender!;
+        }
+        if (context.originalRecipients != null &&
+            context.originalRecipients!.isNotEmpty) {
+          final currentTo = _toController.text;
+          final allTo = [
+            if (currentTo.isNotEmpty) currentTo,
+            ...context.originalRecipients!,
+          ].join(', ');
+          _toController.text = allTo;
+        }
+        if (context.originalCc != null && context.originalCc!.isNotEmpty) {
+          _ccController.text = context.originalCc!.join(', ');
+        }
+      case ComposeMode.forward:
+        // Forward: leave recipients empty for user to fill
+        break;
+      case ComposeMode.compose:
+        // Should not reach here
+        break;
+    }
+
+    // Build quoted body
+    _bodyController.text = context.buildQuotedBody();
+
+    setState(() {
+      _isInitializing = false;
+    });
   }
 }
 
