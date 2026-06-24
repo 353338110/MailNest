@@ -4,6 +4,7 @@ import 'package:drift/drift.dart';
 
 import '../../core/database/app_database.dart';
 import '../../features/accounts/models/email_provider_type.dart';
+import '../errors/mail_error_sanitizer.dart';
 import '../models/mail_folder.dart';
 import '../models/mail_sync_range.dart';
 import '../models/mailbox_folder.dart';
@@ -355,10 +356,7 @@ class MailSyncRepository {
   }
 
   String _syncErrorMessage(Object error) {
-    if (error is MailProtocolException) {
-      return error.message;
-    }
-    return error.toString();
+    return safeMailErrorMessage(error);
   }
 
   MailProvider? _providerFor(EmailAccount account) {

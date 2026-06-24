@@ -236,6 +236,40 @@ void main() {
     },
   );
 
+  test('syncRecentHeaders stores sanitized authentication failures', () async {
+    final database = AppDatabase(NativeDatabase.memory());
+    addTearDown(database.close);
+
+    final now = DateTime.utc(2026, 6, 24, 12);
+    await _saveAccount(database, now);
+
+    final provider = _FakeMailProvider(
+      folders: [
+        _folder(id: 'inbox', name: 'Inbox', flags: const [r'\Inbox']),
+      ],
+      folderFailures: const {
+        'inbox': MailProtocolException(
+          'NO [AUTHENTICATIONFAILED] &uxzo1mwhtvzzoq-&uxzo1mwhtvzzoq-/qq&kk5o9ouilgu-',
+        ),
+      },
+    );
+    final repository = MailSyncRepository(
+      database: database,
+      imapProvider: provider,
+      now: () => now,
+    );
+
+    await repository.syncRecentHeaders();
+
+    final states = await database.mailSyncStatesSnapshot(
+      accountId: 'user@example.com',
+    );
+    expect(states.single.status, 'failed');
+    expect(states.single.error, contains('Authentication failed'));
+    expect(states.single.error, contains('authorization code'));
+    expect(states.single.error, isNot(contains('&uxzo1mwhtvzzoq')));
+  });
+
   test('syncRecentHeaders clears invalid cursors and retries once', () async {
     final database = AppDatabase(NativeDatabase.memory());
     addTearDown(database.close);
@@ -287,12 +321,17 @@ class _FakeMailProvider implements MailProvider {
     List<MailFolder>? folders,
     Map<String, List<MailHeader>>? headersByFolder,
     Set<String> failingFolders = const <String>{},
+    Map<String, MailProtocolException> folderFailures = const {},
     this.invalidateFirstCursor = false,
   }) : folders = folders ?? _defaultFolders,
        headersByFolder = headersByFolder ?? const <String, List<MailHeader>>{},
        failingFolders = failingFolders
            .map((folder) => folder.toLowerCase())
-           .toSet();
+           .toSet(),
+       folderFailures = {
+         for (final entry in folderFailures.entries)
+           entry.key.toLowerCase(): entry.value,
+       };
 
   static final _defaultFolders = [
     _folder(
@@ -310,6 +349,7 @@ class _FakeMailProvider implements MailProvider {
   final List<MailFolder> folders;
   final Map<String, List<MailHeader>> headersByFolder;
   final Set<String> failingFolders;
+  final Map<String, MailProtocolException> folderFailures;
   final bool invalidateFirstCursor;
   final syncCalls = <String, int>{};
   final cursorsByFolder = <String, List<SyncCursor>>{};
@@ -406,6 +446,10 @@ class _FakeMailProvider implements MailProvider {
     }
     if (failingFolders.contains(folderKey)) {
       throw const MailProtocolException('Folder sync failed');
+    }
+    final folderFailure = folderFailures[folderKey];
+    if (folderFailure != null) {
+      throw folderFailure;
     }
     return headersByFolder[folderKey] ??
         [_header(uid: 42, subject: 'Local first mail')];

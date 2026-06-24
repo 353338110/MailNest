@@ -8,6 +8,7 @@ import '../../../core/database/app_database.dart';
 import '../../../core/database/database_providers.dart';
 import '../../../core/platform/platform_info.dart';
 import '../../../l10n/generated/app_localizations.dart';
+import '../../../mail/errors/mail_error_sanitizer.dart';
 import '../../../mail/models/mailbox_folder.dart';
 import '../../../mail/models/mailbox_message.dart';
 import '../../../mail/models/mail_detail.dart';
@@ -1228,7 +1229,7 @@ class _MailboxContentState extends ConsumerState<_MailboxContent> {
 
     if (widget.error != null && widget.messages.isEmpty) {
       return _MailboxErrorState(
-        message: l10n.mailSyncFailed(widget.error!.toString()),
+        message: l10n.mailSyncFailed(safeMailErrorMessage(widget.error)),
         onRefresh: widget.onRefresh,
       );
     }
@@ -1322,7 +1323,7 @@ class _MailboxContentState extends ConsumerState<_MailboxContent> {
                       if (widget.error != null && index == 0) {
                         return _InlineMailboxError(
                           message: l10n.mailSyncFailed(
-                            widget.error!.toString(),
+                            safeMailErrorMessage(widget.error),
                           ),
                           onRefresh: widget.onRefresh,
                         );
