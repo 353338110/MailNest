@@ -47,6 +47,7 @@ hello
     const raw = '''
 Subject: =?UTF-8?B?5rWL6K+V?=
 From: =?UTF-8?B?5Y+R5Lu25Lq6?= <sender@example.com>
+Cc: Copy <copy@example.com>
 Date: 2026-06-09T10:00:00Z
 Content-Type: multipart/mixed; boundary="outer"
 
@@ -81,6 +82,7 @@ SGVsbG8=
 
     expect(parsed.header.subject, '测试');
     expect(parsed.header.sender, '发件人 <sender@example.com>');
+    expect(parsed.header.ccRecipients, const ['Copy <copy@example.com>']);
     expect(parsed.body, 'html 世界');
     expect(parsed.isHtml, isTrue);
     expect(parsed.attachments, hasLength(1));

@@ -584,22 +584,8 @@ class _ComposeMailPageState extends ConsumerState<ComposeMailPage> {
           _toController.text = context.originalSender!;
         }
       case ComposeMode.replyAll:
-        // Reply to sender and all recipients
-        if (context.originalSender != null) {
-          _toController.text = context.originalSender!;
-        }
-        if (context.originalRecipients != null &&
-            context.originalRecipients!.isNotEmpty) {
-          final currentTo = _toController.text;
-          final allTo = [
-            if (currentTo.isNotEmpty) currentTo,
-            ...context.originalRecipients!,
-          ].join(', ');
-          _toController.text = allTo;
-        }
-        if (context.originalCc != null && context.originalCc!.isNotEmpty) {
-          _ccController.text = context.originalCc!.join(', ');
-        }
+        _toController.text = context.replyAllToRecipients.join(', ');
+        _ccController.text = context.replyAllCcRecipients.join(', ');
       case ComposeMode.forward:
         // Forward: leave recipients empty for user to fill
         break;

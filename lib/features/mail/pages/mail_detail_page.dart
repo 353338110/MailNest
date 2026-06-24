@@ -559,7 +559,7 @@ class _MailActionHeader extends ConsumerWidget {
       subject: detail.header.subject,
       sender: detail.header.sender,
       recipients: detail.header.recipients,
-      cc: [], // TODO: Extract CC from parsed headers
+      cc: detail.header.ccRecipients,
       date: detail.header.receivedAt,
       body: _extractPlainText(detail),
       accountId: accountId,

@@ -38,6 +38,8 @@
 - PR #7：本地草稿，已合并。
 - PR #11：发送记录和 Sent 文件夹保存，已合并。
 - 本 PR：写信页支持添加/删除本地附件，SMTP 和 Outlook 发信均可携带附件。
+- 本 PR：邮件详情页支持回复、回复全部和转发，复用写信页生成 `Re:`/`Fwd:` 主题和引用正文。
+- 本 PR：回复全部会排除当前账号、去重收件人，并从 MIME 详情解析 CC 参与抄送填充。
 
 ### OAuth 与翻译入口
 
@@ -146,7 +148,6 @@ flutter test
 
 ### 写邮件与发信
 
-- 回复、回复全部、转发。
 - 写信附件草稿持久化、大附件体验和附件选择失败提示完善。
 - 发送草稿的远端草稿箱同步。
 
@@ -179,17 +180,16 @@ flutter test
 
 建议按以下顺序继续，每项一个 PR：
 
-1. `codex/reply-forward`：回复、回复全部、转发。
-2. `codex/compose-attachment-polish`：写信附件草稿持久化、大附件体验和选择失败提示。
-3. `codex/sync-state`：同步状态持久化、多文件夹增量同步和 UIDVALIDITY 处理。
-4. `codex/mail-actions`：删除、星标、标记未读、移动文件夹和批量操作。
-5. `codex/gmail-mail-provider`：Gmail 邮件列表、详情和发信。
-6. `codex/desktop-mobile-polish`：键盘快捷键、右键菜单和更完整的加载/确认状态。
+1. `codex/compose-attachment-polish`：写信附件草稿持久化、大附件体验和选择失败提示。
+2. `codex/sync-state`：同步状态持久化、多文件夹增量同步和 UIDVALIDITY 处理。
+3. `codex/mail-actions`：删除、星标、标记未读、移动文件夹和批量操作。
+4. `codex/gmail-mail-provider`：Gmail 邮件列表、详情和发信。
+5. `codex/desktop-mobile-polish`：键盘快捷键、右键菜单和更完整的加载/确认状态。
 
 ## 开放 PR
 
 - 当前 GitHub 无开放 PR。
-- 本 PR：进度文档校准，确认当前 main 已完成能力并更新后续 PR 队列。
+- 本 PR：回复、回复全部、转发，确认详情页到写信页的回复/转发流程。
 
 ## 注意事项
 
