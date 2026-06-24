@@ -1,6 +1,6 @@
 # MailNest 开发进度
 
-更新时间：2026-06-15
+更新时间：2026-06-24
 
 ## 维护规则
 
@@ -29,11 +29,15 @@
 - PR #13：移动端 Drawer/NavigationDrawer，已合并。
 - PR #15：最近 30 天邮件头同步和邮件列表真实数据，已合并。
 - PR #14：邮件详情、按 UID 拉取正文、基础 MIME 解析和附件元信息缓存，已合并。
+- 本 PR：小窗口点击邮件列表项可进入详情页，详情页提供返回入口。
+- 本 PR：统一收件箱和分组收件箱展示邮件所属账号标识。
+- 本 PR：设置页增加“邮件同步范围”，支持 30 天、90 天、180 天、1 年和全部邮件；修改范围后清理同步游标以便回填历史邮件。
 
 ### 写信、草稿、发送记录
 
 - PR #7：本地草稿，已合并。
 - PR #11：发送记录和 Sent 文件夹保存，已合并。
+- 本 PR：写信页支持添加/删除本地附件，SMTP 和 Outlook 发信均可携带附件。
 
 ### OAuth 与翻译入口
 
@@ -41,6 +45,7 @@
 - PR #17：邮件详情和写信翻译 UI，已合并。
 - 本 PR：真实翻译服务和隐私确认，支持可配置 HTTPS Provider、自定义 API Key 和安全存储。
 - 本 PR：Outlook OAuth 授权，支持系统浏览器授权、桌面 loopback 回调、移动端 deeplink 回调和 token 安全存储。
+- 本 PR：添加邮箱时对 QQ/网易等授权码型邮箱清理复制粘贴产生的空格和换行。
 
 ### 本轮修复与增强
 
@@ -111,7 +116,7 @@
 
 ## 已验证
 
-最近一次功能 PR 合并前，本地和 GitHub Actions 均通过：
+最近一次主分支合并前，本地已通过：
 
 ```sh
 dart format --output=none --set-exit-if-changed .
@@ -132,7 +137,7 @@ flutter test
 
 - 更完整的真实同步状态持久化。
 - 多文件夹增量同步策略完善。
-- Gmail/Outlook 邮件列表同步。
+- Gmail 邮件列表、详情和发信。
 
 ### 邮件详情与 HTML
 
@@ -141,7 +146,7 @@ flutter test
 ### 写邮件与发信
 
 - 回复、回复全部、转发。
-- 添加/删除附件。
+- 写信附件草稿持久化、大附件体验和附件选择失败提示完善。
 - 发送草稿的远端草稿箱同步。
 
 ### 配置导入导出
@@ -175,7 +180,7 @@ flutter test
 
 1. `codex/attachments-polish`：附件 MIME 解析、下载失败占位和重试体验。
 2. `codex/reply-forward`：回复、回复全部、转发。
-3. `codex/compose-attachments`：写邮件添加/删除附件和 SMTP 附件发送。
+3. `codex/compose-attachment-polish`：写信附件草稿持久化、大附件体验和选择失败提示。
 4. `codex/sync-state`：同步状态持久化、多文件夹增量同步和 UIDVALIDITY 处理。
 5. `codex/mail-actions`：删除、星标、标记未读、移动文件夹和批量操作。
 6. `codex/gmail-mail-provider`：Gmail 邮件列表、详情和发信。
@@ -184,7 +189,7 @@ flutter test
 ## 开放 PR
 
 - 当前 GitHub 无开放 PR。
-- 本 PR：PR 状态整理，并确认远程图片默认加载策略。
+- 本 PR：进度文档校准，确认当前 main 已完成能力并更新后续 PR 队列。
 
 ## 注意事项
 
