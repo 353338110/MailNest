@@ -769,6 +769,10 @@ class AppDatabase extends _$AppDatabase {
     return into(mailSyncCursors).insertOnConflictUpdate(cursor);
   }
 
+  Future<int> clearMailSyncCursors() {
+    return delete(mailSyncCursors).go();
+  }
+
   Future<List<LocalMailSearchResult>> searchLocalMail(String rawQuery) async {
     final query = rawQuery.trim();
     if (query.isEmpty) {

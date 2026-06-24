@@ -145,7 +145,7 @@ Future<void> _handleTap() async {
   // 优先从附件对象获取上下文，回退到 widget 参数
   final accountId = widget.attachment.accountId ?? widget.accountId;
   final folderId = widget.attachment.folderId ?? widget.folderId;
-  final uid = widget.attachment.messageUid ?? 
+  final uid = widget.attachment.messageUid ??
               (widget.uid != null ? int.tryParse(widget.uid!) : null);
 
   if (accountId == null || folderId == null || uid == null) {

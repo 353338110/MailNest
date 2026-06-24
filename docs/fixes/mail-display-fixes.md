@@ -39,13 +39,13 @@
 ### 3. 扩展 CSS 样式支持 ✅
 **文件**: `lib/mail/body/email_html_sanitizer.dart`
 
-新增允许的CSS属性：font-family, text-decoration, border-radius, 
+新增允许的CSS属性：font-family, text-decoration, border-radius,
 display, vertical-align 等30+个样式属性
 
 ### 4. 改进字符编码支持 ✅
 **文件**: `lib/mail/body/email_charset_decoder.dart`
 
-新增支持编码：Big5, Shift-JIS, EUC-KR, EUC-JP, ISO-2022-JP, 
+新增支持编码：Big5, Shift-JIS, EUC-KR, EUC-JP, ISO-2022-JP,
 Windows-1252 等亚洲和欧洲编码
 
 ### 5. 添加测试用例 ✅

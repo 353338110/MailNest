@@ -142,7 +142,7 @@ flutter analyze
 
 ## 未完成部分
 
-1. **附件 MIME 解析**: 
+1. **附件 MIME 解析**:
    - `ImapSmtpMailProvider.fetchAttachmentBytes()` 中的 `_extractAttachmentFromRaw()` 方法是占位实现
    - 需要完整的 MIME 解析来从原始邮件中提取特定附件
    - 建议使用成熟的 MIME 解析库或扩展现有的 `MimeParser`

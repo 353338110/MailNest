@@ -19,15 +19,15 @@ class MailSyncRangeController extends Notifier<MailSyncRange> {
 
   Future<void> selectRange(MailSyncRange range) async {
     state = range;
-    await ref
-        .read(appDatabaseProvider)
-        .saveSetting(
-          AppSettingsCompanion(
-            key: const Value(mailSyncRangeSettingKey),
-            value: Value(range.storageValue),
-            updatedAt: Value(DateTime.now()),
-          ),
-        );
+    final database = ref.read(appDatabaseProvider);
+    await database.saveSetting(
+      AppSettingsCompanion(
+        key: const Value(mailSyncRangeSettingKey),
+        value: Value(range.storageValue),
+        updatedAt: Value(DateTime.now()),
+      ),
+    );
+    await database.clearMailSyncCursors();
   }
 
   Future<void> _loadSavedRange() async {
