@@ -161,6 +161,21 @@ class MailSyncCursors extends Table {
   Set<Column<Object>> get primaryKey => {id};
 }
 
+@DataClassName('MailSyncStateEntry')
+class MailSyncStates extends Table {
+  TextColumn get id => text()();
+  TextColumn get accountId => text()();
+  TextColumn get folderName => text()();
+  TextColumn get status => text()();
+  TextColumn get error => text().nullable()();
+  DateTimeColumn get startedAt => dateTime().nullable()();
+  DateTimeColumn get finishedAt => dateTime().nullable()();
+  DateTimeColumn get updatedAt => dateTime()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
 @DriftDatabase(
   tables: [
     EmailAccounts,
@@ -172,6 +187,7 @@ class MailSyncCursors extends Table {
     LocalMailAttachments,
     LocalMailFolders,
     MailSyncCursors,
+    MailSyncStates,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -179,7 +195,7 @@ class AppDatabase extends _$AppDatabase {
     : super(executor ?? driftDatabase(name: 'mailnest'));
 
   @override
-  int get schemaVersion => 8;
+  int get schemaVersion => 9;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -242,6 +258,9 @@ class AppDatabase extends _$AppDatabase {
           localMailAttachments,
           localMailAttachments.localPath,
         );
+      }
+      if (from < 9) {
+        await _createTableIfMissing(migrator, mailSyncStates);
       }
     },
   );
@@ -417,6 +436,9 @@ class AppDatabase extends _$AppDatabase {
       )..where((table) => table.accountId.equals(id))).go();
       await (delete(
         localMailFolders,
+      )..where((table) => table.accountId.equals(id))).go();
+      await (delete(
+        mailSyncStates,
       )..where((table) => table.accountId.equals(id))).go();
       await (delete(
         sentMessages,
@@ -769,8 +791,42 @@ class AppDatabase extends _$AppDatabase {
     return into(mailSyncCursors).insertOnConflictUpdate(cursor);
   }
 
+  Future<void> deleteMailSyncCursor({
+    required String accountId,
+    required String folderName,
+  }) {
+    final id = mailSyncCursorId(accountId: accountId, folderName: folderName);
+    return (delete(
+      mailSyncCursors,
+    )..where((table) => table.id.equals(id))).go();
+  }
+
   Future<int> clearMailSyncCursors() {
     return delete(mailSyncCursors).go();
+  }
+
+  Stream<List<MailSyncStateEntry>> watchMailSyncStates() {
+    return (select(mailSyncStates)..orderBy([
+          (table) => OrderingTerm.asc(table.accountId),
+          (table) => OrderingTerm.asc(table.folderName),
+        ]))
+        .watch();
+  }
+
+  Future<List<MailSyncStateEntry>> mailSyncStatesSnapshot({String? accountId}) {
+    final query = select(mailSyncStates)
+      ..orderBy([
+        (table) => OrderingTerm.asc(table.accountId),
+        (table) => OrderingTerm.asc(table.folderName),
+      ]);
+    if (accountId != null) {
+      query.where((table) => table.accountId.equals(accountId));
+    }
+    return query.get();
+  }
+
+  Future<void> saveMailSyncState(MailSyncStatesCompanion state) {
+    return into(mailSyncStates).insertOnConflictUpdate(state);
   }
 
   Future<List<LocalMailSearchResult>> searchLocalMail(String rawQuery) async {
@@ -952,6 +1008,13 @@ class AppDatabase extends _$AppDatabase {
   }
 
   static String mailSyncCursorId({
+    required String accountId,
+    required String folderName,
+  }) {
+    return '$accountId:${folderName.toLowerCase()}';
+  }
+
+  static String mailSyncStateId({
     required String accountId,
     required String folderName,
   }) {

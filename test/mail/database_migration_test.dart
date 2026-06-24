@@ -53,4 +53,26 @@ void main() {
     expect(columnNames, contains('raw_headers'));
     expect(columnNames, contains('body_cached_at'));
   });
+
+  test('migration creates mail sync states table from schema 8', () async {
+    final migratedDatabase = AppDatabase(
+      NativeDatabase.memory(
+        setup: (database) {
+          database.execute('PRAGMA user_version = 8');
+        },
+      ),
+    );
+    addTearDown(migratedDatabase.close);
+
+    await migratedDatabase.customSelect('SELECT 1').get();
+
+    final rows = await migratedDatabase
+        .customSelect(
+          "SELECT name FROM sqlite_master WHERE type = 'table' "
+          "AND name = 'mail_sync_states'",
+        )
+        .get();
+
+    expect(rows, hasLength(1));
+  });
 }
