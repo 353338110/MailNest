@@ -67,6 +67,48 @@ class MailRepository {
     );
   }
 
+  Future<void> setStarred({
+    required String accountId,
+    required String folderId,
+    required int uid,
+    required bool isStarred,
+  }) async {
+    final messageId = '$accountId:$folderId:$uid';
+    await imapProvider.setStarred(
+      accountId: accountId,
+      messageId: messageId,
+      isStarred: isStarred,
+    );
+
+    await database.updateMailMessageStarredStatus(
+      accountId: accountId,
+      folderName: folderId,
+      uid: uid,
+      isStarred: isStarred,
+    );
+  }
+
+  Future<void> moveMessage({
+    required String accountId,
+    required String sourceFolderId,
+    required int uid,
+    required String destinationFolderId,
+  }) async {
+    final messageId = '$accountId:$sourceFolderId:$uid';
+    await imapProvider.moveMessage(
+      accountId: accountId,
+      messageId: messageId,
+      destinationFolderId: destinationFolderId,
+    );
+
+    await database.moveLocalMailMessage(
+      accountId: accountId,
+      sourceFolderName: sourceFolderId,
+      uid: uid,
+      destinationFolderName: destinationFolderId,
+    );
+  }
+
   Stream<List<MailHeader>> watchCachedHeaders(String accountId) {
     return database.watchLocalMailMessages().map(
       (messages) => messages

@@ -136,6 +136,36 @@ class OutlookMailProvider implements MailProvider {
   }
 
   @override
+  Future<void> setStarred({
+    required String accountId,
+    required String messageId,
+    required bool isStarred,
+  }) async {
+    await _graphRequest(
+      accountId: accountId,
+      method: 'PATCH',
+      uri: _graphUri(['me', 'messages', messageId]),
+      body: jsonEncode({
+        'flag': {'flagStatus': isStarred ? 'flagged' : 'notFlagged'},
+      }),
+    );
+  }
+
+  @override
+  Future<void> moveMessage({
+    required String accountId,
+    required String messageId,
+    required String destinationFolderId,
+  }) async {
+    await _graphRequest(
+      accountId: accountId,
+      method: 'POST',
+      uri: _graphUri(['me', 'messages', messageId, 'move']),
+      body: jsonEncode({'destinationId': destinationFolderId}),
+    );
+  }
+
+  @override
   Future<void> sendMessage({
     required String accountId,
     required OutgoingMessage message,

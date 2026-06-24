@@ -96,6 +96,89 @@ class ImapSmtpMailProvider implements MailProvider {
   }
 
   @override
+  Future<void> setStarred({
+    required String accountId,
+    required String messageId,
+    required bool isStarred,
+  }) async {
+    final parts = messageId.split(':');
+    if (parts.length != 3 || parts[0] != accountId) {
+      throw const MailProtocolException('Invalid message ID format.');
+    }
+
+    final folderId = parts[1];
+    final uid = parts[2];
+
+    final account = await accountRepository.getAccount(accountId);
+    if (account == null) {
+      throw const MailProtocolException('Account not found.');
+    }
+    final secret = await accountRepository.readSecretForAccount(account);
+    if (secret == null || secret.isEmpty) {
+      throw const MailProtocolException('Account secret is unavailable.');
+    }
+
+    _RawImapClient? client;
+    try {
+      client = await _RawImapClient.connect(
+        host: account.imapHost,
+        port: account.imapPort,
+        security: account.imapSecurity,
+        timeout: timeout,
+      );
+      await client.login(username: account.username, secret: secret);
+      await client.selectMailbox(_mailboxName(folderId));
+      await client.storeFlags(uid: uid, flags: r'\Flagged', add: isStarred);
+      await client.logout();
+    } finally {
+      client?.close();
+    }
+  }
+
+  @override
+  Future<void> moveMessage({
+    required String accountId,
+    required String messageId,
+    required String destinationFolderId,
+  }) async {
+    final parts = messageId.split(':');
+    if (parts.length != 3 || parts[0] != accountId) {
+      throw const MailProtocolException('Invalid message ID format.');
+    }
+
+    final sourceFolderId = parts[1];
+    final uid = parts[2];
+
+    final account = await accountRepository.getAccount(accountId);
+    if (account == null) {
+      throw const MailProtocolException('Account not found.');
+    }
+    final secret = await accountRepository.readSecretForAccount(account);
+    if (secret == null || secret.isEmpty) {
+      throw const MailProtocolException('Account secret is unavailable.');
+    }
+
+    _RawImapClient? client;
+    try {
+      client = await _RawImapClient.connect(
+        host: account.imapHost,
+        port: account.imapPort,
+        security: account.imapSecurity,
+        timeout: timeout,
+      );
+      await client.login(username: account.username, secret: secret);
+      await client.selectMailbox(_mailboxName(sourceFolderId));
+      await client.moveMessage(
+        uid: uid,
+        destinationMailbox: _mailboxName(destinationFolderId),
+      );
+      await client.logout();
+    } finally {
+      client?.close();
+    }
+  }
+
+  @override
   Future<MailDetail> fetchMessageDetail({
     required String accountId,
     required String folderId,
@@ -445,6 +528,24 @@ class _RawImapClient {
     if (!response.isOk) {
       throw const MailProtocolException('IMAP flag update failed.');
     }
+  }
+
+  Future<void> moveMessage({
+    required String uid,
+    required String destinationMailbox,
+  }) async {
+    final destination = _imapQuote(destinationMailbox);
+    final move = await _command('UID MOVE ${_uidAtom(uid)} $destination');
+    if (move.isOk) {
+      return;
+    }
+
+    final copy = await _command('UID COPY ${_uidAtom(uid)} $destination');
+    if (!copy.isOk) {
+      throw const MailProtocolException('IMAP message move failed.');
+    }
+    await storeFlags(uid: uid, flags: r'\Deleted', add: true);
+    await expunge();
   }
 
   Future<void> expunge() async {

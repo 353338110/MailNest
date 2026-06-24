@@ -729,6 +729,58 @@ class AppDatabase extends _$AppDatabase {
     );
   }
 
+  Future<void> updateMailMessageStarredStatus({
+    required String accountId,
+    required String folderName,
+    required int uid,
+    required bool isStarred,
+  }) async {
+    final normalizedFolderName = _normalizeFolderName(folderName);
+    await (update(localMailMessages)..where(
+          (table) =>
+              table.accountId.equals(accountId) &
+              table.folderName.lower().equals(normalizedFolderName) &
+              table.uid.equals(uid),
+        ))
+        .write(
+          LocalMailMessagesCompanion(
+            isStarred: Value(isStarred),
+            updatedAt: Value(DateTime.now()),
+          ),
+        );
+  }
+
+  Future<void> moveLocalMailMessage({
+    required String accountId,
+    required String sourceFolderName,
+    required int uid,
+    required String destinationFolderName,
+  }) async {
+    final source = _normalizeFolderName(sourceFolderName);
+    final destination = _normalizeFolderName(destinationFolderName);
+    await transaction(() async {
+      await (update(localMailMessages)..where(
+            (table) =>
+                table.accountId.equals(accountId) &
+                table.folderName.lower().equals(source) &
+                table.uid.equals(uid),
+          ))
+          .write(
+            LocalMailMessagesCompanion(
+              folderName: Value(destination),
+              updatedAt: Value(DateTime.now()),
+            ),
+          );
+      await (update(localMailAttachments)..where(
+            (table) =>
+                table.accountId.equals(accountId) &
+                table.folderName.lower().equals(source) &
+                table.messageUid.equals(uid),
+          ))
+          .write(LocalMailAttachmentsCompanion(folderName: Value(destination)));
+    });
+  }
+
   Future<void> upsertLocalMailMessage(
     LocalMailMessagesCompanion message,
   ) async {

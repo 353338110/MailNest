@@ -460,6 +460,20 @@ class _NoopMailProvider implements MailProvider {
   }) async {}
 
   @override
+  Future<void> setStarred({
+    required String accountId,
+    required String messageId,
+    required bool isStarred,
+  }) async {}
+
+  @override
+  Future<void> moveMessage({
+    required String accountId,
+    required String messageId,
+    required String destinationFolderId,
+  }) async {}
+
+  @override
   Future<void> deleteMessage({
     required String accountId,
     required String messageId,

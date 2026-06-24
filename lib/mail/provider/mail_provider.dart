@@ -31,6 +31,18 @@ abstract class MailProvider {
     required bool isRead,
   });
 
+  Future<void> setStarred({
+    required String accountId,
+    required String messageId,
+    required bool isStarred,
+  });
+
+  Future<void> moveMessage({
+    required String accountId,
+    required String messageId,
+    required String destinationFolderId,
+  });
+
   Future<void> deleteMessage({
     required String accountId,
     required String messageId,
