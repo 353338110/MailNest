@@ -144,6 +144,48 @@ Hello from raw Gmail.
     expect(decoded, contains('Subject: Hello'));
     expect(decoded, contains(base64.encode(utf8.encode('Private body'))));
   });
+
+  test('searches Gmail messages with query and label scope', () async {
+    final transport = _FakeTransport([
+      _ResponsePlan(
+        statusCode: HttpStatus.ok,
+        body: jsonEncode({
+          'messages': [
+            {'id': 'gmail-search-1'},
+          ],
+        }),
+      ),
+      _ResponsePlan(
+        statusCode: HttpStatus.ok,
+        body: jsonEncode({
+          'id': 'gmail-search-1',
+          'internalDate': '1782288000000',
+          'snippet': 'Search preview',
+          'labelIds': ['INBOX'],
+          'payload': {
+            'headers': [
+              {'name': 'Subject', 'value': 'Remote search'},
+              {'name': 'From', 'value': 'Ada <ada@example.com>'},
+              {'name': 'To', 'value': 'user@example.com'},
+            ],
+          },
+        }),
+      ),
+    ]);
+    final provider = _provider(transport: transport, now: now);
+
+    final headers = await provider.searchMessages(
+      accountId: 'account-1',
+      folderId: 'INBOX',
+      query: 'from:ada report',
+      limit: 10,
+    );
+
+    expect(headers.single.subject, 'Remote search');
+    expect(transport.requests.first.uri.query, contains('labelIds=INBOX'));
+    expect(transport.requests.first.uri.query, contains('maxResults=10'));
+    expect(transport.requests.first.uri.query, contains('from%3Aada+report'));
+  });
 }
 
 GmailMailProvider _provider({

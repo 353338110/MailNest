@@ -241,7 +241,8 @@ lib/
 
 ### 搜索
 
-- ❌ 远程全量搜索
+- ✅ 远程全文搜索（IMAP `UID SEARCH`、Gmail query、Microsoft Graph `$search`）
+- ✅ 本地 FTS fallback
 
 ### Gmail
 
@@ -270,9 +271,8 @@ lib/
 
 建议按以下顺序继续，每项一个 PR：
 
-1. **`codex/remote-search`**：远程全文搜索，IMAP 使用服务器搜索能力，Gmail 使用 Gmail query，本地搜索作为离线 fallback
-2. **`codex/remote-drafts`**：远程草稿同步，按 provider 分别实现 IMAP Drafts、Gmail Drafts、Outlook Drafts
-3. **后续体验收尾**：更完整的加载/确认状态、导入后测试连接和批量移动目标选择
+1. **`codex/remote-drafts`**：远程草稿同步，按 provider 分别实现 IMAP Drafts、Gmail Drafts、Outlook Drafts
+2. **后续体验收尾**：更完整的加载/确认状态、导入后测试连接和批量移动目标选择
 
 ---
 
@@ -395,7 +395,7 @@ MailNest 当前已完成第一阶段的核心功能：
 
 下一阶段重点：
 
-1. 远程全量搜索和远端草稿同步
+1. 远端草稿同步
 2. 更完整的加载/确认状态、导入后测试连接和批量移动目标选择
 3. Gmail 真实账号端到端验收
 

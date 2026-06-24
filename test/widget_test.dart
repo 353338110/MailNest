@@ -441,6 +441,16 @@ class _NoopMailProvider implements MailProvider {
   }
 
   @override
+  Future<List<MailHeader>> searchMessages({
+    required String accountId,
+    required String folderId,
+    required String query,
+    int limit = 50,
+  }) async {
+    return const <MailHeader>[];
+  }
+
+  @override
   Future<MailDetail> fetchMessageDetail({
     required String accountId,
     required String folderId,

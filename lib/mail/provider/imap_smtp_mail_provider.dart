@@ -353,6 +353,42 @@ class ImapSmtpMailProvider implements MailProvider {
     }
   }
 
+  @override
+  Future<List<MailHeader>> searchMessages({
+    required String accountId,
+    required String folderId,
+    required String query,
+    int limit = 50,
+  }) async {
+    final account = await accountRepository.getAccount(accountId);
+    if (account == null) {
+      throw const MailProtocolException('Account not found.');
+    }
+    final secret = await accountRepository.readSecretForAccount(account);
+    if (secret == null || secret.isEmpty) {
+      throw const MailProtocolException('Account secret is unavailable.');
+    }
+
+    final client = await ImapClient.connect(
+      host: account.imapHost,
+      port: account.imapPort,
+      security: account.imapSecurity,
+      timeout: timeout,
+    );
+    try {
+      await client.login(username: account.username, secret: secret);
+      final headers = await client.searchHeaders(
+        folderName: _mailboxName(folderId),
+        query: query,
+        limit: limit,
+      );
+      await client.logout();
+      return headers;
+    } finally {
+      client.close();
+    }
+  }
+
   Future<String> fetchRawMessageByUid({
     required EmailAccount account,
     required String secret,

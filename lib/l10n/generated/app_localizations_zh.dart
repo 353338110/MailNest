@@ -340,23 +340,22 @@ class AppLocalizationsZh extends AppLocalizations {
   String get clearSearch => '清除搜索';
 
   @override
-  String get localSearchLocalOnlyNotice =>
-      '搜索只覆盖已同步到本设备的邮件。尚未同步到本地的邮件不会出现在结果中。';
+  String get localSearchLocalOnlyNotice => '账号可连接时会先搜索远程邮箱，再回退到本机已同步邮件。';
 
   @override
-  String get searchMailEmptyPrompt => '搜索本地已同步邮件。';
+  String get searchMailEmptyPrompt => '搜索已同步和远程邮件。';
 
   @override
   String get searchMailFailed => '搜索失败，请重试。';
 
   @override
   String noLocalSearchResults(String query) {
-    return '没有找到“$query”的本地结果。';
+    return '没有找到“$query”的结果。';
   }
 
   @override
   String localSearchResultCount(int count) {
-    return '$count 条本地结果';
+    return '$count 条结果';
   }
 
   @override
@@ -1217,23 +1216,22 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get clearSearch => '清除搜索';
 
   @override
-  String get localSearchLocalOnlyNotice =>
-      '搜索只覆盖已同步到本设备的邮件。尚未同步到本地的邮件不会出现在结果中。';
+  String get localSearchLocalOnlyNotice => '账号可连接时会先搜索远程邮箱，再回退到本机已同步邮件。';
 
   @override
-  String get searchMailEmptyPrompt => '搜索本地已同步邮件。';
+  String get searchMailEmptyPrompt => '搜索已同步和远程邮件。';
 
   @override
   String get searchMailFailed => '搜索失败，请重试。';
 
   @override
   String noLocalSearchResults(String query) {
-    return '没有找到“$query”的本地结果。';
+    return '没有找到“$query”的结果。';
   }
 
   @override
   String localSearchResultCount(int count) {
-    return '$count 条本地结果';
+    return '$count 条结果';
   }
 
   @override
@@ -1921,19 +1919,19 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
       '搜尋只涵蓋已同步到此裝置的郵件。尚未同步到本機的郵件不會出現在結果中。';
 
   @override
-  String get searchMailEmptyPrompt => '搜尋本機已同步郵件。';
+  String get searchMailEmptyPrompt => '搜尋已同步和遠端郵件。';
 
   @override
   String get searchMailFailed => '搜尋失敗，請重試。';
 
   @override
   String noLocalSearchResults(String query) {
-    return '沒有找到「$query」的本機結果。';
+    return '沒有找到「$query」的結果。';
   }
 
   @override
   String localSearchResultCount(int count) {
-    return '$count 筆本機結果';
+    return '$count 筆結果';
   }
 
   @override

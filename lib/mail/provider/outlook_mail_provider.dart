@@ -230,6 +230,42 @@ class OutlookMailProvider implements MailProvider {
     ];
   }
 
+  @override
+  Future<List<MailHeader>> searchMessages({
+    required String accountId,
+    required String folderId,
+    required String query,
+    int limit = 50,
+  }) async {
+    final trimmed = query.trim();
+    if (trimmed.isEmpty) {
+      return const [];
+    }
+
+    final response = await _graphRequest(
+      accountId: accountId,
+      method: 'GET',
+      uri: _graphUri(
+        _folderMessagesPath(folderId),
+        queryParameters: {
+          r'$search': '"${_escapeGraphSearch(trimmed)}"',
+          r'$select':
+              'id,subject,sender,receivedDateTime,bodyPreview,isRead,'
+              'hasAttachments',
+          r'$top': '$limit',
+        },
+      ),
+      headers: const {'ConsistencyLevel': 'eventual'},
+    );
+    final json = _decodeObject(response.body);
+    final headers = [
+      for (final item in _readList(json, 'value'))
+        _headerFromJson(_asObject(item)),
+    ];
+    headers.sort((a, b) => b.receivedAt.compareTo(a.receivedAt));
+    return headers;
+  }
+
   Future<OutlookGraphResponse> _graphRequest({
     required String accountId,
     required String method,
@@ -389,6 +425,10 @@ class OutlookMailProvider implements MailProvider {
           'emailAddress': {'address': address},
         },
     ];
+  }
+
+  static String _escapeGraphSearch(String value) {
+    return value.replaceAll(r'\', r'\\').replaceAll('"', r'\"');
   }
 
   static MailHeader _headerFromJson(Map<String, Object?> json) {

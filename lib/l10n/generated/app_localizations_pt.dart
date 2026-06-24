@@ -353,22 +353,22 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get localSearchLocalOnlyNotice =>
-      'Search only covers mail already synced to this device. Mail that has not been synced locally will not appear.';
+      'MailNest searches remote mailboxes when accounts are connected, then falls back to mail already synced to this device.';
 
   @override
-  String get searchMailEmptyPrompt => 'Search local synced mail.';
+  String get searchMailEmptyPrompt => 'Search synced and remote mail.';
 
   @override
   String get searchMailFailed => 'Search failed. Try again.';
 
   @override
   String noLocalSearchResults(String query) {
-    return 'No local results for “$query”.';
+    return 'No results for “$query”.';
   }
 
   @override
   String localSearchResultCount(int count) {
-    return '$count local results';
+    return '$count results';
   }
 
   @override

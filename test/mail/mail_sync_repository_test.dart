@@ -393,6 +393,16 @@ class _FakeMailProvider implements MailProvider {
     return headersByFolder[folderKey] ??
         [_header(uid: 42, subject: 'Local first mail')];
   }
+
+  @override
+  Future<List<MailHeader>> searchMessages({
+    required String accountId,
+    required String folderId,
+    required String query,
+    int limit = 50,
+  }) async {
+    return const <MailHeader>[];
+  }
 }
 
 Future<void> _saveAccount(AppDatabase database, DateTime now) {

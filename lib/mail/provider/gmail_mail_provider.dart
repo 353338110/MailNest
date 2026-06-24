@@ -208,6 +208,43 @@ class GmailMailProvider implements MailProvider {
     return headers;
   }
 
+  @override
+  Future<List<MailHeader>> searchMessages({
+    required String accountId,
+    required String folderId,
+    required String query,
+    int limit = 50,
+  }) async {
+    final trimmed = query.trim();
+    if (trimmed.isEmpty) {
+      return const [];
+    }
+
+    final response = await _gmailRequest(
+      accountId: accountId,
+      method: 'GET',
+      uri: _gmailUri(
+        ['users', 'me', 'messages'],
+        queryParameters: {
+          'q': trimmed,
+          'maxResults': '$limit',
+          if (folderId.trim().isNotEmpty) 'labelIds': folderId,
+        },
+      ),
+    );
+    final json = _decodeObject(response.body);
+    final headers = <MailHeader>[];
+    for (final item in _readList(json, 'messages')) {
+      final id = _readString(_asObject(item), 'id');
+      if (id.isEmpty) {
+        continue;
+      }
+      headers.add(await _fetchHeader(accountId: accountId, messageId: id));
+    }
+    headers.sort((a, b) => b.receivedAt.compareTo(a.receivedAt));
+    return headers;
+  }
+
   Future<MailHeader> _fetchHeader({
     required String accountId,
     required String messageId,

@@ -755,13 +755,13 @@ abstract class AppLocalizations {
   /// No description provided for @localSearchLocalOnlyNotice.
   ///
   /// In en, this message translates to:
-  /// **'Search only covers mail already synced to this device. Mail that has not been synced locally will not appear.'**
+  /// **'MailNest searches remote mailboxes when accounts are connected, then falls back to mail already synced to this device.'**
   String get localSearchLocalOnlyNotice;
 
   /// No description provided for @searchMailEmptyPrompt.
   ///
   /// In en, this message translates to:
-  /// **'Search local synced mail.'**
+  /// **'Search synced and remote mail.'**
   String get searchMailEmptyPrompt;
 
   /// No description provided for @searchMailFailed.
@@ -773,13 +773,13 @@ abstract class AppLocalizations {
   /// No description provided for @noLocalSearchResults.
   ///
   /// In en, this message translates to:
-  /// **'No local results for “{query}”.'**
+  /// **'No results for “{query}”.'**
   String noLocalSearchResults(String query);
 
   /// No description provided for @localSearchResultCount.
   ///
   /// In en, this message translates to:
-  /// **'{count} local results'**
+  /// **'{count} results'**
   String localSearchResultCount(int count);
 
   /// No description provided for @noSubject.

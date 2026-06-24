@@ -282,6 +282,46 @@ class ImapClient {
     return _parseFetchedHeaders(fetch.lines);
   }
 
+  Future<List<MailHeader>> searchHeaders({
+    required String folderName,
+    required String query,
+    int limit = 50,
+  }) async {
+    final normalizedQuery = query.trim();
+    if (normalizedQuery.isEmpty) {
+      return const [];
+    }
+
+    final select = await _command('SELECT ${_imapQuote(folderName)}');
+    if (!select.isOk) {
+      throw const MailProtocolException('IMAP folder selection failed.');
+    }
+
+    final search = await _command(
+      'UID SEARCH CHARSET UTF-8 TEXT ${_imapQuote(normalizedQuery)}',
+    );
+    if (!search.isOk) {
+      throw const MailProtocolException('IMAP remote search failed.');
+    }
+
+    final uids = _parseSearchUids(search.lines);
+    if (uids.isEmpty) {
+      return const [];
+    }
+    final selectedUids = uids.reversed.take(limit).toList().reversed.toList();
+    final fetch = await _command(
+      'UID FETCH ${_collapseUidSet(selectedUids)} '
+      '(UID FLAGS INTERNALDATE BODYSTRUCTURE '
+      'BODY.PEEK[HEADER.FIELDS (MESSAGE-ID DATE FROM TO SUBJECT)])',
+    );
+    if (!fetch.isOk) {
+      throw const MailProtocolException('IMAP search header fetch failed.');
+    }
+    final headers = await _parseFetchedHeaders(fetch.lines);
+    headers.sort((a, b) => b.receivedAt.compareTo(a.receivedAt));
+    return headers;
+  }
+
   Future<void> appendMessage({
     required String folderName,
     required String rfc822Content,

@@ -180,7 +180,7 @@ flutter test
 
 ### 搜索
 
-- 远程全量搜索。
+- 已完成：远程全文搜索。IMAP 使用服务器 `UID SEARCH`，Gmail 使用 Gmail query，Outlook 使用 Microsoft Graph `$search`，远程失败时保留本地 FTS fallback。
 
 ### Gmail
 
@@ -204,14 +204,13 @@ flutter test
 
 建议按以下顺序继续，每项一个 PR：
 
-1. `codex/remote-search`：远程全文搜索，IMAP 使用服务器搜索能力，Gmail 使用 Gmail query，本地搜索作为离线 fallback。
-2. `codex/remote-drafts`：远程草稿同步，按 provider 分别实现 IMAP Drafts、Gmail Drafts、Outlook Drafts。
-3. `codex/polish-followups`：更完整的加载/确认/取消状态、导入后连接测试和批量移动目标选择。
+1. `codex/remote-drafts`：远程草稿同步，按 provider 分别实现 IMAP Drafts、Gmail Drafts、Outlook Drafts。
+2. `codex/polish-followups`：更完整的加载/确认/取消状态、导入后连接测试和批量移动目标选择。
 
 ## 开放 PR
 
 - 当前 GitHub 无开放 PR。
-- 本 PR：翻译结果本地缓存、翻译缓存清理入口和备份排除约束。
+- 本 PR：远程全文搜索、远程结果缓存入本地搜索索引和本地 fallback。
 
 ## 注意事项
 

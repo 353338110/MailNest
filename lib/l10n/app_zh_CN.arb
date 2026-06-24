@@ -115,10 +115,10 @@
   "searchMail": "搜索邮件",
   "searchMailHint": "发件人、收件人、主题、摘要或已缓存正文",
   "clearSearch": "清除搜索",
-  "localSearchLocalOnlyNotice": "搜索只覆盖已同步到本设备的邮件。尚未同步到本地的邮件不会出现在结果中。",
-  "searchMailEmptyPrompt": "搜索本地已同步邮件。",
+  "localSearchLocalOnlyNotice": "账号可连接时会先搜索远程邮箱，再回退到本机已同步邮件。",
+  "searchMailEmptyPrompt": "搜索已同步和远程邮件。",
   "searchMailFailed": "搜索失败，请重试。",
-  "noLocalSearchResults": "没有找到“{query}”的本地结果。",
+  "noLocalSearchResults": "没有找到“{query}”的结果。",
   "@noLocalSearchResults": {
     "placeholders": {
       "query": {
@@ -126,7 +126,7 @@
       }
     }
   },
-  "localSearchResultCount": "{count} 条本地结果",
+  "localSearchResultCount": "{count} 条结果",
   "@localSearchResultCount": {
     "placeholders": {
       "count": {
