@@ -458,6 +458,110 @@ class _MailActionHeader extends ConsumerWidget {
     }
   }
 
+  Future<void> _handleToggleStarred(BuildContext context, WidgetRef ref) async {
+    final account = accountId;
+    final folder = folderId;
+    final messageUid = uid;
+
+    if (account == null || folder == null || messageUid == null) {
+      return;
+    }
+
+    try {
+      final repository = ref.read(mailRepositoryProvider);
+      await repository.setStarred(
+        accountId: account,
+        folderId: folder,
+        uid: int.parse(messageUid),
+        isStarred: !detail.header.isStarred,
+      );
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              detail.header.isStarred ? 'Star removed' : 'Message starred',
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('${"Operation failed"}: $e')));
+      }
+    }
+  }
+
+  Future<void> _handleMove(BuildContext context, WidgetRef ref) async {
+    final account = accountId;
+    final folder = folderId;
+    final messageUid = uid;
+
+    if (account == null || folder == null || messageUid == null) {
+      return;
+    }
+
+    final controller = TextEditingController();
+    final destination = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Move message'),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          decoration: const InputDecoration(
+            labelText: 'Destination folder',
+            hintText: 'Archive',
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(AppLocalizations.of(context).cancel),
+          ),
+          FilledButton(
+            onPressed: () {
+              final value = controller.text.trim();
+              if (value.isNotEmpty) {
+                Navigator.of(context).pop(value);
+              }
+            },
+            child: Text(AppLocalizations.of(context).ok),
+          ),
+        ],
+      ),
+    );
+    controller.dispose();
+    if (destination == null || !context.mounted) {
+      return;
+    }
+
+    try {
+      final repository = ref.read(mailRepositoryProvider);
+      await repository.moveMessage(
+        accountId: account,
+        sourceFolderId: folder,
+        uid: int.parse(messageUid),
+        destinationFolderId: destination,
+      );
+
+      if (context.mounted) {
+        Navigator.of(context).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Message moved to $destination')),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('${"Move failed"}: $e')));
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
@@ -467,6 +571,13 @@ class _MailActionHeader extends ConsumerWidget {
         onPressed: hasContext ? () => _handleDelete(context, ref) : null,
         icon: const Icon(Icons.delete_outline),
         tooltip: 'Delete',
+      ),
+      IconButton(
+        onPressed: hasContext ? () => _handleToggleStarred(context, ref) : null,
+        icon: Icon(
+          detail.header.isStarred ? Icons.star : Icons.star_border_outlined,
+        ),
+        tooltip: detail.header.isStarred ? 'Remove star' : 'Star',
       ),
       IconButton(
         onPressed: hasContext ? () => _handleToggleRead(context, ref) : null,
@@ -494,6 +605,11 @@ class _MailActionHeader extends ConsumerWidget {
       ),
     ];
     final secondaryActions = [
+      IconButton(
+        tooltip: 'Move',
+        onPressed: hasContext ? () => _handleMove(context, ref) : null,
+        icon: const Icon(Icons.drive_file_move_outlined),
+      ),
       IconButton(
         tooltip: l10n.viewAsPlainText,
         onPressed: onTogglePlainText,

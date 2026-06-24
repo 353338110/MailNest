@@ -115,6 +115,62 @@ void main() {
     );
     expect(cached?.isRead, isTrue);
   });
+
+  test(
+    'updates starred state and moves cached message with attachments',
+    () async {
+      final database = AppDatabase(NativeDatabase.memory());
+      addTearDown(database.close);
+
+      final receivedAt = DateTime(2026, 6, 10, 10);
+      await database.cacheMailDetail(
+        message: _message(
+          subject: 'Action target',
+          body: '<p>Body</p>',
+          receivedAt: receivedAt,
+        ),
+        attachments: [
+          LocalMailAttachmentsCompanion(
+            id: const Value('user@example.com:inbox:42:att-0'),
+            accountId: const Value('user@example.com'),
+            folderName: const Value('inbox'),
+            messageUid: const Value(42),
+            fileName: const Value('file.pdf'),
+            mimeType: const Value('application/pdf'),
+            size: const Value(10),
+          ),
+        ],
+      );
+
+      await database.updateMailMessageStarredStatus(
+        accountId: 'user@example.com',
+        folderName: 'inbox',
+        uid: 42,
+        isStarred: true,
+      );
+      await database.moveLocalMailMessage(
+        accountId: 'user@example.com',
+        sourceFolderName: 'inbox',
+        uid: 42,
+        destinationFolderName: 'archive',
+      );
+
+      final cached = await database.getLocalMailMessage(
+        accountId: 'user@example.com',
+        folderName: 'archive',
+        uid: 42,
+      );
+      expect(cached?.isStarred, isTrue);
+      expect(cached?.folderName, 'archive');
+
+      final attachments = await database.getLocalMailAttachments(
+        accountId: 'user@example.com',
+        folderName: 'archive',
+        uid: 42,
+      );
+      expect(attachments.single.folderName, 'archive');
+    },
+  );
 }
 
 LocalMailMessagesCompanion _message({

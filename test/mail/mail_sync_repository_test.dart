@@ -347,6 +347,24 @@ class _FakeMailProvider implements MailProvider {
   }
 
   @override
+  Future<void> setStarred({
+    required String accountId,
+    required String messageId,
+    required bool isStarred,
+  }) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> moveMessage({
+    required String accountId,
+    required String messageId,
+    required String destinationFolderId,
+  }) {
+    throw UnimplementedError();
+  }
+
+  @override
   Future<void> sendMessage({
     required String accountId,
     required OutgoingMessage message,

@@ -36,6 +36,20 @@ class GmailMailProvider implements MailProvider {
   }) => _notReady();
 
   @override
+  Future<void> setStarred({
+    required String accountId,
+    required String messageId,
+    required bool isStarred,
+  }) => _notReady();
+
+  @override
+  Future<void> moveMessage({
+    required String accountId,
+    required String messageId,
+    required String destinationFolderId,
+  }) => _notReady();
+
+  @override
   Future<void> sendMessage({
     required String accountId,
     required OutgoingMessage message,

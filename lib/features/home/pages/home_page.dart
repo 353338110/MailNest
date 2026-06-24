@@ -9,6 +9,7 @@ import '../../../l10n/generated/app_localizations.dart';
 import '../../../mail/models/mailbox_folder.dart';
 import '../../../mail/models/mailbox_message.dart';
 import '../../../mail/models/mail_detail.dart';
+import '../../../mail/repository/mail_repository.dart';
 import '../../../mail/repository/mail_repository_provider.dart';
 import '../../../mail/repository/account_repository_provider.dart';
 import '../../../mail/repository/mail_sync_repository.dart';
@@ -1177,7 +1178,7 @@ class _MailboxHeader extends StatelessWidget {
   }
 }
 
-class _MailboxContent extends StatelessWidget {
+class _MailboxContent extends ConsumerStatefulWidget {
   const _MailboxContent({
     required this.messages,
     required this.hasMessages,
@@ -1201,53 +1202,251 @@ class _MailboxContent extends StatelessWidget {
   final ValueChanged<MailboxMessage> onMessageSelected;
 
   @override
+  ConsumerState<_MailboxContent> createState() => _MailboxContentState();
+}
+
+class _MailboxContentState extends ConsumerState<_MailboxContent> {
+  final _selectedKeys = <String>{};
+
+  @override
+  void didUpdateWidget(_MailboxContent oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final availableKeys = widget.messages.map(_messageKey).toSet();
+    _selectedKeys.removeWhere((key) => !availableKeys.contains(key));
+  }
+
+  @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
 
-    if (isLoading) {
+    if (widget.isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
 
-    if (error != null && messages.isEmpty) {
+    if (widget.error != null && widget.messages.isEmpty) {
       return _MailboxErrorState(
-        message: l10n.mailSyncFailed(error!.toString()),
-        onRefresh: onRefresh,
+        message: l10n.mailSyncFailed(widget.error!.toString()),
+        onRefresh: widget.onRefresh,
       );
     }
 
-    if (messages.isEmpty) {
-      return _MailboxEmptyState(filtered: hasMessages, onRefresh: onRefresh);
+    if (widget.messages.isEmpty) {
+      return _MailboxEmptyState(
+        filtered: widget.hasMessages,
+        onRefresh: widget.onRefresh,
+      );
     }
 
-    return RefreshIndicator(
-      onRefresh: () async => onRefresh(),
-      child: ListView.builder(
-        padding: EdgeInsets.only(
-          left: embedded ? AppSpacing.medium : 0,
-          right: embedded ? AppSpacing.medium : 0,
-          top: embedded ? AppSpacing.medium : 0,
-          bottom: AppSpacing.xlarge * 4,
-        ),
-        itemCount: messages.length + (error == null ? 0 : 1),
-        itemBuilder: (context, index) {
-          if (error != null && index == 0) {
-            return _InlineMailboxError(
-              message: l10n.mailSyncFailed(error!.toString()),
-              onRefresh: onRefresh,
-            );
-          }
-          final message = messages[error == null ? index : index - 1];
-          return Padding(
-            padding: EdgeInsets.only(bottom: embedded ? AppSpacing.small : 0),
-            child: _MessageTile(
-              message: message,
-              selected: selectedMessage?.matches(message) ?? false,
-              cardStyle: embedded,
-              showAccountMarker: showAccountMarker,
-              onTap: () => onMessageSelected(message),
+    final selectionMode = _selectedKeys.isNotEmpty;
+    return Column(
+      children: [
+        if (selectionMode)
+          _BatchActionBar(
+            selectedCount: _selectedKeys.length,
+            onClear: () => setState(_selectedKeys.clear),
+            onDelete: () => _deleteSelected(context),
+            onMarkRead: () => _markSelectedRead(true),
+            onMarkUnread: () => _markSelectedRead(false),
+            onStar: () => _starSelected(true),
+          ),
+        Expanded(
+          child: RefreshIndicator(
+            onRefresh: () async => widget.onRefresh(),
+            child: ListView.builder(
+              padding: EdgeInsets.only(
+                left: widget.embedded ? AppSpacing.medium : 0,
+                right: widget.embedded ? AppSpacing.medium : 0,
+                top: widget.embedded ? AppSpacing.medium : 0,
+                bottom: AppSpacing.xlarge * 4,
+              ),
+              itemCount:
+                  widget.messages.length + (widget.error == null ? 0 : 1),
+              itemBuilder: (context, index) {
+                if (widget.error != null && index == 0) {
+                  return _InlineMailboxError(
+                    message: l10n.mailSyncFailed(widget.error!.toString()),
+                    onRefresh: widget.onRefresh,
+                  );
+                }
+                final message =
+                    widget.messages[widget.error == null ? index : index - 1];
+                final key = _messageKey(message);
+                final checked = _selectedKeys.contains(key);
+                return Padding(
+                  padding: EdgeInsets.only(
+                    bottom: widget.embedded ? AppSpacing.small : 0,
+                  ),
+                  child: _MessageTile(
+                    message: message,
+                    selected:
+                        checked ||
+                        (widget.selectedMessage?.matches(message) ?? false),
+                    checked: checked,
+                    selectionMode: selectionMode,
+                    cardStyle: widget.embedded,
+                    showAccountMarker: widget.showAccountMarker,
+                    onLongPress: () => _toggleSelection(message),
+                    onTap: () {
+                      if (selectionMode) {
+                        _toggleSelection(message);
+                      } else {
+                        widget.onMessageSelected(message);
+                      }
+                    },
+                  ),
+                );
+              },
             ),
-          );
-        },
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _toggleSelection(MailboxMessage message) {
+    final key = _messageKey(message);
+    setState(() {
+      if (!_selectedKeys.add(key)) {
+        _selectedKeys.remove(key);
+      }
+    });
+  }
+
+  List<MailboxMessage> get _selectedMessages {
+    return widget.messages
+        .where((message) => _selectedKeys.contains(_messageKey(message)))
+        .toList(growable: false);
+  }
+
+  Future<void> _deleteSelected(BuildContext context) async {
+    final l10n = AppLocalizations.of(context);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete messages'),
+        content: Text('Delete ${_selectedKeys.length} selected messages?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(l10n.cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) {
+      return;
+    }
+    await _runBatchAction(
+      (repository, message) => repository.deleteMessage(
+        accountId: message.account.id,
+        folderId: message.folder.id,
+        uid: message.header.uid,
+      ),
+    );
+  }
+
+  Future<void> _markSelectedRead(bool isRead) {
+    return _runBatchAction(
+      (repository, message) => repository.markAsRead(
+        accountId: message.account.id,
+        folderId: message.folder.id,
+        uid: message.header.uid,
+        isRead: isRead,
+      ),
+    );
+  }
+
+  Future<void> _starSelected(bool isStarred) {
+    return _runBatchAction(
+      (repository, message) => repository.setStarred(
+        accountId: message.account.id,
+        folderId: message.folder.id,
+        uid: message.header.uid,
+        isStarred: isStarred,
+      ),
+    );
+  }
+
+  Future<void> _runBatchAction(
+    Future<void> Function(MailRepository repository, MailboxMessage message)
+    action,
+  ) async {
+    final repository = ref.read(mailRepositoryProvider);
+    final messages = _selectedMessages;
+    for (final message in messages) {
+      await action(repository, message);
+    }
+    if (mounted) {
+      setState(_selectedKeys.clear);
+    }
+  }
+
+  String _messageKey(MailboxMessage message) {
+    return '${message.account.id}:${message.folder.id}:${message.header.uid}';
+  }
+}
+
+class _BatchActionBar extends StatelessWidget {
+  const _BatchActionBar({
+    required this.selectedCount,
+    required this.onClear,
+    required this.onDelete,
+    required this.onMarkRead,
+    required this.onMarkUnread,
+    required this.onStar,
+  });
+
+  final int selectedCount;
+  final VoidCallback onClear;
+  final VoidCallback onDelete;
+  final VoidCallback onMarkRead;
+  final VoidCallback onMarkUnread;
+  final VoidCallback onStar;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Material(
+      color: colorScheme.secondaryContainer,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.small,
+          vertical: AppSpacing.xsmall,
+        ),
+        child: Row(
+          children: [
+            IconButton(
+              tooltip: 'Clear selection',
+              onPressed: onClear,
+              icon: const Icon(Icons.close),
+            ),
+            Expanded(child: Text('$selectedCount selected')),
+            IconButton(
+              tooltip: 'Mark as read',
+              onPressed: onMarkRead,
+              icon: const Icon(Icons.mark_email_read_outlined),
+            ),
+            IconButton(
+              tooltip: 'Mark as unread',
+              onPressed: onMarkUnread,
+              icon: const Icon(Icons.mark_email_unread_outlined),
+            ),
+            IconButton(
+              tooltip: 'Star',
+              onPressed: onStar,
+              icon: const Icon(Icons.star_border_outlined),
+            ),
+            IconButton(
+              tooltip: 'Delete',
+              onPressed: onDelete,
+              icon: const Icon(Icons.delete_outline),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -1627,16 +1826,22 @@ class _MessageTile extends StatelessWidget {
   const _MessageTile({
     required this.message,
     required this.selected,
+    required this.checked,
+    required this.selectionMode,
     required this.cardStyle,
     required this.showAccountMarker,
     required this.onTap,
+    required this.onLongPress,
   });
 
   final MailboxMessage message;
   final bool selected;
+  final bool checked;
+  final bool selectionMode;
   final bool cardStyle;
   final bool showAccountMarker;
   final VoidCallback onTap;
+  final VoidCallback onLongPress;
 
   @override
   Widget build(BuildContext context) {
@@ -1658,7 +1863,10 @@ class _MessageTile extends StatelessWidget {
       return ListTile(
         enabled: _canOpenDetail(header.id),
         onTap: _canOpenDetail(header.id) ? onTap : null,
-        leading: _SenderAvatar(sender: header.sender, selected: false),
+        onLongPress: onLongPress,
+        leading: selectionMode
+            ? Checkbox(value: checked, onChanged: (_) => onTap())
+            : _SenderAvatar(sender: header.sender, selected: false),
         title: Text(
           header.subject,
           maxLines: 1,
@@ -1684,6 +1892,7 @@ class _MessageTile extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: _canOpenDetail(header.id) ? onTap : null,
+        onLongPress: onLongPress,
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.medium),
           child: Stack(
@@ -1694,7 +1903,12 @@ class _MessageTile extends StatelessWidget {
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _SenderAvatar(sender: header.sender, selected: selected),
+                      selectionMode
+                          ? Checkbox(value: checked, onChanged: (_) => onTap())
+                          : _SenderAvatar(
+                              sender: header.sender,
+                              selected: selected,
+                            ),
                       const SizedBox(width: AppSpacing.small),
                       Expanded(
                         child: Column(
