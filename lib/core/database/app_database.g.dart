@@ -2176,6 +2176,514 @@ class DraftMessagesCompanion extends UpdateCompanion<DraftMessage> {
   }
 }
 
+class $DraftAttachmentsTable extends DraftAttachments
+    with TableInfo<$DraftAttachmentsTable, DraftAttachment> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $DraftAttachmentsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _draftIdMeta = const VerificationMeta(
+    'draftId',
+  );
+  @override
+  late final GeneratedColumn<String> draftId = GeneratedColumn<String>(
+    'draft_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _fileNameMeta = const VerificationMeta(
+    'fileName',
+  );
+  @override
+  late final GeneratedColumn<String> fileName = GeneratedColumn<String>(
+    'file_name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _mimeTypeMeta = const VerificationMeta(
+    'mimeType',
+  );
+  @override
+  late final GeneratedColumn<String> mimeType = GeneratedColumn<String>(
+    'mime_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sizeMeta = const VerificationMeta('size');
+  @override
+  late final GeneratedColumn<int> size = GeneratedColumn<int>(
+    'size',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _bytesMeta = const VerificationMeta('bytes');
+  @override
+  late final GeneratedColumn<Uint8List> bytes = GeneratedColumn<Uint8List>(
+    'bytes',
+    aliasedName,
+    false,
+    type: DriftSqlType.blob,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    draftId,
+    fileName,
+    mimeType,
+    size,
+    bytes,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'draft_attachments';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<DraftAttachment> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('draft_id')) {
+      context.handle(
+        _draftIdMeta,
+        draftId.isAcceptableOrUnknown(data['draft_id']!, _draftIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_draftIdMeta);
+    }
+    if (data.containsKey('file_name')) {
+      context.handle(
+        _fileNameMeta,
+        fileName.isAcceptableOrUnknown(data['file_name']!, _fileNameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_fileNameMeta);
+    }
+    if (data.containsKey('mime_type')) {
+      context.handle(
+        _mimeTypeMeta,
+        mimeType.isAcceptableOrUnknown(data['mime_type']!, _mimeTypeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_mimeTypeMeta);
+    }
+    if (data.containsKey('size')) {
+      context.handle(
+        _sizeMeta,
+        size.isAcceptableOrUnknown(data['size']!, _sizeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sizeMeta);
+    }
+    if (data.containsKey('bytes')) {
+      context.handle(
+        _bytesMeta,
+        bytes.isAcceptableOrUnknown(data['bytes']!, _bytesMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_bytesMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  DraftAttachment map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return DraftAttachment(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      draftId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}draft_id'],
+      )!,
+      fileName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}file_name'],
+      )!,
+      mimeType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}mime_type'],
+      )!,
+      size: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}size'],
+      )!,
+      bytes: attachedDatabase.typeMapping.read(
+        DriftSqlType.blob,
+        data['${effectivePrefix}bytes'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $DraftAttachmentsTable createAlias(String alias) {
+    return $DraftAttachmentsTable(attachedDatabase, alias);
+  }
+}
+
+class DraftAttachment extends DataClass implements Insertable<DraftAttachment> {
+  final String id;
+  final String draftId;
+  final String fileName;
+  final String mimeType;
+  final int size;
+  final Uint8List bytes;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const DraftAttachment({
+    required this.id,
+    required this.draftId,
+    required this.fileName,
+    required this.mimeType,
+    required this.size,
+    required this.bytes,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['draft_id'] = Variable<String>(draftId);
+    map['file_name'] = Variable<String>(fileName);
+    map['mime_type'] = Variable<String>(mimeType);
+    map['size'] = Variable<int>(size);
+    map['bytes'] = Variable<Uint8List>(bytes);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  DraftAttachmentsCompanion toCompanion(bool nullToAbsent) {
+    return DraftAttachmentsCompanion(
+      id: Value(id),
+      draftId: Value(draftId),
+      fileName: Value(fileName),
+      mimeType: Value(mimeType),
+      size: Value(size),
+      bytes: Value(bytes),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory DraftAttachment.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return DraftAttachment(
+      id: serializer.fromJson<String>(json['id']),
+      draftId: serializer.fromJson<String>(json['draftId']),
+      fileName: serializer.fromJson<String>(json['fileName']),
+      mimeType: serializer.fromJson<String>(json['mimeType']),
+      size: serializer.fromJson<int>(json['size']),
+      bytes: serializer.fromJson<Uint8List>(json['bytes']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'draftId': serializer.toJson<String>(draftId),
+      'fileName': serializer.toJson<String>(fileName),
+      'mimeType': serializer.toJson<String>(mimeType),
+      'size': serializer.toJson<int>(size),
+      'bytes': serializer.toJson<Uint8List>(bytes),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  DraftAttachment copyWith({
+    String? id,
+    String? draftId,
+    String? fileName,
+    String? mimeType,
+    int? size,
+    Uint8List? bytes,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) => DraftAttachment(
+    id: id ?? this.id,
+    draftId: draftId ?? this.draftId,
+    fileName: fileName ?? this.fileName,
+    mimeType: mimeType ?? this.mimeType,
+    size: size ?? this.size,
+    bytes: bytes ?? this.bytes,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  DraftAttachment copyWithCompanion(DraftAttachmentsCompanion data) {
+    return DraftAttachment(
+      id: data.id.present ? data.id.value : this.id,
+      draftId: data.draftId.present ? data.draftId.value : this.draftId,
+      fileName: data.fileName.present ? data.fileName.value : this.fileName,
+      mimeType: data.mimeType.present ? data.mimeType.value : this.mimeType,
+      size: data.size.present ? data.size.value : this.size,
+      bytes: data.bytes.present ? data.bytes.value : this.bytes,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DraftAttachment(')
+          ..write('id: $id, ')
+          ..write('draftId: $draftId, ')
+          ..write('fileName: $fileName, ')
+          ..write('mimeType: $mimeType, ')
+          ..write('size: $size, ')
+          ..write('bytes: $bytes, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    draftId,
+    fileName,
+    mimeType,
+    size,
+    $driftBlobEquality.hash(bytes),
+    createdAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is DraftAttachment &&
+          other.id == this.id &&
+          other.draftId == this.draftId &&
+          other.fileName == this.fileName &&
+          other.mimeType == this.mimeType &&
+          other.size == this.size &&
+          $driftBlobEquality.equals(other.bytes, this.bytes) &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class DraftAttachmentsCompanion extends UpdateCompanion<DraftAttachment> {
+  final Value<String> id;
+  final Value<String> draftId;
+  final Value<String> fileName;
+  final Value<String> mimeType;
+  final Value<int> size;
+  final Value<Uint8List> bytes;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<int> rowid;
+  const DraftAttachmentsCompanion({
+    this.id = const Value.absent(),
+    this.draftId = const Value.absent(),
+    this.fileName = const Value.absent(),
+    this.mimeType = const Value.absent(),
+    this.size = const Value.absent(),
+    this.bytes = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  DraftAttachmentsCompanion.insert({
+    required String id,
+    required String draftId,
+    required String fileName,
+    required String mimeType,
+    required int size,
+    required Uint8List bytes,
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       draftId = Value(draftId),
+       fileName = Value(fileName),
+       mimeType = Value(mimeType),
+       size = Value(size),
+       bytes = Value(bytes),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<DraftAttachment> custom({
+    Expression<String>? id,
+    Expression<String>? draftId,
+    Expression<String>? fileName,
+    Expression<String>? mimeType,
+    Expression<int>? size,
+    Expression<Uint8List>? bytes,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (draftId != null) 'draft_id': draftId,
+      if (fileName != null) 'file_name': fileName,
+      if (mimeType != null) 'mime_type': mimeType,
+      if (size != null) 'size': size,
+      if (bytes != null) 'bytes': bytes,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  DraftAttachmentsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? draftId,
+    Value<String>? fileName,
+    Value<String>? mimeType,
+    Value<int>? size,
+    Value<Uint8List>? bytes,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return DraftAttachmentsCompanion(
+      id: id ?? this.id,
+      draftId: draftId ?? this.draftId,
+      fileName: fileName ?? this.fileName,
+      mimeType: mimeType ?? this.mimeType,
+      size: size ?? this.size,
+      bytes: bytes ?? this.bytes,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (draftId.present) {
+      map['draft_id'] = Variable<String>(draftId.value);
+    }
+    if (fileName.present) {
+      map['file_name'] = Variable<String>(fileName.value);
+    }
+    if (mimeType.present) {
+      map['mime_type'] = Variable<String>(mimeType.value);
+    }
+    if (size.present) {
+      map['size'] = Variable<int>(size.value);
+    }
+    if (bytes.present) {
+      map['bytes'] = Variable<Uint8List>(bytes.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DraftAttachmentsCompanion(')
+          ..write('id: $id, ')
+          ..write('draftId: $draftId, ')
+          ..write('fileName: $fileName, ')
+          ..write('mimeType: $mimeType, ')
+          ..write('size: $size, ')
+          ..write('bytes: $bytes, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $SentMessagesTable extends SentMessages
     with TableInfo<$SentMessagesTable, SentMessage> {
   @override
@@ -6234,6 +6742,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $AccountGroupsTable accountGroups = $AccountGroupsTable(this);
   late final $AppSettingsTable appSettings = $AppSettingsTable(this);
   late final $DraftMessagesTable draftMessages = $DraftMessagesTable(this);
+  late final $DraftAttachmentsTable draftAttachments = $DraftAttachmentsTable(
+    this,
+  );
   late final $SentMessagesTable sentMessages = $SentMessagesTable(this);
   late final $LocalMailMessagesTable localMailMessages =
       $LocalMailMessagesTable(this);
@@ -6255,6 +6766,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     accountGroups,
     appSettings,
     draftMessages,
+    draftAttachments,
     sentMessages,
     localMailMessages,
     localMailAttachments,
@@ -7348,6 +7860,269 @@ typedef $$DraftMessagesTableProcessedTableManager =
         BaseReferences<_$AppDatabase, $DraftMessagesTable, DraftMessage>,
       ),
       DraftMessage,
+      PrefetchHooks Function()
+    >;
+typedef $$DraftAttachmentsTableCreateCompanionBuilder =
+    DraftAttachmentsCompanion Function({
+      required String id,
+      required String draftId,
+      required String fileName,
+      required String mimeType,
+      required int size,
+      required Uint8List bytes,
+      required DateTime createdAt,
+      required DateTime updatedAt,
+      Value<int> rowid,
+    });
+typedef $$DraftAttachmentsTableUpdateCompanionBuilder =
+    DraftAttachmentsCompanion Function({
+      Value<String> id,
+      Value<String> draftId,
+      Value<String> fileName,
+      Value<String> mimeType,
+      Value<int> size,
+      Value<Uint8List> bytes,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<int> rowid,
+    });
+
+class $$DraftAttachmentsTableFilterComposer
+    extends Composer<_$AppDatabase, $DraftAttachmentsTable> {
+  $$DraftAttachmentsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get draftId => $composableBuilder(
+    column: $table.draftId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get fileName => $composableBuilder(
+    column: $table.fileName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get mimeType => $composableBuilder(
+    column: $table.mimeType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get size => $composableBuilder(
+    column: $table.size,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<Uint8List> get bytes => $composableBuilder(
+    column: $table.bytes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$DraftAttachmentsTableOrderingComposer
+    extends Composer<_$AppDatabase, $DraftAttachmentsTable> {
+  $$DraftAttachmentsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get draftId => $composableBuilder(
+    column: $table.draftId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get fileName => $composableBuilder(
+    column: $table.fileName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get mimeType => $composableBuilder(
+    column: $table.mimeType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get size => $composableBuilder(
+    column: $table.size,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<Uint8List> get bytes => $composableBuilder(
+    column: $table.bytes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$DraftAttachmentsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $DraftAttachmentsTable> {
+  $$DraftAttachmentsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get draftId =>
+      $composableBuilder(column: $table.draftId, builder: (column) => column);
+
+  GeneratedColumn<String> get fileName =>
+      $composableBuilder(column: $table.fileName, builder: (column) => column);
+
+  GeneratedColumn<String> get mimeType =>
+      $composableBuilder(column: $table.mimeType, builder: (column) => column);
+
+  GeneratedColumn<int> get size =>
+      $composableBuilder(column: $table.size, builder: (column) => column);
+
+  GeneratedColumn<Uint8List> get bytes =>
+      $composableBuilder(column: $table.bytes, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$DraftAttachmentsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $DraftAttachmentsTable,
+          DraftAttachment,
+          $$DraftAttachmentsTableFilterComposer,
+          $$DraftAttachmentsTableOrderingComposer,
+          $$DraftAttachmentsTableAnnotationComposer,
+          $$DraftAttachmentsTableCreateCompanionBuilder,
+          $$DraftAttachmentsTableUpdateCompanionBuilder,
+          (
+            DraftAttachment,
+            BaseReferences<
+              _$AppDatabase,
+              $DraftAttachmentsTable,
+              DraftAttachment
+            >,
+          ),
+          DraftAttachment,
+          PrefetchHooks Function()
+        > {
+  $$DraftAttachmentsTableTableManager(
+    _$AppDatabase db,
+    $DraftAttachmentsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$DraftAttachmentsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$DraftAttachmentsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$DraftAttachmentsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> draftId = const Value.absent(),
+                Value<String> fileName = const Value.absent(),
+                Value<String> mimeType = const Value.absent(),
+                Value<int> size = const Value.absent(),
+                Value<Uint8List> bytes = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => DraftAttachmentsCompanion(
+                id: id,
+                draftId: draftId,
+                fileName: fileName,
+                mimeType: mimeType,
+                size: size,
+                bytes: bytes,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String draftId,
+                required String fileName,
+                required String mimeType,
+                required int size,
+                required Uint8List bytes,
+                required DateTime createdAt,
+                required DateTime updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => DraftAttachmentsCompanion.insert(
+                id: id,
+                draftId: draftId,
+                fileName: fileName,
+                mimeType: mimeType,
+                size: size,
+                bytes: bytes,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$DraftAttachmentsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $DraftAttachmentsTable,
+      DraftAttachment,
+      $$DraftAttachmentsTableFilterComposer,
+      $$DraftAttachmentsTableOrderingComposer,
+      $$DraftAttachmentsTableAnnotationComposer,
+      $$DraftAttachmentsTableCreateCompanionBuilder,
+      $$DraftAttachmentsTableUpdateCompanionBuilder,
+      (
+        DraftAttachment,
+        BaseReferences<_$AppDatabase, $DraftAttachmentsTable, DraftAttachment>,
+      ),
+      DraftAttachment,
       PrefetchHooks Function()
     >;
 typedef $$SentMessagesTableCreateCompanionBuilder =
@@ -9354,6 +10129,8 @@ class $AppDatabaseManager {
       $$AppSettingsTableTableManager(_db, _db.appSettings);
   $$DraftMessagesTableTableManager get draftMessages =>
       $$DraftMessagesTableTableManager(_db, _db.draftMessages);
+  $$DraftAttachmentsTableTableManager get draftAttachments =>
+      $$DraftAttachmentsTableTableManager(_db, _db.draftAttachments);
   $$SentMessagesTableTableManager get sentMessages =>
       $$SentMessagesTableTableManager(_db, _db.sentMessages);
   $$LocalMailMessagesTableTableManager get localMailMessages =>

@@ -1,6 +1,9 @@
+import 'dart:typed_data';
+
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mailnest_app/core/database/app_database.dart';
+import 'package:mailnest_app/mail/models/outgoing_attachment.dart';
 import 'package:mailnest_app/mail/repository/draft_repository.dart';
 
 void main() {
@@ -74,5 +77,57 @@ void main() {
     await repository.deleteDraft(secondId);
     final afterDelete = await repository.watchDrafts().first;
     expect(afterDelete.map((draft) => draft.id), [firstId]);
+  });
+
+  test('saves, replaces, and deletes draft attachments', () async {
+    final draftId = await repository.saveDraft(
+      toRecipients: '',
+      ccRecipients: '',
+      bccRecipients: '',
+      subject: 'With attachments',
+      body: '',
+      attachments: [
+        OutgoingAttachment(
+          fileName: 'first.txt',
+          mimeType: 'text/plain',
+          bytes: Uint8List.fromList([1, 2, 3]),
+        ),
+        OutgoingAttachment(
+          fileName: 'second.pdf',
+          mimeType: 'application/pdf',
+          bytes: Uint8List.fromList([4, 5]),
+        ),
+      ],
+    );
+
+    final createdAttachments = await repository.getDraftAttachments(draftId);
+    expect(createdAttachments, hasLength(2));
+    expect(createdAttachments.first.fileName, 'first.txt');
+    expect(createdAttachments.first.size, 3);
+    expect(createdAttachments.last.mimeType, 'application/pdf');
+
+    await repository.saveDraft(
+      draftId: draftId,
+      toRecipients: '',
+      ccRecipients: '',
+      bccRecipients: '',
+      subject: 'With fewer attachments',
+      body: '',
+      attachments: [
+        OutgoingAttachment(
+          fileName: 'replacement.png',
+          mimeType: 'image/png',
+          bytes: Uint8List.fromList([9]),
+        ),
+      ],
+    );
+
+    final replacedAttachments = await repository.getDraftAttachments(draftId);
+    expect(replacedAttachments, hasLength(1));
+    expect(replacedAttachments.single.fileName, 'replacement.png');
+    expect(replacedAttachments.single.bytes, [9]);
+
+    await repository.deleteDraft(draftId);
+    expect(await repository.getDraftAttachments(draftId), isEmpty);
   });
 }

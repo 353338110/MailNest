@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 
 import '../../core/database/app_database.dart';
+import '../models/outgoing_attachment.dart';
 
 class DraftRepository {
   const DraftRepository({required this.database});
@@ -11,6 +12,19 @@ class DraftRepository {
 
   Future<DraftMessage?> getDraft(String id) => database.getDraft(id);
 
+  Future<List<OutgoingAttachment>> getDraftAttachments(String draftId) async {
+    final rows = await database.getDraftAttachments(draftId);
+    return rows
+        .map(
+          (row) => OutgoingAttachment(
+            fileName: row.fileName,
+            mimeType: row.mimeType,
+            bytes: row.bytes,
+          ),
+        )
+        .toList(growable: false);
+  }
+
   Future<String> saveDraft({
     required String toRecipients,
     required String ccRecipients,
@@ -19,6 +33,7 @@ class DraftRepository {
     required String body,
     String? draftId,
     String? accountId,
+    List<OutgoingAttachment>? attachments,
   }) async {
     final now = DateTime.now();
     final id = draftId ?? _draftId(now);
@@ -40,6 +55,21 @@ class DraftRepository {
         updatedAt: Value(updatedAt),
       ),
     );
+    if (attachments != null) {
+      await database.replaceDraftAttachments(id, [
+        for (final entry in attachments.indexed)
+          DraftAttachmentsCompanion(
+            id: Value(_attachmentId(id, entry.$1)),
+            draftId: Value(id),
+            fileName: Value(entry.$2.fileName),
+            mimeType: Value(entry.$2.mimeType),
+            size: Value(entry.$2.size),
+            bytes: Value(entry.$2.bytes),
+            createdAt: Value(now.add(Duration(microseconds: entry.$1))),
+            updatedAt: Value(updatedAt),
+          ),
+      ]);
+    }
     return id;
   }
 
@@ -47,6 +77,10 @@ class DraftRepository {
 
   String _draftId(DateTime now) {
     return 'draft-${now.microsecondsSinceEpoch}';
+  }
+
+  String _attachmentId(String draftId, int index) {
+    return '$draftId-attachment-$index';
   }
 
   DateTime _nextUpdatedAt({required DateTime now, required DateTime previous}) {

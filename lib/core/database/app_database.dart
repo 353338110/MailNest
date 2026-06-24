@@ -61,6 +61,20 @@ class DraftMessages extends Table {
   Set<Column<Object>> get primaryKey => {id};
 }
 
+class DraftAttachments extends Table {
+  TextColumn get id => text()();
+  TextColumn get draftId => text()();
+  TextColumn get fileName => text()();
+  TextColumn get mimeType => text()();
+  IntColumn get size => integer()();
+  BlobColumn get bytes => blob()();
+  DateTimeColumn get createdAt => dateTime()();
+  DateTimeColumn get updatedAt => dateTime()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
 class SentMessages extends Table {
   TextColumn get id => text()();
   TextColumn get accountId => text()();
@@ -182,6 +196,7 @@ class MailSyncStates extends Table {
     AccountGroups,
     AppSettings,
     DraftMessages,
+    DraftAttachments,
     SentMessages,
     LocalMailMessages,
     LocalMailAttachments,
@@ -195,7 +210,7 @@ class AppDatabase extends _$AppDatabase {
     : super(executor ?? driftDatabase(name: 'mailnest'));
 
   @override
-  int get schemaVersion => 9;
+  int get schemaVersion => 10;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -261,6 +276,9 @@ class AppDatabase extends _$AppDatabase {
       }
       if (from < 9) {
         await _createTableIfMissing(migrator, mailSyncStates);
+      }
+      if (from < 10) {
+        await _createTableIfMissing(migrator, draftAttachments);
       }
     },
   );
@@ -482,12 +500,38 @@ class AppDatabase extends _$AppDatabase {
     )..where((table) => table.id.equals(id))).getSingleOrNull();
   }
 
+  Future<List<DraftAttachment>> getDraftAttachments(String draftId) {
+    return (select(draftAttachments)
+          ..where((table) => table.draftId.equals(draftId))
+          ..orderBy([(table) => OrderingTerm.asc(table.createdAt)]))
+        .get();
+  }
+
   Future<void> saveDraft(DraftMessagesCompanion draft) {
     return into(draftMessages).insertOnConflictUpdate(draft);
   }
 
+  Future<void> replaceDraftAttachments(
+    String draftId,
+    List<DraftAttachmentsCompanion> attachments,
+  ) {
+    return transaction(() async {
+      await (delete(
+        draftAttachments,
+      )..where((table) => table.draftId.equals(draftId))).go();
+      for (final attachment in attachments) {
+        await into(draftAttachments).insert(attachment);
+      }
+    });
+  }
+
   Future<void> deleteDraft(String id) {
-    return (delete(draftMessages)..where((table) => table.id.equals(id))).go();
+    return transaction(() async {
+      await (delete(
+        draftAttachments,
+      )..where((table) => table.draftId.equals(id))).go();
+      await (delete(draftMessages)..where((table) => table.id.equals(id))).go();
+    });
   }
 
   Stream<List<SentMessage>> watchSentMessages() {

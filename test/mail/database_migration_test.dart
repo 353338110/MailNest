@@ -75,4 +75,26 @@ void main() {
 
     expect(rows, hasLength(1));
   });
+
+  test('migration creates draft attachments table from schema 9', () async {
+    final migratedDatabase = AppDatabase(
+      NativeDatabase.memory(
+        setup: (database) {
+          database.execute('PRAGMA user_version = 9');
+        },
+      ),
+    );
+    addTearDown(migratedDatabase.close);
+
+    await migratedDatabase.customSelect('SELECT 1').get();
+
+    final rows = await migratedDatabase
+        .customSelect(
+          "SELECT name FROM sqlite_master WHERE type = 'table' "
+          "AND name = 'draft_attachments'",
+        )
+        .get();
+
+    expect(rows, hasLength(1));
+  });
 }

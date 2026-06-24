@@ -52,7 +52,8 @@ class _ComposeMailPageState extends ConsumerState<ComposeMailPage> {
         _ccController.text.trim().isNotEmpty ||
         _bccController.text.trim().isNotEmpty ||
         _subjectController.text.trim().isNotEmpty ||
-        _bodyController.text.trim().isNotEmpty;
+        _bodyController.text.trim().isNotEmpty ||
+        _attachments.isNotEmpty;
   }
 
   @override
@@ -202,6 +203,7 @@ class _ComposeMailPageState extends ConsumerState<ComposeMailPage> {
                       ? null
                       : (index) {
                           setState(() => _attachments.removeAt(index));
+                          _scheduleAutosave();
                         },
                 ),
                 const SizedBox(height: AppSpacing.medium),
@@ -279,7 +281,9 @@ class _ComposeMailPageState extends ConsumerState<ComposeMailPage> {
     }
 
     setState(() => _isLoading = true);
-    final draft = await ref.read(draftRepositoryProvider).getDraft(draftId);
+    final repository = ref.read(draftRepositoryProvider);
+    final draft = await repository.getDraft(draftId);
+    final attachments = await repository.getDraftAttachments(draftId);
     if (!mounted) {
       return;
     }
@@ -301,6 +305,9 @@ class _ComposeMailPageState extends ConsumerState<ComposeMailPage> {
     setState(() {
       _selectedAccountId = draft.accountId;
       _lastSavedAt = draft.updatedAt;
+      _attachments
+        ..clear()
+        ..addAll(attachments);
       _isLoading = false;
       _isInitializing = false;
     });
@@ -346,6 +353,7 @@ class _ComposeMailPageState extends ConsumerState<ComposeMailPage> {
             bccRecipients: _bccController.text,
             subject: _subjectController.text,
             body: _bodyController.text,
+            attachments: List.unmodifiable(_attachments),
           );
       if (!mounted) {
         return;
@@ -470,13 +478,13 @@ class _ComposeMailPageState extends ConsumerState<ComposeMailPage> {
   }
 
   Future<void> _pickAttachments() async {
-    final result = await FilePicker.pickFiles();
-    final files = result?.files;
-    if (files == null || files.isEmpty) {
-      return;
-    }
-
     try {
+      final result = await FilePicker.pickFiles();
+      final files = result?.files;
+      if (files == null || files.isEmpty) {
+        return;
+      }
+
       final attachments = <OutgoingAttachment>[];
       for (final file in files) {
         attachments.add(
@@ -491,6 +499,7 @@ class _ComposeMailPageState extends ConsumerState<ComposeMailPage> {
         return;
       }
       setState(() => _attachments.addAll(attachments));
+      _scheduleAutosave();
     } on Object catch (error) {
       if (mounted) {
         _showSnack('${AppLocalizations.of(context).attachments}: $error');
