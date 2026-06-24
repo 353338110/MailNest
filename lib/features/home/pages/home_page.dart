@@ -9,6 +9,7 @@ import '../../../core/database/database_providers.dart';
 import '../../../core/platform/platform_info.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../../mail/errors/mail_error_sanitizer.dart';
+import '../../../mail/localized_mail_labels.dart';
 import '../../../mail/models/mailbox_folder.dart';
 import '../../../mail/models/mailbox_message.dart';
 import '../../../mail/models/mail_detail.dart';
@@ -61,7 +62,7 @@ class HomePage extends ConsumerWidget {
                       icon: const Icon(Icons.drafts_outlined),
                     ),
                     IconButton(
-                      tooltip: l10n.sentMessages,
+                      tooltip: localizedSentMessages(l10n),
                       onPressed: () => context.push('/sent'),
                       icon: const Icon(Icons.outbox_outlined),
                     ),
@@ -154,7 +155,7 @@ class _HomeNavigationDrawer extends StatelessWidget {
         ),
         ListTile(
           leading: const Icon(Icons.outbox_outlined),
-          title: Text(l10n.sentMessages),
+          title: Text(localizedSentMessages(l10n)),
           onTap: () => _closeAndPush(context, '/sent'),
         ),
         const Divider(),
@@ -615,7 +616,7 @@ class _MailboxDetailEmptyState extends StatelessWidget {
   }
 }
 
-class _MailboxNavigation extends ConsumerWidget {
+class _MailboxNavigation extends ConsumerStatefulWidget {
   const _MailboxNavigation({
     required this.accounts,
     required this.scope,
@@ -633,9 +634,35 @@ class _MailboxNavigation extends ConsumerWidget {
   final ValueChanged<MailboxFilter> onFilterSelected;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_MailboxNavigation> createState() => _MailboxNavigationState();
+}
+
+class _MailboxNavigationState extends ConsumerState<_MailboxNavigation> {
+  final _collapsedAccountIds = <String>{};
+
+  List<EmailAccount> get accounts => widget.accounts;
+  MailboxScope get scope => widget.scope;
+  MailboxFilter get filter => widget.filter;
+
+  @override
+  void didUpdateWidget(_MailboxNavigation oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final accountIds = widget.accounts.map((account) => account.id).toSet();
+    _collapsedAccountIds.removeWhere(
+      (accountId) => !accountIds.contains(accountId),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final groups = ref.watch(accountRepositoryProvider).watchAccountGroups();
+    final accounts = widget.accounts;
+    final scope = widget.scope;
+    final filter = widget.filter;
+    final scrollable = widget.scrollable;
+    final onScopeSelected = widget.onScopeSelected;
+    final onFilterSelected = widget.onFilterSelected;
 
     return ListView(
       shrinkWrap: !scrollable,
@@ -732,7 +759,7 @@ class _MailboxNavigation extends ConsumerWidget {
             ),
             _FilterChipButton(
               icon: Icons.send_outlined,
-              label: l10n.sentMessages,
+              label: localizedSentMessages(l10n),
               selected: filter == MailboxFilter.sent,
               onTap: () => onFilterSelected(MailboxFilter.sent),
             ),
@@ -771,36 +798,40 @@ class _MailboxNavigation extends ConsumerWidget {
                     _AccountNavigationTile(
                       account: account,
                       selected: _isAccountSelected(account.id),
+                      expanded: _isAccountExpanded(account.id),
+                      onToggleExpanded: () =>
+                          _toggleAccountExpanded(account.id),
                       onTap: () =>
                           onScopeSelected(AccountMailboxScope(account.id)),
                     ),
                     const SizedBox(height: AppSpacing.small),
-                    Padding(
-                      padding: const EdgeInsets.only(left: AppSpacing.medium),
-                      child: Column(
-                        children: [
-                          for (final folder in _foldersForAccount(
-                            account,
-                            folders,
-                          ))
-                            _NavigationTile(
-                              dense: true,
-                              icon: _folderIcon(folder.type),
-                              title: _folderName(l10n, folder),
-                              selected: _isFolderSelected(
-                                account.id,
-                                folder.id,
-                              ),
-                              onTap: () => onScopeSelected(
-                                FolderMailboxScope(
-                                  accountId: account.id,
-                                  folderId: folder.id,
+                    if (_isAccountExpanded(account.id))
+                      Padding(
+                        padding: const EdgeInsets.only(left: AppSpacing.medium),
+                        child: Column(
+                          children: [
+                            for (final folder in _foldersForAccount(
+                              account,
+                              folders,
+                            ))
+                              _NavigationTile(
+                                dense: true,
+                                icon: _folderIcon(folder.type),
+                                title: _folderName(l10n, folder),
+                                selected: _isFolderSelected(
+                                  account.id,
+                                  folder.id,
+                                ),
+                                onTap: () => onScopeSelected(
+                                  FolderMailboxScope(
+                                    accountId: account.id,
+                                    folderId: folder.id,
+                                  ),
                                 ),
                               ),
-                            ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
                     const SizedBox(height: AppSpacing.small),
                   ],
                 ],
@@ -817,6 +848,18 @@ class _MailboxNavigation extends ConsumerWidget {
         selectedAccountId == accountId && filter == MailboxFilter.all,
       _ => false,
     };
+  }
+
+  bool _isAccountExpanded(String accountId) {
+    return !_collapsedAccountIds.contains(accountId);
+  }
+
+  void _toggleAccountExpanded(String accountId) {
+    setState(() {
+      if (!_collapsedAccountIds.add(accountId)) {
+        _collapsedAccountIds.remove(accountId);
+      }
+    });
   }
 
   bool _isGroupSelected(String groupName) {
@@ -861,6 +904,7 @@ class _MailboxNavigation extends ConsumerWidget {
       MailboxFolderType.sent => Icons.send_outlined,
       MailboxFolderType.drafts => Icons.drafts_outlined,
       MailboxFolderType.trash => Icons.delete_outline,
+      MailboxFolderType.junk => Icons.report_gmailerrorred_outlined,
       MailboxFolderType.custom => Icons.folder_outlined,
     };
   }
@@ -868,9 +912,10 @@ class _MailboxNavigation extends ConsumerWidget {
   String _folderName(AppLocalizations l10n, MailboxFolder folder) {
     return switch (folder.type) {
       MailboxFolderType.inbox => l10n.inbox,
-      MailboxFolderType.sent => l10n.sentMessages,
+      MailboxFolderType.sent => localizedSentMessages(l10n),
       MailboxFolderType.drafts => l10n.drafts,
       MailboxFolderType.trash => l10n.trash,
+      MailboxFolderType.junk => localizedJunk(l10n),
       MailboxFolderType.custom => folder.name,
     };
   }
@@ -911,6 +956,7 @@ class _MailboxNavigation extends ConsumerWidget {
       MailboxFolderType.sent => 1,
       MailboxFolderType.drafts => 2,
       MailboxFolderType.trash => 3,
+      MailboxFolderType.junk => 4,
       MailboxFolderType.custom => 10,
     };
   }
@@ -1145,7 +1191,7 @@ class _MailboxHeader extends StatelessWidget {
       MailboxFilter.all => l10n.allMessages,
       MailboxFilter.unread => l10n.unread,
       MailboxFilter.starred => l10n.starred,
-      MailboxFilter.sent => l10n.sentMessages,
+      MailboxFilter.sent => localizedSentMessages(l10n),
       MailboxFilter.drafts => l10n.drafts,
       MailboxFilter.trash => l10n.trash,
     };
@@ -1173,9 +1219,10 @@ class _MailboxHeader extends StatelessWidget {
     );
     return switch (folder.type) {
       MailboxFolderType.inbox => l10n.inbox,
-      MailboxFolderType.sent => l10n.sentMessages,
+      MailboxFolderType.sent => localizedSentMessages(l10n),
       MailboxFolderType.drafts => l10n.drafts,
       MailboxFolderType.trash => l10n.trash,
+      MailboxFolderType.junk => localizedJunk(l10n),
       MailboxFolderType.custom => folder.name,
     };
   }
@@ -1815,21 +1862,40 @@ class _AccountNavigationTile extends StatelessWidget {
   const _AccountNavigationTile({
     required this.account,
     required this.selected,
+    required this.expanded,
+    required this.onToggleExpanded,
     required this.onTap,
   });
 
   final EmailAccount account;
   final bool selected;
+  final bool expanded;
+  final VoidCallback onToggleExpanded;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return _NavigationTile(
       icon: Icons.alternate_email,
       title: account.emailAddress,
       subtitle: '${account.provider} • ${account.imapHost}',
       selected: selected,
-      trailing: _AccountMenu(account: account),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+            tooltip: expanded
+                ? localizedCollapseAccount(l10n)
+                : localizedExpandAccount(l10n),
+            onPressed: onToggleExpanded,
+            icon: Icon(
+              expanded ? Icons.keyboard_arrow_down : Icons.keyboard_arrow_right,
+            ),
+          ),
+          _AccountMenu(account: account),
+        ],
+      ),
       onTap: onTap,
     );
   }
@@ -2377,9 +2443,10 @@ class _MessageTile extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     return switch (message.folder.type) {
       MailboxFolderType.inbox => l10n.inbox,
-      MailboxFolderType.sent => l10n.sentMessages,
+      MailboxFolderType.sent => localizedSentMessages(l10n),
       MailboxFolderType.drafts => l10n.drafts,
       MailboxFolderType.trash => l10n.trash,
+      MailboxFolderType.junk => localizedJunk(l10n),
       MailboxFolderType.custom => message.folder.name,
     };
   }

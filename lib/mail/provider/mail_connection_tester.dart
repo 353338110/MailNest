@@ -555,7 +555,7 @@ ImapFolderInfo? _parseListFolder(String line) {
       .toList(growable: false);
   final delimiter = match.group(3);
   final namePart = match.group(4)!.trim();
-  final name = _decodeImapListString(namePart);
+  final name = decodeImapModifiedUtf7(_decodeImapListString(namePart));
   if (name.isEmpty) {
     return null;
   }
@@ -575,6 +575,34 @@ String _decodeImapListString(String value) {
         .replaceAll(r'\\', r'\');
   }
   return value;
+}
+
+@visibleForTesting
+String decodeImapModifiedUtf7(String value) {
+  return value.replaceAllMapped(RegExp(r'&([^-]*)-'), (match) {
+    final encoded = match.group(1)!;
+    if (encoded.isEmpty) {
+      return '&';
+    }
+    try {
+      final normalized = encoded.replaceAll(',', '/');
+      final padded = normalized.padRight(
+        normalized.length + ((4 - normalized.length % 4) % 4),
+        '=',
+      );
+      final bytes = base64.decode(padded);
+      if (bytes.length.isOdd) {
+        return match.group(0)!;
+      }
+      final codeUnits = <int>[];
+      for (var index = 0; index < bytes.length; index += 2) {
+        codeUnits.add((bytes[index] << 8) | bytes[index + 1]);
+      }
+      return String.fromCharCodes(codeUnits);
+    } on FormatException {
+      return match.group(0)!;
+    }
+  });
 }
 
 String _imapInternalDate(DateTime dateTime) {

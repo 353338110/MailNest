@@ -2,6 +2,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mailnest_app/mail/provider/mail_connection_tester.dart';
 
 void main() {
+  test('decodes IMAP modified UTF-7 folder names', () {
+    expect(decodeImapModifiedUtf7('&UXZO1mWHTvZZOQ-'), '其他文件夹');
+    expect(decodeImapModifiedUtf7('Junk'), 'Junk');
+    expect(decodeImapModifiedUtf7('A &- B'), 'A & B');
+  });
+
   test('reports success only when both IMAP and SMTP pass', () {
     const result = MailConnectionTestResult(
       imap: SingleConnectionTestResult.success(),

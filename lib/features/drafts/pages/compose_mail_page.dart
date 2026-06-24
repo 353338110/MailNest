@@ -9,6 +9,7 @@ import '../../../app/localization/app_language.dart';
 import '../../../app/theme/app_spacing.dart';
 import '../../../core/database/app_database.dart';
 import '../../../l10n/generated/app_localizations.dart';
+import '../../../mail/localized_mail_labels.dart';
 import '../../../mail/models/compose_context.dart';
 import '../../../mail/models/outgoing_attachment.dart';
 import '../../../mail/models/outgoing_message.dart';
@@ -437,7 +438,7 @@ class _ComposeMailPageState extends ConsumerState<ComposeMailPage> {
       if (!mounted) {
         return;
       }
-      _showSnack(l10n.sentMessages);
+      _showSnack(localizedSentMessages(l10n));
       Navigator.of(context).pop();
     } on Object catch (error) {
       if (mounted) {

@@ -138,6 +138,31 @@ void main() {
       expect(find.textContaining('b@test.com'), findsWidgets);
     });
 
+    testWidgets('account folders can be collapsed and expanded', (
+      tester,
+    ) async {
+      await tester.pumpHomeWithAccount(
+        width: 1200,
+        folders: [
+          _localFolder(id: 'sent', name: 'Sent', type: 'sent'),
+          _localFolder(id: 'junk', name: 'Junk', type: 'junk'),
+        ],
+      );
+
+      expect(find.text('Sent'), findsWidgets);
+      expect(find.text('Junk'), findsWidgets);
+
+      await tester.tap(find.byTooltip('Collapse account').first);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Junk'), findsNothing);
+
+      await tester.tap(find.byTooltip('Expand account').first);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Junk'), findsWidgets);
+    });
+
     testWidgets('uses two panes on medium desktop windows', (tester) async {
       await tester.pumpHomeWithAccount(width: 800);
 
@@ -238,6 +263,7 @@ extension on WidgetTester {
     TargetPlatform platform = TargetPlatform.macOS,
     List<EmailAccount>? accounts,
     List<LocalMailMessage> messages = const [],
+    List<LocalMailFolder> folders = const [],
   }) async {
     view.physicalSize = Size(width, 900);
     view.devicePixelRatio = 1;
@@ -265,7 +291,11 @@ extension on WidgetTester {
             appDatabaseProvider.overrideWithValue(database),
             accountRepositoryProvider.overrideWithValue(repository),
             mailSyncRepositoryProvider.overrideWithValue(
-              _FakeMailSyncRepository(database, messages: messages),
+              _FakeMailSyncRepository(
+                database,
+                messages: messages,
+                folders: folders,
+              ),
             ),
             translationProviderConfigProvider.overrideWith(
               (ref) async => TranslationProviderConfig.disabled(),
@@ -354,6 +384,24 @@ LocalMailMessage _cachedMessage({
   );
 }
 
+LocalMailFolder _localFolder({
+  required String id,
+  required String name,
+  required String type,
+}) {
+  final now = DateTime(2026, 6, 23, 9);
+  return LocalMailFolder(
+    id: '${_testAccount.id}:$id',
+    accountId: _testAccount.id,
+    folderId: id,
+    name: name,
+    flagsJson: '[]',
+    type: type,
+    syncedAt: now,
+    updatedAt: now,
+  );
+}
+
 class _FakeAccountRepository extends AccountRepository {
   _FakeAccountRepository(
     this.accounts, {
@@ -400,9 +448,11 @@ class _FakeMailSyncRepository extends MailSyncRepository {
   _FakeMailSyncRepository(
     AppDatabase database, {
     this.messages = const <LocalMailMessage>[],
+    this.folders = const <LocalMailFolder>[],
   }) : super(database: database, imapProvider: const _NoopMailProvider());
 
   final List<LocalMailMessage> messages;
+  final List<LocalMailFolder> folders;
 
   @override
   Stream<List<LocalMailMessage>> watchRecentHeaders() {
@@ -411,7 +461,7 @@ class _FakeMailSyncRepository extends MailSyncRepository {
 
   @override
   Stream<List<LocalMailFolder>> watchFolders() {
-    return Stream.value(const <LocalMailFolder>[]);
+    return Stream.value(folders);
   }
 
   @override
