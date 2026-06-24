@@ -466,6 +466,21 @@ class _NoopMailProvider implements MailProvider {
   }) async {}
 
   @override
+  Future<String?> saveDraft({
+    required String accountId,
+    required OutgoingMessage message,
+    String? remoteDraftId,
+  }) async {
+    return remoteDraftId;
+  }
+
+  @override
+  Future<void> deleteDraft({
+    required String accountId,
+    required String remoteDraftId,
+  }) async {}
+
+  @override
   Future<void> markAsRead({
     required String accountId,
     required String messageId,

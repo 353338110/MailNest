@@ -1696,6 +1696,17 @@ class $DraftMessagesTable extends DraftMessages
     requiredDuringInsert: false,
     defaultValue: const Constant(''),
   );
+  static const VerificationMeta _remoteDraftIdMeta = const VerificationMeta(
+    'remoteDraftId',
+  );
+  @override
+  late final GeneratedColumn<String> remoteDraftId = GeneratedColumn<String>(
+    'remote_draft_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
   );
@@ -1727,6 +1738,7 @@ class $DraftMessagesTable extends DraftMessages
     bccRecipients,
     subject,
     body,
+    remoteDraftId,
     createdAt,
     updatedAt,
   ];
@@ -1792,6 +1804,15 @@ class $DraftMessagesTable extends DraftMessages
         body.isAcceptableOrUnknown(data['body']!, _bodyMeta),
       );
     }
+    if (data.containsKey('remote_draft_id')) {
+      context.handle(
+        _remoteDraftIdMeta,
+        remoteDraftId.isAcceptableOrUnknown(
+          data['remote_draft_id']!,
+          _remoteDraftIdMeta,
+        ),
+      );
+    }
     if (data.containsKey('created_at')) {
       context.handle(
         _createdAtMeta,
@@ -1845,6 +1866,10 @@ class $DraftMessagesTable extends DraftMessages
         DriftSqlType.string,
         data['${effectivePrefix}body'],
       )!,
+      remoteDraftId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}remote_draft_id'],
+      ),
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
@@ -1870,6 +1895,7 @@ class DraftMessage extends DataClass implements Insertable<DraftMessage> {
   final String bccRecipients;
   final String subject;
   final String body;
+  final String? remoteDraftId;
   final DateTime createdAt;
   final DateTime updatedAt;
   const DraftMessage({
@@ -1880,6 +1906,7 @@ class DraftMessage extends DataClass implements Insertable<DraftMessage> {
     required this.bccRecipients,
     required this.subject,
     required this.body,
+    this.remoteDraftId,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -1895,6 +1922,9 @@ class DraftMessage extends DataClass implements Insertable<DraftMessage> {
     map['bcc_recipients'] = Variable<String>(bccRecipients);
     map['subject'] = Variable<String>(subject);
     map['body'] = Variable<String>(body);
+    if (!nullToAbsent || remoteDraftId != null) {
+      map['remote_draft_id'] = Variable<String>(remoteDraftId);
+    }
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
     return map;
@@ -1911,6 +1941,9 @@ class DraftMessage extends DataClass implements Insertable<DraftMessage> {
       bccRecipients: Value(bccRecipients),
       subject: Value(subject),
       body: Value(body),
+      remoteDraftId: remoteDraftId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(remoteDraftId),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
     );
@@ -1929,6 +1962,7 @@ class DraftMessage extends DataClass implements Insertable<DraftMessage> {
       bccRecipients: serializer.fromJson<String>(json['bccRecipients']),
       subject: serializer.fromJson<String>(json['subject']),
       body: serializer.fromJson<String>(json['body']),
+      remoteDraftId: serializer.fromJson<String?>(json['remoteDraftId']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
     );
@@ -1944,6 +1978,7 @@ class DraftMessage extends DataClass implements Insertable<DraftMessage> {
       'bccRecipients': serializer.toJson<String>(bccRecipients),
       'subject': serializer.toJson<String>(subject),
       'body': serializer.toJson<String>(body),
+      'remoteDraftId': serializer.toJson<String?>(remoteDraftId),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
     };
@@ -1957,6 +1992,7 @@ class DraftMessage extends DataClass implements Insertable<DraftMessage> {
     String? bccRecipients,
     String? subject,
     String? body,
+    Value<String?> remoteDraftId = const Value.absent(),
     DateTime? createdAt,
     DateTime? updatedAt,
   }) => DraftMessage(
@@ -1967,6 +2003,9 @@ class DraftMessage extends DataClass implements Insertable<DraftMessage> {
     bccRecipients: bccRecipients ?? this.bccRecipients,
     subject: subject ?? this.subject,
     body: body ?? this.body,
+    remoteDraftId: remoteDraftId.present
+        ? remoteDraftId.value
+        : this.remoteDraftId,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
   );
@@ -1985,6 +2024,9 @@ class DraftMessage extends DataClass implements Insertable<DraftMessage> {
           : this.bccRecipients,
       subject: data.subject.present ? data.subject.value : this.subject,
       body: data.body.present ? data.body.value : this.body,
+      remoteDraftId: data.remoteDraftId.present
+          ? data.remoteDraftId.value
+          : this.remoteDraftId,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
@@ -2000,6 +2042,7 @@ class DraftMessage extends DataClass implements Insertable<DraftMessage> {
           ..write('bccRecipients: $bccRecipients, ')
           ..write('subject: $subject, ')
           ..write('body: $body, ')
+          ..write('remoteDraftId: $remoteDraftId, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
@@ -2015,6 +2058,7 @@ class DraftMessage extends DataClass implements Insertable<DraftMessage> {
     bccRecipients,
     subject,
     body,
+    remoteDraftId,
     createdAt,
     updatedAt,
   );
@@ -2029,6 +2073,7 @@ class DraftMessage extends DataClass implements Insertable<DraftMessage> {
           other.bccRecipients == this.bccRecipients &&
           other.subject == this.subject &&
           other.body == this.body &&
+          other.remoteDraftId == this.remoteDraftId &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt);
 }
@@ -2041,6 +2086,7 @@ class DraftMessagesCompanion extends UpdateCompanion<DraftMessage> {
   final Value<String> bccRecipients;
   final Value<String> subject;
   final Value<String> body;
+  final Value<String?> remoteDraftId;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
   final Value<int> rowid;
@@ -2052,6 +2098,7 @@ class DraftMessagesCompanion extends UpdateCompanion<DraftMessage> {
     this.bccRecipients = const Value.absent(),
     this.subject = const Value.absent(),
     this.body = const Value.absent(),
+    this.remoteDraftId = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
@@ -2064,6 +2111,7 @@ class DraftMessagesCompanion extends UpdateCompanion<DraftMessage> {
     this.bccRecipients = const Value.absent(),
     this.subject = const Value.absent(),
     this.body = const Value.absent(),
+    this.remoteDraftId = const Value.absent(),
     required DateTime createdAt,
     required DateTime updatedAt,
     this.rowid = const Value.absent(),
@@ -2078,6 +2126,7 @@ class DraftMessagesCompanion extends UpdateCompanion<DraftMessage> {
     Expression<String>? bccRecipients,
     Expression<String>? subject,
     Expression<String>? body,
+    Expression<String>? remoteDraftId,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
     Expression<int>? rowid,
@@ -2090,6 +2139,7 @@ class DraftMessagesCompanion extends UpdateCompanion<DraftMessage> {
       if (bccRecipients != null) 'bcc_recipients': bccRecipients,
       if (subject != null) 'subject': subject,
       if (body != null) 'body': body,
+      if (remoteDraftId != null) 'remote_draft_id': remoteDraftId,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (rowid != null) 'rowid': rowid,
@@ -2104,6 +2154,7 @@ class DraftMessagesCompanion extends UpdateCompanion<DraftMessage> {
     Value<String>? bccRecipients,
     Value<String>? subject,
     Value<String>? body,
+    Value<String?>? remoteDraftId,
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
     Value<int>? rowid,
@@ -2116,6 +2167,7 @@ class DraftMessagesCompanion extends UpdateCompanion<DraftMessage> {
       bccRecipients: bccRecipients ?? this.bccRecipients,
       subject: subject ?? this.subject,
       body: body ?? this.body,
+      remoteDraftId: remoteDraftId ?? this.remoteDraftId,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       rowid: rowid ?? this.rowid,
@@ -2146,6 +2198,9 @@ class DraftMessagesCompanion extends UpdateCompanion<DraftMessage> {
     if (body.present) {
       map['body'] = Variable<String>(body.value);
     }
+    if (remoteDraftId.present) {
+      map['remote_draft_id'] = Variable<String>(remoteDraftId.value);
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
@@ -2168,6 +2223,7 @@ class DraftMessagesCompanion extends UpdateCompanion<DraftMessage> {
           ..write('bccRecipients: $bccRecipients, ')
           ..write('subject: $subject, ')
           ..write('body: $body, ')
+          ..write('remoteDraftId: $remoteDraftId, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('rowid: $rowid')
@@ -7589,6 +7645,7 @@ typedef $$DraftMessagesTableCreateCompanionBuilder =
       Value<String> bccRecipients,
       Value<String> subject,
       Value<String> body,
+      Value<String?> remoteDraftId,
       required DateTime createdAt,
       required DateTime updatedAt,
       Value<int> rowid,
@@ -7602,6 +7659,7 @@ typedef $$DraftMessagesTableUpdateCompanionBuilder =
       Value<String> bccRecipients,
       Value<String> subject,
       Value<String> body,
+      Value<String?> remoteDraftId,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
       Value<int> rowid,
@@ -7648,6 +7706,11 @@ class $$DraftMessagesTableFilterComposer
 
   ColumnFilters<String> get body => $composableBuilder(
     column: $table.body,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get remoteDraftId => $composableBuilder(
+    column: $table.remoteDraftId,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -7706,6 +7769,11 @@ class $$DraftMessagesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get remoteDraftId => $composableBuilder(
+    column: $table.remoteDraftId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
@@ -7753,6 +7821,11 @@ class $$DraftMessagesTableAnnotationComposer
   GeneratedColumn<String> get body =>
       $composableBuilder(column: $table.body, builder: (column) => column);
 
+  GeneratedColumn<String> get remoteDraftId => $composableBuilder(
+    column: $table.remoteDraftId,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
 
@@ -7798,6 +7871,7 @@ class $$DraftMessagesTableTableManager
                 Value<String> bccRecipients = const Value.absent(),
                 Value<String> subject = const Value.absent(),
                 Value<String> body = const Value.absent(),
+                Value<String?> remoteDraftId = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
@@ -7809,6 +7883,7 @@ class $$DraftMessagesTableTableManager
                 bccRecipients: bccRecipients,
                 subject: subject,
                 body: body,
+                remoteDraftId: remoteDraftId,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 rowid: rowid,
@@ -7822,6 +7897,7 @@ class $$DraftMessagesTableTableManager
                 Value<String> bccRecipients = const Value.absent(),
                 Value<String> subject = const Value.absent(),
                 Value<String> body = const Value.absent(),
+                Value<String?> remoteDraftId = const Value.absent(),
                 required DateTime createdAt,
                 required DateTime updatedAt,
                 Value<int> rowid = const Value.absent(),
@@ -7833,6 +7909,7 @@ class $$DraftMessagesTableTableManager
                 bccRecipients: bccRecipients,
                 subject: subject,
                 body: body,
+                remoteDraftId: remoteDraftId,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 rowid: rowid,

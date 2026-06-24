@@ -45,6 +45,7 @@ class _ComposeMailPageState extends ConsumerState<ComposeMailPage> {
   bool _isSending = false;
   bool _isInitializing = true;
   DateTime? _lastSavedAt;
+  String? _remoteDraftId;
   final List<OutgoingAttachment> _attachments = [];
 
   bool get _hasContent {
@@ -304,6 +305,7 @@ class _ComposeMailPageState extends ConsumerState<ComposeMailPage> {
     _bodyController.text = draft.body;
     setState(() {
       _selectedAccountId = draft.accountId;
+      _remoteDraftId = draft.remoteDraftId;
       _lastSavedAt = draft.updatedAt;
       _attachments
         ..clear()
@@ -353,14 +355,25 @@ class _ComposeMailPageState extends ConsumerState<ComposeMailPage> {
             bccRecipients: _bccController.text,
             subject: _subjectController.text,
             body: _bodyController.text,
+            remoteDraftId: _remoteDraftId,
             attachments: List.unmodifiable(_attachments),
           );
+      final remoteDraftId = await _syncRemoteDraft(
+        accountId: _selectedAccountId,
+        remoteDraftId: _remoteDraftId,
+      );
+      if (remoteDraftId != _remoteDraftId) {
+        await ref
+            .read(draftRepositoryProvider)
+            .updateRemoteDraftId(draftId: id, remoteDraftId: remoteDraftId);
+      }
       if (!mounted) {
         return;
       }
 
       setState(() {
         _draftId = id;
+        _remoteDraftId = remoteDraftId;
         _lastSavedAt = DateTime.now();
       });
 
@@ -418,6 +431,7 @@ class _ComposeMailPageState extends ConsumerState<ComposeMailPage> {
 
       final draftId = _draftId;
       if (draftId != null) {
+        await _deleteRemoteDraftIfNeeded();
         await ref.read(draftRepositoryProvider).deleteDraft(draftId);
       }
       if (!mounted) {
@@ -468,6 +482,7 @@ class _ComposeMailPageState extends ConsumerState<ComposeMailPage> {
     }
 
     setState(() => _isDeleting = true);
+    await _deleteRemoteDraftIfNeeded();
     await ref.read(draftRepositoryProvider).deleteDraft(draftId);
     if (mounted) {
       ScaffoldMessenger.of(
@@ -475,6 +490,57 @@ class _ComposeMailPageState extends ConsumerState<ComposeMailPage> {
       ).showSnackBar(SnackBar(content: Text(l10n.draftDeleted)));
       Navigator.of(context).pop();
     }
+  }
+
+  Future<String?> _syncRemoteDraft({
+    required String? accountId,
+    required String? remoteDraftId,
+  }) async {
+    if (accountId == null || accountId.isEmpty) {
+      return null;
+    }
+    try {
+      return await ref
+          .read(mailRepositoryProvider)
+          .saveRemoteDraft(
+            accountId: accountId,
+            remoteDraftId: remoteDraftId,
+            message: OutgoingMessage(
+              fromAccountId: accountId,
+              to: _splitRecipients(_toController.text),
+              cc: _splitRecipients(_ccController.text),
+              bcc: _splitRecipients(_bccController.text),
+              subject: _subjectController.text.trim(),
+              body: _bodyController.text,
+              attachments: List.unmodifiable(_attachments),
+            ),
+          );
+    } on Object {
+      return remoteDraftId;
+    }
+  }
+
+  Future<void> _deleteRemoteDraftIfNeeded() async {
+    final accountId = _selectedAccountId;
+    final remoteDraftId = _remoteDraftId;
+    if (accountId == null ||
+        accountId.isEmpty ||
+        remoteDraftId == null ||
+        remoteDraftId.isEmpty) {
+      return;
+    }
+    try {
+      await ref
+          .read(mailRepositoryProvider)
+          .deleteRemoteDraft(
+            accountId: accountId,
+            remoteDraftId: remoteDraftId,
+          );
+    } on Object {
+      // Local send/delete completion should not be blocked by a stale remote
+      // draft id. The next provider sync can reconcile server-side state.
+    }
+    _remoteDraftId = null;
   }
 
   Future<void> _pickAttachments() async {

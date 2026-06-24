@@ -97,4 +97,40 @@ void main() {
 
     expect(rows, hasLength(1));
   });
+
+  test('migration adds remote draft id column from schema 10', () async {
+    final migratedDatabase = AppDatabase(
+      NativeDatabase.memory(
+        setup: (database) {
+          database.execute('PRAGMA user_version = 10');
+          database.execute('''
+            CREATE TABLE draft_messages (
+              id TEXT NOT NULL PRIMARY KEY,
+              account_id TEXT NULL,
+              to_recipients TEXT NOT NULL DEFAULT '',
+              cc_recipients TEXT NOT NULL DEFAULT '',
+              bcc_recipients TEXT NOT NULL DEFAULT '',
+              subject TEXT NOT NULL DEFAULT '',
+              body TEXT NOT NULL DEFAULT '',
+              created_at INTEGER NOT NULL,
+              updated_at INTEGER NOT NULL
+            )
+          ''');
+        },
+      ),
+    );
+    addTearDown(migratedDatabase.close);
+
+    await migratedDatabase.customSelect('SELECT 1').get();
+
+    final columns = await migratedDatabase
+        .customSelect('PRAGMA table_info(draft_messages)')
+        .get();
+    final columnNames = columns
+        .map((row) => row.data['name'])
+        .whereType<String>()
+        .toList();
+
+    expect(columnNames, contains('remote_draft_id'));
+  });
 }

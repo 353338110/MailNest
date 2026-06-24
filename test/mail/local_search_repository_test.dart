@@ -235,6 +235,23 @@ class _SearchProvider implements MailProvider {
   }
 
   @override
+  Future<String?> saveDraft({
+    required String accountId,
+    required OutgoingMessage message,
+    String? remoteDraftId,
+  }) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> deleteDraft({
+    required String accountId,
+    required String remoteDraftId,
+  }) {
+    throw UnimplementedError();
+  }
+
+  @override
   Future<void> setStarred({
     required String accountId,
     required String messageId,

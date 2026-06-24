@@ -145,6 +145,68 @@ Hello from raw Gmail.
     expect(decoded, contains(base64.encode(utf8.encode('Private body'))));
   });
 
+  test('creates and deletes Gmail drafts', () async {
+    final transport = _FakeTransport([
+      _ResponsePlan(
+        statusCode: HttpStatus.ok,
+        body: jsonEncode({'id': 'draft-1'}),
+      ),
+      const _ResponsePlan(statusCode: HttpStatus.noContent, body: ''),
+    ]);
+    final provider = _provider(transport: transport, now: now);
+
+    final draftId = await provider.saveDraft(
+      accountId: 'account-1',
+      message: const OutgoingMessage(
+        fromAccountId: 'account-1',
+        to: ['to@example.com'],
+        subject: 'Draft',
+        body: 'Draft body',
+      ),
+    );
+    await provider.deleteDraft(accountId: 'account-1', remoteDraftId: draftId!);
+
+    expect(draftId, 'draft-1');
+    expect(transport.requests.first.method, 'POST');
+    expect(
+      transport.requests.first.uri.toString(),
+      endsWith('/users/me/drafts'),
+    );
+    expect(transport.requests.last.method, 'DELETE');
+    expect(
+      transport.requests.last.uri.toString(),
+      endsWith('/users/me/drafts/draft-1'),
+    );
+  });
+
+  test('updates existing Gmail draft', () async {
+    final transport = _FakeTransport([
+      _ResponsePlan(
+        statusCode: HttpStatus.ok,
+        body: jsonEncode({'id': 'draft-1'}),
+      ),
+    ]);
+    final provider = _provider(transport: transport, now: now);
+
+    final draftId = await provider.saveDraft(
+      accountId: 'account-1',
+      remoteDraftId: 'draft-1',
+      message: const OutgoingMessage(
+        fromAccountId: 'account-1',
+        to: ['to@example.com'],
+        subject: 'Draft',
+        body: 'Draft body',
+      ),
+    );
+
+    expect(draftId, 'draft-1');
+    expect(transport.requests.single.method, 'PUT');
+    expect(
+      transport.requests.single.uri.toString(),
+      endsWith('/users/me/drafts/draft-1'),
+    );
+  });
+
   test('searches Gmail messages with query and label scope', () async {
     final transport = _FakeTransport([
       _ResponsePlan(

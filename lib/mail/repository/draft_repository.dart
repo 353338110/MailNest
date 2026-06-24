@@ -33,6 +33,7 @@ class DraftRepository {
     required String body,
     String? draftId,
     String? accountId,
+    String? remoteDraftId,
     List<OutgoingAttachment>? attachments,
   }) async {
     final now = DateTime.now();
@@ -46,6 +47,7 @@ class DraftRepository {
       DraftMessagesCompanion(
         id: Value(id),
         accountId: Value(accountId),
+        remoteDraftId: Value(remoteDraftId ?? existing?.remoteDraftId),
         toRecipients: Value(toRecipients.trim()),
         ccRecipients: Value(ccRecipients.trim()),
         bccRecipients: Value(bccRecipients.trim()),
@@ -71,6 +73,16 @@ class DraftRepository {
       ]);
     }
     return id;
+  }
+
+  Future<void> updateRemoteDraftId({
+    required String draftId,
+    required String? remoteDraftId,
+  }) {
+    return database.updateDraftRemoteId(
+      id: draftId,
+      remoteDraftId: remoteDraftId,
+    );
   }
 
   Future<void> deleteDraft(String id) => database.deleteDraft(id);

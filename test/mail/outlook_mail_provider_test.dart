@@ -165,6 +165,67 @@ void main() {
     );
   });
 
+  test('creates, updates, and deletes Outlook drafts', () async {
+    final store = _FakeTokenStore(
+      OutlookOAuthToken(
+        accessToken: 'access-token',
+        expiresAt: now.add(const Duration(hours: 1)),
+        tokenEndpoint: Uri.parse('https://login.example/token'),
+      ),
+    );
+    final transport = _FakeTransport([
+      _ResponsePlan(
+        statusCode: HttpStatus.created,
+        body: jsonEncode({'id': 'draft-1'}),
+      ),
+      _ResponsePlan(
+        statusCode: HttpStatus.ok,
+        body: jsonEncode({'id': 'draft-1'}),
+      ),
+      const _ResponsePlan(statusCode: HttpStatus.noContent, body: ''),
+    ]);
+    final provider = OutlookMailProvider(
+      outlookTokenStore: store,
+      transport: transport,
+      clock: () => now,
+    );
+    const message = OutgoingMessage(
+      fromAccountId: 'account-1',
+      to: ['to@example.com'],
+      subject: 'Draft',
+      body: 'Draft body',
+    );
+
+    final draftId = await provider.saveDraft(
+      accountId: 'account-1',
+      message: message,
+    );
+    final updatedId = await provider.saveDraft(
+      accountId: 'account-1',
+      remoteDraftId: draftId,
+      message: message,
+    );
+    await provider.deleteDraft(
+      accountId: 'account-1',
+      remoteDraftId: updatedId!,
+    );
+
+    expect(draftId, 'draft-1');
+    expect(updatedId, 'draft-1');
+    expect(transport.requests[0].method, 'POST');
+    expect(transport.requests[0].uri.toString(), endsWith('/me/messages'));
+    expect(transport.requests[1].method, 'PATCH');
+    expect(
+      transport.requests[1].uri.toString(),
+      endsWith('/me/messages/draft-1'),
+    );
+    expect(transport.requests[2].method, 'DELETE');
+    expect(
+      transport.requests[2].uri.toString(),
+      endsWith('/me/messages/draft-1'),
+    );
+  });
+
   test('asks caller to reauthorize when refresh fails', () async {
     final store = _FakeTokenStore(
       OutlookOAuthToken(

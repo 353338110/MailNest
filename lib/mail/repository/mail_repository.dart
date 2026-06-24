@@ -274,6 +274,30 @@ class MailRepository {
     return provider.sendMessage(accountId: accountId, message: message);
   }
 
+  Future<String?> saveRemoteDraft({
+    required String accountId,
+    required OutgoingMessage message,
+    String? remoteDraftId,
+  }) async {
+    final provider = await _providerForAccount(accountId);
+    return provider.saveDraft(
+      accountId: accountId,
+      message: message,
+      remoteDraftId: remoteDraftId,
+    );
+  }
+
+  Future<void> deleteRemoteDraft({
+    required String accountId,
+    required String remoteDraftId,
+  }) async {
+    final provider = await _providerForAccount(accountId);
+    await provider.deleteDraft(
+      accountId: accountId,
+      remoteDraftId: remoteDraftId,
+    );
+  }
+
   Future<MailDetail> _fetchApiMessageDetail({
     required EmailAccount account,
     required String folderId,

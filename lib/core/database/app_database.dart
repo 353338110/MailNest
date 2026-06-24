@@ -54,6 +54,7 @@ class DraftMessages extends Table {
   TextColumn get bccRecipients => text().withDefault(const Constant(''))();
   TextColumn get subject => text().withDefault(const Constant(''))();
   TextColumn get body => text().withDefault(const Constant(''))();
+  TextColumn get remoteDraftId => text().nullable()();
   DateTimeColumn get createdAt => dateTime()();
   DateTimeColumn get updatedAt => dateTime()();
 
@@ -210,7 +211,7 @@ class AppDatabase extends _$AppDatabase {
     : super(executor ?? driftDatabase(name: 'mailnest'));
 
   @override
-  int get schemaVersion => 10;
+  int get schemaVersion => 11;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -279,6 +280,15 @@ class AppDatabase extends _$AppDatabase {
       }
       if (from < 10) {
         await _createTableIfMissing(migrator, draftAttachments);
+      }
+      if (from < 11) {
+        if (await _tableExists(draftMessages)) {
+          await _addColumnIfMissing(
+            migrator,
+            draftMessages,
+            draftMessages.remoteDraftId,
+          );
+        }
       }
     },
   );
@@ -515,6 +525,18 @@ class AppDatabase extends _$AppDatabase {
 
   Future<void> saveDraft(DraftMessagesCompanion draft) {
     return into(draftMessages).insertOnConflictUpdate(draft);
+  }
+
+  Future<void> updateDraftRemoteId({
+    required String id,
+    required String? remoteDraftId,
+  }) {
+    return (update(draftMessages)..where((table) => table.id.equals(id))).write(
+      DraftMessagesCompanion(
+        remoteDraftId: Value(remoteDraftId),
+        updatedAt: Value(DateTime.now()),
+      ),
+    );
   }
 
   Future<void> replaceDraftAttachments(

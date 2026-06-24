@@ -322,7 +322,7 @@ class ImapClient {
     return headers;
   }
 
-  Future<void> appendMessage({
+  Future<int?> appendMessage({
     required String folderName,
     required String rfc822Content,
     required DateTime sentAt,
@@ -352,7 +352,7 @@ class ImapClient {
         if (!response.isOk) {
           throw const MailProtocolException('IMAP APPEND failed.');
         }
-        return;
+        return _parseAppendUid(line);
       }
     }
   }
@@ -624,6 +624,17 @@ List<int> _parseSearchUids(List<String> lines) {
         .toList(growable: false);
   }
   return const <int>[];
+}
+
+int? _parseAppendUid(String line) {
+  final match = RegExp(
+    r'\[APPENDUID\s+\d+\s+(\d+)\]',
+    caseSensitive: false,
+  ).firstMatch(line);
+  if (match == null) {
+    return null;
+  }
+  return int.tryParse(match.group(1)!);
 }
 
 Future<List<MailHeader>> _parseFetchedHeaders(List<String> lines) async {

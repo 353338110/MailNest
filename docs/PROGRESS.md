@@ -171,7 +171,7 @@ flutter test
 
 ### 写邮件与发信
 
-- 发送草稿的远端草稿箱同步。
+- 已完成：远端草稿箱同步。IMAP 保存到 Drafts 文件夹并记录 APPENDUID，Gmail 使用 Draft API，Outlook 使用 Microsoft Graph message draft；发送或删除本地草稿时会清理远端草稿。
 
 ### 配置导入导出
 
@@ -204,13 +204,12 @@ flutter test
 
 建议按以下顺序继续，每项一个 PR：
 
-1. `codex/remote-drafts`：远程草稿同步，按 provider 分别实现 IMAP Drafts、Gmail Drafts、Outlook Drafts。
-2. `codex/polish-followups`：更完整的加载/确认/取消状态、导入后连接测试和批量移动目标选择。
+1. `codex/polish-followups`：更完整的加载/确认/取消状态、导入后连接测试和批量移动目标选择。
 
 ## 开放 PR
 
 - 当前 GitHub 无开放 PR。
-- 本 PR：远程全文搜索、远程结果缓存入本地搜索索引和本地 fallback。
+- 本 PR：远端草稿同步、远端 draft id 持久化和发送/删除后的远端清理。
 
 ## 注意事项
 

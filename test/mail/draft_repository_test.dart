@@ -54,6 +54,26 @@ void main() {
     expect(updated.body, 'Updated body');
   });
 
+  test('stores and updates remote draft id', () async {
+    final draftId = await repository.saveDraft(
+      toRecipients: 'first@example.com',
+      ccRecipients: '',
+      bccRecipients: '',
+      subject: 'Remote',
+      body: 'Body',
+      remoteDraftId: 'remote-1',
+    );
+
+    expect((await repository.getDraft(draftId))?.remoteDraftId, 'remote-1');
+
+    await repository.updateRemoteDraftId(
+      draftId: draftId,
+      remoteDraftId: 'remote-2',
+    );
+
+    expect((await repository.getDraft(draftId))?.remoteDraftId, 'remote-2');
+  });
+
   test('watches drafts newest first and deletes drafts', () async {
     final firstId = await repository.saveDraft(
       toRecipients: 'first@example.com',

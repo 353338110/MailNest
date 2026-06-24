@@ -8,6 +8,7 @@ import '../models/mail_folder.dart';
 import '../models/mail_header.dart';
 import '../models/outgoing_message.dart';
 import '../models/sync_cursor.dart';
+import '../models/mailbox_folder.dart';
 import '../mime/attachment_extractor.dart';
 import '../repository/account_repository.dart';
 import '../services/sent_record_service.dart';
@@ -318,6 +319,71 @@ class ImapSmtpMailProvider implements MailProvider {
   }
 
   @override
+  Future<String?> saveDraft({
+    required String accountId,
+    required OutgoingMessage message,
+    String? remoteDraftId,
+  }) async {
+    final account = await accountRepository.getAccount(accountId);
+    if (account == null) {
+      throw const MailProtocolException('Account not found.');
+    }
+    final secret = await accountRepository.readSecretForAccount(account);
+    if (secret == null || secret.isEmpty) {
+      throw const MailProtocolException('Account secret is unavailable.');
+    }
+
+    if (remoteDraftId != null && remoteDraftId.isNotEmpty) {
+      await deleteDraft(accountId: accountId, remoteDraftId: remoteDraftId);
+    }
+
+    final sentAt = DateTime.now();
+    final rfc822Content = buildRfc822Message(
+      fromEmail: account.emailAddress,
+      message: message,
+      sentAt: sentAt,
+    );
+    final client = await ImapClient.connect(
+      host: account.imapHost,
+      port: account.imapPort,
+      security: account.imapSecurity,
+      timeout: timeout,
+    );
+    try {
+      await client.login(username: account.username, secret: secret);
+      final folders = await client.listFolders();
+      final folder = _pickDraftFolder(folders);
+      if (folder == null) {
+        throw const MailProtocolException('Drafts folder could not be found.');
+      }
+      final uid = await client.appendMessage(
+        folderName: folder.name,
+        rfc822Content: rfc822Content,
+        sentAt: sentAt,
+      );
+      await client.logout();
+      return uid == null ? null : '${folder.id}:$uid';
+    } finally {
+      client.close();
+    }
+  }
+
+  @override
+  Future<void> deleteDraft({
+    required String accountId,
+    required String remoteDraftId,
+  }) async {
+    final parts = _parseRemoteDraftId(remoteDraftId);
+    if (parts == null) {
+      return;
+    }
+    await deleteMessage(
+      accountId: accountId,
+      messageId: '$accountId:${parts.folderId}:${parts.uid}',
+    );
+  }
+
+  @override
   Future<List<MailHeader>> syncHeaders({
     required String accountId,
     required String folderId,
@@ -458,6 +524,45 @@ class ImapSmtpMailProvider implements MailProvider {
   static String _mailboxName(String folderId) {
     return folderId.toLowerCase() == 'inbox' ? 'INBOX' : folderId;
   }
+
+  static MailFolder? _pickDraftFolder(List<ImapFolderInfo> folders) {
+    for (final folder in folders) {
+      if (mailboxFolderTypeFor(folder.name, folder.attributes) ==
+          MailboxFolderType.drafts) {
+        return _folderFromInfo(folder);
+      }
+    }
+    return null;
+  }
+
+  static MailFolder _folderFromInfo(ImapFolderInfo folder) {
+    return MailFolder(
+      id: folder.name.toLowerCase(),
+      name: folder.name,
+      path: folder.name,
+      delimiter: folder.delimiter,
+      flags: folder.attributes,
+    );
+  }
+
+  static _RemoteDraftParts? _parseRemoteDraftId(String value) {
+    final separator = value.lastIndexOf(':');
+    if (separator <= 0 || separator == value.length - 1) {
+      return null;
+    }
+    final uid = int.tryParse(value.substring(separator + 1));
+    if (uid == null) {
+      return null;
+    }
+    return _RemoteDraftParts(folderId: value.substring(0, separator), uid: uid);
+  }
+}
+
+class _RemoteDraftParts {
+  const _RemoteDraftParts({required this.folderId, required this.uid});
+
+  final String folderId;
+  final int uid;
 }
 
 class _RawImapClient {

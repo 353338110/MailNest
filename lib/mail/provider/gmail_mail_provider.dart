@@ -169,6 +169,46 @@ class GmailMailProvider implements MailProvider {
   }
 
   @override
+  Future<String?> saveDraft({
+    required String accountId,
+    required OutgoingMessage message,
+    String? remoteDraftId,
+  }) async {
+    final accountEmail = await _tokenStore.emailAddress(accountId);
+    final raw = buildRfc822Message(
+      fromEmail: accountEmail,
+      message: message,
+      sentAt: _clock(),
+    );
+    final body = jsonEncode({
+      'message': {'raw': _encodeBase64Url(utf8.encode(raw))},
+    });
+    final response = await _gmailRequest(
+      accountId: accountId,
+      method: remoteDraftId == null ? 'POST' : 'PUT',
+      uri: remoteDraftId == null
+          ? _gmailUri(['users', 'me', 'drafts'])
+          : _gmailUri(['users', 'me', 'drafts', remoteDraftId]),
+      body: body,
+      successStatusCodes: const {200},
+    );
+    return _readString(_decodeObject(response.body), 'id');
+  }
+
+  @override
+  Future<void> deleteDraft({
+    required String accountId,
+    required String remoteDraftId,
+  }) async {
+    await _gmailRequest(
+      accountId: accountId,
+      method: 'DELETE',
+      uri: _gmailUri(['users', 'me', 'drafts', remoteDraftId]),
+      successStatusCodes: const {204},
+    );
+  }
+
+  @override
   Future<List<MailHeader>> syncHeaders({
     required String accountId,
     required String folderId,

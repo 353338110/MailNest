@@ -32,6 +32,17 @@ abstract class MailProvider {
     required OutgoingMessage message,
   });
 
+  Future<String?> saveDraft({
+    required String accountId,
+    required OutgoingMessage message,
+    String? remoteDraftId,
+  });
+
+  Future<void> deleteDraft({
+    required String accountId,
+    required String remoteDraftId,
+  });
+
   Future<void> markAsRead({
     required String accountId,
     required String messageId,

@@ -199,6 +199,40 @@ class OutlookMailProvider implements MailProvider {
   }
 
   @override
+  Future<String?> saveDraft({
+    required String accountId,
+    required OutgoingMessage message,
+    String? remoteDraftId,
+  }) async {
+    final response = await _graphRequest(
+      accountId: accountId,
+      method: remoteDraftId == null ? 'POST' : 'PATCH',
+      uri: remoteDraftId == null
+          ? _graphUri(const ['me', 'messages'])
+          : _graphUri(['me', 'messages', remoteDraftId]),
+      body: jsonEncode(_draftMessagePayload(message)),
+      successStatusCodes: remoteDraftId == null ? const {201} : const {200},
+    );
+    if (remoteDraftId != null) {
+      return remoteDraftId;
+    }
+    return _readString(_decodeObject(response.body), 'id');
+  }
+
+  @override
+  Future<void> deleteDraft({
+    required String accountId,
+    required String remoteDraftId,
+  }) async {
+    await _graphRequest(
+      accountId: accountId,
+      method: 'DELETE',
+      uri: _graphUri(['me', 'messages', remoteDraftId]),
+      successStatusCodes: const {204},
+    );
+  }
+
+  @override
   Future<List<MailHeader>> syncHeaders({
     required String accountId,
     required String folderId,
@@ -425,6 +459,26 @@ class OutlookMailProvider implements MailProvider {
           'emailAddress': {'address': address},
         },
     ];
+  }
+
+  static Map<String, Object?> _draftMessagePayload(OutgoingMessage message) {
+    return {
+      'subject': message.subject,
+      'body': {'contentType': 'Text', 'content': message.body},
+      'toRecipients': _recipients(message.to),
+      if (message.cc.isNotEmpty) 'ccRecipients': _recipients(message.cc),
+      if (message.bcc.isNotEmpty) 'bccRecipients': _recipients(message.bcc),
+      if (message.attachments.isNotEmpty)
+        'attachments': [
+          for (final attachment in message.attachments)
+            {
+              '@odata.type': '#microsoft.graph.fileAttachment',
+              'name': attachment.fileName,
+              'contentType': attachment.mimeType,
+              'contentBytes': base64Encode(attachment.bytes),
+            },
+        ],
+    };
   }
 
   static String _escapeGraphSearch(String value) {

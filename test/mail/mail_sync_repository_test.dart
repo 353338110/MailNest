@@ -373,6 +373,23 @@ class _FakeMailProvider implements MailProvider {
   }
 
   @override
+  Future<String?> saveDraft({
+    required String accountId,
+    required OutgoingMessage message,
+    String? remoteDraftId,
+  }) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> deleteDraft({
+    required String accountId,
+    required String remoteDraftId,
+  }) {
+    throw UnimplementedError();
+  }
+
+  @override
   Future<List<MailHeader>> syncHeaders({
     required String accountId,
     required String folderId,
