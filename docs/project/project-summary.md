@@ -141,6 +141,7 @@ lib/
 ✅ **附件功能**
 - 附件元信息缓存
 - 附件从 IMAP 服务器下载到本地缓存
+- 附件字节提取支持嵌套 multipart、base64、quoted-printable 和 inline/attachment 顺序一致的 `att-N` 定位
 - 附件类型图标（图片、PDF、文档、压缩包等）
 - 附件本地缓存管理（查看缓存大小、清理全部缓存、清理 30 天前旧缓存）
 - 使用系统方式打开附件
@@ -206,8 +207,8 @@ lib/
 
 ### 附件
 
-- ❌ 附件下载失败占位和重试体验
-- ❌ 附件 MIME 解析完善（当前使用占位实现）
+- ❌ 大附件下载进度百分比、取消和批量下载体验
+- ❌ 更多真实邮件样本下的附件兼容性回归测试
 
 ### 邮件同步
 
@@ -262,13 +263,12 @@ lib/
 
 建议按以下顺序继续，每项一个 PR：
 
-1. **`codex/attachments-polish`**：附件 MIME 解析、下载失败占位和重试体验
-2. **`codex/reply-forward`**：回复、回复全部、转发
-3. **`codex/compose-attachment-polish`**：写信附件草稿持久化、大附件体验和选择失败提示
-4. **`codex/sync-state`**：同步状态持久化、多文件夹增量同步和 UIDVALIDITY 处理
-5. **`codex/mail-actions`**：删除、星标、标记未读、移动文件夹和批量操作
-6. **`codex/gmail-mail-provider`**：Gmail 邮件列表、详情和发信
-7. **`codex/desktop-mobile-polish`**：键盘快捷键、右键菜单和更完整的加载/确认状态
+1. **`codex/reply-forward`**：回复、回复全部、转发
+2. **`codex/compose-attachment-polish`**：写信附件草稿持久化、大附件体验和选择失败提示
+3. **`codex/sync-state`**：同步状态持久化、多文件夹增量同步和 UIDVALIDITY 处理
+4. **`codex/mail-actions`**：删除、星标、标记未读、移动文件夹和批量操作
+5. **`codex/gmail-mail-provider`**：Gmail 邮件列表、详情和发信
+6. **`codex/desktop-mobile-polish`**：键盘快捷键、右键菜单和更完整的加载/确认状态
 
 ---
 
@@ -392,12 +392,12 @@ MailNest 当前已完成第一阶段的核心功能：
 
 下一阶段重点：
 
-1. 完善附件 MIME 解析和重试体验
-2. 实现回复、回复全部、转发
-3. 写信附件草稿持久化和大附件体验
-4. 同步状态持久化和增量同步
-5. 邮件操作（删除、星标、移动文件夹）
-6. Gmail API Provider 实现
+1. 实现回复、回复全部、转发
+2. 写信附件草稿持久化和大附件体验
+3. 同步状态持久化和增量同步
+4. 邮件操作（删除、星标、移动文件夹）
+5. Gmail API Provider 实现
+6. 桌面和移动端体验完善
 7. 桌面和移动端体验优化
 
 **当前版本 v0.1.0 已具备基础多账号邮件客户端的核心能力。**

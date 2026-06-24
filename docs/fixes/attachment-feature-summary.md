@@ -106,7 +106,9 @@ _AttachmentCard._handleTap()
   ↓
 AttachmentService.downloadAttachment()
   ↓
-ImapSmtpMailProvider.fetchAttachmentBytes() [TODO: 实现 MIME 解析]
+ImapSmtpMailProvider.fetchAttachmentBytes()
+  ↓
+MimeAttachmentExtractor.extractBytes()
   ↓
 保存到本地文件系统
   ↓
@@ -142,19 +144,17 @@ flutter analyze
 
 ## 未完成部分
 
-1. **附件 MIME 解析**:
-   - `ImapSmtpMailProvider.fetchAttachmentBytes()` 中的 `_extractAttachmentFromRaw()` 方法是占位实现
-   - 需要完整的 MIME 解析来从原始邮件中提取特定附件
-   - 建议使用成熟的 MIME 解析库或扩展现有的 `MimeParser`
+1. **真实邮件样本兼容性**:
+   - 已增加独立 `MimeAttachmentExtractor`，支持嵌套 multipart、base64、quoted-printable 和 `att-N` 顺序定位
+   - 后续仍需持续补充真实邮箱样本，覆盖更多 Content-Type、文件名编码和非标准 MIME 边界
 
-2. **附件下载失败处理**:
-   - 重试机制
-   - 下载进度显示
-   - 失败占位UI
+2. **大附件下载体验**:
+   - 当前有下载中状态、错误提示和重试入口
+   - 后续需要下载进度百分比、取消下载和批量下载体验
 
-3. **写邮件时添加附件**:
-   - 当前只实现了查看和下载已收邮件的附件
-   - 写邮件时选择和添加附件功能待实现
+3. **写信附件体验**:
+   - 当前写信页已支持添加/删除本地附件，SMTP 和 Outlook 发信均可携带附件
+   - 后续需要附件草稿持久化、大附件提示和选择失败提示完善
 
 ## 后续优化建议
 
