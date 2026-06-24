@@ -435,6 +435,12 @@ class AppDatabase extends _$AppDatabase {
     return into(appSettings).insertOnConflictUpdate(setting);
   }
 
+  Future<int> deleteSettingsWithPrefix(String prefix) {
+    return (delete(
+      appSettings,
+    )..where((table) => table.key.like('$prefix%'))).go();
+  }
+
   Future<void> setAccountSyncEnabled(String id, bool enabled) {
     return (update(emailAccounts)..where((table) => table.id.equals(id))).write(
       EmailAccountsCompanion(

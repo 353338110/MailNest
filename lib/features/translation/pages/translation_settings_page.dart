@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/theme/app_spacing.dart';
+import '../../../core/database/database_providers.dart';
 import '../../../l10n/generated/app_localizations.dart';
+import '../../../translation/cached_translation_service.dart';
 import '../../../translation/models/translation_provider_config.dart';
 import '../../../translation/models/translation_provider_definition.dart';
 import '../../../translation/repository/translation_settings_repository_provider.dart';
@@ -48,6 +50,7 @@ class _TranslationSettingsFormState
   late TextEditingController _apiKeyController;
   bool _clearSavedApiKey = false;
   bool _saving = false;
+  bool _clearingCache = false;
 
   @override
   void initState() {
@@ -208,6 +211,23 @@ class _TranslationSettingsFormState
               : const Icon(Icons.save_outlined),
           label: Text(l10n.translationSaveProvider),
         ),
+        const SizedBox(height: AppSpacing.large),
+        const Divider(),
+        ListTile(
+          contentPadding: EdgeInsets.zero,
+          title: Text(_translationCacheLabel(context)),
+          subtitle: Text(_translationCacheDescription(context)),
+          trailing: OutlinedButton.icon(
+            onPressed: _saving || _clearingCache ? null : _clearCache,
+            icon: _clearingCache
+                ? const SizedBox.square(
+                    dimension: 18,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Icon(Icons.delete_sweep_outlined),
+            label: Text(l10n.clearAttachmentCache),
+          ),
+        ),
       ],
     );
   }
@@ -323,6 +343,100 @@ class _TranslationSettingsFormState
         });
       }
     }
+  }
+
+  Future<void> _clearCache() async {
+    final l10n = AppLocalizations.of(context);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(_translationCacheLabel(context)),
+          content: Text(_translationCacheConfirmMessage(context)),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text(l10n.cancel),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text(l10n.clearAttachmentCache),
+            ),
+          ],
+        );
+      },
+    );
+    if (confirmed != true || !mounted) {
+      return;
+    }
+
+    setState(() {
+      _clearingCache = true;
+    });
+    try {
+      await CachedTranslationService.clearCache(ref.read(appDatabaseProvider));
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(_translationCacheClearedMessage(context))),
+      );
+    } catch (error) {
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            _translationCacheClearFailedMessage(context, error.toString()),
+          ),
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _clearingCache = false;
+        });
+      }
+    }
+  }
+
+  String _translationCacheLabel(BuildContext context) {
+    final locale = Localizations.localeOf(context).languageCode;
+    return locale == 'zh'
+        ? '\u6e05\u7406\u7ffb\u8bd1\u7f13\u5b58'
+        : 'Clear translation cache';
+  }
+
+  String _translationCacheDescription(BuildContext context) {
+    final locale = Localizations.localeOf(context).languageCode;
+    return locale == 'zh'
+        ? '\u7ffb\u8bd1\u7f13\u5b58\u53ea\u4fdd\u5b58\u5728\u672c\u673a\uff0c\u4e0d\u4f1a\u5305\u542b\u5728\u914d\u7f6e\u5907\u4efd\u4e2d\u3002'
+        : 'Cached translations are stored locally and are not included in configuration backups.';
+  }
+
+  String _translationCacheConfirmMessage(BuildContext context) {
+    final locale = Localizations.localeOf(context).languageCode;
+    return locale == 'zh'
+        ? '\u8fd9\u4f1a\u5220\u9664\u5df2\u7f13\u5b58\u7684\u7ffb\u8bd1\u7ed3\u679c\uff0c\u7ffb\u8bd1\u8bbe\u7f6e\u548c API Key \u4f1a\u4fdd\u7559\u3002'
+        : 'This will delete cached translation results. Translation settings and API keys will be kept.';
+  }
+
+  String _translationCacheClearedMessage(BuildContext context) {
+    final locale = Localizations.localeOf(context).languageCode;
+    return locale == 'zh'
+        ? '\u7ffb\u8bd1\u7f13\u5b58\u5df2\u6e05\u7406\u3002'
+        : 'Translation cache cleared.';
+  }
+
+  String _translationCacheClearFailedMessage(
+    BuildContext context,
+    String reason,
+  ) {
+    final locale = Localizations.localeOf(context).languageCode;
+    return locale == 'zh'
+        ? '\u65e0\u6cd5\u6e05\u7406\u7ffb\u8bd1\u7f13\u5b58\uff1a$reason'
+        : 'Could not clear translation cache: $reason';
   }
 }
 

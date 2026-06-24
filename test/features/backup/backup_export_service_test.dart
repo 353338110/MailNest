@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mailnest_app/core/database/app_database.dart';
 import 'package:mailnest_app/core/secure_storage/secure_storage_service.dart';
 import 'package:mailnest_app/features/backup/services/backup_export_service.dart';
+import 'package:mailnest_app/translation/cached_translation_service.dart';
 
 class FakeSecureStorageService extends SecureStorageService {
   FakeSecureStorageService(this.secrets);
@@ -61,6 +62,21 @@ void main() {
   });
 
   test('builds a configuration-only export payload', () async {
+    await database.saveSetting(
+      AppSettingsCompanion(
+        key: const Value('translation.provider_id'),
+        value: const Value('custom_rest'),
+        updatedAt: Value(DateTime.utc(2026, 6, 3)),
+      ),
+    );
+    await database.saveSetting(
+      AppSettingsCompanion(
+        key: const Value('${CachedTranslationService.cacheKeyPrefix}abc'),
+        value: const Value('sensitive translated mail body'),
+        updatedAt: Value(DateTime.utc(2026, 6, 3)),
+      ),
+    );
+
     final payload = await service.buildExportPayload(languageTag: 'zh-CN');
     final encoded = jsonEncode(payload);
 
@@ -71,6 +87,9 @@ void main() {
     expect(encoded, contains('mailnest.language.selectedLocale'));
     expect(encoded, contains('zh-CN'));
     expect(encoded, contains('mailnest.translation.provider'));
+    expect(encoded, contains('translation.provider_id'));
+    expect(encoded, isNot(contains(CachedTranslationService.cacheKeyPrefix)));
+    expect(encoded, isNot(contains('sensitive translated mail body')));
     expect(encoded, isNot(contains('mailBody')));
     expect(encoded, isNot(contains('attachmentCachePath')));
     expect(encoded, isNot(contains('fts')));
@@ -80,6 +99,7 @@ void main() {
     expect(excludes['mailHeaderCache'], isTrue);
     expect(excludes['attachmentCache'], isTrue);
     expect(excludes['searchIndex'], isTrue);
+    expect(excludes['translationCache'], isTrue);
   });
 
   test(

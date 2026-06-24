@@ -88,6 +88,7 @@ class BackupExportService {
         'mailHeaderCache': true,
         'attachmentCache': true,
         'searchIndex': true,
+        'translationCache': true,
       },
       'accounts': [
         for (final account in accounts) await _accountToJson(account),

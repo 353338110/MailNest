@@ -188,7 +188,8 @@ flutter test
 
 ### 翻译
 
-- 翻译结果缓存，可选。
+- 已完成：翻译结果本地缓存，按原文 hash、源语言、目标语言和 provider 配置隔离，并在翻译设置页提供清理入口。
+- 已完成：配置备份继续只导出翻译设置，不导出翻译缓存内容。
 
 ### 桌面和移动端体验
 
@@ -203,12 +204,14 @@ flutter test
 
 建议按以下顺序继续，每项一个 PR：
 
-1. `codex/advanced-backlog`：远程全量搜索、翻译结果缓存和远端草稿同步。
+1. `codex/remote-search`：远程全文搜索，IMAP 使用服务器搜索能力，Gmail 使用 Gmail query，本地搜索作为离线 fallback。
+2. `codex/remote-drafts`：远程草稿同步，按 provider 分别实现 IMAP Drafts、Gmail Drafts、Outlook Drafts。
+3. `codex/polish-followups`：更完整的加载/确认/取消状态、导入后连接测试和批量移动目标选择。
 
 ## 开放 PR
 
 - 当前 GitHub 无开放 PR。
-- 本 PR：键盘快捷键、右键菜单、远程图片重试和 Drift 测试 warning 清理。
+- 本 PR：翻译结果本地缓存、翻译缓存清理入口和备份排除约束。
 
 ## 注意事项
 
