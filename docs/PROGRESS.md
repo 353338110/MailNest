@@ -69,6 +69,7 @@
 - 本 PR：附件类型图标，根据 MIME 类型和文件扩展名显示对应图标（图片、PDF、文档、压缩包等）。
 - 本 PR：附件本地缓存管理，支持查看缓存大小、清理全部缓存、清理 30 天前的旧缓存。
 - 本 PR：使用系统方式打开附件，下载后可用系统默认应用打开。
+- 本 PR：附件字节提取改为独立 MIME 解析器，支持嵌套 multipart、base64、quoted-printable 和 inline/attachment 顺序一致的 `att-N` 定位。
 
 ### 配置导入导出
 
@@ -130,8 +131,8 @@ flutter test
 
 ### 附件
 
-- 附件下载失败占位和重试体验。
-- 附件 MIME 解析（当前使用占位实现）。
+- 大附件下载进度百分比、取消和批量下载体验。
+- 更多真实邮件样本下的附件兼容性回归测试。
 
 ### 邮件同步
 
@@ -178,13 +179,12 @@ flutter test
 
 建议按以下顺序继续，每项一个 PR：
 
-1. `codex/attachments-polish`：附件 MIME 解析、下载失败占位和重试体验。
-2. `codex/reply-forward`：回复、回复全部、转发。
-3. `codex/compose-attachment-polish`：写信附件草稿持久化、大附件体验和选择失败提示。
-4. `codex/sync-state`：同步状态持久化、多文件夹增量同步和 UIDVALIDITY 处理。
-5. `codex/mail-actions`：删除、星标、标记未读、移动文件夹和批量操作。
-6. `codex/gmail-mail-provider`：Gmail 邮件列表、详情和发信。
-7. `codex/desktop-mobile-polish`：键盘快捷键、右键菜单和更完整的加载/确认状态。
+1. `codex/reply-forward`：回复、回复全部、转发。
+2. `codex/compose-attachment-polish`：写信附件草稿持久化、大附件体验和选择失败提示。
+3. `codex/sync-state`：同步状态持久化、多文件夹增量同步和 UIDVALIDITY 处理。
+4. `codex/mail-actions`：删除、星标、标记未读、移动文件夹和批量操作。
+5. `codex/gmail-mail-provider`：Gmail 邮件列表、详情和发信。
+6. `codex/desktop-mobile-polish`：键盘快捷键、右键菜单和更完整的加载/确认状态。
 
 ## 开放 PR
 
