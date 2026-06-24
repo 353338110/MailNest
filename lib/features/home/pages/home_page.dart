@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../app/theme/app_spacing.dart';
@@ -1238,68 +1239,131 @@ class _MailboxContentState extends ConsumerState<_MailboxContent> {
     }
 
     final selectionMode = _selectedKeys.isNotEmpty;
-    return Column(
-      children: [
-        if (selectionMode)
-          _BatchActionBar(
-            selectedCount: _selectedKeys.length,
-            onClear: () => setState(_selectedKeys.clear),
-            onDelete: () => _deleteSelected(context),
-            onMarkRead: () => _markSelectedRead(true),
-            onMarkUnread: () => _markSelectedRead(false),
-            onStar: () => _starSelected(true),
-          ),
-        Expanded(
-          child: RefreshIndicator(
-            onRefresh: () async => widget.onRefresh(),
-            child: ListView.builder(
-              padding: EdgeInsets.only(
-                left: widget.embedded ? AppSpacing.medium : 0,
-                right: widget.embedded ? AppSpacing.medium : 0,
-                top: widget.embedded ? AppSpacing.medium : 0,
-                bottom: AppSpacing.xlarge * 4,
-              ),
-              itemCount:
-                  widget.messages.length + (widget.error == null ? 0 : 1),
-              itemBuilder: (context, index) {
-                if (widget.error != null && index == 0) {
-                  return _InlineMailboxError(
-                    message: l10n.mailSyncFailed(widget.error!.toString()),
-                    onRefresh: widget.onRefresh,
-                  );
-                }
-                final message =
-                    widget.messages[widget.error == null ? index : index - 1];
-                final key = _messageKey(message);
-                final checked = _selectedKeys.contains(key);
-                return Padding(
-                  padding: EdgeInsets.only(
-                    bottom: widget.embedded ? AppSpacing.small : 0,
-                  ),
-                  child: _MessageTile(
-                    message: message,
-                    selected:
-                        checked ||
-                        (widget.selectedMessage?.matches(message) ?? false),
-                    checked: checked,
-                    selectionMode: selectionMode,
-                    cardStyle: widget.embedded,
-                    showAccountMarker: widget.showAccountMarker,
-                    onLongPress: () => _toggleSelection(message),
-                    onTap: () {
-                      if (selectionMode) {
-                        _toggleSelection(message);
-                      } else {
-                        widget.onMessageSelected(message);
-                      }
-                    },
-                  ),
-                );
+    return Focus(
+      autofocus: true,
+      child: Shortcuts(
+        shortcuts: const {
+          SingleActivator(LogicalKeyboardKey.delete): _DeleteMessageIntent(),
+          SingleActivator(LogicalKeyboardKey.backspace): _DeleteMessageIntent(),
+          SingleActivator(LogicalKeyboardKey.keyM): _ToggleReadIntent(),
+          SingleActivator(LogicalKeyboardKey.keyS): _StarMessageIntent(),
+        },
+        child: Actions(
+          actions: {
+            _DeleteMessageIntent: CallbackAction<_DeleteMessageIntent>(
+              onInvoke: (_) {
+                _deleteActiveMessages(context);
+                return null;
               },
             ),
+            _ToggleReadIntent: CallbackAction<_ToggleReadIntent>(
+              onInvoke: (_) {
+                final message = _activeMessage;
+                if (message != null) {
+                  _runSingleAction(
+                    message,
+                    (repository, message) => repository.markAsRead(
+                      accountId: message.account.id,
+                      folderId: message.folder.id,
+                      uid: message.header.uid,
+                      isRead: !message.header.isRead,
+                    ),
+                  );
+                }
+                return null;
+              },
+            ),
+            _StarMessageIntent: CallbackAction<_StarMessageIntent>(
+              onInvoke: (_) {
+                final message = _activeMessage;
+                if (message != null) {
+                  _runSingleAction(
+                    message,
+                    (repository, message) => repository.setStarred(
+                      accountId: message.account.id,
+                      folderId: message.folder.id,
+                      uid: message.header.uid,
+                      isStarred: !message.header.isStarred,
+                    ),
+                  );
+                }
+                return null;
+              },
+            ),
+          },
+          child: Column(
+            children: [
+              if (selectionMode)
+                _BatchActionBar(
+                  selectedCount: _selectedKeys.length,
+                  onClear: () => setState(_selectedKeys.clear),
+                  onDelete: () => _deleteSelected(context),
+                  onMarkRead: () => _markSelectedRead(true),
+                  onMarkUnread: () => _markSelectedRead(false),
+                  onStar: () => _starSelected(true),
+                ),
+              Expanded(
+                child: RefreshIndicator(
+                  onRefresh: () async => widget.onRefresh(),
+                  child: ListView.builder(
+                    padding: EdgeInsets.only(
+                      left: widget.embedded ? AppSpacing.medium : 0,
+                      right: widget.embedded ? AppSpacing.medium : 0,
+                      top: widget.embedded ? AppSpacing.medium : 0,
+                      bottom: AppSpacing.xlarge * 4,
+                    ),
+                    itemCount:
+                        widget.messages.length + (widget.error == null ? 0 : 1),
+                    itemBuilder: (context, index) {
+                      if (widget.error != null && index == 0) {
+                        return _InlineMailboxError(
+                          message: l10n.mailSyncFailed(
+                            widget.error!.toString(),
+                          ),
+                          onRefresh: widget.onRefresh,
+                        );
+                      }
+                      final message = widget
+                          .messages[widget.error == null ? index : index - 1];
+                      final key = _messageKey(message);
+                      final checked = _selectedKeys.contains(key);
+                      return Padding(
+                        padding: EdgeInsets.only(
+                          bottom: widget.embedded ? AppSpacing.small : 0,
+                        ),
+                        child: _MessageTile(
+                          message: message,
+                          selected:
+                              checked ||
+                              (widget.selectedMessage?.matches(message) ??
+                                  false),
+                          checked: checked,
+                          selectionMode: selectionMode,
+                          cardStyle: widget.embedded,
+                          showAccountMarker: widget.showAccountMarker,
+                          onLongPress: () => _toggleSelection(message),
+                          onContextMenu: (position) => _showMessageContextMenu(
+                            context,
+                            message,
+                            position,
+                          ),
+                          onTap: () {
+                            if (selectionMode) {
+                              _toggleSelection(message);
+                            } else {
+                              widget.onMessageSelected(message);
+                            }
+                          },
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
-      ],
+      ),
     );
   }
 
@@ -1316,6 +1380,28 @@ class _MailboxContentState extends ConsumerState<_MailboxContent> {
     return widget.messages
         .where((message) => _selectedKeys.contains(_messageKey(message)))
         .toList(growable: false);
+  }
+
+  MailboxMessage? get _activeMessage {
+    if (_selectedKeys.isNotEmpty) {
+      return _selectedMessages.firstOrNull;
+    }
+    final selected = widget.selectedMessage;
+    if (selected == null) {
+      return null;
+    }
+    return widget.messages.firstWhereOrNull(selected.matches);
+  }
+
+  Future<void> _deleteActiveMessages(BuildContext context) {
+    if (_selectedKeys.isNotEmpty) {
+      return _deleteSelected(context);
+    }
+    final message = _activeMessage;
+    if (message == null) {
+      return Future.value();
+    }
+    return _deleteSingle(context, message);
   }
 
   Future<void> _deleteSelected(BuildContext context) async {
@@ -1371,6 +1457,127 @@ class _MailboxContentState extends ConsumerState<_MailboxContent> {
     );
   }
 
+  Future<void> _deleteSingle(
+    BuildContext context,
+    MailboxMessage message,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete message'),
+        content: const Text('Delete this message?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(l10n.cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) {
+      return;
+    }
+    await _runSingleAction(
+      message,
+      (repository, message) => repository.deleteMessage(
+        accountId: message.account.id,
+        folderId: message.folder.id,
+        uid: message.header.uid,
+      ),
+    );
+  }
+
+  Future<void> _showMessageContextMenu(
+    BuildContext context,
+    MailboxMessage message,
+    Offset position,
+  ) async {
+    final action = await showMenu<_MessageContextAction>(
+      context: context,
+      position: RelativeRect.fromLTRB(position.dx, position.dy, 0, 0),
+      items: [
+        const PopupMenuItem(
+          value: _MessageContextAction.open,
+          child: ListTile(
+            leading: Icon(Icons.open_in_new),
+            title: Text('Open'),
+          ),
+        ),
+        PopupMenuItem(
+          value: _MessageContextAction.toggleRead,
+          child: ListTile(
+            leading: Icon(
+              message.header.isRead
+                  ? Icons.mark_email_unread_outlined
+                  : Icons.mark_email_read_outlined,
+            ),
+            title: Text(message.header.isRead ? 'Mark unread' : 'Mark read'),
+          ),
+        ),
+        PopupMenuItem(
+          value: _MessageContextAction.toggleStar,
+          child: ListTile(
+            leading: Icon(
+              message.header.isStarred
+                  ? Icons.star_border_outlined
+                  : Icons.star_outline,
+            ),
+            title: Text(message.header.isStarred ? 'Remove star' : 'Star'),
+          ),
+        ),
+        const PopupMenuItem(
+          value: _MessageContextAction.delete,
+          child: ListTile(
+            leading: Icon(Icons.delete_outline),
+            title: Text('Delete'),
+          ),
+        ),
+      ],
+    );
+    if (!context.mounted || action == null) {
+      return;
+    }
+    switch (action) {
+      case _MessageContextAction.open:
+        widget.onMessageSelected(message);
+      case _MessageContextAction.toggleRead:
+        await _runSingleAction(
+          message,
+          (repository, message) => repository.markAsRead(
+            accountId: message.account.id,
+            folderId: message.folder.id,
+            uid: message.header.uid,
+            isRead: !message.header.isRead,
+          ),
+        );
+      case _MessageContextAction.toggleStar:
+        await _runSingleAction(
+          message,
+          (repository, message) => repository.setStarred(
+            accountId: message.account.id,
+            folderId: message.folder.id,
+            uid: message.header.uid,
+            isStarred: !message.header.isStarred,
+          ),
+        );
+      case _MessageContextAction.delete:
+        await _deleteSingle(context, message);
+    }
+  }
+
+  Future<void> _runSingleAction(
+    MailboxMessage message,
+    Future<void> Function(MailRepository repository, MailboxMessage message)
+    action,
+  ) {
+    return action(ref.read(mailRepositoryProvider), message);
+  }
+
   Future<void> _runBatchAction(
     Future<void> Function(MailRepository repository, MailboxMessage message)
     action,
@@ -1389,6 +1596,20 @@ class _MailboxContentState extends ConsumerState<_MailboxContent> {
     return '${message.account.id}:${message.folder.id}:${message.header.uid}';
   }
 }
+
+class _DeleteMessageIntent extends Intent {
+  const _DeleteMessageIntent();
+}
+
+class _ToggleReadIntent extends Intent {
+  const _ToggleReadIntent();
+}
+
+class _StarMessageIntent extends Intent {
+  const _StarMessageIntent();
+}
+
+enum _MessageContextAction { open, toggleRead, toggleStar, delete }
 
 class _BatchActionBar extends StatelessWidget {
   const _BatchActionBar({
@@ -1832,6 +2053,7 @@ class _MessageTile extends StatelessWidget {
     required this.showAccountMarker,
     required this.onTap,
     required this.onLongPress,
+    required this.onContextMenu,
   });
 
   final MailboxMessage message;
@@ -1842,6 +2064,7 @@ class _MessageTile extends StatelessWidget {
   final bool showAccountMarker;
   final VoidCallback onTap;
   final VoidCallback onLongPress;
+  final ValueChanged<Offset> onContextMenu;
 
   @override
   Widget build(BuildContext context) {
@@ -1860,116 +2083,127 @@ class _MessageTile extends StatelessWidget {
         : colorScheme.onSurfaceVariant;
 
     if (!cardStyle) {
-      return ListTile(
-        enabled: _canOpenDetail(header.id),
-        onTap: _canOpenDetail(header.id) ? onTap : null,
-        onLongPress: onLongPress,
-        leading: selectionMode
-            ? Checkbox(value: checked, onChanged: (_) => onTap())
-            : _SenderAvatar(sender: header.sender, selected: false),
-        title: Text(
-          header.subject,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: subjectStyle,
-        ),
-        subtitle: Text(
-          _subtitle(context),
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
-        ),
-        trailing: _MessageMeta(
-          message: message,
-          selected: false,
-          compact: true,
+      return GestureDetector(
+        onSecondaryTapDown: (details) => onContextMenu(details.globalPosition),
+        child: ListTile(
+          enabled: _canOpenDetail(header.id),
+          onTap: _canOpenDetail(header.id) ? onTap : null,
+          onLongPress: onLongPress,
+          leading: selectionMode
+              ? Checkbox(value: checked, onChanged: (_) => onTap())
+              : _SenderAvatar(sender: header.sender, selected: false),
+          title: Text(
+            header.subject,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: subjectStyle,
+          ),
+          subtitle: Text(
+            _subtitle(context),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+          trailing: _MessageMeta(
+            message: message,
+            selected: false,
+            compact: true,
+          ),
         ),
       );
     }
 
-    return Material(
-      color: activeColor,
-      borderRadius: BorderRadius.circular(8),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: _canOpenDetail(header.id) ? onTap : null,
-        onLongPress: onLongPress,
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.medium),
-          child: Stack(
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      selectionMode
-                          ? Checkbox(value: checked, onChanged: (_) => onTap())
-                          : _SenderAvatar(
-                              sender: header.sender,
-                              selected: selected,
-                            ),
-                      const SizedBox(width: AppSpacing.small),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              _senderName(header.sender),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: theme.textTheme.titleSmall?.copyWith(
-                                fontWeight: header.isRead
-                                    ? FontWeight.w600
-                                    : FontWeight.w800,
-                                color: selected ? colorScheme.onPrimary : null,
+    return GestureDetector(
+      onSecondaryTapDown: (details) => onContextMenu(details.globalPosition),
+      child: Material(
+        color: activeColor,
+        borderRadius: BorderRadius.circular(8),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: _canOpenDetail(header.id) ? onTap : null,
+          onLongPress: onLongPress,
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.medium),
+            child: Stack(
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        selectionMode
+                            ? Checkbox(
+                                value: checked,
+                                onChanged: (_) => onTap(),
+                              )
+                            : _SenderAvatar(
+                                sender: header.sender,
+                                selected: selected,
                               ),
-                            ),
-                            const SizedBox(height: AppSpacing.xsmall),
-                            Text(
-                              header.subject,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: subjectStyle,
-                            ),
-                          ],
+                        const SizedBox(width: AppSpacing.small),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                _senderName(header.sender),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: theme.textTheme.titleSmall?.copyWith(
+                                  fontWeight: header.isRead
+                                      ? FontWeight.w600
+                                      : FontWeight.w800,
+                                  color: selected
+                                      ? colorScheme.onPrimary
+                                      : null,
+                                ),
+                              ),
+                              const SizedBox(height: AppSpacing.xsmall),
+                              Text(
+                                header.subject,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: subjectStyle,
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: AppSpacing.small),
-                      _MessageMeta(
-                        message: message,
-                        selected: selected,
-                        compact: false,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: AppSpacing.small),
-                  Text(
-                    _subtitle(context),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: secondaryColor,
-                      height: 1.35,
+                        const SizedBox(width: AppSpacing.small),
+                        _MessageMeta(
+                          message: message,
+                          selected: selected,
+                          compact: false,
+                        ),
+                      ],
                     ),
-                  ),
-                ],
-              ),
-              if (!header.isRead)
-                Positioned(
-                  right: 0,
-                  top: 0,
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: selected
-                          ? colorScheme.onPrimary
-                          : colorScheme.primary,
-                      shape: BoxShape.circle,
+                    const SizedBox(height: AppSpacing.small),
+                    Text(
+                      _subtitle(context),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: secondaryColor,
+                        height: 1.35,
+                      ),
                     ),
-                    child: const SizedBox.square(dimension: 10),
-                  ),
+                  ],
                 ),
-            ],
+                if (!header.isRead)
+                  Positioned(
+                    right: 0,
+                    top: 0,
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: selected
+                            ? colorScheme.onPrimary
+                            : colorScheme.primary,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const SizedBox.square(dimension: 10),
+                    ),
+                  ),
+              ],
+            ),
           ),
         ),
       ),
@@ -2010,6 +2244,17 @@ class _MessageTile extends StatelessWidget {
       MailboxFolderType.trash => l10n.trash,
       MailboxFolderType.custom => message.folder.name,
     };
+  }
+}
+
+extension _FirstWhereOrNullExtension<T> on Iterable<T> {
+  T? firstWhereOrNull(bool Function(T value) test) {
+    for (final value in this) {
+      if (test(value)) {
+        return value;
+      }
+    }
+    return null;
   }
 }
 

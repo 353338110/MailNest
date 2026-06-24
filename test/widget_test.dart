@@ -1,3 +1,4 @@
+import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -24,6 +25,8 @@ import 'package:mailnest_app/translation/models/translation_provider_config.dart
 import 'package:mailnest_app/translation/translation_service_provider.dart';
 
 void main() {
+  driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
+
   testWidgets('shows onboarding entry point', (tester) async {
     await tester.pumpWidget(const ProviderScope(child: MailNestApp()));
     await tester.pumpAndSettle();

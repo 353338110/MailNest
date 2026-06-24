@@ -481,11 +481,7 @@ class _HtmlBodyBuilder {
       if (!options.allowRemoteImages) {
         return null;
       }
-      return Image.network(
-        src,
-        fit: BoxFit.contain,
-        errorBuilder: (_, _, _) => _ImagePlaceholder(source: src),
-      );
+      return _RetryableRemoteImage(source: src);
     }
     return null;
   }
@@ -984,10 +980,39 @@ class _SizedEmailImage extends StatelessWidget {
   }
 }
 
-class _ImagePlaceholder extends StatelessWidget {
-  const _ImagePlaceholder({required this.source});
+class _RetryableRemoteImage extends StatefulWidget {
+  const _RetryableRemoteImage({required this.source});
 
   final String source;
+
+  @override
+  State<_RetryableRemoteImage> createState() => _RetryableRemoteImageState();
+}
+
+class _RetryableRemoteImageState extends State<_RetryableRemoteImage> {
+  int _attempt = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    return Image.network(
+      widget.source,
+      key: ValueKey('${widget.source}:$_attempt'),
+      fit: BoxFit.contain,
+      errorBuilder: (_, _, _) {
+        return _ImagePlaceholder(
+          source: widget.source,
+          onRetry: () => setState(() => _attempt += 1),
+        );
+      },
+    );
+  }
+}
+
+class _ImagePlaceholder extends StatelessWidget {
+  const _ImagePlaceholder({required this.source, this.onRetry});
+
+  final String source;
+  final VoidCallback? onRetry;
 
   @override
   Widget build(BuildContext context) {
@@ -1010,6 +1035,14 @@ class _ImagePlaceholder extends StatelessWidget {
                     : AppLocalizations.of(context).emptyMessageBody,
               ),
             ),
+            if (onRetry != null) ...[
+              const SizedBox(width: AppSpacing.small),
+              TextButton.icon(
+                onPressed: onRetry,
+                icon: const Icon(Icons.refresh),
+                label: Text(AppLocalizations.of(context).retry),
+              ),
+            ],
           ],
         ),
       ),
