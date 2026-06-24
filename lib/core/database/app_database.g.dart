@@ -5711,6 +5711,522 @@ class MailSyncCursorsCompanion extends UpdateCompanion<MailSyncCursorEntry> {
   }
 }
 
+class $MailSyncStatesTable extends MailSyncStates
+    with TableInfo<$MailSyncStatesTable, MailSyncStateEntry> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $MailSyncStatesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _accountIdMeta = const VerificationMeta(
+    'accountId',
+  );
+  @override
+  late final GeneratedColumn<String> accountId = GeneratedColumn<String>(
+    'account_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _folderNameMeta = const VerificationMeta(
+    'folderName',
+  );
+  @override
+  late final GeneratedColumn<String> folderName = GeneratedColumn<String>(
+    'folder_name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
+  @override
+  late final GeneratedColumn<String> status = GeneratedColumn<String>(
+    'status',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _errorMeta = const VerificationMeta('error');
+  @override
+  late final GeneratedColumn<String> error = GeneratedColumn<String>(
+    'error',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _startedAtMeta = const VerificationMeta(
+    'startedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> startedAt = GeneratedColumn<DateTime>(
+    'started_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _finishedAtMeta = const VerificationMeta(
+    'finishedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> finishedAt = GeneratedColumn<DateTime>(
+    'finished_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    accountId,
+    folderName,
+    status,
+    error,
+    startedAt,
+    finishedAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'mail_sync_states';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<MailSyncStateEntry> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('account_id')) {
+      context.handle(
+        _accountIdMeta,
+        accountId.isAcceptableOrUnknown(data['account_id']!, _accountIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_accountIdMeta);
+    }
+    if (data.containsKey('folder_name')) {
+      context.handle(
+        _folderNameMeta,
+        folderName.isAcceptableOrUnknown(data['folder_name']!, _folderNameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_folderNameMeta);
+    }
+    if (data.containsKey('status')) {
+      context.handle(
+        _statusMeta,
+        status.isAcceptableOrUnknown(data['status']!, _statusMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_statusMeta);
+    }
+    if (data.containsKey('error')) {
+      context.handle(
+        _errorMeta,
+        error.isAcceptableOrUnknown(data['error']!, _errorMeta),
+      );
+    }
+    if (data.containsKey('started_at')) {
+      context.handle(
+        _startedAtMeta,
+        startedAt.isAcceptableOrUnknown(data['started_at']!, _startedAtMeta),
+      );
+    }
+    if (data.containsKey('finished_at')) {
+      context.handle(
+        _finishedAtMeta,
+        finishedAt.isAcceptableOrUnknown(data['finished_at']!, _finishedAtMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  MailSyncStateEntry map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return MailSyncStateEntry(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      accountId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}account_id'],
+      )!,
+      folderName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}folder_name'],
+      )!,
+      status: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}status'],
+      )!,
+      error: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}error'],
+      ),
+      startedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}started_at'],
+      ),
+      finishedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}finished_at'],
+      ),
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $MailSyncStatesTable createAlias(String alias) {
+    return $MailSyncStatesTable(attachedDatabase, alias);
+  }
+}
+
+class MailSyncStateEntry extends DataClass
+    implements Insertable<MailSyncStateEntry> {
+  final String id;
+  final String accountId;
+  final String folderName;
+  final String status;
+  final String? error;
+  final DateTime? startedAt;
+  final DateTime? finishedAt;
+  final DateTime updatedAt;
+  const MailSyncStateEntry({
+    required this.id,
+    required this.accountId,
+    required this.folderName,
+    required this.status,
+    this.error,
+    this.startedAt,
+    this.finishedAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['account_id'] = Variable<String>(accountId);
+    map['folder_name'] = Variable<String>(folderName);
+    map['status'] = Variable<String>(status);
+    if (!nullToAbsent || error != null) {
+      map['error'] = Variable<String>(error);
+    }
+    if (!nullToAbsent || startedAt != null) {
+      map['started_at'] = Variable<DateTime>(startedAt);
+    }
+    if (!nullToAbsent || finishedAt != null) {
+      map['finished_at'] = Variable<DateTime>(finishedAt);
+    }
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  MailSyncStatesCompanion toCompanion(bool nullToAbsent) {
+    return MailSyncStatesCompanion(
+      id: Value(id),
+      accountId: Value(accountId),
+      folderName: Value(folderName),
+      status: Value(status),
+      error: error == null && nullToAbsent
+          ? const Value.absent()
+          : Value(error),
+      startedAt: startedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(startedAt),
+      finishedAt: finishedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(finishedAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory MailSyncStateEntry.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return MailSyncStateEntry(
+      id: serializer.fromJson<String>(json['id']),
+      accountId: serializer.fromJson<String>(json['accountId']),
+      folderName: serializer.fromJson<String>(json['folderName']),
+      status: serializer.fromJson<String>(json['status']),
+      error: serializer.fromJson<String?>(json['error']),
+      startedAt: serializer.fromJson<DateTime?>(json['startedAt']),
+      finishedAt: serializer.fromJson<DateTime?>(json['finishedAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'accountId': serializer.toJson<String>(accountId),
+      'folderName': serializer.toJson<String>(folderName),
+      'status': serializer.toJson<String>(status),
+      'error': serializer.toJson<String?>(error),
+      'startedAt': serializer.toJson<DateTime?>(startedAt),
+      'finishedAt': serializer.toJson<DateTime?>(finishedAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  MailSyncStateEntry copyWith({
+    String? id,
+    String? accountId,
+    String? folderName,
+    String? status,
+    Value<String?> error = const Value.absent(),
+    Value<DateTime?> startedAt = const Value.absent(),
+    Value<DateTime?> finishedAt = const Value.absent(),
+    DateTime? updatedAt,
+  }) => MailSyncStateEntry(
+    id: id ?? this.id,
+    accountId: accountId ?? this.accountId,
+    folderName: folderName ?? this.folderName,
+    status: status ?? this.status,
+    error: error.present ? error.value : this.error,
+    startedAt: startedAt.present ? startedAt.value : this.startedAt,
+    finishedAt: finishedAt.present ? finishedAt.value : this.finishedAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  MailSyncStateEntry copyWithCompanion(MailSyncStatesCompanion data) {
+    return MailSyncStateEntry(
+      id: data.id.present ? data.id.value : this.id,
+      accountId: data.accountId.present ? data.accountId.value : this.accountId,
+      folderName: data.folderName.present
+          ? data.folderName.value
+          : this.folderName,
+      status: data.status.present ? data.status.value : this.status,
+      error: data.error.present ? data.error.value : this.error,
+      startedAt: data.startedAt.present ? data.startedAt.value : this.startedAt,
+      finishedAt: data.finishedAt.present
+          ? data.finishedAt.value
+          : this.finishedAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MailSyncStateEntry(')
+          ..write('id: $id, ')
+          ..write('accountId: $accountId, ')
+          ..write('folderName: $folderName, ')
+          ..write('status: $status, ')
+          ..write('error: $error, ')
+          ..write('startedAt: $startedAt, ')
+          ..write('finishedAt: $finishedAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    accountId,
+    folderName,
+    status,
+    error,
+    startedAt,
+    finishedAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is MailSyncStateEntry &&
+          other.id == this.id &&
+          other.accountId == this.accountId &&
+          other.folderName == this.folderName &&
+          other.status == this.status &&
+          other.error == this.error &&
+          other.startedAt == this.startedAt &&
+          other.finishedAt == this.finishedAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class MailSyncStatesCompanion extends UpdateCompanion<MailSyncStateEntry> {
+  final Value<String> id;
+  final Value<String> accountId;
+  final Value<String> folderName;
+  final Value<String> status;
+  final Value<String?> error;
+  final Value<DateTime?> startedAt;
+  final Value<DateTime?> finishedAt;
+  final Value<DateTime> updatedAt;
+  final Value<int> rowid;
+  const MailSyncStatesCompanion({
+    this.id = const Value.absent(),
+    this.accountId = const Value.absent(),
+    this.folderName = const Value.absent(),
+    this.status = const Value.absent(),
+    this.error = const Value.absent(),
+    this.startedAt = const Value.absent(),
+    this.finishedAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  MailSyncStatesCompanion.insert({
+    required String id,
+    required String accountId,
+    required String folderName,
+    required String status,
+    this.error = const Value.absent(),
+    this.startedAt = const Value.absent(),
+    this.finishedAt = const Value.absent(),
+    required DateTime updatedAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       accountId = Value(accountId),
+       folderName = Value(folderName),
+       status = Value(status),
+       updatedAt = Value(updatedAt);
+  static Insertable<MailSyncStateEntry> custom({
+    Expression<String>? id,
+    Expression<String>? accountId,
+    Expression<String>? folderName,
+    Expression<String>? status,
+    Expression<String>? error,
+    Expression<DateTime>? startedAt,
+    Expression<DateTime>? finishedAt,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (accountId != null) 'account_id': accountId,
+      if (folderName != null) 'folder_name': folderName,
+      if (status != null) 'status': status,
+      if (error != null) 'error': error,
+      if (startedAt != null) 'started_at': startedAt,
+      if (finishedAt != null) 'finished_at': finishedAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  MailSyncStatesCompanion copyWith({
+    Value<String>? id,
+    Value<String>? accountId,
+    Value<String>? folderName,
+    Value<String>? status,
+    Value<String?>? error,
+    Value<DateTime?>? startedAt,
+    Value<DateTime?>? finishedAt,
+    Value<DateTime>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return MailSyncStatesCompanion(
+      id: id ?? this.id,
+      accountId: accountId ?? this.accountId,
+      folderName: folderName ?? this.folderName,
+      status: status ?? this.status,
+      error: error ?? this.error,
+      startedAt: startedAt ?? this.startedAt,
+      finishedAt: finishedAt ?? this.finishedAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (accountId.present) {
+      map['account_id'] = Variable<String>(accountId.value);
+    }
+    if (folderName.present) {
+      map['folder_name'] = Variable<String>(folderName.value);
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
+    }
+    if (error.present) {
+      map['error'] = Variable<String>(error.value);
+    }
+    if (startedAt.present) {
+      map['started_at'] = Variable<DateTime>(startedAt.value);
+    }
+    if (finishedAt.present) {
+      map['finished_at'] = Variable<DateTime>(finishedAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MailSyncStatesCompanion(')
+          ..write('id: $id, ')
+          ..write('accountId: $accountId, ')
+          ..write('folderName: $folderName, ')
+          ..write('status: $status, ')
+          ..write('error: $error, ')
+          ..write('startedAt: $startedAt, ')
+          ..write('finishedAt: $finishedAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -5729,6 +6245,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $MailSyncCursorsTable mailSyncCursors = $MailSyncCursorsTable(
     this,
   );
+  late final $MailSyncStatesTable mailSyncStates = $MailSyncStatesTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -5743,6 +6260,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     localMailAttachments,
     localMailFolders,
     mailSyncCursors,
+    mailSyncStates,
   ];
 }
 
@@ -8557,6 +9075,273 @@ typedef $$MailSyncCursorsTableProcessedTableManager =
       MailSyncCursorEntry,
       PrefetchHooks Function()
     >;
+typedef $$MailSyncStatesTableCreateCompanionBuilder =
+    MailSyncStatesCompanion Function({
+      required String id,
+      required String accountId,
+      required String folderName,
+      required String status,
+      Value<String?> error,
+      Value<DateTime?> startedAt,
+      Value<DateTime?> finishedAt,
+      required DateTime updatedAt,
+      Value<int> rowid,
+    });
+typedef $$MailSyncStatesTableUpdateCompanionBuilder =
+    MailSyncStatesCompanion Function({
+      Value<String> id,
+      Value<String> accountId,
+      Value<String> folderName,
+      Value<String> status,
+      Value<String?> error,
+      Value<DateTime?> startedAt,
+      Value<DateTime?> finishedAt,
+      Value<DateTime> updatedAt,
+      Value<int> rowid,
+    });
+
+class $$MailSyncStatesTableFilterComposer
+    extends Composer<_$AppDatabase, $MailSyncStatesTable> {
+  $$MailSyncStatesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get accountId => $composableBuilder(
+    column: $table.accountId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get folderName => $composableBuilder(
+    column: $table.folderName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get error => $composableBuilder(
+    column: $table.error,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get startedAt => $composableBuilder(
+    column: $table.startedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get finishedAt => $composableBuilder(
+    column: $table.finishedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$MailSyncStatesTableOrderingComposer
+    extends Composer<_$AppDatabase, $MailSyncStatesTable> {
+  $$MailSyncStatesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get accountId => $composableBuilder(
+    column: $table.accountId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get folderName => $composableBuilder(
+    column: $table.folderName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get error => $composableBuilder(
+    column: $table.error,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get startedAt => $composableBuilder(
+    column: $table.startedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get finishedAt => $composableBuilder(
+    column: $table.finishedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$MailSyncStatesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $MailSyncStatesTable> {
+  $$MailSyncStatesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get accountId =>
+      $composableBuilder(column: $table.accountId, builder: (column) => column);
+
+  GeneratedColumn<String> get folderName => $composableBuilder(
+    column: $table.folderName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+
+  GeneratedColumn<String> get error =>
+      $composableBuilder(column: $table.error, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get startedAt =>
+      $composableBuilder(column: $table.startedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get finishedAt => $composableBuilder(
+    column: $table.finishedAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$MailSyncStatesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $MailSyncStatesTable,
+          MailSyncStateEntry,
+          $$MailSyncStatesTableFilterComposer,
+          $$MailSyncStatesTableOrderingComposer,
+          $$MailSyncStatesTableAnnotationComposer,
+          $$MailSyncStatesTableCreateCompanionBuilder,
+          $$MailSyncStatesTableUpdateCompanionBuilder,
+          (
+            MailSyncStateEntry,
+            BaseReferences<
+              _$AppDatabase,
+              $MailSyncStatesTable,
+              MailSyncStateEntry
+            >,
+          ),
+          MailSyncStateEntry,
+          PrefetchHooks Function()
+        > {
+  $$MailSyncStatesTableTableManager(
+    _$AppDatabase db,
+    $MailSyncStatesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$MailSyncStatesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$MailSyncStatesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$MailSyncStatesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> accountId = const Value.absent(),
+                Value<String> folderName = const Value.absent(),
+                Value<String> status = const Value.absent(),
+                Value<String?> error = const Value.absent(),
+                Value<DateTime?> startedAt = const Value.absent(),
+                Value<DateTime?> finishedAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => MailSyncStatesCompanion(
+                id: id,
+                accountId: accountId,
+                folderName: folderName,
+                status: status,
+                error: error,
+                startedAt: startedAt,
+                finishedAt: finishedAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String accountId,
+                required String folderName,
+                required String status,
+                Value<String?> error = const Value.absent(),
+                Value<DateTime?> startedAt = const Value.absent(),
+                Value<DateTime?> finishedAt = const Value.absent(),
+                required DateTime updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => MailSyncStatesCompanion.insert(
+                id: id,
+                accountId: accountId,
+                folderName: folderName,
+                status: status,
+                error: error,
+                startedAt: startedAt,
+                finishedAt: finishedAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$MailSyncStatesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $MailSyncStatesTable,
+      MailSyncStateEntry,
+      $$MailSyncStatesTableFilterComposer,
+      $$MailSyncStatesTableOrderingComposer,
+      $$MailSyncStatesTableAnnotationComposer,
+      $$MailSyncStatesTableCreateCompanionBuilder,
+      $$MailSyncStatesTableUpdateCompanionBuilder,
+      (
+        MailSyncStateEntry,
+        BaseReferences<_$AppDatabase, $MailSyncStatesTable, MailSyncStateEntry>,
+      ),
+      MailSyncStateEntry,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -8579,4 +9364,6 @@ class $AppDatabaseManager {
       $$LocalMailFoldersTableTableManager(_db, _db.localMailFolders);
   $$MailSyncCursorsTableTableManager get mailSyncCursors =>
       $$MailSyncCursorsTableTableManager(_db, _db.mailSyncCursors);
+  $$MailSyncStatesTableTableManager get mailSyncStates =>
+      $$MailSyncStatesTableTableManager(_db, _db.mailSyncStates);
 }

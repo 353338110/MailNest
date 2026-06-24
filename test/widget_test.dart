@@ -412,6 +412,11 @@ class _FakeMailSyncRepository extends MailSyncRepository {
   }
 
   @override
+  Stream<List<MailSyncStateEntry>> watchSyncStates() {
+    return Stream.value(const <MailSyncStateEntry>[]);
+  }
+
+  @override
   Future<void> syncRecentHeaders() async {}
 }
 

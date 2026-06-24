@@ -11,6 +11,7 @@ import '../../../mail/models/mailbox_message.dart';
 import '../../../mail/models/mail_detail.dart';
 import '../../../mail/repository/mail_repository_provider.dart';
 import '../../../mail/repository/account_repository_provider.dart';
+import '../../../mail/repository/mail_sync_repository.dart';
 import '../../../mail/repository/mail_sync_repository_provider.dart';
 import '../../../mail/repository/mailbox_repository_provider.dart';
 import '../../mail/pages/mail_detail_page.dart';
@@ -940,6 +941,7 @@ class _MailboxList extends ConsumerWidget {
     final localHeaders = ref
         .watch(mailSyncRepositoryProvider)
         .watchRecentHeaders();
+    final syncStates = ref.watch(mailSyncRepositoryProvider).watchSyncStates();
 
     return StreamBuilder<List<LocalMailMessage>>(
       stream: localHeaders,
@@ -957,43 +959,102 @@ class _MailboxList extends ConsumerWidget {
           scope: scope,
         );
 
-        return FutureBuilder<void>(
-          future: syncFuture,
-          builder: (context, syncSnapshot) {
-            final isLoading =
-                snapshot.connectionState == ConnectionState.waiting ||
-                syncSnapshot.connectionState == ConnectionState.waiting;
+        return StreamBuilder<List<MailSyncStateEntry>>(
+          stream: syncStates,
+          builder: (context, stateSnapshot) {
+            final visibleSyncStates = _visibleSyncStates(
+              stateSnapshot.data ?? const <MailSyncStateEntry>[],
+            );
+            final failedSyncStates = visibleSyncStates
+                .where((state) => state.status == MailSyncStatus.failed)
+                .toList(growable: false);
+            final hasRunningFolders = visibleSyncStates.any(
+              (state) => state.status == MailSyncStatus.running,
+            );
 
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _MailboxHeader(
-                  scope: scope,
-                  filter: filter,
-                  count: messages.length,
-                  isSyncing: isLoading,
-                  onRefresh: onRefresh,
-                ),
-                const Divider(height: 1),
-                Expanded(
-                  child: _MailboxContent(
-                    messages: messages,
-                    hasMessages: hasMessages,
-                    isLoading: isLoading && localMessages.isEmpty,
-                    error: syncSnapshot.error,
-                    onRefresh: onRefresh,
-                    selectedMessage: selectedMessage,
-                    embedded: embedded,
-                    showAccountMarker: showAccountMarker,
-                    onMessageSelected: onMessageSelected,
-                  ),
-                ),
-              ],
+            return FutureBuilder<void>(
+              future: syncFuture,
+              builder: (context, syncSnapshot) {
+                final isLoading =
+                    snapshot.connectionState == ConnectionState.waiting ||
+                    syncSnapshot.connectionState == ConnectionState.waiting ||
+                    hasRunningFolders;
+
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    _MailboxHeader(
+                      scope: scope,
+                      filter: filter,
+                      count: messages.length,
+                      isSyncing: isLoading,
+                      syncErrorSummary: failedSyncStates.isEmpty
+                          ? null
+                          : _syncErrorSummary(failedSyncStates),
+                      onRefresh: onRefresh,
+                    ),
+                    const Divider(height: 1),
+                    Expanded(
+                      child: _MailboxContent(
+                        messages: messages,
+                        hasMessages: hasMessages,
+                        isLoading: isLoading && localMessages.isEmpty,
+                        error: syncSnapshot.error,
+                        onRefresh: onRefresh,
+                        selectedMessage: selectedMessage,
+                        embedded: embedded,
+                        showAccountMarker: showAccountMarker,
+                        onMessageSelected: onMessageSelected,
+                      ),
+                    ),
+                  ],
+                );
+              },
             );
           },
         );
       },
     );
+  }
+
+  List<MailSyncStateEntry> _visibleSyncStates(List<MailSyncStateEntry> states) {
+    final visibleAccountIds = switch (scope) {
+      UnifiedMailboxScope() => accounts.map((account) => account.id).toSet(),
+      GroupMailboxScope(:final groupName) =>
+        accounts
+            .where((account) => account.groupName == groupName)
+            .map((account) => account.id)
+            .toSet(),
+      AccountMailboxScope(:final accountId) => {accountId},
+      FolderMailboxScope(:final accountId) => {accountId},
+    };
+    final visibleFolderId = switch (scope) {
+      FolderMailboxScope(:final folderId) => folderId.toLowerCase(),
+      _ => null,
+    };
+    return states
+        .where((state) {
+          if (!visibleAccountIds.contains(state.accountId)) {
+            return false;
+          }
+          if (visibleFolderId != null && state.folderName != visibleFolderId) {
+            return false;
+          }
+          return true;
+        })
+        .toList(growable: false);
+  }
+
+  String _syncErrorSummary(List<MailSyncStateEntry> failedStates) {
+    if (failedStates.length == 1) {
+      final failed = failedStates.single;
+      final error = failed.error?.trim();
+      if (error == null || error.isEmpty) {
+        return failed.folderName;
+      }
+      return '${failed.folderName}: $error';
+    }
+    return failedStates.map((state) => state.folderName).join(', ');
   }
 }
 
@@ -1003,6 +1064,7 @@ class _MailboxHeader extends StatelessWidget {
     required this.filter,
     required this.count,
     required this.isSyncing,
+    required this.syncErrorSummary,
     required this.onRefresh,
   });
 
@@ -1010,6 +1072,7 @@ class _MailboxHeader extends StatelessWidget {
   final MailboxFilter filter;
   final int count;
   final bool isSyncing;
+  final String? syncErrorSummary;
   final VoidCallback onRefresh;
 
   @override
@@ -1033,6 +1096,17 @@ class _MailboxHeader extends StatelessWidget {
                   '${_filterTitle(l10n)} • ${l10n.mailMessageCount(count)}',
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
+                if (syncErrorSummary != null) ...[
+                  const SizedBox(height: AppSpacing.xsmall),
+                  Text(
+                    l10n.mailSyncFailed(syncErrorSummary!),
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).colorScheme.error,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
               ],
             ),
           ),

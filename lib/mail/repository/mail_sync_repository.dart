@@ -8,7 +8,16 @@ import '../models/mail_folder.dart';
 import '../models/mail_sync_range.dart';
 import '../models/mailbox_folder.dart';
 import '../models/sync_cursor.dart';
+import '../provider/mail_connection_tester.dart';
 import '../provider/mail_provider.dart';
+
+class MailSyncStatus {
+  const MailSyncStatus._();
+
+  static const running = 'running';
+  static const success = 'success';
+  static const failed = 'failed';
+}
 
 class MailSyncRepository {
   MailSyncRepository({
@@ -29,6 +38,10 @@ class MailSyncRepository {
     return database.watchLocalMailFolders();
   }
 
+  Stream<List<MailSyncStateEntry>> watchSyncStates() {
+    return database.watchMailSyncStates();
+  }
+
   Future<void> syncRecentHeaders() async {
     final accounts = await database.watchableAccountsSnapshot();
     final enabledAccounts = accounts.where((account) => account.syncEnabled);
@@ -37,8 +50,22 @@ class MailSyncRepository {
       if (!_supportsImap(account.provider)) {
         continue;
       }
-      await _syncFolders(account);
-      await _syncInbox(account);
+      try {
+        await _syncFolders(account);
+      } catch (error) {
+        await _recordSyncFailure(
+          accountId: account.id,
+          folderName: 'folders',
+          startedAt: _now(),
+          error: error,
+        );
+        continue;
+      }
+
+      final folders = await _foldersForSync(account);
+      for (final folder in folders) {
+        await _syncFolder(account: account, folderName: folder.folderId);
+      }
     }
   }
 
@@ -92,8 +119,83 @@ class MailSyncRepository {
     );
   }
 
-  Future<void> _syncInbox(EmailAccount account) async {
-    const folderName = 'inbox';
+  Future<List<_SyncFolderTarget>> _foldersForSync(EmailAccount account) async {
+    final folders = await database.localMailFoldersSnapshot(
+      accountId: account.id,
+    );
+    if (folders.isEmpty) {
+      return const [_SyncFolderTarget(folderId: 'inbox')];
+    }
+    return folders
+        .map((folder) => _SyncFolderTarget(folderId: folder.folderId))
+        .toList(growable: false);
+  }
+
+  Future<void> _syncFolder({
+    required EmailAccount account,
+    required String folderName,
+  }) async {
+    final startedAt = _now();
+    await _recordSyncRunning(
+      accountId: account.id,
+      folderName: folderName,
+      startedAt: startedAt,
+    );
+
+    try {
+      await _syncFolderWithCursor(
+        account: account,
+        folderName: folderName,
+        resetCursor: false,
+      );
+      await _recordSyncSuccess(
+        accountId: account.id,
+        folderName: folderName,
+        startedAt: startedAt,
+      );
+    } catch (error) {
+      if (_isCursorInvalidation(error)) {
+        try {
+          await database.deleteMailSyncCursor(
+            accountId: account.id,
+            folderName: folderName,
+          );
+          await _syncFolderWithCursor(
+            account: account,
+            folderName: folderName,
+            resetCursor: true,
+          );
+          await _recordSyncSuccess(
+            accountId: account.id,
+            folderName: folderName,
+            startedAt: startedAt,
+          );
+          return;
+        } catch (retryError) {
+          await _recordSyncFailure(
+            accountId: account.id,
+            folderName: folderName,
+            startedAt: startedAt,
+            error: retryError,
+          );
+          return;
+        }
+      }
+
+      await _recordSyncFailure(
+        accountId: account.id,
+        folderName: folderName,
+        startedAt: startedAt,
+        error: error,
+      );
+    }
+  }
+
+  Future<void> _syncFolderWithCursor({
+    required EmailAccount account,
+    required String folderName,
+    required bool resetCursor,
+  }) async {
     final cursor = await database.getMailSyncCursor(
       accountId: account.id,
       folderName: folderName,
@@ -101,11 +203,11 @@ class MailSyncRepository {
     final syncRange = await _loadSyncRange();
     final headers = await imapProvider.syncHeaders(
       accountId: account.id,
-      folderId: standardMailboxFolders.first.id,
+      folderId: folderName,
       cursor: SyncCursor(
-        lastUid: cursor?.lastUid,
-        pageToken: cursor?.pageToken,
-        syncedAt: cursor?.syncedAt,
+        lastUid: resetCursor ? null : cursor?.lastUid,
+        pageToken: resetCursor ? null : cursor?.pageToken,
+        syncedAt: resetCursor ? null : cursor?.syncedAt,
         since: syncRange.since(_now()),
       ),
     );
@@ -115,7 +217,7 @@ class MailSyncRepository {
         headers.map((header) {
           return LocalMailMessagesCompanion(
             accountId: Value(account.id),
-            folderName: const Value(folderName),
+            folderName: Value(folderName),
             uid: Value(header.uid),
             messageId: Value(header.messageId),
             sender: Value(header.sender),
@@ -147,12 +249,104 @@ class MailSyncRepository {
           ),
         ),
         accountId: Value(account.id),
-        folderName: const Value(folderName),
+        folderName: Value(folderName),
         lastUid: Value(lastUid),
         pageToken: const Value(null),
         syncedAt: Value(_now()),
       ),
     );
+  }
+
+  Future<void> _recordSyncRunning({
+    required String accountId,
+    required String folderName,
+    required DateTime startedAt,
+  }) {
+    return database.saveMailSyncState(
+      MailSyncStatesCompanion(
+        id: Value(
+          AppDatabase.mailSyncStateId(
+            accountId: accountId,
+            folderName: folderName,
+          ),
+        ),
+        accountId: Value(accountId),
+        folderName: Value(folderName.toLowerCase()),
+        status: const Value(MailSyncStatus.running),
+        error: const Value(null),
+        startedAt: Value(startedAt),
+        finishedAt: const Value(null),
+        updatedAt: Value(startedAt),
+      ),
+    );
+  }
+
+  Future<void> _recordSyncSuccess({
+    required String accountId,
+    required String folderName,
+    required DateTime startedAt,
+  }) {
+    final finishedAt = _now();
+    return database.saveMailSyncState(
+      MailSyncStatesCompanion(
+        id: Value(
+          AppDatabase.mailSyncStateId(
+            accountId: accountId,
+            folderName: folderName,
+          ),
+        ),
+        accountId: Value(accountId),
+        folderName: Value(folderName.toLowerCase()),
+        status: const Value(MailSyncStatus.success),
+        error: const Value(null),
+        startedAt: Value(startedAt),
+        finishedAt: Value(finishedAt),
+        updatedAt: Value(finishedAt),
+      ),
+    );
+  }
+
+  Future<void> _recordSyncFailure({
+    required String accountId,
+    required String folderName,
+    required DateTime startedAt,
+    required Object error,
+  }) {
+    final finishedAt = _now();
+    return database.saveMailSyncState(
+      MailSyncStatesCompanion(
+        id: Value(
+          AppDatabase.mailSyncStateId(
+            accountId: accountId,
+            folderName: folderName,
+          ),
+        ),
+        accountId: Value(accountId),
+        folderName: Value(folderName.toLowerCase()),
+        status: const Value(MailSyncStatus.failed),
+        error: Value(_syncErrorMessage(error)),
+        startedAt: Value(startedAt),
+        finishedAt: Value(finishedAt),
+        updatedAt: Value(finishedAt),
+      ),
+    );
+  }
+
+  bool _isCursorInvalidation(Object error) {
+    if (error is! MailProtocolException) {
+      return false;
+    }
+    final message = error.message.toLowerCase();
+    return message.contains('uidvalidity') ||
+        message.contains('cursor invalid') ||
+        message.contains('invalid cursor');
+  }
+
+  String _syncErrorMessage(Object error) {
+    if (error is MailProtocolException) {
+      return error.message;
+    }
+    return error.toString();
   }
 
   bool _supportsImap(String provider) {
@@ -164,4 +358,10 @@ class MailSyncRepository {
     final setting = await database.getSetting(mailSyncRangeSettingKey);
     return MailSyncRange.fromStorageValue(setting?.value);
   }
+}
+
+class _SyncFolderTarget {
+  const _SyncFolderTarget({required this.folderId});
+
+  final String folderId;
 }
