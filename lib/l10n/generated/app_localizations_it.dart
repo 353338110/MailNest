@@ -25,6 +25,24 @@ class AppLocalizationsIt extends AppLocalizations {
   String get language => 'Language';
 
   @override
+  String get mailSyncRangeTitle => 'Mail sync range';
+
+  @override
+  String get mailSyncRange30Days => 'Last 30 days';
+
+  @override
+  String get mailSyncRange90Days => 'Last 90 days';
+
+  @override
+  String get mailSyncRange180Days => 'Last 180 days';
+
+  @override
+  String get mailSyncRange365Days => 'Last year';
+
+  @override
+  String get mailSyncRangeAll => 'All mail';
+
+  @override
   String get translationSettings => 'Translation settings';
 
   @override
@@ -639,6 +657,107 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get attachments => 'Attachments';
+
+  @override
+  String get addAttachments => 'Add attachments';
+
+  @override
+  String get removeAttachment => 'Remove attachment';
+
+  @override
+  String attachmentOpenFailed(String reason) {
+    return 'Failed to open file: $reason';
+  }
+
+  @override
+  String get attachmentContextMissing => 'Missing context information.';
+
+  @override
+  String get attachmentDownloadCompleted => 'Download completed.';
+
+  @override
+  String attachmentDownloadFailed(String reason) {
+    return 'Download failed: $reason';
+  }
+
+  @override
+  String get attachmentAccountNotFound => 'Account not found.';
+
+  @override
+  String get attachmentNoCredentials => 'No credentials available.';
+
+  @override
+  String get attachmentDownloadTimedOut => 'Download timed out.';
+
+  @override
+  String get attachmentNetworkError => 'Network error occurred.';
+
+  @override
+  String get attachmentParseFailed => 'Failed to parse attachment.';
+
+  @override
+  String get attachmentDiskFull => 'Not enough disk space.';
+
+  @override
+  String get attachmentPermissionDenied => 'Permission denied.';
+
+  @override
+  String get attachmentUnknownError => 'Unknown error occurred.';
+
+  @override
+  String get attachmentCacheTitle => 'Attachment cache';
+
+  @override
+  String get attachmentCacheSubtitle => 'Manage downloaded attachments.';
+
+  @override
+  String get attachmentCacheDescription =>
+      'Downloaded attachments are stored locally. You can clear them to free up space.';
+
+  @override
+  String attachmentCacheSize(String size) {
+    return 'Cache size: $size';
+  }
+
+  @override
+  String attachmentCacheLoadFailed(String reason) {
+    return 'Failed to load cache size: $reason';
+  }
+
+  @override
+  String get clearAttachmentCache => 'Clear cache';
+
+  @override
+  String get clearAttachmentCacheTitle => 'Clear cache';
+
+  @override
+  String get clearAttachmentCacheMessage =>
+      'This will delete all downloaded attachments. You can re-download them later.';
+
+  @override
+  String get attachmentCacheCleared => 'Cache cleared successfully.';
+
+  @override
+  String attachmentCacheClearFailed(String reason) {
+    return 'Failed to clear cache: $reason';
+  }
+
+  @override
+  String get clearOldAttachments => 'Clear old';
+
+  @override
+  String get oldAttachmentsCleared => 'Cleared attachments older than 30 days.';
+
+  @override
+  String oldAttachmentsClearFailed(String reason) {
+    return 'Failed to clear old cache: $reason';
+  }
+
+  @override
+  String get clearAllAttachments => 'Clear all';
+
+  @override
+  String get close => 'Close';
 
   @override
   String get emptyMessageBody => 'This message has no readable body.';

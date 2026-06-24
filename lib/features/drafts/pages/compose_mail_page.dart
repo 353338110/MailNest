@@ -643,7 +643,7 @@ class _ComposeAttachmentSection extends StatelessWidget {
             OutlinedButton.icon(
               onPressed: onPickAttachments,
               icon: const Icon(Icons.attach_file_outlined),
-              label: Text(l10n.attachments),
+              label: Text(l10n.addAttachments),
             ),
           ],
         ),
@@ -667,7 +667,7 @@ class _ComposeAttachmentSection extends StatelessWidget {
                   ),
                   subtitle: Text(_formatAttachmentSize(entry.$2.size)),
                   trailing: IconButton(
-                    tooltip: 'Remove attachment',
+                    tooltip: l10n.removeAttachment,
                     onPressed: onRemoveAttachment == null
                         ? null
                         : () => onRemoveAttachment!(entry.$1),

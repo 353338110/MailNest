@@ -214,7 +214,9 @@ class ImapClient {
       'LOGIN ${_imapQuote(username)} ${_imapQuote(secret)}',
     );
     if (!response.isOk) {
-      throw const MailProtocolException('IMAP authentication failed.');
+      throw const MailProtocolException(
+        'IMAP authentication failed. Check the username and use the mailbox authorization code or app password instead of the web login password.',
+      );
     }
   }
 
@@ -245,7 +247,7 @@ class ImapClient {
 
   Future<List<MailHeader>> fetchHeaders({
     required String folderName,
-    required DateTime since,
+    required DateTime? since,
     required SyncCursor cursor,
   }) async {
     final select = await _command('SELECT ${_imapQuote(folderName)}');
@@ -256,9 +258,10 @@ class ImapClient {
     final uidRange = cursor.lastUid == null
         ? '1:*'
         : '${cursor.lastUid! + 1}:*';
-    final search = await _command(
-      'UID SEARCH SINCE ${_imapSearchDate(since)} UID $uidRange',
-    );
+    final searchQuery = since == null
+        ? 'UID SEARCH UID $uidRange'
+        : 'UID SEARCH SINCE ${_imapSearchDate(since)} UID $uidRange';
+    final search = await _command(searchQuery);
     if (!search.isOk) {
       throw const MailProtocolException('IMAP header search failed.');
     }

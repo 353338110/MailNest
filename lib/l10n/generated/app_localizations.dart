@@ -146,6 +146,42 @@ abstract class AppLocalizations {
   /// **'Language'**
   String get language;
 
+  /// No description provided for @mailSyncRangeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Mail sync range'**
+  String get mailSyncRangeTitle;
+
+  /// No description provided for @mailSyncRange30Days.
+  ///
+  /// In en, this message translates to:
+  /// **'Last 30 days'**
+  String get mailSyncRange30Days;
+
+  /// No description provided for @mailSyncRange90Days.
+  ///
+  /// In en, this message translates to:
+  /// **'Last 90 days'**
+  String get mailSyncRange90Days;
+
+  /// No description provided for @mailSyncRange180Days.
+  ///
+  /// In en, this message translates to:
+  /// **'Last 180 days'**
+  String get mailSyncRange180Days;
+
+  /// No description provided for @mailSyncRange365Days.
+  ///
+  /// In en, this message translates to:
+  /// **'Last year'**
+  String get mailSyncRange365Days;
+
+  /// No description provided for @mailSyncRangeAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All mail'**
+  String get mailSyncRangeAll;
+
   /// No description provided for @translationSettings.
   ///
   /// In en, this message translates to:
@@ -1261,6 +1297,180 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Attachments'**
   String get attachments;
+
+  /// No description provided for @addAttachments.
+  ///
+  /// In en, this message translates to:
+  /// **'Add attachments'**
+  String get addAttachments;
+
+  /// No description provided for @removeAttachment.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove attachment'**
+  String get removeAttachment;
+
+  /// No description provided for @attachmentOpenFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to open file: {reason}'**
+  String attachmentOpenFailed(String reason);
+
+  /// No description provided for @attachmentContextMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'Missing context information.'**
+  String get attachmentContextMissing;
+
+  /// No description provided for @attachmentDownloadCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Download completed.'**
+  String get attachmentDownloadCompleted;
+
+  /// No description provided for @attachmentDownloadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Download failed: {reason}'**
+  String attachmentDownloadFailed(String reason);
+
+  /// No description provided for @attachmentAccountNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Account not found.'**
+  String get attachmentAccountNotFound;
+
+  /// No description provided for @attachmentNoCredentials.
+  ///
+  /// In en, this message translates to:
+  /// **'No credentials available.'**
+  String get attachmentNoCredentials;
+
+  /// No description provided for @attachmentDownloadTimedOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Download timed out.'**
+  String get attachmentDownloadTimedOut;
+
+  /// No description provided for @attachmentNetworkError.
+  ///
+  /// In en, this message translates to:
+  /// **'Network error occurred.'**
+  String get attachmentNetworkError;
+
+  /// No description provided for @attachmentParseFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to parse attachment.'**
+  String get attachmentParseFailed;
+
+  /// No description provided for @attachmentDiskFull.
+  ///
+  /// In en, this message translates to:
+  /// **'Not enough disk space.'**
+  String get attachmentDiskFull;
+
+  /// No description provided for @attachmentPermissionDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Permission denied.'**
+  String get attachmentPermissionDenied;
+
+  /// No description provided for @attachmentUnknownError.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown error occurred.'**
+  String get attachmentUnknownError;
+
+  /// No description provided for @attachmentCacheTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Attachment cache'**
+  String get attachmentCacheTitle;
+
+  /// No description provided for @attachmentCacheSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage downloaded attachments.'**
+  String get attachmentCacheSubtitle;
+
+  /// No description provided for @attachmentCacheDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Downloaded attachments are stored locally. You can clear them to free up space.'**
+  String get attachmentCacheDescription;
+
+  /// No description provided for @attachmentCacheSize.
+  ///
+  /// In en, this message translates to:
+  /// **'Cache size: {size}'**
+  String attachmentCacheSize(String size);
+
+  /// No description provided for @attachmentCacheLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load cache size: {reason}'**
+  String attachmentCacheLoadFailed(String reason);
+
+  /// No description provided for @clearAttachmentCache.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear cache'**
+  String get clearAttachmentCache;
+
+  /// No description provided for @clearAttachmentCacheTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear cache'**
+  String get clearAttachmentCacheTitle;
+
+  /// No description provided for @clearAttachmentCacheMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This will delete all downloaded attachments. You can re-download them later.'**
+  String get clearAttachmentCacheMessage;
+
+  /// No description provided for @attachmentCacheCleared.
+  ///
+  /// In en, this message translates to:
+  /// **'Cache cleared successfully.'**
+  String get attachmentCacheCleared;
+
+  /// No description provided for @attachmentCacheClearFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to clear cache: {reason}'**
+  String attachmentCacheClearFailed(String reason);
+
+  /// No description provided for @clearOldAttachments.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear old'**
+  String get clearOldAttachments;
+
+  /// No description provided for @oldAttachmentsCleared.
+  ///
+  /// In en, this message translates to:
+  /// **'Cleared attachments older than 30 days.'**
+  String get oldAttachmentsCleared;
+
+  /// No description provided for @oldAttachmentsClearFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to clear old cache: {reason}'**
+  String oldAttachmentsClearFailed(String reason);
+
+  /// No description provided for @clearAllAttachments.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear all'**
+  String get clearAllAttachments;
+
+  /// No description provided for @close.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get close;
 
   /// No description provided for @emptyMessageBody.
   ///

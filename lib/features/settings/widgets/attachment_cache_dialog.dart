@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../l10n/generated/app_localizations.dart';
 import '../../../mail/services/attachment_service.dart';
 import '../../mail/widgets/attachment_icon_helper.dart';
 
@@ -37,7 +38,11 @@ class _AttachmentCacheDialogState extends State<AttachmentCacheDialog> {
       if (mounted) {
         setState(() => _isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to load cache size: $e')),
+          SnackBar(
+            content: Text(
+              AppLocalizations.of(context).attachmentCacheLoadFailed('$e'),
+            ),
+          ),
         );
       }
     }
@@ -47,18 +52,16 @@ class _AttachmentCacheDialogState extends State<AttachmentCacheDialog> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Clear Cache'),
-        content: const Text(
-          'This will delete all downloaded attachments. You can re-download them later.',
-        ),
+        title: Text(AppLocalizations.of(context).clearAttachmentCacheTitle),
+        content: Text(AppLocalizations.of(context).clearAttachmentCacheMessage),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancel'),
+            child: Text(AppLocalizations.of(context).cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Clear'),
+            child: Text(AppLocalizations.of(context).clearAttachmentCache),
           ),
         ],
       ),
@@ -77,15 +80,21 @@ class _AttachmentCacheDialogState extends State<AttachmentCacheDialog> {
           _isClearing = false;
         });
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Cache cleared successfully')),
+          SnackBar(
+            content: Text(AppLocalizations.of(context).attachmentCacheCleared),
+          ),
         );
       }
     } catch (e) {
       if (mounted) {
         setState(() => _isClearing = false);
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Failed to clear cache: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              AppLocalizations.of(context).attachmentCacheClearFailed('$e'),
+            ),
+          ),
+        );
       }
     }
   }
@@ -98,8 +107,8 @@ class _AttachmentCacheDialogState extends State<AttachmentCacheDialog> {
       if (mounted) {
         setState(() => _isClearing = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Cleared attachments older than 30 days'),
+          SnackBar(
+            content: Text(AppLocalizations.of(context).oldAttachmentsCleared),
           ),
         );
       }
@@ -107,7 +116,11 @@ class _AttachmentCacheDialogState extends State<AttachmentCacheDialog> {
       if (mounted) {
         setState(() => _isClearing = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to clear old cache: $e')),
+          SnackBar(
+            content: Text(
+              AppLocalizations.of(context).oldAttachmentsClearFailed('$e'),
+            ),
+          ),
         );
       }
     }
@@ -115,8 +128,10 @@ class _AttachmentCacheDialogState extends State<AttachmentCacheDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return AlertDialog(
-      title: const Text('Attachment Cache'),
+      title: Text(l10n.attachmentCacheTitle),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -125,24 +140,26 @@ class _AttachmentCacheDialogState extends State<AttachmentCacheDialog> {
             const Center(child: CircularProgressIndicator())
           else
             Text(
-              'Cache size: ${AttachmentIconHelper.formatFileSize(_cacheSize)}',
+              l10n.attachmentCacheSize(
+                AttachmentIconHelper.formatFileSize(_cacheSize),
+              ),
               style: Theme.of(context).textTheme.bodyLarge,
             ),
           const SizedBox(height: 16),
-          const Text(
-            'Downloaded attachments are stored locally. You can clear them to free up space.',
-            style: TextStyle(fontSize: 14),
+          Text(
+            l10n.attachmentCacheDescription,
+            style: const TextStyle(fontSize: 14),
           ),
         ],
       ),
       actions: [
         TextButton(
           onPressed: _isClearing ? null : () => Navigator.of(context).pop(),
-          child: const Text('Close'),
+          child: Text(l10n.close),
         ),
         TextButton(
           onPressed: _isClearing || _isLoading ? null : _clearOldCache,
-          child: const Text('Clear Old'),
+          child: Text(l10n.clearOldAttachments),
         ),
         FilledButton(
           onPressed: _isClearing || _isLoading ? null : _clearCache,
@@ -152,7 +169,7 @@ class _AttachmentCacheDialogState extends State<AttachmentCacheDialog> {
                   height: 16,
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
-              : const Text('Clear All'),
+              : Text(l10n.clearAllAttachments),
         ),
       ],
     );

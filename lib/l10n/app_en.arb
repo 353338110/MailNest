@@ -4,6 +4,12 @@
   "getStarted": "Get started",
   "settings": "Settings",
   "language": "Language",
+  "mailSyncRangeTitle": "Mail sync range",
+  "mailSyncRange30Days": "Last 30 days",
+  "mailSyncRange90Days": "Last 90 days",
+  "mailSyncRange180Days": "Last 180 days",
+  "mailSyncRange365Days": "Last year",
+  "mailSyncRangeAll": "All mail",
   "translationSettings": "Translation settings",
   "translationPrivacyNote": "MailNest does not send email content to third-party translation services by default.",
   "translationMockOnly": "The first release only includes translation entry points and a mock service.",
@@ -309,6 +315,77 @@
   "noMessagesMatchFilter": "No messages match this filter.",
   "noMessages": "No messages.",
   "attachments": "Attachments",
+  "addAttachments": "Add attachments",
+  "removeAttachment": "Remove attachment",
+  "attachmentOpenFailed": "Failed to open file: {reason}",
+  "@attachmentOpenFailed": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "attachmentContextMissing": "Missing context information.",
+  "attachmentDownloadCompleted": "Download completed.",
+  "attachmentDownloadFailed": "Download failed: {reason}",
+  "@attachmentDownloadFailed": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "attachmentAccountNotFound": "Account not found.",
+  "attachmentNoCredentials": "No credentials available.",
+  "attachmentDownloadTimedOut": "Download timed out.",
+  "attachmentNetworkError": "Network error occurred.",
+  "attachmentParseFailed": "Failed to parse attachment.",
+  "attachmentDiskFull": "Not enough disk space.",
+  "attachmentPermissionDenied": "Permission denied.",
+  "attachmentUnknownError": "Unknown error occurred.",
+  "attachmentCacheTitle": "Attachment cache",
+  "attachmentCacheSubtitle": "Manage downloaded attachments.",
+  "attachmentCacheDescription": "Downloaded attachments are stored locally. You can clear them to free up space.",
+  "attachmentCacheSize": "Cache size: {size}",
+  "@attachmentCacheSize": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "attachmentCacheLoadFailed": "Failed to load cache size: {reason}",
+  "@attachmentCacheLoadFailed": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "clearAttachmentCache": "Clear cache",
+  "clearAttachmentCacheTitle": "Clear cache",
+  "clearAttachmentCacheMessage": "This will delete all downloaded attachments. You can re-download them later.",
+  "attachmentCacheCleared": "Cache cleared successfully.",
+  "attachmentCacheClearFailed": "Failed to clear cache: {reason}",
+  "@attachmentCacheClearFailed": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "clearOldAttachments": "Clear old",
+  "oldAttachmentsCleared": "Cleared attachments older than 30 days.",
+  "oldAttachmentsClearFailed": "Failed to clear old cache: {reason}",
+  "@oldAttachmentsClearFailed": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "clearAllAttachments": "Clear all",
+  "close": "Close",
   "emptyMessageBody": "This message has no readable body.",
   "htmlShownAsSource": "HTML is shown as source text for now. Remote images are not loaded.",
   "remoteImagesBlocked": "This email contains remote images. They are currently blocked.",
