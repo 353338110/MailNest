@@ -15,7 +15,8 @@ class BackupImportPackage {
   });
 
   factory BackupImportPackage.fromJson(Map<String, Object?> json) {
-    if (json['format'] != 'mailnest.config.backup' || json['version'] != 1) {
+    final version = json['version'] ?? json['formatVersion'];
+    if (json['format'] != 'mailnest.config.backup' || version != 1) {
       throw const BackupImportException('Unsupported backup format.');
     }
 
@@ -28,8 +29,10 @@ class BackupImportPackage {
                 BackupImportAccount.fromJson(item.cast<String, Object?>()),
           )
           .toList(growable: false),
-      settings: _stringMap(json['settings']),
-      exportedAt: DateTime.tryParse(_string(json['exportedAt']) ?? ''),
+      settings: _settingsMap(json['settings']),
+      exportedAt: DateTime.tryParse(
+        _string(json['exportedAt'] ?? json['createdAt']) ?? '',
+      ),
     );
   }
 
@@ -58,16 +61,28 @@ class BackupImportAccount {
   });
 
   factory BackupImportAccount.fromJson(Map<String, Object?> json) {
+    final imap = _objectMap(json['imap']);
+    final smtp = _objectMap(json['smtp']);
     final emailAddress = _requiredString(json, 'emailAddress');
     final username = _requiredString(json, 'username');
     final provider = _requiredString(json, 'provider');
     final authType = _requiredString(json, 'authType');
-    final imapHost = _requiredString(json, 'imapHost');
-    final imapPort = _requiredInt(json, 'imapPort');
-    final imapSecurity = _requiredString(json, 'imapSecurity');
-    final smtpHost = _requiredString(json, 'smtpHost');
-    final smtpPort = _requiredInt(json, 'smtpPort');
-    final smtpSecurity = _requiredString(json, 'smtpSecurity');
+    final imapHost = _requiredString(json, 'imapHost', fallback: imap['host']);
+    final imapPort = _requiredInt(json, 'imapPort', fallback: imap['port']);
+    final imapSecurity = _requiredString(
+      json,
+      'imapSecurity',
+      fallback: imap['security'],
+    );
+    final smtpHost = _requiredString(json, 'smtpHost', fallback: smtp['host']);
+    final smtpPort = _requiredInt(json, 'smtpPort', fallback: smtp['port']);
+    final smtpSecurity = _requiredString(
+      json,
+      'smtpSecurity',
+      fallback: smtp['security'],
+    );
+    final secret = _secretValue(json['secret']);
+    final oauthToken = _secretValue(json['oauthToken']);
 
     return BackupImportAccount(
       emailAddress: emailAddress,
@@ -81,10 +96,10 @@ class BackupImportAccount {
       smtpHost: smtpHost,
       smtpPort: smtpPort,
       smtpSecurity: smtpSecurity,
-      smtpStartTls: _bool(json['smtpStartTls']) ?? true,
+      smtpStartTls: _bool(json['smtpStartTls'] ?? smtp['startTls']) ?? true,
       syncEnabled: _bool(json['syncEnabled']) ?? true,
-      secret: _string(json['secret']),
-      oauthToken: _string(json['oauthToken']),
+      secret: secret,
+      oauthToken: oauthToken,
     );
   }
 
@@ -127,16 +142,50 @@ Map<String, String> _stringMap(Object? value) {
   return value.map((key, value) => MapEntry(key.toString(), value.toString()));
 }
 
-String _requiredString(Map<String, Object?> json, String key) {
-  final value = _string(json[key]);
+Map<String, String> _settingsMap(Object? value) {
+  if (value == null) {
+    return const {};
+  }
+  if (value is! Map) {
+    throw const BackupImportException('Invalid settings.');
+  }
+  final flattened = <String, String>{};
+  for (final entry in value.entries) {
+    final itemKey = entry.key.toString();
+    final itemValue = entry.value;
+    if (itemValue is Map) {
+      flattened.addAll(_stringMap(itemValue));
+    } else {
+      flattened[itemKey] = itemValue.toString();
+    }
+  }
+  return flattened;
+}
+
+Map<String, Object?> _objectMap(Object? value) {
+  if (value == null) {
+    return const {};
+  }
+  if (value is! Map) {
+    return const {};
+  }
+  return value.cast<String, Object?>();
+}
+
+String _requiredString(
+  Map<String, Object?> json,
+  String key, {
+  Object? fallback,
+}) {
+  final value = _string(json[key] ?? fallback);
   if (value == null || value.trim().isEmpty) {
     throw BackupImportException('Missing $key.');
   }
   return value;
 }
 
-int _requiredInt(Map<String, Object?> json, String key) {
-  final value = json[key];
+int _requiredInt(Map<String, Object?> json, String key, {Object? fallback}) {
+  final value = json[key] ?? fallback;
   if (value is int) {
     return value;
   }
@@ -147,6 +196,13 @@ int _requiredInt(Map<String, Object?> json, String key) {
     }
   }
   throw BackupImportException('Invalid $key.');
+}
+
+String? _secretValue(Object? value) {
+  if (value is Map) {
+    return _string(value['value']);
+  }
+  return _string(value);
 }
 
 String? _string(Object? value) {

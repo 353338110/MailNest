@@ -10,6 +10,7 @@ import 'package:mailnest_app/core/secure_storage/secure_storage_service.dart';
 import 'package:mailnest_app/features/settings/backup/backup_crypto_service.dart';
 import 'package:mailnest_app/features/settings/backup/backup_import_models.dart';
 import 'package:mailnest_app/features/settings/backup/backup_import_repository.dart';
+import 'package:mailnest_app/mail/models/mail_sync_range.dart';
 
 void main() {
   group('BackupCryptoService', () {
@@ -71,6 +72,49 @@ void main() {
         ),
         throwsA(isA<BackupImportException>()),
       );
+    });
+
+    test('parses current export format with nested accounts and settings', () {
+      final package = BackupImportPackage.fromJson({
+        'format': 'mailnest.config.backup',
+        'formatVersion': 1,
+        'createdAt': '2026-06-09T00:00:00.000Z',
+        'accounts': [
+          {
+            'emailAddress': 'User@Example.com',
+            'displayName': 'User',
+            'username': 'User@Example.com',
+            'provider': 'custom',
+            'authType': 'app_password',
+            'imap': {
+              'host': 'imap.example.com',
+              'port': 993,
+              'security': 'ssl',
+            },
+            'smtp': {
+              'host': 'smtp.example.com',
+              'port': 587,
+              'security': 'starttls',
+              'startTls': true,
+            },
+            'syncEnabled': true,
+            'secret': {'ref': 'secret-ref', 'value': 'app-password'},
+          },
+        ],
+        'settings': {
+          'user': {mailSyncRangeSettingKey: '180d'},
+          'language': {appLanguageSettingKey: 'en'},
+          'translation': {'translation.provider_id': 'custom_rest'},
+        },
+      });
+
+      expect(package.exportedAt, DateTime.utc(2026, 6, 9));
+      expect(package.accounts.single.imapHost, 'imap.example.com');
+      expect(package.accounts.single.smtpHost, 'smtp.example.com');
+      expect(package.accounts.single.secret, 'app-password');
+      expect(package.settings[mailSyncRangeSettingKey], '180d');
+      expect(package.settings[appLanguageSettingKey], 'en');
+      expect(package.settings['translation.provider_id'], 'custom_rest');
     });
   });
 

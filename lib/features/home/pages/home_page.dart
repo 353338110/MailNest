@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../app/theme/app_spacing.dart';
 import '../../../core/database/app_database.dart';
+import '../../../core/database/database_providers.dart';
 import '../../../core/platform/platform_info.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../../mail/models/mailbox_folder.dart';
@@ -1208,6 +1209,7 @@ class _MailboxContent extends ConsumerStatefulWidget {
 
 class _MailboxContentState extends ConsumerState<_MailboxContent> {
   final _selectedKeys = <String>{};
+  bool _isRunningAction = false;
 
   @override
   void didUpdateWidget(_MailboxContent oldWidget) {
@@ -1293,6 +1295,7 @@ class _MailboxContentState extends ConsumerState<_MailboxContent> {
           },
           child: Column(
             children: [
+              if (_isRunningAction) const LinearProgressIndicator(),
               if (selectionMode)
                 _BatchActionBar(
                   selectedCount: _selectedKeys.length,
@@ -1300,6 +1303,7 @@ class _MailboxContentState extends ConsumerState<_MailboxContent> {
                   onDelete: () => _deleteSelected(context),
                   onMarkRead: () => _markSelectedRead(true),
                   onMarkUnread: () => _markSelectedRead(false),
+                  onMove: () => _moveSelected(context),
                   onStar: () => _starSelected(true),
                 ),
               Expanded(
@@ -1457,6 +1461,39 @@ class _MailboxContentState extends ConsumerState<_MailboxContent> {
     );
   }
 
+  Future<void> _moveSelected(BuildContext context) async {
+    final messages = _selectedMessages;
+    if (messages.isEmpty) {
+      return;
+    }
+    final accountIds = messages.map((message) => message.account.id).toSet();
+    if (accountIds.length != 1) {
+      _showActionMessage(
+        context,
+        '\u8bf7\u53ea\u9009\u62e9\u540c\u4e00\u4e2a\u8d26\u53f7\u7684\u90ae\u4ef6\u8fdb\u884c\u79fb\u52a8\u3002',
+      );
+      return;
+    }
+    final destinationFolderId = await _chooseMoveDestination(
+      context: context,
+      accountId: accountIds.single,
+      excludedFolderIds: messages
+          .map((message) => message.folder.id.toLowerCase())
+          .toSet(),
+    );
+    if (destinationFolderId == null) {
+      return;
+    }
+    await _runBatchAction(
+      (repository, message) => repository.moveMessage(
+        accountId: message.account.id,
+        sourceFolderId: message.folder.id,
+        uid: message.header.uid,
+        destinationFolderId: destinationFolderId,
+      ),
+    );
+  }
+
   Future<void> _deleteSingle(
     BuildContext context,
     MailboxMessage message,
@@ -1531,6 +1568,13 @@ class _MailboxContentState extends ConsumerState<_MailboxContent> {
           ),
         ),
         const PopupMenuItem(
+          value: _MessageContextAction.move,
+          child: ListTile(
+            leading: Icon(Icons.drive_file_move_outlined),
+            title: Text('Move'),
+          ),
+        ),
+        const PopupMenuItem(
           value: _MessageContextAction.delete,
           child: ListTile(
             leading: Icon(Icons.delete_outline),
@@ -1565,31 +1609,117 @@ class _MailboxContentState extends ConsumerState<_MailboxContent> {
             isStarred: !message.header.isStarred,
           ),
         );
+      case _MessageContextAction.move:
+        final destinationFolderId = await _chooseMoveDestination(
+          context: context,
+          accountId: message.account.id,
+          excludedFolderIds: {message.folder.id.toLowerCase()},
+        );
+        if (destinationFolderId != null) {
+          await _runSingleAction(
+            message,
+            (repository, message) => repository.moveMessage(
+              accountId: message.account.id,
+              sourceFolderId: message.folder.id,
+              uid: message.header.uid,
+              destinationFolderId: destinationFolderId,
+            ),
+          );
+        }
       case _MessageContextAction.delete:
         await _deleteSingle(context, message);
     }
+  }
+
+  Future<String?> _chooseMoveDestination({
+    required BuildContext context,
+    required String accountId,
+    required Set<String> excludedFolderIds,
+  }) async {
+    final folders = await ref
+        .read(appDatabaseProvider)
+        .localMailFoldersSnapshot(accountId: accountId);
+    if (!context.mounted) {
+      return null;
+    }
+    final candidates = folders
+        .where(
+          (folder) =>
+              !excludedFolderIds.contains(folder.folderId.toLowerCase()),
+        )
+        .toList(growable: false);
+    if (candidates.isEmpty) {
+      _showActionMessage(
+        context,
+        '\u6ca1\u6709\u53ef\u7528\u7684\u76ee\u6807\u6587\u4ef6\u5939\u3002',
+      );
+      return null;
+    }
+    return showDialog<String>(
+      context: context,
+      builder: (context) => SimpleDialog(
+        title: const Text('Move to folder'),
+        children: [
+          for (final folder in candidates)
+            SimpleDialogOption(
+              onPressed: () => Navigator.of(context).pop(folder.folderId),
+              child: ListTile(
+                leading: const Icon(Icons.folder_outlined),
+                title: Text(folder.name),
+                subtitle: Text(folder.folderId),
+              ),
+            ),
+        ],
+      ),
+    );
   }
 
   Future<void> _runSingleAction(
     MailboxMessage message,
     Future<void> Function(MailRepository repository, MailboxMessage message)
     action,
-  ) {
-    return action(ref.read(mailRepositoryProvider), message);
+  ) async {
+    if (_isRunningAction) {
+      return;
+    }
+    setState(() => _isRunningAction = true);
+    try {
+      await action(ref.read(mailRepositoryProvider), message);
+    } finally {
+      if (mounted) {
+        setState(() => _isRunningAction = false);
+      }
+    }
   }
 
   Future<void> _runBatchAction(
     Future<void> Function(MailRepository repository, MailboxMessage message)
     action,
   ) async {
+    if (_isRunningAction) {
+      return;
+    }
+    setState(() => _isRunningAction = true);
     final repository = ref.read(mailRepositoryProvider);
     final messages = _selectedMessages;
-    for (final message in messages) {
-      await action(repository, message);
+    try {
+      for (final message in messages) {
+        await action(repository, message);
+      }
+      if (mounted) {
+        setState(_selectedKeys.clear);
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isRunningAction = false);
+      }
     }
-    if (mounted) {
-      setState(_selectedKeys.clear);
-    }
+  }
+
+  void _showActionMessage(BuildContext context, String message) {
+    ScaffoldMessenger.of(context)
+      ..clearSnackBars()
+      ..showSnackBar(SnackBar(content: Text(message)));
   }
 
   String _messageKey(MailboxMessage message) {
@@ -1609,7 +1739,7 @@ class _StarMessageIntent extends Intent {
   const _StarMessageIntent();
 }
 
-enum _MessageContextAction { open, toggleRead, toggleStar, delete }
+enum _MessageContextAction { open, toggleRead, toggleStar, move, delete }
 
 class _BatchActionBar extends StatelessWidget {
   const _BatchActionBar({
@@ -1618,6 +1748,7 @@ class _BatchActionBar extends StatelessWidget {
     required this.onDelete,
     required this.onMarkRead,
     required this.onMarkUnread,
+    required this.onMove,
     required this.onStar,
   });
 
@@ -1626,6 +1757,7 @@ class _BatchActionBar extends StatelessWidget {
   final VoidCallback onDelete;
   final VoidCallback onMarkRead;
   final VoidCallback onMarkUnread;
+  final VoidCallback onMove;
   final VoidCallback onStar;
 
   @override
@@ -1660,6 +1792,11 @@ class _BatchActionBar extends StatelessWidget {
               tooltip: 'Star',
               onPressed: onStar,
               icon: const Icon(Icons.star_border_outlined),
+            ),
+            IconButton(
+              tooltip: 'Move',
+              onPressed: onMove,
+              icon: const Icon(Icons.drive_file_move_outlined),
             ),
             IconButton(
               tooltip: 'Delete',

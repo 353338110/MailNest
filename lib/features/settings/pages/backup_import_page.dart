@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../app/localization/locale_controller.dart';
 import '../../../app/theme/app_spacing.dart';
@@ -216,11 +217,25 @@ class _BackupImportPageState extends ConsumerState<BackupImportPage> {
       if (!mounted) {
         return;
       }
+      final firstImportedAccountId = _firstImportedAccountId(
+        preview,
+        _conflictActions,
+      );
       _showMessage(
         AppLocalizations.of(context).importConfigSucceeded(
           result.importedAccounts,
           result.skippedAccounts,
         ),
+        action: firstImportedAccountId == null
+            ? null
+            : SnackBarAction(
+                label: AppLocalizations.of(context).testConnection,
+                onPressed: () {
+                  context.push(
+                    '/accounts/${Uri.encodeComponent(firstImportedAccountId)}/edit',
+                  );
+                },
+              ),
       );
     } finally {
       if (mounted) {
@@ -229,10 +244,25 @@ class _BackupImportPageState extends ConsumerState<BackupImportPage> {
     }
   }
 
-  void _showMessage(String message) {
+  String? _firstImportedAccountId(
+    BackupImportPreview preview,
+    Map<String, BackupAccountConflictAction> conflictActions,
+  ) {
+    for (final account in preview.package.accounts) {
+      if (preview.conflictingAccountIds.contains(account.accountId) &&
+          conflictActions[account.accountId] !=
+              BackupAccountConflictAction.overwrite) {
+        continue;
+      }
+      return account.accountId;
+    }
+    return null;
+  }
+
+  void _showMessage(String message, {SnackBarAction? action}) {
     ScaffoldMessenger.of(
       context,
-    ).showSnackBar(SnackBar(content: Text(message)));
+    ).showSnackBar(SnackBar(content: Text(message), action: action));
   }
 }
 

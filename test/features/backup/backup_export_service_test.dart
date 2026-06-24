@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mailnest_app/core/database/app_database.dart';
 import 'package:mailnest_app/core/secure_storage/secure_storage_service.dart';
 import 'package:mailnest_app/features/backup/services/backup_export_service.dart';
+import 'package:mailnest_app/mail/models/mail_sync_range.dart';
 import 'package:mailnest_app/translation/cached_translation_service.dart';
 
 class FakeSecureStorageService extends SecureStorageService {
@@ -76,11 +77,20 @@ void main() {
         updatedAt: Value(DateTime.utc(2026, 6, 3)),
       ),
     );
+    await database.saveSetting(
+      AppSettingsCompanion(
+        key: const Value(mailSyncRangeSettingKey),
+        value: const Value('180d'),
+        updatedAt: Value(DateTime.utc(2026, 6, 3)),
+      ),
+    );
 
     final payload = await service.buildExportPayload(languageTag: 'zh-CN');
     final encoded = jsonEncode(payload);
+    final includes = payload['includes']! as Map<String, Object?>;
 
     expect(payload['format'], 'mailnest.config.backup');
+    expect(includes['syncSettings'], isTrue);
     expect(encoded, contains('imap.example.com'));
     expect(encoded, contains('smtp.example.com'));
     expect(encoded, contains('app-password'));
@@ -88,6 +98,8 @@ void main() {
     expect(encoded, contains('zh-CN'));
     expect(encoded, contains('mailnest.translation.provider'));
     expect(encoded, contains('translation.provider_id'));
+    expect(encoded, contains(mailSyncRangeSettingKey));
+    expect(encoded, contains('180d'));
     expect(encoded, isNot(contains(CachedTranslationService.cacheKeyPrefix)));
     expect(encoded, isNot(contains('sensitive translated mail body')));
     expect(encoded, isNot(contains('mailBody')));

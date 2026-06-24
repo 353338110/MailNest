@@ -78,6 +78,7 @@ class BackupExportService {
         'userSettings': true,
         'languageSettings': true,
         'translationSettings': true,
+        'syncSettings': true,
       },
       // Security boundary: this export is intentionally configuration-only.
       // Mail bodies, downloaded headers, attachment cache, and search indexes
