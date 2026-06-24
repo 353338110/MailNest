@@ -150,10 +150,50 @@ class ComposeContext {
     return header + quotedLines;
   }
 
+  List<String> get replyAllToRecipients {
+    return _deduplicateRecipients([?originalSender, ...?originalRecipients]);
+  }
+
+  List<String> get replyAllCcRecipients {
+    final toKeys = replyAllToRecipients.map(_recipientKey).toSet();
+    return _deduplicateRecipients(
+      originalCc ?? const <String>[],
+      excludedKeys: toKeys,
+    );
+  }
+
   String _ensurePrefix(String prefix, String subject) {
     if (subject.toLowerCase().startsWith(prefix.toLowerCase())) {
       return subject;
     }
     return '$prefix $subject';
+  }
+
+  List<String> _deduplicateRecipients(
+    Iterable<String> recipients, {
+    Set<String> excludedKeys = const <String>{},
+  }) {
+    final currentAccountKey = _recipientKey(originalAccountId ?? '');
+    final seen = <String>{...excludedKeys};
+    final result = <String>[];
+    for (final recipient in recipients) {
+      final trimmed = recipient.trim();
+      if (trimmed.isEmpty) {
+        continue;
+      }
+      final key = _recipientKey(trimmed);
+      if (key.isEmpty || key == currentAccountKey || seen.contains(key)) {
+        continue;
+      }
+      seen.add(key);
+      result.add(trimmed);
+    }
+    return result;
+  }
+
+  String _recipientKey(String recipient) {
+    final match = RegExp(r'<([^>]+)>').firstMatch(recipient);
+    final email = match?.group(1) ?? recipient;
+    return email.trim().toLowerCase();
   }
 }

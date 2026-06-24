@@ -9,6 +9,7 @@ class MailHeader {
     this.folderId = 'inbox',
     this.messageId,
     this.recipients = const <String>[],
+    this.ccRecipients = const <String>[],
     this.preview,
     this.isRead = false,
     this.isStarred = false,
@@ -21,6 +22,7 @@ class MailHeader {
   final String subject;
   final String sender;
   final List<String> recipients;
+  final List<String> ccRecipients;
   final DateTime receivedAt;
   final String folderId;
   final String? preview;

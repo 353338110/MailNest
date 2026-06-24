@@ -56,6 +56,9 @@ class MimeParser {
     final recipients = _splitAddresses(
       await SimpleEmailBodyParser.decodeHeader(headers.value('to')),
     );
+    final ccRecipients = _splitAddresses(
+      await SimpleEmailBodyParser.decodeHeader(headers.value('cc')),
+    );
     final parsedUid = int.tryParse(uid) ?? 0;
     final attachments = parsedBody.attachments
         .map(
@@ -78,6 +81,7 @@ class MimeParser {
         subject: subject.isEmpty ? '(No subject)' : subject,
         sender: sender.isEmpty ? 'Unknown sender' : sender,
         recipients: recipients,
+        ccRecipients: ccRecipients,
         receivedAt: _parseDate(headers.value('date')) ?? DateTime.now(),
         preview: _previewFrom(bodyText),
         hasAttachments: attachments.isNotEmpty,
