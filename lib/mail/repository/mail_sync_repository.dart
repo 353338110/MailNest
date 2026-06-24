@@ -23,11 +23,15 @@ class MailSyncRepository {
   MailSyncRepository({
     required this.database,
     required this.imapProvider,
+    this.gmailProvider,
+    this.outlookProvider,
     DateTime Function()? now,
   }) : _now = now ?? DateTime.now;
 
   final AppDatabase database;
   final MailProvider imapProvider;
+  final MailProvider? gmailProvider;
+  final MailProvider? outlookProvider;
   final DateTime Function() _now;
 
   Stream<List<LocalMailMessage>> watchRecentHeaders() {
@@ -47,11 +51,12 @@ class MailSyncRepository {
     final enabledAccounts = accounts.where((account) => account.syncEnabled);
 
     for (final account in enabledAccounts) {
-      if (!_supportsImap(account.provider)) {
+      final provider = _providerFor(account);
+      if (provider == null) {
         continue;
       }
       try {
-        await _syncFolders(account);
+        await _syncFolders(account, provider);
       } catch (error) {
         await _recordSyncFailure(
           accountId: account.id,
@@ -74,15 +79,16 @@ class MailSyncRepository {
     final enabledAccounts = accounts.where((account) => account.syncEnabled);
 
     for (final account in enabledAccounts) {
-      if (!_supportsImap(account.provider)) {
+      final provider = _providerFor(account);
+      if (provider == null) {
         continue;
       }
-      await _syncFolders(account);
+      await _syncFolders(account, provider);
     }
   }
 
-  Future<void> _syncFolders(EmailAccount account) async {
-    final folders = await imapProvider.listFolders(account.id);
+  Future<void> _syncFolders(EmailAccount account, MailProvider provider) async {
+    final folders = await provider.listFolders(account.id);
     if (folders.isEmpty) {
       return;
     }
@@ -98,7 +104,9 @@ class MailSyncRepository {
     MailFolder folder,
     DateTime now,
   ) {
-    final folderId = folder.id.trim().toLowerCase();
+    final folderId = _isApiProvider(account.provider)
+        ? folder.id.trim()
+        : folder.id.trim().toLowerCase();
     final type = mailboxFolderTypeFor(folderId, folder.flags).name;
     return LocalMailFoldersCompanion(
       id: Value(
@@ -201,7 +209,11 @@ class MailSyncRepository {
       folderName: folderName,
     );
     final syncRange = await _loadSyncRange();
-    final headers = await imapProvider.syncHeaders(
+    final provider = _providerFor(account);
+    if (provider == null) {
+      return;
+    }
+    final headers = await provider.syncHeaders(
       accountId: account.id,
       folderId: folderName,
       cursor: SyncCursor(
@@ -349,9 +361,19 @@ class MailSyncRepository {
     return error.toString();
   }
 
-  bool _supportsImap(String provider) {
-    return provider != EmailProviderType.gmail.storageValue &&
-        provider != EmailProviderType.outlook.storageValue;
+  MailProvider? _providerFor(EmailAccount account) {
+    if (account.provider == EmailProviderType.gmail.storageValue) {
+      return gmailProvider;
+    }
+    if (account.provider == EmailProviderType.outlook.storageValue) {
+      return outlookProvider;
+    }
+    return imapProvider;
+  }
+
+  bool _isApiProvider(String provider) {
+    return provider == EmailProviderType.gmail.storageValue ||
+        provider == EmailProviderType.outlook.storageValue;
   }
 
   Future<MailSyncRange> _loadSyncRange() async {

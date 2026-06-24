@@ -223,7 +223,7 @@ lib/
 
 ### 邮件同步
 
-- ❌ Gmail 邮件列表、详情和发信
+- ❌ Gmail 真实账号端到端手工验收
 
 ### 邮件详情与 HTML
 
@@ -244,9 +244,8 @@ lib/
 
 ### Gmail
 
-- ❌ Gmail 邮件列表
-- ❌ Gmail 邮件详情
-- ❌ Gmail 发信
+- ✅ Gmail REST API Provider（邮件列表、详情、发信、删除、标记、移动）
+- ❌ Gmail token 过期、刷新失败和重新授权提示的端到端手工验收
 
 ### 翻译
 
@@ -268,9 +267,8 @@ lib/
 
 建议按以下顺序继续，每项一个 PR：
 
-1. **`codex/gmail-mail-provider`**：Gmail 邮件列表、详情和发信
-2. **`codex/desktop-mobile-polish`**：键盘快捷键、右键菜单和更完整的加载/确认状态
-3. **`codex/advanced-backlog`**：远程全量搜索、翻译结果缓存和远端草稿同步
+1. **`codex/desktop-mobile-polish`**：键盘快捷键、右键菜单和更完整的加载/确认状态
+2. **`codex/advanced-backlog`**：远程全量搜索、翻译结果缓存和远端草稿同步
 
 ---
 
@@ -328,8 +326,7 @@ flutter test
 ### 3. 多 Provider 抽象
 
 - 统一 `MailProvider` 接口
-- 支持 IMAP（`ImapMailProvider`）和 Outlook Graph（`OutlookMailProvider`）
-- 未来可扩展 Gmail API Provider
+- 支持 IMAP/SMTP、Outlook Graph 和 Gmail REST API Provider
 
 ### 4. 本地 FTS 全文搜索
 
@@ -394,8 +391,8 @@ MailNest 当前已完成第一阶段的核心功能：
 
 下一阶段重点：
 
-1. Gmail API Provider 实现
-2. 桌面和移动端体验完善
-3. 远程全量搜索、翻译结果缓存和远端草稿同步
+1. 桌面和移动端体验完善
+2. 远程全量搜索、翻译结果缓存和远端草稿同步
+3. Gmail 真实账号端到端验收
 
 **当前版本 v0.1.0 已具备基础多账号邮件客户端的核心能力。**

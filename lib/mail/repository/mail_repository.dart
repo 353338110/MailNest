@@ -3,12 +3,14 @@ import 'dart:async';
 import 'package:drift/drift.dart';
 
 import '../../core/database/app_database.dart';
+import '../../features/accounts/models/email_provider_type.dart';
 import '../body/parsed_email_body.dart';
 import '../mime/mime_parser.dart';
 import '../models/mail_detail.dart';
 import '../models/mail_header.dart';
 import '../models/outgoing_message.dart';
 import '../provider/imap_smtp_mail_provider.dart';
+import '../provider/mail_provider.dart';
 import 'account_repository.dart';
 
 class MailRepository {
@@ -16,12 +18,16 @@ class MailRepository {
     required this.database,
     required this.accountRepository,
     required this.imapProvider,
+    this.gmailProvider,
+    this.outlookProvider,
     this.mimeParser = const MimeParser(),
   });
 
   final AppDatabase database;
   final AccountRepository accountRepository;
   final ImapSmtpMailProvider imapProvider;
+  final MailProvider? gmailProvider;
+  final MailProvider? outlookProvider;
   final MimeParser mimeParser;
 
   Future<void> deleteMessage({
@@ -29,12 +35,13 @@ class MailRepository {
     required String folderId,
     required int uid,
   }) async {
-    // Delete from IMAP server
-    final messageId = '$accountId:$folderId:$uid';
-    await imapProvider.deleteMessage(
+    final messageId = await _remoteMessageId(
       accountId: accountId,
-      messageId: messageId,
+      folderId: folderId,
+      uid: uid,
     );
+    final provider = await _providerForAccount(accountId);
+    await provider.deleteMessage(accountId: accountId, messageId: messageId);
 
     // Delete from local database
     await database.deleteLocalMailMessage(
@@ -50,9 +57,13 @@ class MailRepository {
     required int uid,
     required bool isRead,
   }) async {
-    // Update on IMAP server
-    final messageId = '$accountId:$folderId:$uid';
-    await imapProvider.markAsRead(
+    final messageId = await _remoteMessageId(
+      accountId: accountId,
+      folderId: folderId,
+      uid: uid,
+    );
+    final provider = await _providerForAccount(accountId);
+    await provider.markAsRead(
       accountId: accountId,
       messageId: messageId,
       isRead: isRead,
@@ -73,8 +84,13 @@ class MailRepository {
     required int uid,
     required bool isStarred,
   }) async {
-    final messageId = '$accountId:$folderId:$uid';
-    await imapProvider.setStarred(
+    final messageId = await _remoteMessageId(
+      accountId: accountId,
+      folderId: folderId,
+      uid: uid,
+    );
+    final provider = await _providerForAccount(accountId);
+    await provider.setStarred(
       accountId: accountId,
       messageId: messageId,
       isStarred: isStarred,
@@ -94,8 +110,13 @@ class MailRepository {
     required int uid,
     required String destinationFolderId,
   }) async {
-    final messageId = '$accountId:$sourceFolderId:$uid';
-    await imapProvider.moveMessage(
+    final messageId = await _remoteMessageId(
+      accountId: accountId,
+      folderId: sourceFolderId,
+      uid: uid,
+    );
+    final provider = await _providerForAccount(accountId);
+    await provider.moveMessage(
       accountId: accountId,
       messageId: messageId,
       destinationFolderId: destinationFolderId,
@@ -126,6 +147,19 @@ class MailRepository {
     final parsedUid = int.tryParse(uid);
     if (parsedUid == null) {
       throw const MailDetailException('Invalid IMAP UID.');
+    }
+
+    final account = await accountRepository.getAccount(accountId);
+    if (account == null) {
+      throw const MailDetailException('Account not found.');
+    }
+
+    if (_isApiProvider(account.provider)) {
+      return _fetchApiMessageDetail(
+        account: account,
+        folderId: folderId,
+        uid: parsedUid,
+      );
     }
 
     final cached = await database.getLocalMailMessage(
@@ -167,10 +201,6 @@ class MailRepository {
       );
     }
 
-    final account = await accountRepository.getAccount(accountId);
-    if (account == null) {
-      throw const MailDetailException('Account not found.');
-    }
     final secret = await accountRepository.readSecretForAccount(account);
     if (secret == null || secret.isEmpty) {
       throw const MailDetailException(
@@ -239,8 +269,97 @@ class MailRepository {
   Future<void> sendMessage({
     required String accountId,
     required OutgoingMessage message,
-  }) {
-    return imapProvider.sendMessage(accountId: accountId, message: message);
+  }) async {
+    final provider = await _providerForAccount(accountId);
+    return provider.sendMessage(accountId: accountId, message: message);
+  }
+
+  Future<MailDetail> _fetchApiMessageDetail({
+    required EmailAccount account,
+    required String folderId,
+    required int uid,
+  }) async {
+    final cached = await database.getLocalMailMessage(
+      accountId: account.id,
+      folderName: folderId,
+      uid: uid,
+    );
+    final cachedBody = cached?.cachedBody;
+    if (cached != null && cachedBody != null) {
+      await _markReadLocally(
+        accountId: account.id,
+        folderId: folderId,
+        uid: uid,
+      );
+      return MailDetail(
+        header: _headerFromLocal(cached),
+        body: cachedBody,
+        isHtml: cached.cachedBodyIsHtml,
+        attachments: await _attachmentsFromCache(
+          accountId: account.id,
+          folderId: folderId,
+          uid: uid,
+        ),
+        parsedBody: cached.cachedBodyIsHtml
+            ? ParsedEmailBody(
+                html: cachedBody,
+                hasRemoteImages: _hasRemoteImages(cachedBody),
+                rawPreview: cached.rawHeaders,
+              )
+            : ParsedEmailBody(
+                plainText: cachedBody,
+                rawPreview: cached.rawHeaders,
+              ),
+        cachedAt: cached.bodyCachedAt,
+      );
+    }
+
+    final remoteId = cached?.messageId;
+    if (remoteId == null || remoteId.isEmpty) {
+      throw const MailDetailException('Remote message id is missing.');
+    }
+    final detail = await _providerFor(account).fetchMessageDetail(
+      accountId: account.id,
+      folderId: folderId,
+      messageLocalId: remoteId,
+    );
+    final now = DateTime.now();
+    await database.cacheMailDetail(
+      message: LocalMailMessagesCompanion(
+        accountId: Value(account.id),
+        folderName: Value(folderId),
+        uid: Value(uid),
+        messageId: Value(remoteId),
+        sender: Value(detail.header.sender),
+        recipients: Value(detail.header.recipients.join(', ')),
+        subject: Value(detail.header.subject),
+        summary: Value(detail.header.preview),
+        cachedBody: Value(detail.parsedBody?.html ?? detail.body),
+        cachedBodyIsHtml: Value(detail.isHtml),
+        rawHeaders: const Value(null),
+        bodyCachedAt: Value(now),
+        isRead: const Value(true),
+        isStarred: Value(detail.header.isStarred),
+        hasAttachments: Value(detail.attachments.isNotEmpty),
+        receivedAt: Value(detail.header.receivedAt),
+        updatedAt: Value(now),
+      ),
+      attachments: [
+        for (final attachment in detail.attachments)
+          LocalMailAttachmentsCompanion(
+            id: Value('${account.id}:$folderId:$uid:${attachment.id}'),
+            accountId: Value(account.id),
+            folderName: Value(folderId),
+            messageUid: Value(uid),
+            fileName: Value(attachment.fileName),
+            mimeType: Value(attachment.mimeType),
+            size: Value(attachment.size),
+            contentId: Value(attachment.contentId),
+          ),
+      ],
+    );
+    await _markReadLocally(accountId: account.id, folderId: folderId, uid: uid);
+    return detail;
   }
 
   Future<void> _markReadLocally({
@@ -318,6 +437,50 @@ class MailRepository {
       isStarred: row.isStarred,
       hasAttachments: row.hasAttachments,
     );
+  }
+
+  Future<String> _remoteMessageId({
+    required String accountId,
+    required String folderId,
+    required int uid,
+  }) async {
+    final account = await accountRepository.getAccount(accountId);
+    if (account == null || !_isApiProvider(account.provider)) {
+      return '$accountId:$folderId:$uid';
+    }
+    final cached = await database.getLocalMailMessage(
+      accountId: accountId,
+      folderName: folderId,
+      uid: uid,
+    );
+    final remoteId = cached?.messageId;
+    if (remoteId == null || remoteId.isEmpty) {
+      throw const MailDetailException('Remote message id is missing.');
+    }
+    return remoteId;
+  }
+
+  MailProvider _providerFor(EmailAccount account) {
+    if (account.provider == EmailProviderType.gmail.storageValue) {
+      return gmailProvider ?? imapProvider;
+    }
+    if (account.provider == EmailProviderType.outlook.storageValue) {
+      return outlookProvider ?? imapProvider;
+    }
+    return imapProvider;
+  }
+
+  bool _isApiProvider(String provider) {
+    return provider == EmailProviderType.gmail.storageValue ||
+        provider == EmailProviderType.outlook.storageValue;
+  }
+
+  Future<MailProvider> _providerForAccount(String accountId) async {
+    final account = await accountRepository.getAccount(accountId);
+    if (account == null) {
+      throw const MailDetailException('Account not found.');
+    }
+    return _providerFor(account);
   }
 
   static bool _hasBrokenEncoding(LocalMailMessage row) {

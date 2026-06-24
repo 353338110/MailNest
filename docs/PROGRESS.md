@@ -51,6 +51,7 @@
 ### OAuth 与翻译入口
 
 - PR #16：Gmail OAuth，已合并。
+- 本 PR：Gmail OAuth scope 扩展为支持读取、发信和邮件修改，供 Gmail Provider 执行同步、发信、删除、标记和移动操作。
 - PR #17：邮件详情和写信翻译 UI，已合并。
 - 本 PR：真实翻译服务和隐私确认，支持可配置 HTTPS Provider、自定义 API Key 和安全存储。
 - 本 PR：Outlook OAuth 授权，支持系统浏览器授权、桌面 loopback 回调、移动端 deeplink 回调和 token 安全存储。
@@ -107,6 +108,20 @@
 - 增加 Outlook Graph 映射、token 刷新和重新授权异常测试。
 - Outlook OAuth token 仅写入 SecureStorage，SQLite 只保存 token 引用。
 
+### Gmail Provider
+
+状态：本 PR 实现中
+
+已完成内容：
+
+- 替换 `GmailMailProvider` 占位实现。
+- 基于 Gmail REST API 实现 label 列表、邮件 metadata 同步、raw MIME 详情解析和发信。
+- Gmail 发信复用现有 RFC822 构造逻辑，支持正文和附件编码。
+- Gmail 邮件删除、已读/未读、星标和移动通过 Gmail label/modify/trash API 执行。
+- 同步仓库和邮件仓库按账号 provider 路由到 IMAP、Gmail 或 Outlook provider。
+- Gmail message id 存入本地 `messageId`，现有 `uid` 使用稳定 hash 生成，详情和操作优先用远端 message id。
+- 增加 Gmail label 映射、metadata 同步、raw MIME 解析和发信测试。
+
 ### PR #23：发布流程和 tag 自动化
 
 链接：待创建
@@ -145,7 +160,7 @@ flutter test
 
 ### 邮件同步
 
-- Gmail 邮件列表、详情和发信。
+- Gmail 真实账号端到端手工验收。
 
 ### 邮件详情与 HTML
 
@@ -166,9 +181,7 @@ flutter test
 
 ### Gmail
 
-- Gmail 邮件列表。
-- Gmail 邮件详情。
-- Gmail 发信。
+- Gmail token 过期、刷新失败和重新授权提示的端到端手工验收。
 
 ### 翻译
 
@@ -188,14 +201,13 @@ flutter test
 
 建议按以下顺序继续，每项一个 PR：
 
-1. `codex/gmail-mail-provider`：Gmail 邮件列表、详情和发信。
-2. `codex/desktop-mobile-polish`：键盘快捷键、右键菜单和更完整的加载/确认状态。
-3. `codex/advanced-backlog`：远程全量搜索、翻译结果缓存和远端草稿同步。
+1. `codex/desktop-mobile-polish`：键盘快捷键、右键菜单和更完整的加载/确认状态。
+2. `codex/advanced-backlog`：远程全量搜索、翻译结果缓存和远端草稿同步。
 
 ## 开放 PR
 
 - 当前 GitHub 无开放 PR。
-- 本 PR：写信附件草稿持久化和附件选择失败提示。
+- 本 PR：Gmail 邮件列表、详情和发信。
 
 ## 注意事项
 
