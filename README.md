@@ -4,13 +4,18 @@ MailNest is a local-first, privacy-focused multi-account email client built with
 
 It helps users manage multiple email accounts in one clean inbox while keeping account settings, credentials, email cache, and attachments stored locally on the device.
 
-## First-stage scope
+## Current scope
 
 - Flutter app for Android, iOS, Windows, macOS, and Linux.
-- Material Design 3 UI.
+- Material Design 3 UI with desktop three-column layout and mobile responsive layout.
+- Multi-account management with grouping, IMAP/SMTP, Gmail OAuth, and Outlook OAuth.
+- Mail sync with configurable range, multi-folder incremental sync, and sync status tracking.
+- Mail list with search (local FTS + remote full-text), multi-select, keyboard shortcuts, and context menu.
+- Mail detail with safe HTML rendering, inline/remote images, attachments, reply/forward, and translation.
+- Compose with local and remote draft sync, attachments, SMTP and Outlook/Gmail send.
+- Encrypted config import/export with secure token handling.
 - Local account metadata stored in SQLite through Drift.
-- Passwords, app passwords, and future tokens stored through secure storage.
-- Gmail and Outlook entry points are present, but real OAuth is intentionally deferred.
+- Passwords, app passwords, and OAuth tokens stored through secure storage — never in SQLite.
 - No backend service and no Flutter Web target.
 
 ## Development

@@ -27,4 +27,4 @@
 - 接入 Flutter HTML 或 WebView 渲染器。
 - 完善 cid 图片替换与附件下载。
 - 增加更多字符集和复杂 HTML 邮件测试集。
-- 支持签名验证、S/MIME/PGP 解密和远程图片失败重试。
+- 支持签名验证、S/MIME/PGP 解密。
