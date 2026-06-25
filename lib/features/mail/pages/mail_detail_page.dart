@@ -995,7 +995,7 @@ class _SenderAvatar extends StatelessWidget {
   }
 }
 
-class _AttachmentSection extends StatelessWidget {
+class _AttachmentSection extends ConsumerStatefulWidget {
   const _AttachmentSection({
     required this.attachments,
     required this.subtitleBuilder,
@@ -1011,9 +1011,134 @@ class _AttachmentSection extends StatelessWidget {
   final String? uid;
 
   @override
+  ConsumerState<_AttachmentSection> createState() => _AttachmentSectionState();
+}
+
+class _AttachmentSectionState extends ConsumerState<_AttachmentSection> {
+  final _downloadedPathsById = <String, String>{};
+  final _failedAttachmentIds = <String>{};
+  bool _isBatchDownloading = false;
+  bool _cancelBatch = false;
+  int _batchCompleted = 0;
+  int _batchFailed = 0;
+  int _batchTotal = 0;
+
+  Future<void> _downloadAll() async {
+    if (_isBatchDownloading) {
+      return;
+    }
+
+    final pending = widget.attachments
+        .where((attachment) => !_isDownloaded(attachment))
+        .toList(growable: false);
+    if (pending.isEmpty) {
+      return;
+    }
+
+    setState(() {
+      _isBatchDownloading = true;
+      _cancelBatch = false;
+      _batchCompleted = 0;
+      _batchFailed = 0;
+      _batchTotal = pending.length;
+      _failedAttachmentIds.clear();
+    });
+
+    for (final attachment in pending) {
+      if (_cancelBatch) {
+        break;
+      }
+      try {
+        final localPath = await _downloadAttachment(attachment);
+        if (!mounted) {
+          return;
+        }
+        setState(() {
+          _downloadedPathsById[attachment.id] = localPath;
+          _batchCompleted += 1;
+        });
+      } catch (_) {
+        if (!mounted) {
+          return;
+        }
+        setState(() {
+          _failedAttachmentIds.add(attachment.id);
+          _batchFailed += 1;
+        });
+      }
+    }
+
+    if (!mounted) {
+      return;
+    }
+
+    final l10n = AppLocalizations.of(context);
+    final canceled = _cancelBatch;
+    final completed = _batchCompleted;
+    final failed = _batchFailed;
+    final total = _batchTotal;
+    setState(() {
+      _isBatchDownloading = false;
+      _cancelBatch = false;
+    });
+
+    final message = canceled
+        ? l10n.attachmentDownloadCanceled
+        : failed == 0
+        ? l10n.attachmentBatchDownloadCompleted(completed)
+        : l10n.attachmentBatchDownloadFailed(completed, failed, total);
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  Future<String> _downloadAttachment(MailAttachmentInfo attachment) {
+    final contextInfo = _attachmentDownloadContext(attachment);
+    if (contextInfo == null) {
+      throw const AttachmentDownloadException(
+        AttachmentDownloadErrorType.unknown,
+        'Missing attachment context',
+      );
+    }
+    return ref
+        .read(attachmentServiceProvider)
+        .downloadAttachment(
+          accountId: contextInfo.accountId,
+          folderId: contextInfo.folderId,
+          uid: contextInfo.uid,
+          attachment: attachment,
+        );
+  }
+
+  _AttachmentDownloadContext? _attachmentDownloadContext(
+    MailAttachmentInfo attachment,
+  ) {
+    final accountId = attachment.accountId ?? widget.accountId;
+    final folderId = attachment.folderId ?? widget.folderId;
+    final uid =
+        attachment.messageUid ??
+        (widget.uid != null ? int.tryParse(widget.uid!) : null);
+    if (accountId == null || folderId == null || uid == null) {
+      return null;
+    }
+    return _AttachmentDownloadContext(
+      accountId: accountId,
+      folderId: folderId,
+      uid: uid,
+    );
+  }
+
+  bool _isDownloaded(MailAttachmentInfo attachment) {
+    return attachment.downloaded || _downloadedPathsById[attachment.id] != null;
+  }
+
+  @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
+    final pendingCount = widget.attachments
+        .where((attachment) => !_isDownloaded(attachment))
+        .length;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1021,19 +1146,46 @@ class _AttachmentSection extends StatelessWidget {
         Row(
           children: [
             Text(
-              '${attachments.length} ${l10n.attachments}',
+              '${widget.attachments.length} ${l10n.attachments}',
               style: theme.textTheme.labelLarge,
             ),
             const Spacer(),
-            Text(l10n.attachments, style: theme.textTheme.bodySmall),
-            const SizedBox(width: AppSpacing.xsmall),
-            Icon(
-              Icons.download_outlined,
-              size: 16,
-              color: theme.colorScheme.onSurfaceVariant,
+            TextButton.icon(
+              onPressed: pendingCount == 0 || _isBatchDownloading
+                  ? null
+                  : _downloadAll,
+              icon: const Icon(Icons.download_outlined),
+              label: Text(l10n.downloadAllAttachments),
             ),
           ],
         ),
+        if (_isBatchDownloading) ...[
+          const SizedBox(height: AppSpacing.xsmall),
+          Row(
+            children: [
+              Expanded(
+                child: LinearProgressIndicator(
+                  value: _batchTotal == 0
+                      ? null
+                      : (_batchCompleted + _batchFailed) / _batchTotal,
+                ),
+              ),
+              const SizedBox(width: AppSpacing.small),
+              Text(
+                l10n.attachmentDownloadProgress(
+                  _batchCompleted + _batchFailed,
+                  _batchTotal,
+                ),
+                style: theme.textTheme.bodySmall,
+              ),
+              const SizedBox(width: AppSpacing.small),
+              TextButton(
+                onPressed: () => setState(() => _cancelBatch = true),
+                child: Text(l10n.cancel),
+              ),
+            ],
+          ),
+        ],
         const Divider(height: AppSpacing.large),
         LayoutBuilder(
           builder: (context, constraints) {
@@ -1041,7 +1193,7 @@ class _AttachmentSection extends StatelessWidget {
             return GridView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              itemCount: attachments.length,
+              itemCount: widget.attachments.length,
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: columns,
                 mainAxisSpacing: AppSpacing.medium,
@@ -1049,13 +1201,24 @@ class _AttachmentSection extends StatelessWidget {
                 childAspectRatio: columns == 1 ? 4.6 : 2.4,
               ),
               itemBuilder: (context, index) {
-                final attachment = attachments[index];
+                final attachment = widget.attachments[index];
                 return _AttachmentCard(
                   attachment: attachment,
-                  subtitle: subtitleBuilder(attachment),
-                  accountId: accountId,
-                  folderId: folderId,
-                  uid: uid,
+                  subtitle: widget.subtitleBuilder(attachment),
+                  accountId: widget.accountId,
+                  folderId: widget.folderId,
+                  uid: widget.uid,
+                  downloaded: _isDownloaded(attachment),
+                  localPath:
+                      _downloadedPathsById[attachment.id] ??
+                      attachment.localPath,
+                  batchFailed: _failedAttachmentIds.contains(attachment.id),
+                  onDownloaded: (localPath) {
+                    setState(() {
+                      _downloadedPathsById[attachment.id] = localPath;
+                      _failedAttachmentIds.remove(attachment.id);
+                    });
+                  },
                 );
               },
             );
@@ -1066,10 +1229,26 @@ class _AttachmentSection extends StatelessWidget {
   }
 }
 
+class _AttachmentDownloadContext {
+  const _AttachmentDownloadContext({
+    required this.accountId,
+    required this.folderId,
+    required this.uid,
+  });
+
+  final String accountId;
+  final String folderId;
+  final int uid;
+}
+
 class _AttachmentCard extends ConsumerStatefulWidget {
   const _AttachmentCard({
     required this.attachment,
     required this.subtitle,
+    required this.downloaded,
+    required this.localPath,
+    required this.batchFailed,
+    required this.onDownloaded,
     this.accountId,
     this.folderId,
     this.uid,
@@ -1077,6 +1256,10 @@ class _AttachmentCard extends ConsumerStatefulWidget {
 
   final MailAttachmentInfo attachment;
   final String subtitle;
+  final bool downloaded;
+  final String? localPath;
+  final bool batchFailed;
+  final ValueChanged<String> onDownloaded;
   final String? accountId;
   final String? folderId;
   final String? uid;
@@ -1087,6 +1270,7 @@ class _AttachmentCard extends ConsumerStatefulWidget {
 
 class _AttachmentCardState extends ConsumerState<_AttachmentCard> {
   bool _isDownloading = false;
+  bool _cancelRequested = false;
   String? _errorMessage;
 
   Future<void> _handleTap() async {
@@ -1096,9 +1280,10 @@ class _AttachmentCardState extends ConsumerState<_AttachmentCard> {
     }
 
     // If already downloaded, try to open it
-    if (widget.attachment.downloaded && widget.attachment.localPath != null) {
+    final localPath = widget.localPath;
+    if (widget.downloaded && localPath != null) {
       try {
-        await AttachmentOpener.openFile(widget.attachment.localPath!);
+        await AttachmentOpener.openFile(localPath);
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -1127,12 +1312,13 @@ class _AttachmentCardState extends ConsumerState<_AttachmentCard> {
 
     setState(() {
       _isDownloading = true;
+      _cancelRequested = false;
       _errorMessage = null;
     });
 
     try {
       final attachmentService = ref.read(attachmentServiceProvider);
-      final localPath = await attachmentService.downloadAttachment(
+      final downloadedPath = await attachmentService.downloadAttachment(
         accountId: accountId,
         folderId: folderId,
         uid: uid,
@@ -1140,13 +1326,20 @@ class _AttachmentCardState extends ConsumerState<_AttachmentCard> {
       );
 
       if (mounted) {
+        if (_cancelRequested) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(l10n.attachmentDownloadCanceled)),
+          );
+          return;
+        }
+        widget.onDownloaded(downloadedPath);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(l10n.attachmentDownloadCompleted)),
         );
 
         // Try to open the file after download
         try {
-          await AttachmentOpener.openFile(localPath);
+          await AttachmentOpener.openFile(downloadedPath);
         } catch (e) {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -1199,11 +1392,15 @@ class _AttachmentCardState extends ConsumerState<_AttachmentCard> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final colorScheme = Theme.of(context).colorScheme;
     final icon = AttachmentIconHelper.getIcon(
       widget.attachment.mimeType,
       widget.attachment.fileName,
     );
+
+    final hasError = _errorMessage != null || widget.batchFailed;
+    final errorMessage = _errorMessage ?? l10n.attachmentBatchItemFailed;
 
     return InkWell(
       onTap: _handleTap,
@@ -1212,7 +1409,7 @@ class _AttachmentCardState extends ConsumerState<_AttachmentCard> {
         decoration: BoxDecoration(
           color: colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(8),
-          border: _errorMessage != null
+          border: hasError
               ? Border.all(color: colorScheme.error, width: 1)
               : null,
         ),
@@ -1247,18 +1444,30 @@ class _AttachmentCardState extends ConsumerState<_AttachmentCard> {
                     ),
                   ),
                   if (_isDownloading)
-                    const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                        const SizedBox(width: AppSpacing.xsmall),
+                        TextButton(
+                          onPressed: () {
+                            setState(() => _cancelRequested = true);
+                          },
+                          child: Text(AppLocalizations.of(context).cancel),
+                        ),
+                      ],
                     )
-                  else if (_errorMessage != null)
+                  else if (hasError)
                     Icon(
                       Icons.error_outline,
                       color: colorScheme.error,
                       size: 20,
                     )
-                  else if (widget.attachment.downloaded)
+                  else if (widget.downloaded)
                     Icon(
                       Icons.check_circle,
                       color: colorScheme.primary,
@@ -1272,13 +1481,13 @@ class _AttachmentCardState extends ConsumerState<_AttachmentCard> {
                     ),
                 ],
               ),
-              if (_errorMessage != null) ...[
+              if (hasError) ...[
                 const SizedBox(height: AppSpacing.small),
                 Row(
                   children: [
                     Expanded(
                       child: Text(
-                        _errorMessage!,
+                        errorMessage,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: colorScheme.error,
                         ),

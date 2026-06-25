@@ -681,6 +681,31 @@ class AppLocalizationsRu extends AppLocalizations {
   String get attachmentContextMissing => 'Missing context information.';
 
   @override
+  String get downloadAllAttachments => 'Download all';
+
+  @override
+  String attachmentDownloadProgress(int completed, int total) {
+    return '$completed of $total';
+  }
+
+  @override
+  String get attachmentDownloadCanceled => 'Download canceled.';
+
+  @override
+  String attachmentBatchDownloadCompleted(int count) {
+    return 'Downloaded $count attachment(s).';
+  }
+
+  @override
+  String attachmentBatchDownloadFailed(int completed, int failed, int total) {
+    return 'Downloaded $completed of $total; $failed failed.';
+  }
+
+  @override
+  String get attachmentBatchItemFailed =>
+      'Batch download failed. Retry this attachment.';
+
+  @override
   String get attachmentDownloadCompleted => 'Download completed.';
 
   @override

@@ -329,6 +329,42 @@
     }
   },
   "attachmentContextMissing": "Missing context information.",
+  "downloadAllAttachments": "Download all",
+  "attachmentDownloadProgress": "{completed} of {total}",
+  "@attachmentDownloadProgress": {
+    "placeholders": {
+      "completed": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "attachmentDownloadCanceled": "Download canceled.",
+  "attachmentBatchDownloadCompleted": "Downloaded {count} attachment(s).",
+  "@attachmentBatchDownloadCompleted": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "attachmentBatchDownloadFailed": "Downloaded {completed} of {total}; {failed} failed.",
+  "@attachmentBatchDownloadFailed": {
+    "placeholders": {
+      "completed": {
+        "type": "int"
+      },
+      "failed": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "attachmentBatchItemFailed": "Batch download failed. Retry this attachment.",
   "attachmentDownloadCompleted": "Download completed.",
   "attachmentDownloadFailed": "Download failed: {reason}",
   "@attachmentDownloadFailed": {

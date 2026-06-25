@@ -106,6 +106,46 @@ YmluYXJ5
     );
   });
 
+  test('extracts Chinese filename attachments by stable parser id', () {
+    const raw = '''
+Subject: Chinese filename
+Content-Type: multipart/mixed; boundary="outer"
+
+--outer
+Content-Type: text/plain; charset=utf-8
+
+body
+--outer
+Content-Type: text/plain; name*=utf-8''%E6%8A%A5%E5%91%8A.txt
+Content-Disposition: attachment; filename*=utf-8''%E6%8A%A5%E5%91%8A.txt
+Content-Transfer-Encoding: base64
+
+5Lit5paH5YaF5a65
+--outer
+Content-Type: application/pdf; name="invoice.pdf"
+Content-Disposition: attachment; filename="invoice.pdf"
+Content-Transfer-Encoding: base64
+
+UERGLURBVEE=
+--outer--
+''';
+
+    final extractor = const MimeAttachmentExtractor();
+
+    expect(
+      utf8.decode(
+        extractor.extractBytes(rawMessage: raw, attachmentId: 'att-1'),
+      ),
+      '中文内容',
+    );
+    expect(
+      utf8.decode(
+        extractor.extractBytes(rawMessage: raw, attachmentId: 'att-2'),
+      ),
+      'PDF-DATA',
+    );
+  });
+
   test('throws protocol exception when attachment id is absent', () {
     const raw = '''
 Subject: Missing

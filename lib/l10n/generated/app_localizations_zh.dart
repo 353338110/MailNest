@@ -661,6 +661,30 @@ class AppLocalizationsZh extends AppLocalizations {
   String get attachmentContextMissing => '缺少上下文信息。';
 
   @override
+  String get downloadAllAttachments => '全部下载';
+
+  @override
+  String attachmentDownloadProgress(int completed, int total) {
+    return '$completed/$total';
+  }
+
+  @override
+  String get attachmentDownloadCanceled => '下载已取消。';
+
+  @override
+  String attachmentBatchDownloadCompleted(int count) {
+    return '已下载 $count 个附件。';
+  }
+
+  @override
+  String attachmentBatchDownloadFailed(int completed, int failed, int total) {
+    return '已下载 $completed/$total，$failed 个失败。';
+  }
+
+  @override
+  String get attachmentBatchItemFailed => '批量下载失败，请重试此附件。';
+
+  @override
   String get attachmentDownloadCompleted => '下载完成。';
 
   @override
@@ -1463,6 +1487,30 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get attachments => '附件';
 
   @override
+  String get downloadAllAttachments => '全部下载';
+
+  @override
+  String attachmentDownloadProgress(int completed, int total) {
+    return '$completed/$total';
+  }
+
+  @override
+  String get attachmentDownloadCanceled => '下载已取消。';
+
+  @override
+  String attachmentBatchDownloadCompleted(int count) {
+    return '已下载 $count 个附件。';
+  }
+
+  @override
+  String attachmentBatchDownloadFailed(int completed, int failed, int total) {
+    return '已下载 $completed/$total，$failed 个失败。';
+  }
+
+  @override
+  String get attachmentBatchItemFailed => '批量下载失败，请重试此附件。';
+
+  @override
   String get emptyMessageBody => '这封邮件没有可读正文。';
 
   @override
@@ -2169,6 +2217,30 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get attachments => '附件';
+
+  @override
+  String get downloadAllAttachments => '全部下載';
+
+  @override
+  String attachmentDownloadProgress(int completed, int total) {
+    return '$completed/$total';
+  }
+
+  @override
+  String get attachmentDownloadCanceled => '下載已取消。';
+
+  @override
+  String attachmentBatchDownloadCompleted(int count) {
+    return '已下載 $count 個附件。';
+  }
+
+  @override
+  String attachmentBatchDownloadFailed(int completed, int failed, int total) {
+    return '已下載 $completed/$total，$failed 個失敗。';
+  }
+
+  @override
+  String get attachmentBatchItemFailed => '批次下載失敗，請重試此附件。';
 
   @override
   String get emptyMessageBody => '這封郵件沒有可讀內文。';

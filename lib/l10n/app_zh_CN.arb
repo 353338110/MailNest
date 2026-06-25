@@ -255,6 +255,42 @@
   "noMessagesMatchFilter": "没有符合此筛选条件的邮件。",
   "noMessages": "没有邮件。",
   "attachments": "附件",
+  "downloadAllAttachments": "全部下载",
+  "attachmentDownloadProgress": "{completed}/{total}",
+  "@attachmentDownloadProgress": {
+    "placeholders": {
+      "completed": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "attachmentDownloadCanceled": "下载已取消。",
+  "attachmentBatchDownloadCompleted": "已下载 {count} 个附件。",
+  "@attachmentBatchDownloadCompleted": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "attachmentBatchDownloadFailed": "已下载 {completed}/{total}，{failed} 个失败。",
+  "@attachmentBatchDownloadFailed": {
+    "placeholders": {
+      "completed": {
+        "type": "int"
+      },
+      "failed": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "attachmentBatchItemFailed": "批量下载失败，请重试此附件。",
   "emptyMessageBody": "这封邮件没有可读正文。",
   "htmlShownAsSource": "当前以源码文本显示 HTML。不会加载远程图片。",
   "remoteImagesBlocked": "此邮件包含远程图片，当前已阻止加载。",

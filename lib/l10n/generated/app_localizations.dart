@@ -1340,6 +1340,42 @@ abstract class AppLocalizations {
   /// **'Missing context information.'**
   String get attachmentContextMissing;
 
+  /// No description provided for @downloadAllAttachments.
+  ///
+  /// In en, this message translates to:
+  /// **'Download all'**
+  String get downloadAllAttachments;
+
+  /// No description provided for @attachmentDownloadProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'{completed} of {total}'**
+  String attachmentDownloadProgress(int completed, int total);
+
+  /// No description provided for @attachmentDownloadCanceled.
+  ///
+  /// In en, this message translates to:
+  /// **'Download canceled.'**
+  String get attachmentDownloadCanceled;
+
+  /// No description provided for @attachmentBatchDownloadCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Downloaded {count} attachment(s).'**
+  String attachmentBatchDownloadCompleted(int count);
+
+  /// No description provided for @attachmentBatchDownloadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Downloaded {completed} of {total}; {failed} failed.'**
+  String attachmentBatchDownloadFailed(int completed, int failed, int total);
+
+  /// No description provided for @attachmentBatchItemFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Batch download failed. Retry this attachment.'**
+  String get attachmentBatchItemFailed;
+
   /// No description provided for @attachmentDownloadCompleted.
   ///
   /// In en, this message translates to:
