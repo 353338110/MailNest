@@ -491,6 +491,8 @@ class ImapSmtpMailProvider implements MailProvider {
     required String folderId,
     required String uid,
     required String attachmentId,
+    void Function(int received, int? total)? onProgress,
+    Future<bool> Function()? isCancelled,
   }) async {
     _RawImapClient? client;
     try {
@@ -502,7 +504,11 @@ class ImapSmtpMailProvider implements MailProvider {
       );
       await client.login(username: account.username, secret: secret);
       await client.selectMailbox(_mailboxName(folderId));
-      final raw = await client.fetchMessageBody(uid);
+      final raw = await client.fetchMessageBody(
+        uid,
+        onBytesReceived: onProgress,
+        isCancelled: isCancelled,
+      );
       await client.logout();
 
       final bytes = const MimeAttachmentExtractor().extractBytes(
@@ -623,13 +629,20 @@ class _RawImapClient {
     }
   }
 
-  Future<String> fetchMessageBody(String uid) async {
+  Future<String> fetchMessageBody(
+    String uid, {
+    void Function(int received, int? total)? onBytesReceived,
+    Future<bool> Function()? isCancelled,
+  }) async {
     final tag = 'mn${_tag++}';
     _socket.write('$tag UID FETCH ${_uidAtom(uid)} (BODY.PEEK[])\r\n');
     await _socket.flush();
 
     final buffer = StringBuffer();
     while (true) {
+      if (isCancelled != null && await isCancelled()) {
+        throw const MailProtocolException('Download cancelled.');
+      }
       final line = await _readLine();
       if (line.startsWith(tag)) {
         final response = _TaggedResponse(line);
@@ -644,7 +657,13 @@ class _RawImapClient {
         continue;
       }
       final byteCount = int.parse(literalMatch.group(1)!);
-      buffer.write(await _readLiteral(byteCount));
+      buffer.write(
+        await _readLiteral(
+          byteCount,
+          onBytesReceived: onBytesReceived,
+          isCancelled: isCancelled,
+        ),
+      );
     }
   }
 
@@ -721,8 +740,16 @@ class _RawImapClient {
     return _reader.readLine();
   }
 
-  Future<String> _readLiteral(int byteCount) async {
-    final literal = await _reader.readBytes(byteCount);
+  Future<String> _readLiteral(
+    int byteCount, {
+    void Function(int received, int? total)? onBytesReceived,
+    Future<bool> Function()? isCancelled,
+  }) async {
+    final literal = await _reader.readBytes(
+      byteCount,
+      onBytesReceived: onBytesReceived,
+      isCancelled: isCancelled,
+    );
     // Preserve the raw 8-bit message bytes in a Dart string. MIME part
     // charsets are decoded later by SimpleEmailBodyParser; decoding the whole
     // literal as UTF-8 here would permanently turn GBK/GB2312 bytes into U+FFFD.
@@ -753,12 +780,23 @@ class _ImapByteReader {
     }
   }
 
-  Future<List<int>> readBytes(int byteCount) async {
+  Future<List<int>> readBytes(
+    int byteCount, {
+    void Function(int received, int? total)? onBytesReceived,
+    Future<bool> Function()? isCancelled,
+  }) async {
+    int received = 0;
     while (_buffer.length < byteCount) {
+      if (isCancelled != null && await isCancelled()) {
+        throw const MailProtocolException('Download cancelled.');
+      }
       await _readChunk();
+      received = _buffer.length;
+      onBytesReceived?.call(received, byteCount);
     }
     final bytes = _buffer.sublist(0, byteCount);
     _buffer.removeRange(0, byteCount);
+    onBytesReceived?.call(byteCount, byteCount);
     return bytes;
   }
 

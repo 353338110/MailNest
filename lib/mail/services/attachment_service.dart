@@ -17,7 +17,16 @@ enum AttachmentDownloadErrorType {
   parseError,
   diskFull,
   permissionDenied,
+  cancelled,
   unknown,
+}
+
+typedef DownloadProgressCallback = void Function(int received, int? total);
+
+class DownloadCancelToken {
+  bool _cancelled = false;
+  bool get isCancelled => _cancelled;
+  void cancel() => _cancelled = true;
 }
 
 class AttachmentDownloadException implements Exception {
@@ -46,6 +55,8 @@ class AttachmentService {
     required String folderId,
     required int uid,
     required MailAttachmentInfo attachment,
+    DownloadProgressCallback? onProgress,
+    DownloadCancelToken? cancelToken,
   }) async {
     try {
       final account = await accountRepository.getAccount(accountId);
@@ -64,6 +75,13 @@ class AttachmentService {
         );
       }
 
+      if (cancelToken?.isCancelled == true) {
+        throw const AttachmentDownloadException(
+          AttachmentDownloadErrorType.cancelled,
+          'Download cancelled',
+        );
+      }
+
       final remoteFolderId = await _remoteFolderId(
         accountId: accountId,
         folderId: folderId,
@@ -74,7 +92,18 @@ class AttachmentService {
         folderId: remoteFolderId,
         uid: uid.toString(),
         attachmentId: attachment.id,
+        onProgress: onProgress,
+        isCancelled: cancelToken != null
+            ? () async => cancelToken.isCancelled
+            : null,
       );
+
+      if (cancelToken?.isCancelled == true) {
+        throw const AttachmentDownloadException(
+          AttachmentDownloadErrorType.cancelled,
+          'Download cancelled',
+        );
+      }
 
       final cacheDir = await _getAttachmentCacheDir();
       final sanitizedFileName = _sanitizeFileName(attachment.fileName);
@@ -100,7 +129,12 @@ class AttachmentService {
     } on AttachmentDownloadException {
       rethrow;
     } on MailProtocolException catch (e) {
-      if (e.message.contains('timed out')) {
+      if (e.message.contains('cancelled')) {
+        throw const AttachmentDownloadException(
+          AttachmentDownloadErrorType.cancelled,
+          'Download cancelled',
+        );
+      } else if (e.message.contains('timed out')) {
         throw AttachmentDownloadException(
           AttachmentDownloadErrorType.networkTimeout,
           'Download timed out: ${e.message}',

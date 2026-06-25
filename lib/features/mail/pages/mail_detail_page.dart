@@ -1272,6 +1272,9 @@ class _AttachmentCardState extends ConsumerState<_AttachmentCard> {
   bool _isDownloading = false;
   bool _cancelRequested = false;
   String? _errorMessage;
+  DownloadCancelToken? _cancelToken;
+  int _bytesReceived = 0;
+  int? _bytesTotal;
 
   Future<void> _handleTap() async {
     final l10n = AppLocalizations.of(context);
@@ -1314,6 +1317,9 @@ class _AttachmentCardState extends ConsumerState<_AttachmentCard> {
       _isDownloading = true;
       _cancelRequested = false;
       _errorMessage = null;
+      _cancelToken = DownloadCancelToken();
+      _bytesReceived = 0;
+      _bytesTotal = null;
     });
 
     try {
@@ -1323,6 +1329,15 @@ class _AttachmentCardState extends ConsumerState<_AttachmentCard> {
         folderId: folderId,
         uid: uid,
         attachment: widget.attachment,
+        onProgress: (received, total) {
+          if (mounted) {
+            setState(() {
+              _bytesReceived = received;
+              _bytesTotal = total;
+            });
+          }
+        },
+        cancelToken: _cancelToken,
       );
 
       if (mounted) {
@@ -1350,6 +1365,12 @@ class _AttachmentCardState extends ConsumerState<_AttachmentCard> {
       }
     } on AttachmentDownloadException catch (e) {
       if (mounted) {
+        if (e.type == AttachmentDownloadErrorType.cancelled) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(l10n.attachmentDownloadCanceled)),
+          );
+          return;
+        }
         setState(() {
           _errorMessage = _getErrorMessage(e.type);
         });
@@ -1368,7 +1389,12 @@ class _AttachmentCardState extends ConsumerState<_AttachmentCard> {
       }
     } finally {
       if (mounted) {
-        setState(() => _isDownloading = false);
+        setState(() {
+          _isDownloading = false;
+          _cancelToken = null;
+          _bytesReceived = 0;
+          _bytesTotal = null;
+        });
       }
     }
   }
@@ -1386,8 +1412,18 @@ class _AttachmentCardState extends ConsumerState<_AttachmentCard> {
       AttachmentDownloadErrorType.diskFull => l10n.attachmentDiskFull,
       AttachmentDownloadErrorType.permissionDenied =>
         l10n.attachmentPermissionDenied,
+      AttachmentDownloadErrorType.cancelled => l10n.attachmentDownloadCanceled,
       AttachmentDownloadErrorType.unknown => l10n.attachmentUnknownError,
     };
+  }
+
+  String _formatBytes(int bytes) {
+    if (bytes < 1024) return '$bytes B';
+    if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';
+    if (bytes < 1024 * 1024 * 1024) {
+      return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+    }
+    return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
   }
 
   @override
@@ -1444,22 +1480,50 @@ class _AttachmentCardState extends ConsumerState<_AttachmentCard> {
                     ),
                   ),
                   if (_isDownloading)
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        ),
-                        const SizedBox(width: AppSpacing.xsmall),
-                        TextButton(
-                          onPressed: () {
-                            setState(() => _cancelRequested = true);
-                          },
-                          child: Text(AppLocalizations.of(context).cancel),
-                        ),
-                      ],
+                    Expanded(
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Expanded(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                if (_bytesTotal != null &&
+                                    _bytesTotal! > 0) ...[
+                                  LinearProgressIndicator(
+                                    value: _bytesReceived / _bytesTotal!,
+                                    minHeight: 4,
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    '${_formatBytes(_bytesReceived)} / ${_formatBytes(_bytesTotal!)}'
+                                    ' (${(_bytesReceived * 100 ~/ _bytesTotal!)}%)',
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.bodySmall,
+                                  ),
+                                ] else
+                                  const SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: AppSpacing.xsmall),
+                          TextButton(
+                            onPressed: () {
+                              _cancelToken?.cancel();
+                              setState(() => _cancelRequested = true);
+                            },
+                            child: Text(AppLocalizations.of(context).cancel),
+                          ),
+                        ],
+                      ),
                     )
                   else if (hasError)
                     Icon(
