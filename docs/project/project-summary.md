@@ -249,6 +249,8 @@ lib/
 ### Gmail
 
 - ✅ Gmail REST API Provider（邮件列表、详情、发信、删除、标记、移动）
+- ✅ Gmail API 401 后强制刷新 token 并重试一次，刷新失败进入重新授权异常路径
+- ✅ Gmail 真实账号端到端验收清单：`docs/qa/gmail-e2e.md`
 - ❌ Gmail token 过期、刷新失败和重新授权提示的端到端手工验收
 
 ### 翻译

@@ -126,6 +126,9 @@
 - 同步仓库和邮件仓库按账号 provider 路由到 IMAP、Gmail 或 Outlook provider。
 - Gmail message id 存入本地 `messageId`，现有 `uid` 使用稳定 hash 生成，详情和操作优先用远端 message id。
 - 增加 Gmail label 映射、metadata 同步、raw MIME 解析和发信测试。
+- 本 PR：Gmail API 返回 401 时会强制刷新 token 并重试一次；刷新失败时抛出重新授权异常。
+- 本 PR：新增 Gmail 401 重试和刷新失败单元测试。
+- 本 PR：新增 `docs/qa/gmail-e2e.md` 真实账号端到端验收清单。
 
 ### PR #23：发布流程和 tag 自动化
 
@@ -186,7 +189,8 @@ flutter test
 
 ### Gmail
 
-- Gmail token 过期、刷新失败和重新授权提示的端到端手工验收。
+- 已完成：Gmail token 401 刷新重试和刷新失败重新授权异常自动化覆盖。
+- Gmail token 过期、刷新失败和重新授权提示的真实账号端到端手工验收。
 
 ### 翻译
 

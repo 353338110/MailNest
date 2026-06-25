@@ -248,23 +248,98 @@ Hello from raw Gmail.
     expect(transport.requests.first.uri.query, contains('maxResults=10'));
     expect(transport.requests.first.uri.query, contains('from%3Aada+report'));
   });
+
+  test('refreshes once and retries when Gmail returns unauthorized', () async {
+    final transport = _FakeTransport([
+      _ResponsePlan(
+        statusCode: HttpStatus.unauthorized,
+        body: jsonEncode({'error': 'invalid_token'}),
+      ),
+      _ResponsePlan(
+        statusCode: HttpStatus.ok,
+        body: jsonEncode({
+          'labels': [
+            {'id': 'INBOX', 'name': 'Inbox'},
+          ],
+        }),
+      ),
+    ]);
+    final tokenStore = _FakeTokenStore(
+      now,
+      accessToken: 'stale-token',
+      refreshedAccessToken: 'fresh-token',
+    );
+    final provider = _provider(
+      transport: transport,
+      tokenStore: tokenStore,
+      now: now,
+    );
+
+    final folders = await provider.listFolders('account-1');
+
+    expect(folders.single.id, 'INBOX');
+    expect(tokenStore.refreshCount, 1);
+    expect(
+      transport.requests.first.headers[HttpHeaders.authorizationHeader],
+      'Bearer stale-token',
+    );
+    expect(
+      transport.requests.last.headers[HttpHeaders.authorizationHeader],
+      'Bearer fresh-token',
+    );
+  });
+
+  test('asks caller to reauthorize when token refresh fails', () async {
+    final transport = _FakeTransport([
+      _ResponsePlan(
+        statusCode: HttpStatus.unauthorized,
+        body: jsonEncode({'error': 'invalid_token'}),
+      ),
+    ]);
+    final tokenStore = _FakeTokenStore(
+      now,
+      refreshError: const GmailAuthorizationRequiredException(),
+    );
+    final provider = _provider(
+      transport: transport,
+      tokenStore: tokenStore,
+      now: now,
+    );
+
+    await expectLater(
+      provider.listFolders('account-1'),
+      throwsA(isA<GmailAuthorizationRequiredException>()),
+    );
+    expect(tokenStore.refreshCount, 1);
+    expect(transport.requests, hasLength(1));
+  });
 }
 
 GmailMailProvider _provider({
   required _FakeTransport transport,
   required DateTime now,
+  _FakeTokenStore? tokenStore,
 }) {
   return GmailMailProvider(
-    tokenStore: _FakeTokenStore(now),
+    tokenStore: tokenStore ?? _FakeTokenStore(now),
     transport: transport,
     clock: () => now,
   );
 }
 
 class _FakeTokenStore implements GmailOAuthTokenStore {
-  _FakeTokenStore(this.now);
+  _FakeTokenStore(
+    this.now, {
+    this.accessToken = 'access-token',
+    this.refreshedAccessToken = 'fresh-token',
+    this.refreshError,
+  });
 
   final DateTime now;
+  final String accessToken;
+  final String refreshedAccessToken;
+  final Object? refreshError;
+  var refreshCount = 0;
 
   @override
   Future<String> emailAddress(String accountId) async {
@@ -274,7 +349,23 @@ class _FakeTokenStore implements GmailOAuthTokenStore {
   @override
   Future<OAuthToken> validToken(String accountId, DateTime now) async {
     return OAuthToken(
-      accessToken: 'access-token',
+      accessToken: accessToken,
+      refreshToken: 'refresh-token',
+      expiresAt: this.now.add(const Duration(hours: 1)),
+      scope: 'https://www.googleapis.com/auth/gmail.readonly',
+      tokenType: 'Bearer',
+    );
+  }
+
+  @override
+  Future<OAuthToken> refreshToken(String accountId, DateTime now) async {
+    refreshCount += 1;
+    final error = refreshError;
+    if (error != null) {
+      throw error;
+    }
+    return OAuthToken(
+      accessToken: refreshedAccessToken,
       refreshToken: 'refresh-token',
       expiresAt: this.now.add(const Duration(hours: 1)),
       scope: 'https://www.googleapis.com/auth/gmail.readonly',

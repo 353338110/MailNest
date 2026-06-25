@@ -328,18 +328,21 @@ class GmailMailProvider implements MailProvider {
     Set<int> successStatusCodes = const {200},
   }) async {
     final token = await _tokenStore.validToken(accountId, _clock());
-    final response = await _transport.send(
-      GmailApiRequest(
+    var response = await _sendAuthorizedRequest(
+      method: method,
+      uri: uri,
+      body: body,
+      accessToken: token.accessToken,
+    );
+    if (response.statusCode == HttpStatus.unauthorized) {
+      final refreshed = await _tokenStore.refreshToken(accountId, _clock());
+      response = await _sendAuthorizedRequest(
         method: method,
         uri: uri,
-        headers: {
-          HttpHeaders.authorizationHeader: 'Bearer ${token.accessToken}',
-          HttpHeaders.acceptHeader: 'application/json',
-          if (body != null) HttpHeaders.contentTypeHeader: 'application/json',
-        },
         body: body,
-      ),
-    );
+        accessToken: refreshed.accessToken,
+      );
+    }
     if (!successStatusCodes.contains(response.statusCode)) {
       throw GmailApiException(
         'Gmail API request failed with status ${response.statusCode}.',
@@ -347,6 +350,26 @@ class GmailMailProvider implements MailProvider {
       );
     }
     return response;
+  }
+
+  Future<GmailApiResponse> _sendAuthorizedRequest({
+    required String method,
+    required Uri uri,
+    required String accessToken,
+    String? body,
+  }) {
+    return _transport.send(
+      GmailApiRequest(
+        method: method,
+        uri: uri,
+        headers: {
+          HttpHeaders.authorizationHeader: 'Bearer $accessToken',
+          HttpHeaders.acceptHeader: 'application/json',
+          if (body != null) HttpHeaders.contentTypeHeader: 'application/json',
+        },
+        body: body,
+      ),
+    );
   }
 
   Uri _gmailUri(
@@ -501,6 +524,8 @@ class GmailMailProvider implements MailProvider {
 abstract class GmailOAuthTokenStore {
   Future<OAuthToken> validToken(String accountId, DateTime now);
 
+  Future<OAuthToken> refreshToken(String accountId, DateTime now);
+
   Future<String> emailAddress(String accountId);
 }
 
@@ -531,7 +556,22 @@ class AccountGmailOAuthTokenStore implements GmailOAuthTokenStore {
       return token;
     }
 
-    final refreshed = await _refresh(token);
+    final refreshed = await _refresh(token, now: now);
+    await accountRepository.secureStorage.writeSecret(
+      ref: tokenRef,
+      value: refreshed.toJsonString(),
+    );
+    return refreshed;
+  }
+
+  @override
+  Future<OAuthToken> refreshToken(String accountId, DateTime now) async {
+    final tokenRef = await _tokenRef(accountId);
+    final raw = await accountRepository.secureStorage.readSecret(tokenRef);
+    if (raw == null || raw.isEmpty) {
+      throw const GmailAuthorizationRequiredException();
+    }
+    final refreshed = await _refresh(OAuthToken.fromJsonString(raw), now: now);
     await accountRepository.secureStorage.writeSecret(
       ref: tokenRef,
       value: refreshed.toJsonString(),
@@ -551,7 +591,10 @@ class AccountGmailOAuthTokenStore implements GmailOAuthTokenStore {
     return tokenRef;
   }
 
-  Future<OAuthToken> _refresh(OAuthToken current) async {
+  Future<OAuthToken> _refresh(
+    OAuthToken current, {
+    required DateTime now,
+  }) async {
     final endpoint = Uri.tryParse(
       current.tokenEndpoint ??
           GmailOAuthService.defaultTokenEndpoint.toString(),
@@ -587,7 +630,7 @@ class AccountGmailOAuthTokenStore implements GmailOAuthTokenStore {
       return OAuthToken.fromTokenEndpointJson(
         GmailMailProvider._decodeObject(body),
         fallbackRefreshToken: current.refreshToken,
-        issuedAt: DateTime.now(),
+        issuedAt: now,
         clientId: current.clientId,
         clientSecret: current.clientSecret,
         tokenEndpoint: endpoint.toString(),
