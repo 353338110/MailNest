@@ -77,6 +77,35 @@ void main() {
     );
     expect(messages.first.header.id, messages.first.header.uid.toString());
   });
+
+  test('decodes legacy IMAP modified UTF-7 folder names in mailbox views', () {
+    final repository = MailboxRepository();
+    final account = _account('first@example.com');
+
+    final messages = repository.messagesFor(
+      accounts: [account],
+      localMessages: [
+        _message(
+          id: 301,
+          accountId: account.id,
+          uid: 3,
+          subject: 'Legacy folder',
+          isRead: false,
+          receivedAt: DateTime(2026, 6, 9),
+          folderName: '&UXZO1mWHTvZZOQ-',
+        ),
+      ],
+      scope: const FolderMailboxScope(
+        accountId: 'first@example.com',
+        folderId: '其他文件夹',
+      ),
+      filter: MailboxFilter.all,
+    );
+
+    expect(messages, hasLength(1));
+    expect(messages.single.folder.id, '其他文件夹');
+    expect(messages.single.folder.name, '其他文件夹');
+  });
 }
 
 List<LocalMailMessage> _messages() {
@@ -118,11 +147,12 @@ LocalMailMessage _message({
   required bool isRead,
   required DateTime receivedAt,
   bool isStarred = false,
+  String folderName = 'Inbox',
 }) {
   return LocalMailMessage(
     id: id,
     accountId: accountId,
-    folderName: 'Inbox',
+    folderName: folderName,
     uid: uid,
     sender: 'sender@example.com',
     recipients: accountId,

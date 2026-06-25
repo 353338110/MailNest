@@ -10,6 +10,7 @@ import '../models/mail_detail.dart';
 import '../models/mail_header.dart';
 import '../models/outgoing_message.dart';
 import '../provider/imap_smtp_mail_provider.dart';
+import '../provider/mail_connection_tester.dart';
 import '../provider/mail_provider.dart';
 import 'account_repository.dart';
 
@@ -35,12 +36,17 @@ class MailRepository {
     required String folderId,
     required int uid,
   }) async {
+    final account = await accountRepository.getAccount(accountId);
+    if (account == null) {
+      throw const MailDetailException('Account not found.');
+    }
     final messageId = await _remoteMessageId(
+      account: account,
       accountId: accountId,
       folderId: folderId,
       uid: uid,
     );
-    final provider = await _providerForAccount(accountId);
+    final provider = _providerFor(account);
     await provider.deleteMessage(accountId: accountId, messageId: messageId);
 
     // Delete from local database
@@ -57,12 +63,17 @@ class MailRepository {
     required int uid,
     required bool isRead,
   }) async {
+    final account = await accountRepository.getAccount(accountId);
+    if (account == null) {
+      throw const MailDetailException('Account not found.');
+    }
     final messageId = await _remoteMessageId(
+      account: account,
       accountId: accountId,
       folderId: folderId,
       uid: uid,
     );
-    final provider = await _providerForAccount(accountId);
+    final provider = _providerFor(account);
     await provider.markAsRead(
       accountId: accountId,
       messageId: messageId,
@@ -84,12 +95,17 @@ class MailRepository {
     required int uid,
     required bool isStarred,
   }) async {
+    final account = await accountRepository.getAccount(accountId);
+    if (account == null) {
+      throw const MailDetailException('Account not found.');
+    }
     final messageId = await _remoteMessageId(
+      account: account,
       accountId: accountId,
       folderId: folderId,
       uid: uid,
     );
-    final provider = await _providerForAccount(accountId);
+    final provider = _providerFor(account);
     await provider.setStarred(
       accountId: accountId,
       messageId: messageId,
@@ -110,16 +126,27 @@ class MailRepository {
     required int uid,
     required String destinationFolderId,
   }) async {
+    final account = await accountRepository.getAccount(accountId);
+    if (account == null) {
+      throw const MailDetailException('Account not found.');
+    }
     final messageId = await _remoteMessageId(
+      account: account,
       accountId: accountId,
       folderId: sourceFolderId,
       uid: uid,
     );
-    final provider = await _providerForAccount(accountId);
+    final provider = _providerFor(account);
+    final remoteDestinationFolderId = _isApiProvider(account.provider)
+        ? destinationFolderId
+        : await _remoteFolderId(
+            account: account,
+            folderId: destinationFolderId,
+          );
     await provider.moveMessage(
       accountId: accountId,
       messageId: messageId,
-      destinationFolderId: destinationFolderId,
+      destinationFolderId: remoteDestinationFolderId,
     );
 
     await database.moveLocalMailMessage(
@@ -208,10 +235,14 @@ class MailRepository {
       );
     }
 
+    final remoteFolderId = await _remoteFolderId(
+      account: account,
+      folderId: folderId,
+    );
     final raw = await imapProvider.fetchRawMessageByUid(
       account: account,
       secret: secret,
-      folderId: folderId,
+      folderId: remoteFolderId,
       uid: uid,
     );
     final parsed = await mimeParser.parse(
@@ -405,11 +436,15 @@ class MailRepository {
     required int uid,
   }) async {
     await _markReadLocally(accountId: accountId, folderId: folderId, uid: uid);
+    final account = await accountRepository.getAccount(accountId);
+    final remoteFolderId = account == null
+        ? folderId
+        : await _remoteFolderId(account: account, folderId: folderId);
     unawaited(
       imapProvider
           .markMessageReadByUid(
             accountId: accountId,
-            folderId: folderId,
+            folderId: remoteFolderId,
             uid: uid.toString(),
             isRead: true,
           )
@@ -464,13 +499,17 @@ class MailRepository {
   }
 
   Future<String> _remoteMessageId({
+    required EmailAccount account,
     required String accountId,
     required String folderId,
     required int uid,
   }) async {
-    final account = await accountRepository.getAccount(accountId);
-    if (account == null || !_isApiProvider(account.provider)) {
-      return '$accountId:$folderId:$uid';
+    if (!_isApiProvider(account.provider)) {
+      final remoteFolderId = await _remoteFolderId(
+        account: account,
+        folderId: folderId,
+      );
+      return '$accountId:$remoteFolderId:$uid';
     }
     final cached = await database.getLocalMailMessage(
       accountId: accountId,
@@ -482,6 +521,23 @@ class MailRepository {
       throw const MailDetailException('Remote message id is missing.');
     }
     return remoteId;
+  }
+
+  Future<String> _remoteFolderId({
+    required EmailAccount account,
+    required String folderId,
+  }) async {
+    final decoded = decodeImapModifiedUtf7(folderId).trim().toLowerCase();
+    final folders = await database.localMailFoldersSnapshot(
+      accountId: account.id,
+    );
+    for (final folder in folders) {
+      if (decodeImapModifiedUtf7(folder.folderId).trim().toLowerCase() ==
+          decoded) {
+        return folder.path ?? folder.folderId;
+      }
+    }
+    return folderId;
   }
 
   MailProvider _providerFor(EmailAccount account) {

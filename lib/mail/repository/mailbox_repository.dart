@@ -2,6 +2,7 @@ import '../../core/database/app_database.dart';
 import '../models/mail_header.dart';
 import '../models/mailbox_folder.dart';
 import '../models/mailbox_message.dart';
+import '../provider/mail_connection_tester.dart';
 
 class MailboxRepository {
   const MailboxRepository();
@@ -96,12 +97,13 @@ class MailboxRepository {
   }
 
   MailboxFolder _folderForLocalMessage(String folderName) {
-    final normalized = folderName.toLowerCase();
+    final decodedName = decodeImapModifiedUtf7(folderName);
+    final normalized = decodedName.toLowerCase();
     return standardMailboxFolders.firstWhere(
       (folder) => folder.id == normalized,
       orElse: () => MailboxFolder(
         id: normalized,
-        name: folderName,
+        name: decodedName,
         type: mailboxFolderTypeFor(normalized, const []),
       ),
     );

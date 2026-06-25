@@ -221,7 +221,7 @@ class ImapSmtpMailProvider implements MailProvider {
     return MailFolder(
       id: folder.name.toLowerCase(),
       name: folder.name,
-      path: folder.name,
+      path: folder.rawName ?? folder.name,
       delimiter: folder.delimiter,
       flags: folder.attributes,
     );
@@ -539,7 +539,7 @@ class ImapSmtpMailProvider implements MailProvider {
     return MailFolder(
       id: folder.name.toLowerCase(),
       name: folder.name,
-      path: folder.name,
+      path: folder.rawName ?? folder.name,
       delimiter: folder.delimiter,
       flags: folder.attributes,
     );

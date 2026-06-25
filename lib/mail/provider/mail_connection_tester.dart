@@ -162,11 +162,19 @@ class ImapFolderInfo {
     required this.name,
     required this.attributes,
     this.delimiter,
+    this.rawName,
   });
 
+  /// Decoded display name. IMAP LIST returns non-ASCII names as modified UTF-7.
   final String name;
   final List<String> attributes;
   final String? delimiter;
+
+  /// Original server mailbox name from LIST, before modified UTF-7 decoding.
+  ///
+  /// Some servers require this exact value for SELECT/APPEND even when the UI
+  /// should show the decoded [name].
+  final String? rawName;
 }
 
 class ImapClient {
@@ -555,7 +563,8 @@ ImapFolderInfo? _parseListFolder(String line) {
       .toList(growable: false);
   final delimiter = match.group(3);
   final namePart = match.group(4)!.trim();
-  final name = decodeImapModifiedUtf7(_decodeImapListString(namePart));
+  final rawName = _decodeImapListString(namePart);
+  final name = decodeImapModifiedUtf7(rawName);
   if (name.isEmpty) {
     return null;
   }
@@ -564,7 +573,13 @@ ImapFolderInfo? _parseListFolder(String line) {
     name: name,
     attributes: attributes,
     delimiter: delimiter,
+    rawName: rawName,
   );
+}
+
+@visibleForTesting
+ImapFolderInfo? parseImapListFolderForTest(String line) {
+  return _parseListFolder(line);
 }
 
 String _decodeImapListString(String value) {
@@ -577,7 +592,6 @@ String _decodeImapListString(String value) {
   return value;
 }
 
-@visibleForTesting
 String decodeImapModifiedUtf7(String value) {
   return value.replaceAllMapped(RegExp(r'&([^-]*)-'), (match) {
     final encoded = match.group(1)!;

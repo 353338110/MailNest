@@ -92,6 +92,47 @@ void main() {
   );
 
   test(
+    'decodes IMAP modified UTF-7 folders for display and syncs raw path',
+    () async {
+      final database = AppDatabase(NativeDatabase.memory());
+      addTearDown(database.close);
+
+      final now = DateTime(2026, 6, 9, 12);
+      await _saveAccount(database, now);
+
+      const encodedFolder = '&UXZO1mWHTvZZOQ-';
+      final provider = _FakeMailProvider(
+        folders: [
+          _folder(id: encodedFolder, name: encodedFolder, path: encodedFolder),
+        ],
+        headersByFolder: {
+          encodedFolder.toLowerCase(): [
+            _header(uid: 8, subject: 'Decoded folder mail'),
+          ],
+        },
+      );
+      final repository = MailSyncRepository(
+        database: database,
+        imapProvider: provider,
+        now: () => now,
+      );
+
+      await repository.syncRecentHeaders();
+
+      final folders = await database.localMailFoldersSnapshot(
+        accountId: 'user@example.com',
+      );
+      expect(folders.single.folderId, '其他文件夹');
+      expect(folders.single.name, '其他文件夹');
+      expect(folders.single.path, encodedFolder);
+      expect(provider.syncCalls[encodedFolder.toLowerCase()], 1);
+
+      final headers = await repository.watchRecentHeaders().first;
+      expect(headers.single.folderName, '其他文件夹');
+    },
+  );
+
+  test(
     'syncRecentHeaders passes the configured sync range to providers',
     () async {
       final database = AppDatabase(NativeDatabase.memory());
@@ -494,9 +535,10 @@ Future<void> _saveAccount(AppDatabase database, DateTime now) {
 MailFolder _folder({
   required String id,
   required String name,
+  String? path,
   List<String> flags = const <String>[],
 }) {
-  return MailFolder(id: id, name: name, path: name, flags: flags);
+  return MailFolder(id: id, name: name, path: path ?? name, flags: flags);
 }
 
 MailHeader _header({required int uid, required String subject}) {

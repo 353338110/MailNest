@@ -64,10 +64,14 @@ class AttachmentService {
         );
       }
 
+      final remoteFolderId = await _remoteFolderId(
+        accountId: accountId,
+        folderId: folderId,
+      );
       final bytes = await imapProvider.fetchAttachmentBytes(
         account: account,
         secret: secret,
-        folderId: folderId,
+        folderId: remoteFolderId,
         uid: uid.toString(),
         attachmentId: attachment.id,
       );
@@ -153,6 +157,23 @@ class AttachmentService {
 
   String _sanitizeFileName(String fileName) {
     return fileName.replaceAll(RegExp(r'[^\w\s\-\.]'), '_');
+  }
+
+  Future<String> _remoteFolderId({
+    required String accountId,
+    required String folderId,
+  }) async {
+    final decoded = decodeImapModifiedUtf7(folderId).trim().toLowerCase();
+    final folders = await database.localMailFoldersSnapshot(
+      accountId: accountId,
+    );
+    for (final folder in folders) {
+      if (decodeImapModifiedUtf7(folder.folderId).trim().toLowerCase() ==
+          decoded) {
+        return folder.path ?? folder.folderId;
+      }
+    }
+    return folderId;
   }
 
   Future<int> getCacheSize() async {

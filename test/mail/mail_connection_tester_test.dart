@@ -8,6 +8,15 @@ void main() {
     expect(decodeImapModifiedUtf7('A &- B'), 'A & B');
   });
 
+  test('parses LIST folder with decoded display name and raw server name', () {
+    final folder = parseImapListFolderForTest(
+      r'* LIST (\HasNoChildren) "/" "&UXZO1mWHTvZZOQ-"',
+    );
+
+    expect(folder?.name, '其他文件夹');
+    expect(folder?.rawName, '&UXZO1mWHTvZZOQ-');
+  });
+
   test('reports success only when both IMAP and SMTP pass', () {
     const result = MailConnectionTestResult(
       imap: SingleConnectionTestResult.success(),

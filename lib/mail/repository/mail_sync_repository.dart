@@ -70,7 +70,11 @@ class MailSyncRepository {
 
       final folders = await _foldersForSync(account);
       for (final folder in folders) {
-        await _syncFolder(account: account, folderName: folder.folderId);
+        await _syncFolder(
+          account: account,
+          localFolderName: folder.localFolderName,
+          remoteFolderId: folder.remoteFolderId,
+        );
       }
     }
   }
@@ -107,7 +111,10 @@ class MailSyncRepository {
   ) {
     final folderId = _isApiProvider(account.provider)
         ? folder.id.trim()
-        : folder.id.trim().toLowerCase();
+        : decodeImapModifiedUtf7(folder.id.trim()).toLowerCase();
+    final folderName = _isApiProvider(account.provider)
+        ? folder.name
+        : decodeImapModifiedUtf7(folder.name);
     final type = mailboxFolderTypeFor(folderId, folder.flags).name;
     return LocalMailFoldersCompanion(
       id: Value(
@@ -118,8 +125,8 @@ class MailSyncRepository {
       ),
       accountId: Value(account.id),
       folderId: Value(folderId),
-      name: Value(folder.name),
-      path: Value(folder.path),
+      name: Value(folderName),
+      path: Value(folder.path ?? folder.id),
       delimiter: Value(folder.delimiter),
       flagsJson: Value(jsonEncode(folder.flags)),
       type: Value(type),
@@ -133,33 +140,45 @@ class MailSyncRepository {
       accountId: account.id,
     );
     if (folders.isEmpty) {
-      return const [_SyncFolderTarget(folderId: 'inbox')];
+      return const [
+        _SyncFolderTarget(localFolderName: 'inbox', remoteFolderId: 'inbox'),
+      ];
     }
-    return folders
-        .map((folder) => _SyncFolderTarget(folderId: folder.folderId))
-        .toList(growable: false);
+    final byLocalName = <String, _SyncFolderTarget>{};
+    for (final folder in folders) {
+      final localFolderName = decodeImapModifiedUtf7(
+        folder.folderId,
+      ).toLowerCase();
+      byLocalName[localFolderName] = _SyncFolderTarget(
+        localFolderName: localFolderName,
+        remoteFolderId: folder.path ?? folder.folderId,
+      );
+    }
+    return byLocalName.values.toList(growable: false);
   }
 
   Future<void> _syncFolder({
     required EmailAccount account,
-    required String folderName,
+    required String localFolderName,
+    required String remoteFolderId,
   }) async {
     final startedAt = _now();
     await _recordSyncRunning(
       accountId: account.id,
-      folderName: folderName,
+      folderName: localFolderName,
       startedAt: startedAt,
     );
 
     try {
       await _syncFolderWithCursor(
         account: account,
-        folderName: folderName,
+        localFolderName: localFolderName,
+        remoteFolderId: remoteFolderId,
         resetCursor: false,
       );
       await _recordSyncSuccess(
         accountId: account.id,
-        folderName: folderName,
+        folderName: localFolderName,
         startedAt: startedAt,
       );
     } catch (error) {
@@ -167,23 +186,24 @@ class MailSyncRepository {
         try {
           await database.deleteMailSyncCursor(
             accountId: account.id,
-            folderName: folderName,
+            folderName: localFolderName,
           );
           await _syncFolderWithCursor(
             account: account,
-            folderName: folderName,
+            localFolderName: localFolderName,
+            remoteFolderId: remoteFolderId,
             resetCursor: true,
           );
           await _recordSyncSuccess(
             accountId: account.id,
-            folderName: folderName,
+            folderName: localFolderName,
             startedAt: startedAt,
           );
           return;
         } catch (retryError) {
           await _recordSyncFailure(
             accountId: account.id,
-            folderName: folderName,
+            folderName: localFolderName,
             startedAt: startedAt,
             error: retryError,
           );
@@ -193,7 +213,7 @@ class MailSyncRepository {
 
       await _recordSyncFailure(
         accountId: account.id,
-        folderName: folderName,
+        folderName: localFolderName,
         startedAt: startedAt,
         error: error,
       );
@@ -202,12 +222,13 @@ class MailSyncRepository {
 
   Future<void> _syncFolderWithCursor({
     required EmailAccount account,
-    required String folderName,
+    required String localFolderName,
+    required String remoteFolderId,
     required bool resetCursor,
   }) async {
     final cursor = await database.getMailSyncCursor(
       accountId: account.id,
-      folderName: folderName,
+      folderName: localFolderName,
     );
     final syncRange = await _loadSyncRange();
     final provider = _providerFor(account);
@@ -216,7 +237,7 @@ class MailSyncRepository {
     }
     final headers = await provider.syncHeaders(
       accountId: account.id,
-      folderId: folderName,
+      folderId: remoteFolderId,
       cursor: SyncCursor(
         lastUid: resetCursor ? null : cursor?.lastUid,
         pageToken: resetCursor ? null : cursor?.pageToken,
@@ -230,7 +251,7 @@ class MailSyncRepository {
         headers.map((header) {
           return LocalMailMessagesCompanion(
             accountId: Value(account.id),
-            folderName: Value(folderName),
+            folderName: Value(localFolderName),
             uid: Value(header.uid),
             messageId: Value(header.messageId),
             sender: Value(header.sender),
@@ -258,11 +279,11 @@ class MailSyncRepository {
         id: Value(
           AppDatabase.mailSyncCursorId(
             accountId: account.id,
-            folderName: folderName,
+            folderName: localFolderName,
           ),
         ),
         accountId: Value(account.id),
-        folderName: Value(folderName),
+        folderName: Value(localFolderName),
         lastUid: Value(lastUid),
         pageToken: const Value(null),
         syncedAt: Value(_now()),
@@ -381,7 +402,11 @@ class MailSyncRepository {
 }
 
 class _SyncFolderTarget {
-  const _SyncFolderTarget({required this.folderId});
+  const _SyncFolderTarget({
+    required this.localFolderName,
+    required this.remoteFolderId,
+  });
 
-  final String folderId;
+  final String localFolderName;
+  final String remoteFolderId;
 }

@@ -3,6 +3,7 @@ import 'package:drift/drift.dart';
 import '../../core/database/app_database.dart';
 import '../../features/accounts/models/email_provider_type.dart';
 import '../models/mail_header.dart';
+import '../provider/mail_connection_tester.dart';
 import '../provider/mail_provider.dart';
 
 class LocalSearchRepository {
@@ -42,17 +43,20 @@ class LocalSearchRepository {
       if (provider == null) {
         continue;
       }
-      final folders = await _foldersForAccount(account.id);
-      for (final folderId in folders) {
+      final folders = await _foldersForAccount(
+        accountId: account.id,
+        provider: account.provider,
+      );
+      for (final folder in folders) {
         try {
           final headers = await provider.searchMessages(
             accountId: account.id,
-            folderId: folderId,
+            folderId: folder.remoteFolderId,
             query: query,
           );
           await _cacheHeaders(
             accountId: account.id,
-            folderId: folderId,
+            folderId: folder.localFolderName,
             headers: headers,
           );
         } on Object {
@@ -63,14 +67,35 @@ class LocalSearchRepository {
     }
   }
 
-  Future<List<String>> _foldersForAccount(String accountId) async {
+  Future<List<_RemoteSearchFolder>> _foldersForAccount({
+    required String accountId,
+    required String provider,
+  }) async {
     final folders = await database.localMailFoldersSnapshot(
       accountId: accountId,
     );
     if (folders.isEmpty) {
-      return const ['inbox'];
+      return const [
+        _RemoteSearchFolder(localFolderName: 'inbox', remoteFolderId: 'inbox'),
+      ];
     }
-    return folders.map((folder) => folder.folderId).toList(growable: false);
+    final byLocalName = <String, _RemoteSearchFolder>{};
+    for (final folder in folders) {
+      final localFolderName =
+          provider == EmailProviderType.gmail.storageValue ||
+              provider == EmailProviderType.outlook.storageValue
+          ? folder.folderId
+          : decodeImapModifiedUtf7(folder.folderId).toLowerCase();
+      byLocalName[localFolderName] = _RemoteSearchFolder(
+        localFolderName: localFolderName,
+        remoteFolderId:
+            provider == EmailProviderType.gmail.storageValue ||
+                provider == EmailProviderType.outlook.storageValue
+            ? folder.folderId
+            : folder.path ?? folder.folderId,
+      );
+    }
+    return byLocalName.values.toList(growable: false);
   }
 
   Future<void> _cacheHeaders({
@@ -129,4 +154,14 @@ class LocalSearchRepository {
     deduplicated.sort((a, b) => b.receivedAt.compareTo(a.receivedAt));
     return deduplicated;
   }
+}
+
+class _RemoteSearchFolder {
+  const _RemoteSearchFolder({
+    required this.localFolderName,
+    required this.remoteFolderId,
+  });
+
+  final String localFolderName;
+  final String remoteFolderId;
 }

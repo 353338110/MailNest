@@ -188,7 +188,7 @@ class SentRecordService {
         }
 
         await client.appendMessage(
-          folderName: sentFolder.name,
+          folderName: sentFolder.rawName ?? sentFolder.name,
           rfc822Content: rfc822Content,
           sentAt: sentAt,
         );

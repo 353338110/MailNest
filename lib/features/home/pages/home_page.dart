@@ -12,6 +12,7 @@ import '../../../mail/errors/mail_error_sanitizer.dart';
 import '../../../mail/models/mailbox_folder.dart';
 import '../../../mail/models/mailbox_message.dart';
 import '../../../mail/models/mail_detail.dart';
+import '../../../mail/provider/mail_connection_tester.dart';
 import '../../../mail/repository/mail_repository.dart';
 import '../../../mail/repository/mail_repository_provider.dart';
 import '../../../mail/repository/account_repository_provider.dart';
@@ -925,9 +926,11 @@ class _MailboxNavigationState extends ConsumerState<_MailboxNavigation> {
   }
 
   MailboxFolder _mailboxFolderFromLocal(LocalMailFolder folder) {
+    final decodedId = decodeImapModifiedUtf7(folder.folderId).toLowerCase();
+    final decodedName = decodeImapModifiedUtf7(folder.name);
     return MailboxFolder(
-      id: folder.folderId,
-      name: folder.name,
+      id: decodedId,
+      name: decodedName,
       type: _folderTypeFromStorage(folder.type),
     );
   }
@@ -1087,13 +1090,16 @@ class _MailboxList extends ConsumerWidget {
   String _syncErrorSummary(List<MailSyncStateEntry> failedStates) {
     if (failedStates.length == 1) {
       final failed = failedStates.single;
-      final error = failed.error?.trim();
-      if (error == null || error.isEmpty) {
-        return failed.folderName;
+      final folderName = decodeImapModifiedUtf7(failed.folderName);
+      final error = decodeImapModifiedUtf7(failed.error?.trim() ?? '');
+      if (error.isEmpty) {
+        return folderName;
       }
-      return '${failed.folderName}: $error';
+      return '$folderName: $error';
     }
-    return failedStates.map((state) => state.folderName).join(', ');
+    return failedStates
+        .map((state) => decodeImapModifiedUtf7(state.folderName))
+        .join(', ');
   }
 }
 
@@ -1198,11 +1204,13 @@ class _MailboxHeader extends StatelessWidget {
   }
 
   String _folderName(AppLocalizations l10n, String folderId) {
+    final decodedFolderId = decodeImapModifiedUtf7(folderId);
+    final normalizedFolderId = decodedFolderId.toLowerCase();
     final folder = standardMailboxFolders.firstWhere(
-      (folder) => folder.id == folderId,
+      (folder) => folder.id == normalizedFolderId,
       orElse: () => MailboxFolder(
-        id: folderId,
-        name: folderId,
+        id: normalizedFolderId,
+        name: decodedFolderId,
         type: MailboxFolderType.custom,
       ),
     );
@@ -1681,8 +1689,9 @@ class _MailboxContentState extends ConsumerState<_MailboxContent> {
     }
     final candidates = folders
         .where(
-          (folder) =>
-              !excludedFolderIds.contains(folder.folderId.toLowerCase()),
+          (folder) => !excludedFolderIds.contains(
+            decodeImapModifiedUtf7(folder.folderId).toLowerCase(),
+          ),
         )
         .toList(growable: false);
     if (candidates.isEmpty) {
@@ -1695,15 +1704,17 @@ class _MailboxContentState extends ConsumerState<_MailboxContent> {
     return showDialog<String>(
       context: context,
       builder: (context) => SimpleDialog(
-        title: const Text('Move to folder'),
+        title: const Text('移动到文件夹'),
         children: [
           for (final folder in candidates)
             SimpleDialogOption(
-              onPressed: () => Navigator.of(context).pop(folder.folderId),
+              onPressed: () => Navigator.of(
+                context,
+              ).pop(decodeImapModifiedUtf7(folder.folderId)),
               child: ListTile(
                 leading: const Icon(Icons.folder_outlined),
-                title: Text(folder.name),
-                subtitle: Text(folder.folderId),
+                title: Text(decodeImapModifiedUtf7(folder.name)),
+                subtitle: Text(decodeImapModifiedUtf7(folder.folderId)),
               ),
             ),
         ],
