@@ -10,6 +10,8 @@ void main() {
       scope: 'openid email',
       tokenType: 'Bearer',
       idToken: 'id-token',
+      clientId: 'client-id',
+      tokenEndpoint: 'https://oauth2.googleapis.com/token',
     );
 
     final decoded = OAuthToken.fromJsonString(token.toJsonString());
@@ -20,6 +22,8 @@ void main() {
     expect(decoded.scope, 'openid email');
     expect(decoded.tokenType, 'Bearer');
     expect(decoded.idToken, 'id-token');
+    expect(decoded.clientId, 'client-id');
+    expect(decoded.tokenEndpoint, 'https://oauth2.googleapis.com/token');
   });
 
   test('refresh response keeps existing refresh token when omitted', () {
@@ -31,10 +35,14 @@ void main() {
       },
       fallbackRefreshToken: 'existing-refresh-token',
       issuedAt: DateTime.utc(2026, 6, 9, 12),
+      clientId: 'client-id',
+      tokenEndpoint: 'https://oauth2.googleapis.com/token',
     );
 
     expect(token.accessToken, 'new-access-token');
     expect(token.refreshToken, 'existing-refresh-token');
     expect(token.expiresAt, DateTime.utc(2026, 6, 9, 12, 2));
+    expect(token.clientId, 'client-id');
+    expect(token.tokenEndpoint, 'https://oauth2.googleapis.com/token');
   });
 }

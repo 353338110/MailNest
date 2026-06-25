@@ -8,3 +8,11 @@ final gmailOAuthServiceProvider = Provider<GmailOAuthService>((ref) {
     secureStorage: ref.watch(secureStorageServiceProvider),
   );
 });
+
+final gmailOAuthServiceForClientIdProvider =
+    Provider.family<GmailOAuthService, String>((ref, clientId) {
+      return GmailOAuthService(
+        secureStorage: ref.watch(secureStorageServiceProvider),
+        clientId: clientId.trim(),
+      );
+    });

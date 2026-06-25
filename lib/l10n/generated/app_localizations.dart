@@ -494,6 +494,18 @@ abstract class AppLocalizations {
   /// **'MailNest opens Google authorization in your system browser and stores tokens only in secure storage.'**
   String get gmailOAuthSystemBrowserNotice;
 
+  /// No description provided for @gmailOAuthClientId.
+  ///
+  /// In en, this message translates to:
+  /// **'Google OAuth Client ID'**
+  String get gmailOAuthClientId;
+
+  /// No description provided for @gmailOAuthClientIdHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste the OAuth Client ID from Google Cloud Console. You can also prefill it with --dart-define=GMAIL_OAUTH_CLIENT_ID=...'**
+  String get gmailOAuthClientIdHelp;
+
   /// No description provided for @authorizeGmail.
   ///
   /// In en, this message translates to:
@@ -539,7 +551,7 @@ abstract class AppLocalizations {
   /// No description provided for @gmailOAuthClientIdMissing.
   ///
   /// In en, this message translates to:
-  /// **'Gmail OAuth client ID is not configured. Start or build MailNest with --dart-define=GMAIL_OAUTH_CLIENT_ID=your-client-id.'**
+  /// **'Enter the Google OAuth Client ID before authorizing Gmail.'**
   String get gmailOAuthClientIdMissing;
 
   /// No description provided for @gmailReauthorizeEmailMismatch.

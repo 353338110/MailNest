@@ -207,6 +207,8 @@ class GmailOAuthService implements OAuthService {
         refreshed,
         fallbackRefreshToken: current.refreshToken,
         issuedAt: DateTime.now(),
+        clientId: clientId,
+        tokenEndpoint: tokenEndpoint.toString(),
       );
       await secureStorage.writeSecret(ref: ref, value: token.toJsonString());
     } on Object catch (error) {
@@ -248,6 +250,8 @@ class GmailOAuthService implements OAuthService {
       json,
       fallbackRefreshToken: '',
       issuedAt: DateTime.now(),
+      clientId: clientId,
+      tokenEndpoint: tokenEndpoint.toString(),
     );
   }
 

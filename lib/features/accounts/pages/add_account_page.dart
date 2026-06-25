@@ -36,6 +36,9 @@ class _AddAccountPageState extends ConsumerState<AddAccountPage> {
   final _imapPortController = TextEditingController(text: '993');
   final _smtpHostController = TextEditingController();
   final _smtpPortController = TextEditingController(text: '587');
+  final _gmailClientIdController = TextEditingController(
+    text: const String.fromEnvironment('GMAIL_OAUTH_CLIENT_ID'),
+  );
   final _detector = const MailConfigDetector();
 
   EmailProviderType _provider = EmailProviderType.custom;
@@ -69,6 +72,7 @@ class _AddAccountPageState extends ConsumerState<AddAccountPage> {
     _imapPortController.dispose();
     _smtpHostController.dispose();
     _smtpPortController.dispose();
+    _gmailClientIdController.dispose();
     super.dispose();
   }
 
@@ -100,6 +104,8 @@ class _AddAccountPageState extends ConsumerState<AddAccountPage> {
                       if (_isGmailOAuth && !_isEditing) ...[
                         _GmailOAuthSection(
                           isAuthorizing: _isAuthorizing,
+                          clientIdController: _gmailClientIdController,
+                          requiredValidator: _required,
                           onAuthorize: _authorizeGmail,
                         ),
                       ] else ...[
@@ -145,6 +151,15 @@ class _AddAccountPageState extends ConsumerState<AddAccountPage> {
                             title: Text(l10n.gmailOAuthConnected),
                             subtitle: Text(l10n.gmailReauthorizeHelp),
                           ),
+                          TextFormField(
+                            controller: _gmailClientIdController,
+                            decoration: InputDecoration(
+                              labelText: l10n.gmailOAuthClientId,
+                              helperText: l10n.gmailOAuthClientIdHelp,
+                            ),
+                            validator: _required,
+                          ),
+                          const SizedBox(height: AppSpacing.medium),
                           OutlinedButton.icon(
                             onPressed: _isSaving || _isAuthorizing
                                 ? null
@@ -545,10 +560,21 @@ class _AddAccountPageState extends ConsumerState<AddAccountPage> {
   }
 
   Future<void> _authorizeGmail() async {
+    if (!_formKey.currentState!.validate()) {
+      _showValidationFailed();
+      return;
+    }
+
     final l10n = AppLocalizations.of(context);
     setState(() => _isAuthorizing = true);
     try {
-      final result = await ref.read(gmailOAuthServiceProvider).authorize();
+      final result = await ref
+          .read(
+            gmailOAuthServiceForClientIdProvider(
+              _gmailClientIdController.text.trim(),
+            ),
+          )
+          .authorize();
       await ref
           .read(accountRepositoryProvider)
           .saveOAuthAccount(
@@ -591,11 +617,19 @@ class _AddAccountPageState extends ConsumerState<AddAccountPage> {
     }
 
     final l10n = AppLocalizations.of(context);
+    if (!_formKey.currentState!.validate()) {
+      _showValidationFailed();
+      return;
+    }
+
     setState(() => _isAuthorizing = true);
     try {
-      final result = await ref.read(gmailOAuthServiceProvider).authorize();
+      final service = ref.read(
+        gmailOAuthServiceForClientIdProvider(_gmailClientIdController.text),
+      );
+      final result = await service.authorize();
       if (result.emailAddress != account.emailAddress) {
-        await ref.read(gmailOAuthServiceProvider).revokeToken(result.tokenRef);
+        await service.revokeToken(result.tokenRef);
         _showOAuthError(l10n.gmailReauthorizeEmailMismatch);
         return;
       }
@@ -957,10 +991,14 @@ class _ProviderShortcuts extends StatelessWidget {
 class _GmailOAuthSection extends StatelessWidget {
   const _GmailOAuthSection({
     required this.isAuthorizing,
+    required this.clientIdController,
+    required this.requiredValidator,
     required this.onAuthorize,
   });
 
   final bool isAuthorizing;
+  final TextEditingController clientIdController;
+  final FormFieldValidator<String> requiredValidator;
   final VoidCallback onAuthorize;
 
   @override
@@ -976,6 +1014,15 @@ class _GmailOAuthSection extends StatelessWidget {
           title: Text(l10n.gmailOAuthTitle),
           subtitle: Text(l10n.gmailOAuthSystemBrowserNotice),
         ),
+        TextFormField(
+          controller: clientIdController,
+          decoration: InputDecoration(
+            labelText: l10n.gmailOAuthClientId,
+            helperText: l10n.gmailOAuthClientIdHelp,
+          ),
+          validator: requiredValidator,
+        ),
+        const SizedBox(height: AppSpacing.medium),
         FilledButton.icon(
           onPressed: isAuthorizing ? null : onAuthorize,
           icon: isAuthorizing

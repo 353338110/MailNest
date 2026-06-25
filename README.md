@@ -30,15 +30,15 @@ flutter test
 
 ### OAuth client IDs
 
-Gmail OAuth requires a Google OAuth desktop/mobile client ID at build time:
+Gmail OAuth requires a Google OAuth desktop/mobile client ID. Enter it on the
+Gmail add-account page, or prefill the field at build/run time:
 
 ```sh
 flutter run -d macos --dart-define=GMAIL_OAUTH_CLIENT_ID=your-google-client-id
 ```
 
-Use the same `--dart-define` with `flutter build ...` for packaged builds.
-Without this value, Gmail authorization is disabled and the app shows a
-configuration message instead of opening Google authorization.
+Use the same `--dart-define` with `flutter build ...` for packaged builds when
+you want packaged builds to prefill the field.
 
 ## Releases
 

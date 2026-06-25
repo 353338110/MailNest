@@ -58,6 +58,8 @@
   "oauthFutureNotice": "Use Gmail or Outlook authorization to connect OAuth-based accounts.",
   "gmailOAuthTitle": "Sign in with Google",
   "gmailOAuthSystemBrowserNotice": "MailNest opens Google authorization in your system browser and stores tokens only in secure storage.",
+  "gmailOAuthClientId": "Google OAuth Client ID",
+  "gmailOAuthClientIdHelp": "Paste the OAuth Client ID from Google Cloud Console. You can also prefill it with --dart-define=GMAIL_OAUTH_CLIENT_ID=...",
   "authorizeGmail": "Authorize Gmail",
   "reauthorizeGmail": "Reauthorize Gmail",
   "gmailOAuthConnected": "Gmail authorization is connected.",
@@ -72,7 +74,7 @@
       }
     }
   },
-  "gmailOAuthClientIdMissing": "Gmail OAuth client ID is not configured. Start or build MailNest with --dart-define=GMAIL_OAUTH_CLIENT_ID=your-client-id.",
+  "gmailOAuthClientIdMissing": "Enter the Google OAuth Client ID before authorizing Gmail.",
   "gmailReauthorizeEmailMismatch": "Reauthorize with the same Gmail address.",
   "gmailReauthorizationRequired": "Gmail reauthorization is required.",
   "ok": "OK",

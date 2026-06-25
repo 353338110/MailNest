@@ -58,6 +58,8 @@
   "oauthFutureNotice": "可使用 Gmail 或 Outlook 授權連接 OAuth 信箱。",
   "gmailOAuthTitle": "使用 Google 登入",
   "gmailOAuthSystemBrowserNotice": "MailNest 會在系統瀏覽器中開啟 Google 授權，Token 只儲存到安全儲存空間。",
+  "gmailOAuthClientId": "Google OAuth Client ID",
+  "gmailOAuthClientIdHelp": "填寫 Google Cloud Console 中的 OAuth Client ID；也可以用 --dart-define=GMAIL_OAUTH_CLIENT_ID=... 預填。",
   "authorizeGmail": "授權 Gmail",
   "reauthorizeGmail": "重新授權 Gmail",
   "gmailOAuthConnected": "Gmail 授權已連接。",
@@ -72,7 +74,7 @@
       }
     }
   },
-  "gmailOAuthClientIdMissing": "尚未設定 Gmail OAuth Client ID。請使用 --dart-define=GMAIL_OAUTH_CLIENT_ID=你的用戶端ID 啟動或建置 MailNest。",
+  "gmailOAuthClientIdMissing": "請先填寫 Google OAuth Client ID，再授權 Gmail。",
   "gmailReauthorizeEmailMismatch": "請使用同一個 Gmail 地址重新授權。",
   "gmailReauthorizationRequired": "需要重新授權 Gmail。",
   "outlookOAuthTitle": "使用 Microsoft 登入",
