@@ -914,15 +914,18 @@ class _MailboxNavigationState extends ConsumerState<_MailboxNavigation> {
     EmailAccount account,
     List<LocalMailFolder> folders,
   ) {
-    final synced = folders
-        .where((folder) => folder.accountId == account.id)
-        .map(_mailboxFolderFromLocal)
-        .toList();
+    final synced = <String, MailboxFolder>{};
+    for (final folder in folders) {
+      if (folder.accountId != account.id) continue;
+      final mailbox = _mailboxFolderFromLocal(folder);
+      synced.putIfAbsent(mailbox.id, () => mailbox);
+    }
     if (synced.isEmpty) {
       return standardMailboxFolders;
     }
-    synced.sort((a, b) => _folderSortKey(a).compareTo(_folderSortKey(b)));
-    return synced;
+    final result = synced.values.toList();
+    result.sort((a, b) => _folderSortKey(a).compareTo(_folderSortKey(b)));
+    return result;
   }
 
   MailboxFolder _mailboxFolderFromLocal(LocalMailFolder folder) {
