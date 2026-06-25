@@ -224,6 +224,10 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get gmailOAuthClientIdMissing =>
+      '尚未配置 Gmail OAuth Client ID。请使用 --dart-define=GMAIL_OAUTH_CLIENT_ID=你的客户端ID 启动或构建 MailNest。';
+
+  @override
   String get gmailReauthorizeEmailMismatch => '请使用同一个 Gmail 地址重新授权。';
 
   @override
@@ -1133,6 +1137,10 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   }
 
   @override
+  String get gmailOAuthClientIdMissing =>
+      '尚未配置 Gmail OAuth Client ID。请使用 --dart-define=GMAIL_OAUTH_CLIENT_ID=你的客户端ID 启动或构建 MailNest。';
+
+  @override
   String get gmailReauthorizeEmailMismatch => '请使用同一个 Gmail 地址重新授权。';
 
   @override
@@ -1863,6 +1871,10 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String gmailAuthorizationFailed(String reason) {
     return 'Gmail 授權失敗：$reason';
   }
+
+  @override
+  String get gmailOAuthClientIdMissing =>
+      '尚未設定 Gmail OAuth Client ID。請使用 --dart-define=GMAIL_OAUTH_CLIENT_ID=你的用戶端ID 啟動或建置 MailNest。';
 
   @override
   String get gmailReauthorizeEmailMismatch => '請使用同一個 Gmail 地址重新授權。';

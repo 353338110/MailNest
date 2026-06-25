@@ -6,6 +6,7 @@
 
 - 使用专用 Gmail 测试账号，不使用个人主账号。
 - Google OAuth Client 已配置 MailNest 使用的桌面 loopback redirect URI 和移动端 deeplink redirect URI。
+- 启动或构建应用时传入 `--dart-define=GMAIL_OAUTH_CLIENT_ID=<Google OAuth Client ID>`；未传入时 Gmail 授权入口会提示配置缺失。
 - 测试账号中准备至少 5 封邮件：普通纯文本、HTML 邮件、含附件邮件、已读邮件、未读邮件。
 - 测试账号中准备至少 2 个自定义 label，用于移动/同步验证。
 - 本地测试前确认 SQLite、日志和截图中不包含 access token、refresh token 或授权码。

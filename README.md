@@ -28,6 +28,18 @@ flutter analyze
 flutter test
 ```
 
+### OAuth client IDs
+
+Gmail OAuth requires a Google OAuth desktop/mobile client ID at build time:
+
+```sh
+flutter run -d macos --dart-define=GMAIL_OAUTH_CLIENT_ID=your-google-client-id
+```
+
+Use the same `--dart-define` with `flutter build ...` for packaged builds.
+Without this value, Gmail authorization is disabled and the app shows a
+configuration message instead of opening Google authorization.
+
 ## Releases
 
 MailNest releases use SemVer tags such as `v0.1.0` and `v0.2.0`.

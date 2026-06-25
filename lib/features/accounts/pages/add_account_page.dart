@@ -567,8 +567,10 @@ class _AddAccountPageState extends ConsumerState<AddAccountPage> {
         context,
       ).showSnackBar(SnackBar(content: Text(l10n.gmailAuthorizationSaved)));
       Navigator.of(context).pop();
-    } on OAuthConfigurationException catch (error) {
-      _showOAuthError(l10n.gmailAuthorizationFailed(error.message));
+    } on OAuthConfigurationException {
+      _showOAuthError(
+        l10n.gmailAuthorizationFailed(l10n.gmailOAuthClientIdMissing),
+      );
     } on OAuthAuthorizationCanceled {
       _showOAuthError(l10n.gmailAuthorizationCanceled);
     } on OAuthRefreshException catch (error) {
@@ -615,8 +617,10 @@ class _AddAccountPageState extends ConsumerState<AddAccountPage> {
         context,
       ).showSnackBar(SnackBar(content: Text(l10n.gmailAuthorizationSaved)));
       Navigator.of(context).pop();
-    } on OAuthConfigurationException catch (error) {
-      _showOAuthError(l10n.gmailAuthorizationFailed(error.message));
+    } on OAuthConfigurationException {
+      _showOAuthError(
+        l10n.gmailAuthorizationFailed(l10n.gmailOAuthClientIdMissing),
+      );
     } on OAuthAuthorizationCanceled {
       _showOAuthError(l10n.gmailAuthorizationCanceled);
     } on OAuthRefreshException catch (error) {

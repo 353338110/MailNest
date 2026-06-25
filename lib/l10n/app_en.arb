@@ -83,6 +83,7 @@
       }
     }
   },
+  "gmailOAuthClientIdMissing": "Gmail OAuth client ID is not configured. Start or build MailNest with --dart-define=GMAIL_OAUTH_CLIENT_ID=your-client-id.",
   "gmailReauthorizeEmailMismatch": "Reauthorize with the same Gmail address.",
   "gmailReauthorizationRequired": "Gmail reauthorization is required.",
   "outlookOAuthTitle": "Sign in with Microsoft",

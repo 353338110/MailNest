@@ -230,6 +230,10 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get gmailOAuthClientIdMissing =>
+      'Gmail OAuth client ID is not configured. Start or build MailNest with --dart-define=GMAIL_OAUTH_CLIENT_ID=your-client-id.';
+
+  @override
   String get gmailReauthorizeEmailMismatch =>
       'Reauthorize with the same Gmail address.';
 

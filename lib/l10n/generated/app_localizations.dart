@@ -536,6 +536,12 @@ abstract class AppLocalizations {
   /// **'Gmail authorization failed: {reason}'**
   String gmailAuthorizationFailed(String reason);
 
+  /// No description provided for @gmailOAuthClientIdMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'Gmail OAuth client ID is not configured. Start or build MailNest with --dart-define=GMAIL_OAUTH_CLIENT_ID=your-client-id.'**
+  String get gmailOAuthClientIdMissing;
+
   /// No description provided for @gmailReauthorizeEmailMismatch.
   ///
   /// In en, this message translates to:

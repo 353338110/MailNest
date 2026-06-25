@@ -76,6 +76,7 @@
       }
     }
   },
+  "gmailOAuthClientIdMissing": "尚未配置 Gmail OAuth Client ID。请使用 --dart-define=GMAIL_OAUTH_CLIENT_ID=你的客户端ID 启动或构建 MailNest。",
   "gmailReauthorizeEmailMismatch": "请使用同一个 Gmail 地址重新授权。",
   "gmailReauthorizationRequired": "需要重新授权 Gmail。",
   "outlookOAuthTitle": "使用 Microsoft 登录",
