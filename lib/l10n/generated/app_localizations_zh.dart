@@ -191,7 +191,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get invalidPort => '请输入有效端口。';
 
   @override
-  String get oauthFutureNotice => '真实 OAuth 授权将在后续版本支持。';
+  String get oauthFutureNotice => '可使用 Gmail 或 Outlook 授权连接 OAuth 邮箱。';
 
   @override
   String get gmailOAuthTitle => '使用 Google 登录';
@@ -372,7 +372,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get backupExportDescription =>
-      '创建包含账号配置、服务器设置和应用偏好的加密备份。导入功能将在后续版本添加。';
+      '创建包含账号配置、服务器设置和应用偏好的加密备份。邮件缓存和密钥不会被导出。';
 
   @override
   String get backupIncludes => '导出内容';
@@ -526,13 +526,13 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get chooseSentFolder => '选择 Sent 文件夹';
+  String get chooseSentFolder => '选择已发送文件夹';
 
   @override
   String get sentFolderOnlyLocalRecord => '这封邮件仅保存了本地发送记录。';
 
   @override
-  String get sentFolderSavePending => '正在保存到 Sent';
+  String get sentFolderSavePending => '正在保存到已发送文件夹';
 
   @override
   String sentFolderSaved(String folderName) {
@@ -540,10 +540,10 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get sentFolderSelectionRequired => '请选择 Sent 文件夹';
+  String get sentFolderSelectionRequired => '请选择已发送文件夹';
 
   @override
-  String get sentFolderSaveFailed => 'Sent 文件夹保存失败';
+  String get sentFolderSaveFailed => '已发送文件夹保存失败';
 
   @override
   String sentFolderAppendSucceeded(String folderName) {
@@ -552,7 +552,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String sentFolderAppendFailed(String reason) {
-    return '无法保存到 Sent：$reason';
+    return '无法保存到已发送文件夹：$reason';
   }
 
   @override
@@ -568,10 +568,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get composeEmail => '写邮件';
 
   @override
-  String get composeFutureNotice => '写邮件功能将在后续版本提供。';
+  String get composeFutureNotice => '可通过工具栏或写邮件按钮创建邮件。';
 
   @override
-  String get foldersFutureNotice => '邮件同步加入后将支持文件夹导航。';
+  String get foldersFutureNotice => '文件夹会在账号下显示，同步后自动更新。';
 
   @override
   String get syncMail => '同步邮件';
@@ -603,13 +603,22 @@ class AppLocalizationsZh extends AppLocalizations {
   String get trash => '废纸篓';
 
   @override
+  String get junk => '垃圾邮件';
+
+  @override
   String get account => '账号';
+
+  @override
+  String get expandAccount => '展开账号';
+
+  @override
+  String get collapseAccount => '收起账号';
 
   @override
   String get folder => '文件夹';
 
   @override
-  String get fullMessageBodiesFutureNotice => '完整邮件正文将在后续 PR 中显示。';
+  String get fullMessageBodiesFutureNotice => '打开邮件后会显示已缓存或远程获取的正文。';
 
   @override
   String get noMessageSelected => '未选择邮件';
@@ -1067,7 +1076,7 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get invalidPort => '请输入有效端口。';
 
   @override
-  String get oauthFutureNotice => '真实 OAuth 授权将在后续版本支持。';
+  String get oauthFutureNotice => '可使用 Gmail 或 Outlook 授权连接 OAuth 邮箱。';
 
   @override
   String get gmailOAuthTitle => '使用 Google 登录';
@@ -1248,7 +1257,7 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String get backupExportDescription =>
-      '创建包含账号配置、服务器设置和应用偏好的加密备份。导入功能将在后续版本添加。';
+      '创建包含账号配置、服务器设置和应用偏好的加密备份。邮件缓存和密钥不会被导出。';
 
   @override
   String get backupIncludes => '导出内容';
@@ -1321,25 +1330,25 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get subject => '主题';
 
   @override
-  String get sentMessages => 'Sent';
+  String get sentMessages => '已发送';
 
   @override
-  String get noSentMessagesYet => 'No sent messages yet.';
+  String get noSentMessagesYet => '还没有已发送邮件。';
 
   @override
   String sentToRecipients(String recipients) {
-    return 'To: $recipients';
+    return '收件人：$recipients';
   }
 
   @override
-  String get chooseSentFolder => 'Choose Sent folder';
+  String get chooseSentFolder => '选择已发送文件夹';
 
   @override
   String get sentFolderOnlyLocalRecord =>
       'Only the local sent record is saved for this message.';
 
   @override
-  String get sentFolderSavePending => 'Saving to Sent';
+  String get sentFolderSavePending => '正在保存到已发送文件夹';
 
   @override
   String sentFolderSaved(String folderName) {
@@ -1347,10 +1356,10 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   }
 
   @override
-  String get sentFolderSelectionRequired => 'Choose a Sent folder';
+  String get sentFolderSelectionRequired => '请选择已发送文件夹';
 
   @override
-  String get sentFolderSaveFailed => 'Sent folder save failed';
+  String get sentFolderSaveFailed => '已发送文件夹保存失败';
 
   @override
   String sentFolderAppendSucceeded(String folderName) {
@@ -1359,7 +1368,7 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
 
   @override
   String sentFolderAppendFailed(String reason) {
-    return 'Could not save to Sent: $reason';
+    return '无法保存到已发送文件夹：$reason';
   }
 
   @override
@@ -1375,10 +1384,10 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get composeEmail => '写邮件';
 
   @override
-  String get composeFutureNotice => '写邮件功能将在后续版本提供。';
+  String get composeFutureNotice => '可通过工具栏或写邮件按钮创建邮件。';
 
   @override
-  String get foldersFutureNotice => '邮件同步加入后将支持文件夹导航。';
+  String get foldersFutureNotice => '文件夹会在账号下显示，同步后自动更新。';
 
   @override
   String get syncMail => '同步邮件';
@@ -1410,13 +1419,22 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get trash => '废纸篓';
 
   @override
+  String get junk => '垃圾邮件';
+
+  @override
   String get account => '账号';
+
+  @override
+  String get expandAccount => '展开账号';
+
+  @override
+  String get collapseAccount => '收起账号';
 
   @override
   String get folder => '文件夹';
 
   @override
-  String get fullMessageBodiesFutureNotice => '完整邮件正文将在后续 PR 中显示。';
+  String get fullMessageBodiesFutureNotice => '打开邮件后会显示已缓存或远程获取的正文。';
 
   @override
   String get noMessageSelected => '未选择邮件';
@@ -1766,7 +1784,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get invalidPort => '請輸入有效連接埠。';
 
   @override
-  String get oauthFutureNotice => '真實 OAuth 授權將在後續版本支援。';
+  String get oauthFutureNotice => '可使用 Gmail 或 Outlook 授權連接 OAuth 信箱。';
 
   @override
   String get gmailOAuthTitle => '使用 Google 登入';
@@ -1948,7 +1966,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get backupExportDescription =>
-      '建立包含帳號設定、伺服器設定和應用程式偏好的加密備份。匯入功能將在後續版本加入。';
+      '建立包含帳號設定、伺服器設定和應用程式偏好的加密備份。郵件快取和密鑰不會被匯出。';
 
   @override
   String get backupIncludes => '匯出內容';
@@ -2032,13 +2050,13 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   }
 
   @override
-  String get chooseSentFolder => '選擇 Sent 資料夾';
+  String get chooseSentFolder => '選擇已傳送資料夾';
 
   @override
   String get sentFolderOnlyLocalRecord => '這封郵件僅儲存了本機傳送記錄。';
 
   @override
-  String get sentFolderSavePending => '正在儲存到 Sent';
+  String get sentFolderSavePending => '正在儲存到已傳送資料夾';
 
   @override
   String sentFolderSaved(String folderName) {
@@ -2046,10 +2064,10 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   }
 
   @override
-  String get sentFolderSelectionRequired => '請選擇 Sent 資料夾';
+  String get sentFolderSelectionRequired => '請選擇已傳送資料夾';
 
   @override
-  String get sentFolderSaveFailed => 'Sent 資料夾儲存失敗';
+  String get sentFolderSaveFailed => '已傳送資料夾儲存失敗';
 
   @override
   String sentFolderAppendSucceeded(String folderName) {
@@ -2058,7 +2076,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String sentFolderAppendFailed(String reason) {
-    return '無法儲存到 Sent：$reason';
+    return '無法儲存到已傳送資料夾：$reason';
   }
 
   @override
@@ -2074,10 +2092,10 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get composeEmail => '寫郵件';
 
   @override
-  String get composeFutureNotice => '寫郵件功能將在後續版本提供。';
+  String get composeFutureNotice => '可透過工具列或寫郵件按鈕建立郵件。';
 
   @override
-  String get foldersFutureNotice => '加入郵件同步後將支援資料夾導覽。';
+  String get foldersFutureNotice => '資料夾會顯示在各帳號下，同步後自動更新。';
 
   @override
   String get syncMail => '同步邮件';
@@ -2109,13 +2127,22 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get trash => '垃圾桶';
 
   @override
+  String get junk => '垃圾郵件';
+
+  @override
   String get account => '帳號';
+
+  @override
+  String get expandAccount => '展開帳號';
+
+  @override
+  String get collapseAccount => '收合帳號';
 
   @override
   String get folder => '資料夾';
 
   @override
-  String get fullMessageBodiesFutureNotice => '完整郵件正文將在後續 PR 中顯示。';
+  String get fullMessageBodiesFutureNotice => '開啟郵件後會顯示已快取或遠端取得的正文。';
 
   @override
   String get noMessageSelected => '未選擇郵件';

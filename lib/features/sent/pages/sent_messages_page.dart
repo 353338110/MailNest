@@ -7,7 +7,6 @@ import '../../../app/theme/app_spacing.dart';
 import '../../../core/database/app_database.dart';
 import '../../../core/secure_storage/secure_storage_provider.dart';
 import '../../../l10n/generated/app_localizations.dart';
-import '../../../mail/localized_mail_labels.dart';
 import '../../../mail/models/sent_append_status.dart';
 import '../../../mail/provider/mail_connection_tester.dart';
 import '../../../mail/repository/account_repository_provider.dart';
@@ -26,7 +25,7 @@ class SentMessagesPage extends ConsumerWidget {
         .watchSentMessages();
 
     return Scaffold(
-      appBar: AppBar(title: Text(localizedSentMessages(l10n))),
+      appBar: AppBar(title: Text(l10n.sentMessages)),
       body: StreamBuilder<List<SentMessage>>(
         stream: messages,
         builder: (context, snapshot) {

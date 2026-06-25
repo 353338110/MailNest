@@ -1,24 +1,23 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mailnest_app/l10n/generated/app_localizations_en.dart';
 import 'package:mailnest_app/l10n/generated/app_localizations_zh.dart';
-import 'package:mailnest_app/mail/localized_mail_labels.dart';
 
 void main() {
   test('uses Chinese labels for zh-CN mail folders and account toggles', () {
     final l10n = AppLocalizationsZhCn();
 
-    expect(localizedSentMessages(l10n), '已发送');
-    expect(localizedJunk(l10n), '垃圾邮件');
-    expect(localizedExpandAccount(l10n), '展开账号');
-    expect(localizedCollapseAccount(l10n), '收起账号');
+    expect(l10n.sentMessages, '已发送');
+    expect(l10n.junk, '垃圾邮件');
+    expect(l10n.expandAccount, '展开账号');
+    expect(l10n.collapseAccount, '收起账号');
   });
 
   test('keeps English labels for English locale', () {
     final l10n = AppLocalizationsEn();
 
-    expect(localizedSentMessages(l10n), 'Sent');
-    expect(localizedJunk(l10n), 'Junk');
-    expect(localizedExpandAccount(l10n), 'Expand account');
-    expect(localizedCollapseAccount(l10n), 'Collapse account');
+    expect(l10n.sentMessages, 'Sent');
+    expect(l10n.junk, 'Junk');
+    expect(l10n.expandAccount, 'Expand account');
+    expect(l10n.collapseAccount, 'Collapse account');
   });
 }

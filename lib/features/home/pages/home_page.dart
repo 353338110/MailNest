@@ -9,7 +9,6 @@ import '../../../core/database/database_providers.dart';
 import '../../../core/platform/platform_info.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../../mail/errors/mail_error_sanitizer.dart';
-import '../../../mail/localized_mail_labels.dart';
 import '../../../mail/models/mailbox_folder.dart';
 import '../../../mail/models/mailbox_message.dart';
 import '../../../mail/models/mail_detail.dart';
@@ -62,7 +61,7 @@ class HomePage extends ConsumerWidget {
                       icon: const Icon(Icons.drafts_outlined),
                     ),
                     IconButton(
-                      tooltip: localizedSentMessages(l10n),
+                      tooltip: l10n.sentMessages,
                       onPressed: () => context.push('/sent'),
                       icon: const Icon(Icons.outbox_outlined),
                     ),
@@ -129,16 +128,6 @@ class _HomeNavigationDrawer extends StatelessWidget {
           label: Text(l10n.inbox),
         ),
         ListTile(
-          leading: const Icon(Icons.folder_outlined),
-          title: Text(l10n.folders),
-          onTap: () {
-            Navigator.of(context).pop();
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(SnackBar(content: Text(l10n.foldersFutureNotice)));
-          },
-        ),
-        ListTile(
           leading: const Icon(Icons.search),
           title: Text(l10n.searchMail),
           onTap: () => _closeAndPush(context, '/search'),
@@ -155,7 +144,7 @@ class _HomeNavigationDrawer extends StatelessWidget {
         ),
         ListTile(
           leading: const Icon(Icons.outbox_outlined),
-          title: Text(localizedSentMessages(l10n)),
+          title: Text(l10n.sentMessages),
           onTap: () => _closeAndPush(context, '/sent'),
         ),
         const Divider(),
@@ -759,7 +748,7 @@ class _MailboxNavigationState extends ConsumerState<_MailboxNavigation> {
             ),
             _FilterChipButton(
               icon: Icons.send_outlined,
-              label: localizedSentMessages(l10n),
+              label: l10n.sentMessages,
               selected: filter == MailboxFilter.sent,
               onTap: () => onFilterSelected(MailboxFilter.sent),
             ),
@@ -912,10 +901,10 @@ class _MailboxNavigationState extends ConsumerState<_MailboxNavigation> {
   String _folderName(AppLocalizations l10n, MailboxFolder folder) {
     return switch (folder.type) {
       MailboxFolderType.inbox => l10n.inbox,
-      MailboxFolderType.sent => localizedSentMessages(l10n),
+      MailboxFolderType.sent => l10n.sentMessages,
       MailboxFolderType.drafts => l10n.drafts,
       MailboxFolderType.trash => l10n.trash,
-      MailboxFolderType.junk => localizedJunk(l10n),
+      MailboxFolderType.junk => l10n.junk,
       MailboxFolderType.custom => folder.name,
     };
   }
@@ -1191,7 +1180,7 @@ class _MailboxHeader extends StatelessWidget {
       MailboxFilter.all => l10n.allMessages,
       MailboxFilter.unread => l10n.unread,
       MailboxFilter.starred => l10n.starred,
-      MailboxFilter.sent => localizedSentMessages(l10n),
+      MailboxFilter.sent => l10n.sentMessages,
       MailboxFilter.drafts => l10n.drafts,
       MailboxFilter.trash => l10n.trash,
     };
@@ -1219,10 +1208,10 @@ class _MailboxHeader extends StatelessWidget {
     );
     return switch (folder.type) {
       MailboxFolderType.inbox => l10n.inbox,
-      MailboxFolderType.sent => localizedSentMessages(l10n),
+      MailboxFolderType.sent => l10n.sentMessages,
       MailboxFolderType.drafts => l10n.drafts,
       MailboxFolderType.trash => l10n.trash,
-      MailboxFolderType.junk => localizedJunk(l10n),
+      MailboxFolderType.junk => l10n.junk,
       MailboxFolderType.custom => folder.name,
     };
   }
@@ -1885,9 +1874,7 @@ class _AccountNavigationTile extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           IconButton(
-            tooltip: expanded
-                ? localizedCollapseAccount(l10n)
-                : localizedExpandAccount(l10n),
+            tooltip: expanded ? l10n.collapseAccount : l10n.expandAccount,
             onPressed: onToggleExpanded,
             icon: Icon(
               expanded ? Icons.keyboard_arrow_down : Icons.keyboard_arrow_right,
@@ -2443,10 +2430,10 @@ class _MessageTile extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     return switch (message.folder.type) {
       MailboxFolderType.inbox => l10n.inbox,
-      MailboxFolderType.sent => localizedSentMessages(l10n),
+      MailboxFolderType.sent => l10n.sentMessages,
       MailboxFolderType.drafts => l10n.drafts,
       MailboxFolderType.trash => l10n.trash,
-      MailboxFolderType.junk => localizedJunk(l10n),
+      MailboxFolderType.junk => l10n.junk,
       MailboxFolderType.custom => message.folder.name,
     };
   }

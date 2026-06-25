@@ -196,7 +196,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get oauthFutureNotice =>
-      'Real OAuth authorization will be supported in a later version.';
+      'Use Gmail or Outlook authorization to connect OAuth-based accounts.';
 
   @override
   String get gmailOAuthTitle => 'Sign in with Google';
@@ -386,7 +386,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get backupExportDescription =>
-      'Create an encrypted backup of account configuration, server settings, and app preferences. Import will be added later.';
+      'Create an encrypted backup of account configuration, server settings, and app preferences. Mail caches and secrets are not exported.';
 
   @override
   String get backupIncludes => 'Included';
@@ -585,11 +585,11 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get composeFutureNotice =>
-      'Email composing will be available in a later version.';
+      'Compose mail from the toolbar or the compose button.';
 
   @override
   String get foldersFutureNotice =>
-      'Folder navigation will be available after mail sync is added.';
+      'Folders are shown under each account after sync.';
 
   @override
   String get syncMail => 'Sync mail';
@@ -621,14 +621,23 @@ class AppLocalizationsJa extends AppLocalizations {
   String get trash => 'Trash';
 
   @override
+  String get junk => 'Junk';
+
+  @override
   String get account => 'Account';
+
+  @override
+  String get expandAccount => 'Expand account';
+
+  @override
+  String get collapseAccount => 'Collapse account';
 
   @override
   String get folder => 'Folder';
 
   @override
   String get fullMessageBodiesFutureNotice =>
-      'Full message bodies will appear in a later PR.';
+      'Open a message to view its cached or remotely fetched body.';
 
   @override
   String get noMessageSelected => 'No message selected';

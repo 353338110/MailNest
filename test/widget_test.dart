@@ -42,8 +42,9 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Inbox'), findsWidgets);
-    expect(find.text('Folders'), findsOneWidget);
     expect(find.text('Accounts'), findsWidgets);
+    expect(find.text('Sent'), findsOneWidget);
+    expect(find.text(_testAccount.emailAddress), findsWidgets);
     expect(find.text('Settings'), findsOneWidget);
     expect(find.text('Mail detail'), findsNothing);
   });

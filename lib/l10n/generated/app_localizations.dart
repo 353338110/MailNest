@@ -479,7 +479,7 @@ abstract class AppLocalizations {
   /// No description provided for @oauthFutureNotice.
   ///
   /// In en, this message translates to:
-  /// **'Real OAuth authorization will be supported in a later version.'**
+  /// **'Use Gmail or Outlook authorization to connect OAuth-based accounts.'**
   String get oauthFutureNotice;
 
   /// No description provided for @gmailOAuthTitle.
@@ -809,7 +809,7 @@ abstract class AppLocalizations {
   /// No description provided for @backupExportDescription.
   ///
   /// In en, this message translates to:
-  /// **'Create an encrypted backup of account configuration, server settings, and app preferences. Import will be added later.'**
+  /// **'Create an encrypted backup of account configuration, server settings, and app preferences. Mail caches and secrets are not exported.'**
   String get backupExportDescription;
 
   /// No description provided for @backupIncludes.
@@ -1169,13 +1169,13 @@ abstract class AppLocalizations {
   /// No description provided for @composeFutureNotice.
   ///
   /// In en, this message translates to:
-  /// **'Email composing will be available in a later version.'**
+  /// **'Compose mail from the toolbar or the compose button.'**
   String get composeFutureNotice;
 
   /// No description provided for @foldersFutureNotice.
   ///
   /// In en, this message translates to:
-  /// **'Folder navigation will be available after mail sync is added.'**
+  /// **'Folders are shown under each account after sync.'**
   String get foldersFutureNotice;
 
   /// No description provided for @syncMail.
@@ -1232,11 +1232,29 @@ abstract class AppLocalizations {
   /// **'Trash'**
   String get trash;
 
+  /// No description provided for @junk.
+  ///
+  /// In en, this message translates to:
+  /// **'Junk'**
+  String get junk;
+
   /// No description provided for @account.
   ///
   /// In en, this message translates to:
   /// **'Account'**
   String get account;
+
+  /// No description provided for @expandAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Expand account'**
+  String get expandAccount;
+
+  /// No description provided for @collapseAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Collapse account'**
+  String get collapseAccount;
 
   /// No description provided for @folder.
   ///
@@ -1247,7 +1265,7 @@ abstract class AppLocalizations {
   /// No description provided for @fullMessageBodiesFutureNotice.
   ///
   /// In en, this message translates to:
-  /// **'Full message bodies will appear in a later PR.'**
+  /// **'Open a message to view its cached or remotely fetched body.'**
   String get fullMessageBodiesFutureNotice;
 
   /// No description provided for @noMessageSelected.
