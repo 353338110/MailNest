@@ -45,6 +45,7 @@
 - Download attachments from IMAP server to local cache.
 - Batch "Download All" with progress, success/failure count, and stop button.
 - Individual attachment download with progress and cancel entry.
+- Provider-level byte progress and cancel for attachment downloads: each attachment card shows byte-level progress bar and percentage; cancel button triggers immediate Provider-level cancellation.
 - Attachment type icons based on MIME type and file extension.
 - Local attachment cache management: view cache size, clear all, clear caches older than 30 days.
 - Open attachments with system default application.
