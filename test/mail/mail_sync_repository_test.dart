@@ -9,6 +9,7 @@ import 'package:mailnest_app/mail/models/mail_header.dart';
 import 'package:mailnest_app/mail/models/mail_sync_range.dart';
 import 'package:mailnest_app/mail/models/outgoing_message.dart';
 import 'package:mailnest_app/mail/models/sync_cursor.dart';
+import 'package:mailnest_app/mail/provider/gmail_mail_provider.dart';
 import 'package:mailnest_app/mail/provider/mail_connection_tester.dart';
 import 'package:mailnest_app/mail/provider/mail_provider.dart';
 import 'package:mailnest_app/mail/repository/mail_sync_repository.dart';
@@ -311,6 +312,40 @@ void main() {
     expect(states.single.error, isNot(contains('&uxzo1mwhtvzzoq')));
   });
 
+  test(
+    'syncRecentHeaders stores actionable Gmail reauthorization failures',
+    () async {
+      final database = AppDatabase(NativeDatabase.memory());
+      addTearDown(database.close);
+
+      final now = DateTime.utc(2026, 6, 24, 12);
+      await _saveAccount(database, now, provider: EmailProviderType.gmail);
+
+      final gmailProvider = _FakeMailProvider(
+        folders: [
+          _folder(id: 'INBOX', name: 'Inbox', flags: const [r'\Inbox']),
+        ],
+        folderFailures: const {'INBOX': GmailAuthorizationRequiredException()},
+      );
+      final repository = MailSyncRepository(
+        database: database,
+        imapProvider: _FakeMailProvider(),
+        gmailProvider: gmailProvider,
+        now: () => now,
+      );
+
+      await repository.syncRecentHeaders();
+
+      final states = await database.mailSyncStatesSnapshot(
+        accountId: 'user@example.com',
+      );
+      expect(states.single.status, 'failed');
+      expect(states.single.error, contains('Gmail authorization expired'));
+      expect(states.single.error, contains('reconnect this account'));
+      expect(states.single.error, isNot(contains('Authentication failed')));
+    },
+  );
+
   test('syncRecentHeaders clears invalid cursors and retries once', () async {
     final database = AppDatabase(NativeDatabase.memory());
     addTearDown(database.close);
@@ -362,7 +397,7 @@ class _FakeMailProvider implements MailProvider {
     List<MailFolder>? folders,
     Map<String, List<MailHeader>>? headersByFolder,
     Set<String> failingFolders = const <String>{},
-    Map<String, MailProtocolException> folderFailures = const {},
+    Map<String, Object> folderFailures = const {},
     this.invalidateFirstCursor = false,
   }) : folders = folders ?? _defaultFolders,
        headersByFolder = headersByFolder ?? const <String, List<MailHeader>>{},
@@ -390,7 +425,7 @@ class _FakeMailProvider implements MailProvider {
   final List<MailFolder> folders;
   final Map<String, List<MailHeader>> headersByFolder;
   final Set<String> failingFolders;
-  final Map<String, MailProtocolException> folderFailures;
+  final Map<String, Object> folderFailures;
   final bool invalidateFirstCursor;
   final syncCalls = <String, int>{};
   final cursorsByFolder = <String, List<SyncCursor>>{};
@@ -507,13 +542,17 @@ class _FakeMailProvider implements MailProvider {
   }
 }
 
-Future<void> _saveAccount(AppDatabase database, DateTime now) {
+Future<void> _saveAccount(
+  AppDatabase database,
+  DateTime now, {
+  EmailProviderType provider = EmailProviderType.custom,
+}) {
   return database.saveAccount(
     EmailAccountsCompanion(
       id: const Value('user@example.com'),
       emailAddress: const Value('user@example.com'),
       displayName: const Value(null),
-      provider: Value(EmailProviderType.custom.storageValue),
+      provider: Value(provider.storageValue),
       username: const Value('user@example.com'),
       authType: const Value('app_password'),
       imapHost: const Value('imap.example.com'),

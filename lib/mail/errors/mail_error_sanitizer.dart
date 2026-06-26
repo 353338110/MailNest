@@ -1,4 +1,5 @@
 import '../provider/mail_connection_tester.dart';
+import '../provider/gmail_mail_provider.dart';
 
 const _authenticationSyncError =
     'Authentication failed. Check the username and use the mailbox authorization code or app password instead of the web login password.';
@@ -6,13 +7,20 @@ const _authenticationSyncError =
 String safeMailErrorMessage(Object? error) {
   final raw = switch (error) {
     null => 'Unknown mail error.',
+    GmailAuthorizationRequiredException(:final message) => message,
     MailProtocolException(:final message) => message,
     _ => error.toString(),
   };
-  return sanitizeMailErrorMessage(raw);
+  return sanitizeMailErrorMessage(
+    raw,
+    mapAuthenticationErrors: error is! GmailAuthorizationRequiredException,
+  );
 }
 
-String sanitizeMailErrorMessage(String rawMessage) {
+String sanitizeMailErrorMessage(
+  String rawMessage, {
+  bool mapAuthenticationErrors = true,
+}) {
   var message = rawMessage
       .replaceFirst(RegExp(r'^MailProtocolException:\s*'), '')
       .replaceAll(RegExp(r'[\r\n\t]+'), ' ')
@@ -24,7 +32,7 @@ String sanitizeMailErrorMessage(String rawMessage) {
   }
 
   final lower = message.toLowerCase();
-  if (_isAuthenticationError(lower)) {
+  if (mapAuthenticationErrors && _isAuthenticationError(lower)) {
     return _authenticationSyncError;
   }
 

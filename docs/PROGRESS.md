@@ -1,6 +1,6 @@
 # MailNest 开发进度
 
-更新时间：2026-06-25
+更新时间：2026-06-26
 
 ## 维护规则
 
@@ -133,6 +133,8 @@
 - 本 PR：Gmail API 返回 401 时会强制刷新 token 并重试一次；刷新失败时抛出重新授权异常。
 - 本 PR：新增 Gmail 401 重试和刷新失败单元测试。
 - 本 PR：新增 `docs/qa/gmail-e2e.md` 真实账号端到端验收清单。
+- 本 PR：Gmail 重新授权异常在同步失败状态中保留为明确重新连接账号提示，不再被通用 IMAP/SMTP 认证失败文案覆盖。
+- 本 PR：新增 Gmail 重新授权错误净化和同步失败持久化回归测试。
 
 ### PR #23：发布流程和 tag 自动化
 
@@ -163,11 +165,21 @@ flutter test
 
 说明：测试中仍可能输出 Drift 多数据库 warning，目前不影响通过结果，后续可单独清理测试 provider 覆写。
 
+本 PR 本地已通过：
+
+```sh
+dart format --output=none --set-exit-if-changed .
+flutter analyze
+flutter test
+flutter test test/mail/mail_error_sanitizer_test.dart test/mail/mail_sync_repository_test.dart test/mail/gmail_mail_provider_test.dart
+```
+
 ## 未完成
 
 ### Gmail
 
 - Gmail token 过期、刷新失败和重新授权提示的真实账号端到端手工验收。
+  - 当前本地单元测试已覆盖错误净化和同步失败状态；真实账号验收仍需要专用 Gmail 测试账号和 Google OAuth Client ID。
 
 ## 后续 PR 队列
 

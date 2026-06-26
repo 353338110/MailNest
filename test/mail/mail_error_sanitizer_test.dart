@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mailnest_app/mail/errors/mail_error_sanitizer.dart';
+import 'package:mailnest_app/mail/provider/gmail_mail_provider.dart';
 import 'package:mailnest_app/mail/provider/mail_connection_tester.dart';
 
 void main() {
@@ -21,5 +22,15 @@ void main() {
     );
 
     expect(message, 'IMAP FETCH failed for token [redacted] and folder Inbox');
+  });
+
+  test('keeps Gmail reauthorization failures actionable', () {
+    final message = safeMailErrorMessage(
+      const GmailAuthorizationRequiredException(),
+    );
+
+    expect(message, contains('Gmail authorization expired'));
+    expect(message, contains('reconnect this account'));
+    expect(message, isNot(contains('Authentication failed')));
   });
 }
