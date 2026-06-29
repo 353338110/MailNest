@@ -1310,6 +1310,12 @@ abstract class AppLocalizations {
   /// **'Message contents will appear here on wide desktop windows.'**
   String get messageContentsPlaceholder;
 
+  /// No description provided for @loadingMailbox.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading mailbox…'**
+  String get loadingMailbox;
+
   /// No description provided for @accountMailbox.
   ///
   /// In en, this message translates to:

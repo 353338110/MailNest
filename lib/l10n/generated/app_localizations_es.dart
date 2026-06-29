@@ -665,6 +665,9 @@ class AppLocalizationsEs extends AppLocalizations {
       'Message contents will appear here on wide desktop windows.';
 
   @override
+  String get loadingMailbox => 'Cargando buzón…';
+
+  @override
   String get accountMailbox => 'Account mailbox';
 
   @override

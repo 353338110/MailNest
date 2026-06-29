@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../app/theme/app_spacing.dart';
+import '../../../app/theme/app_theme.dart';
 import '../../../core/database/app_database.dart';
 import '../../../core/database/database_providers.dart';
 import '../../../core/platform/platform_info.dart';
@@ -44,7 +45,20 @@ class HomePage extends ConsumerWidget {
           appBar: AppBar(
             title: Text(l10n.appTitle),
             actions: useMobileNavigation
-                ? null
+                ? [
+                    IconButton(
+                      tooltip: l10n.searchMail,
+                      onPressed: () => context.push('/search'),
+                      icon: const Icon(Icons.search),
+                    ),
+                    IconButton(
+                      tooltip: l10n.composeMail,
+                      onPressed: data.isEmpty
+                          ? null
+                          : () => context.push('/compose'),
+                      icon: const Icon(Icons.edit_outlined),
+                    ),
+                  ]
                 : [
                     IconButton(
                       tooltip: l10n.searchMail,
@@ -107,6 +121,9 @@ class _HomeNavigationDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final colorScheme = Theme.of(context).colorScheme;
+    final groupNames = {
+      for (final account in accounts) account.groupName,
+    }.toList(growable: false);
 
     return NavigationDrawer(
       selectedIndex: 0,
@@ -118,9 +135,36 @@ class _HomeNavigationDrawer extends StatelessWidget {
             AppSpacing.medium,
             AppSpacing.small,
           ),
-          child: Text(
-            l10n.appTitle,
-            style: Theme.of(context).textTheme.titleLarge,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: colorScheme.primaryContainer,
+              borderRadius: BorderRadius.circular(AppTheme.cardRadius),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.medium),
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    backgroundColor: colorScheme.primary,
+                    foregroundColor: colorScheme.onPrimary,
+                    child: const Text(
+                      'M',
+                      style: TextStyle(fontWeight: FontWeight.w800),
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.small),
+                  Expanded(
+                    child: Text(
+                      l10n.appTitle,
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        color: colorScheme.onPrimaryContainer,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ),
         NavigationDrawerDestination(
@@ -149,18 +193,33 @@ class _HomeNavigationDrawer extends StatelessWidget {
           onTap: () => _closeAndPush(context, '/sent'),
         ),
         const Divider(),
-        Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.medium,
-            vertical: AppSpacing.small,
-          ),
-          child: Text(
-            l10n.accounts,
-            style: Theme.of(context).textTheme.labelLarge?.copyWith(
-              color: colorScheme.onSurfaceVariant,
+        _DrawerSectionHeader(title: l10n.accountGroups),
+        if (groupNames.isEmpty)
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.medium,
+              vertical: AppSpacing.small,
             ),
-          ),
-        ),
+            child: Text(
+              l10n.noAccountsYet,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
+          )
+        else
+          for (final groupName in groupNames)
+            ListTile(
+              leading: const Icon(Icons.folder_shared_outlined),
+              title: Text(
+                groupName,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              onTap: () => Navigator.of(context).pop(),
+            ),
+        const Divider(),
+        _DrawerSectionHeader(title: l10n.accounts),
         ListTile(
           leading: const Icon(Icons.add),
           title: Text(l10n.addEmailAccount),
@@ -213,6 +272,32 @@ class _HomeNavigationDrawer extends StatelessWidget {
   void _closeAndPush(BuildContext context, String location) {
     Navigator.of(context).pop();
     context.push(location);
+  }
+}
+
+class _DrawerSectionHeader extends StatelessWidget {
+  const _DrawerSectionHeader({required this.title});
+
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.medium,
+        AppSpacing.medium,
+        AppSpacing.medium,
+        AppSpacing.small,
+      ),
+      child: Text(
+        title,
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
+          fontWeight: FontWeight.w800,
+          letterSpacing: 0.6,
+        ),
+      ),
+    );
   }
 }
 
@@ -340,7 +425,7 @@ class _MailboxWorkspaceState extends ConsumerState<_MailboxWorkspace> {
       syncFuture: _syncFuture,
       onRefresh: _refresh,
       selectedMessage: _selectedMessage,
-      embedded: isMedium,
+      embedded: true,
       showAccountMarker: _showsAccountMarker(scope),
       onMessageSelected: (message) {
         if (isWide) {
@@ -360,15 +445,21 @@ class _MailboxWorkspaceState extends ConsumerState<_MailboxWorkspace> {
     if (isWide) {
       return ColoredBox(
         color: Theme.of(context).colorScheme.surfaceContainerHighest,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            SizedBox(width: 280, child: navigation),
-            const VerticalDivider(width: 1),
-            SizedBox(width: width > 1340 ? 400 : 360, child: mailbox),
-            const VerticalDivider(width: 1),
-            Expanded(child: detail),
-          ],
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.medium),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              SizedBox(width: 292, child: _WorkspacePanel(child: navigation)),
+              const SizedBox(width: AppSpacing.medium),
+              SizedBox(
+                width: width > 1340 ? 420 : 380,
+                child: _WorkspacePanel(child: mailbox),
+              ),
+              const SizedBox(width: AppSpacing.medium),
+              Expanded(child: _WorkspacePanel(child: detail)),
+            ],
+          ),
         ),
       );
     }
@@ -376,13 +467,16 @@ class _MailboxWorkspaceState extends ConsumerState<_MailboxWorkspace> {
     if (isMedium) {
       return ColoredBox(
         color: Theme.of(context).colorScheme.surfaceContainerHighest,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            SizedBox(width: 280, child: navigation),
-            const VerticalDivider(width: 1),
-            Expanded(child: mailbox),
-          ],
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.medium),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              SizedBox(width: 292, child: _WorkspacePanel(child: navigation)),
+              const SizedBox(width: AppSpacing.medium),
+              Expanded(child: _WorkspacePanel(child: mailbox)),
+            ],
+          ),
         ),
       );
     }
@@ -392,13 +486,18 @@ class _MailboxWorkspaceState extends ConsumerState<_MailboxWorkspace> {
     }
 
     return ListView(
-      padding: const EdgeInsets.only(bottom: AppSpacing.xlarge * 3),
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.medium,
+        AppSpacing.medium,
+        AppSpacing.medium,
+        AppSpacing.xlarge * 3,
+      ),
       children: [
-        navigation,
-        const Divider(height: 1),
+        _WorkspacePanel(child: navigation),
+        const SizedBox(height: AppSpacing.medium),
         SizedBox(
           height: MediaQuery.sizeOf(context).height * 0.58,
-          child: mailbox,
+          child: _WorkspacePanel(child: mailbox),
         ),
       ],
     );
@@ -485,6 +584,36 @@ class _SelectedMessage {
   }
 }
 
+class _WorkspacePanel extends StatelessWidget {
+  const _WorkspacePanel({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerLowest,
+        borderRadius: BorderRadius.circular(AppTheme.panelRadius),
+        border: Border.all(color: colorScheme.outlineVariant),
+        boxShadow: [
+          BoxShadow(
+            color: colorScheme.shadow.withValues(alpha: 0.06),
+            blurRadius: 24,
+            offset: const Offset(0, 12),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(AppTheme.panelRadius),
+        child: child,
+      ),
+    );
+  }
+}
+
 class _MailboxDetailPane extends ConsumerWidget {
   const _MailboxDetailPane({
     required this.accounts,
@@ -502,10 +631,7 @@ class _MailboxDetailPane extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final selected = selectedMessage;
     if (selected == null || !RegExp(r'^\d+$').hasMatch(selected.uid)) {
-      return const Padding(
-        padding: EdgeInsets.all(AppSpacing.large),
-        child: _MailboxDetailEmptyState(),
-      );
+      return const _MailboxDetailEmptyState();
     }
 
     final detail = ref.watch(
@@ -521,7 +647,7 @@ class _MailboxDetailPane extends ConsumerWidget {
     return detail.when(
       data: (detail) => MailDetailEmbeddedView(detail: detail),
       error: (error, _) => const _MailboxDetailError(),
-      loading: () => const Center(child: CircularProgressIndicator()),
+      loading: () => const _PanelLoadingState(),
     );
   }
 }
@@ -565,18 +691,9 @@ class _MailboxDetailError extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.large),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.error_outline, size: 48),
-            const SizedBox(height: AppSpacing.medium),
-            Text(AppLocalizations.of(context).messageLoadFailed),
-          ],
-        ),
-      ),
+    return _PanelStateCard(
+      icon: Icons.error_outline,
+      title: AppLocalizations.of(context).messageLoadFailed,
     );
   }
 }
@@ -588,19 +705,112 @@ class _MailboxDetailEmptyState extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
 
+    return _PanelStateCard(
+      icon: Icons.mark_email_read_outlined,
+      title: l10n.noMessageSelected,
+      message: l10n.messageContentsPlaceholder,
+      actions: [
+        OutlinedButton.icon(
+          onPressed: () => context.push('/search'),
+          icon: const Icon(Icons.search),
+          label: Text(l10n.searchMail),
+        ),
+        FilledButton.icon(
+          onPressed: () => context.push('/compose'),
+          icon: const Icon(Icons.edit_outlined),
+          label: Text(l10n.composeMail),
+        ),
+      ],
+    );
+  }
+}
+
+class _PanelLoadingState extends StatelessWidget {
+  const _PanelLoadingState();
+
+  @override
+  Widget build(BuildContext context) {
+    return _PanelStateCard(
+      icon: Icons.sync_outlined,
+      title: AppLocalizations.of(context).loadingMailbox,
+      progress: true,
+    );
+  }
+}
+
+class _PanelStateCard extends StatelessWidget {
+  const _PanelStateCard({
+    required this.icon,
+    required this.title,
+    this.message,
+    this.actions = const [],
+    this.progress = false,
+  });
+
+  final IconData icon;
+  final String title;
+  final String? message;
+  final List<Widget> actions;
+  final bool progress;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(Icons.article_outlined, size: 48),
-          const SizedBox(height: AppSpacing.medium),
-          Text(
-            l10n.noMessageSelected,
-            style: Theme.of(context).textTheme.titleMedium,
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.large),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 360),
+          child: Card(
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.large),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CircleAvatar(
+                    radius: 28,
+                    backgroundColor: colorScheme.secondaryContainer,
+                    foregroundColor: colorScheme.onSecondaryContainer,
+                    child: Icon(icon, size: 30),
+                  ),
+                  const SizedBox(height: AppSpacing.medium),
+                  Text(
+                    title,
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  if (message != null) ...[
+                    const SizedBox(height: AppSpacing.small),
+                    Text(
+                      message!,
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                  if (progress) ...[
+                    const SizedBox(height: AppSpacing.large),
+                    const LinearProgressIndicator(),
+                  ],
+                  if (actions.isNotEmpty) ...[
+                    const SizedBox(height: AppSpacing.large),
+                    Wrap(
+                      alignment: WrapAlignment.center,
+                      spacing: AppSpacing.small,
+                      runSpacing: AppSpacing.small,
+                      children: actions,
+                    ),
+                  ],
+                ],
+              ),
+            ),
           ),
-          const SizedBox(height: AppSpacing.small),
-          Text(l10n.messageContentsPlaceholder, textAlign: TextAlign.center),
-        ],
+        ),
       ),
     );
   }
@@ -659,27 +869,7 @@ class _MailboxNavigationState extends ConsumerState<_MailboxNavigation> {
       physics: scrollable ? null : const NeverScrollableScrollPhysics(),
       padding: const EdgeInsets.all(AppSpacing.medium),
       children: [
-        Row(
-          children: [
-            CircleAvatar(
-              backgroundColor: Theme.of(context).colorScheme.primary,
-              child: Text(
-                'M',
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onPrimary,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-            ),
-            const SizedBox(width: AppSpacing.small),
-            Expanded(
-              child: Text(
-                l10n.appTitle,
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-            ),
-          ],
-        ),
+        const _NavigationBrand(),
         const SizedBox(height: AppSpacing.medium),
         FilledButton.icon(
           onPressed: () => context.push('/compose'),
@@ -687,7 +877,7 @@ class _MailboxNavigationState extends ConsumerState<_MailboxNavigation> {
           label: Text(l10n.composeMail),
         ),
         const SizedBox(height: AppSpacing.large),
-        Text(l10n.mailboxes, style: Theme.of(context).textTheme.titleMedium),
+        _NavigationSectionHeader(title: l10n.mailboxes),
         const SizedBox(height: AppSpacing.small),
         _NavigationTile(
           icon: Icons.move_to_inbox_outlined,
@@ -696,16 +886,9 @@ class _MailboxNavigationState extends ConsumerState<_MailboxNavigation> {
           onTap: () => onScopeSelected(const UnifiedMailboxScope()),
         ),
         const SizedBox(height: AppSpacing.medium),
-        Row(
-          children: [
-            Expanded(
-              child: Text(
-                l10n.accountGroups,
-                style: Theme.of(context).textTheme.titleSmall,
-              ),
-            ),
-            _GroupActionsMenu(accounts: accounts),
-          ],
+        _NavigationSectionHeader(
+          title: l10n.accountGroups,
+          trailing: _GroupActionsMenu(accounts: accounts),
         ),
         const SizedBox(height: AppSpacing.small),
         StreamBuilder<List<AccountGroup>>(
@@ -729,7 +912,7 @@ class _MailboxNavigationState extends ConsumerState<_MailboxNavigation> {
           },
         ),
         const SizedBox(height: AppSpacing.medium),
-        Text(l10n.filters, style: Theme.of(context).textTheme.titleSmall),
+        _NavigationSectionHeader(title: l10n.filters),
         const SizedBox(height: AppSpacing.small),
         Wrap(
           spacing: AppSpacing.small,
@@ -768,7 +951,7 @@ class _MailboxNavigationState extends ConsumerState<_MailboxNavigation> {
           ],
         ),
         const SizedBox(height: AppSpacing.medium),
-        Text(l10n.accounts, style: Theme.of(context).textTheme.titleSmall),
+        _NavigationSectionHeader(title: l10n.accounts),
         const SizedBox(height: AppSpacing.small),
         _NavigationTile(
           icon: Icons.person_add_outlined,
@@ -957,6 +1140,96 @@ class _MailboxNavigationState extends ConsumerState<_MailboxNavigation> {
   }
 }
 
+class _NavigationBrand extends StatelessWidget {
+  const _NavigationBrand();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final l10n = AppLocalizations.of(context);
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            colorScheme.primaryContainer,
+            colorScheme.secondaryContainer,
+          ],
+        ),
+        borderRadius: BorderRadius.circular(AppTheme.cardRadius),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.medium),
+        child: Row(
+          children: [
+            CircleAvatar(
+              backgroundColor: colorScheme.primary,
+              foregroundColor: colorScheme.onPrimary,
+              child: const Text(
+                'M',
+                style: TextStyle(fontWeight: FontWeight.w800),
+              ),
+            ),
+            const SizedBox(width: AppSpacing.small),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l10n.appTitle,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      color: colorScheme.onPrimaryContainer,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  Text(
+                    l10n.unifiedInbox,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: colorScheme.onPrimaryContainer.withValues(
+                        alpha: 0.74,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _NavigationSectionHeader extends StatelessWidget {
+  const _NavigationSectionHeader({required this.title, this.trailing});
+
+  final String title;
+  final Widget? trailing;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            title,
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0.6,
+            ),
+          ),
+        ),
+        ?trailing,
+      ],
+    );
+  }
+}
+
 class _MailboxList extends ConsumerWidget {
   const _MailboxList({
     required this.accounts,
@@ -1038,7 +1311,6 @@ class _MailboxList extends ConsumerWidget {
                           : _syncErrorSummary(failedSyncStates),
                       onRefresh: onRefresh,
                     ),
-                    const Divider(height: 1),
                     Expanded(
                       child: _MailboxContent(
                         messages: messages,
@@ -1126,53 +1398,88 @@ class _MailboxHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
     return Padding(
       padding: const EdgeInsets.all(AppSpacing.medium),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  _scopeTitle(l10n),
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                const SizedBox(height: AppSpacing.xsmall),
-                Text(
-                  '${_filterTitle(l10n)} • ${l10n.mailMessageCount(count)}',
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-                if (syncErrorSummary != null) ...[
-                  const SizedBox(height: AppSpacing.xsmall),
-                  Text(
-                    l10n.mailSyncFailed(syncErrorSummary!),
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context).colorScheme.error,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: colorScheme.surfaceContainerLow,
+          borderRadius: BorderRadius.circular(AppTheme.cardRadius),
+          border: Border.all(color: colorScheme.outlineVariant),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.medium),
+          child: Row(
+            children: [
+              CircleAvatar(
+                backgroundColor: colorScheme.primaryContainer,
+                foregroundColor: colorScheme.onPrimaryContainer,
+                child: Icon(_scopeIcon()),
+              ),
+              const SizedBox(width: AppSpacing.medium),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      _scopeTitle(l10n),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w800,
+                      ),
                     ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
+                    const SizedBox(height: AppSpacing.xsmall),
+                    Text(
+                      '${_filterTitle(l10n)} • ${l10n.mailMessageCount(count)}',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                    if (syncErrorSummary != null) ...[
+                      const SizedBox(height: AppSpacing.xsmall),
+                      Text(
+                        l10n.mailSyncFailed(syncErrorSummary!),
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: colorScheme.error,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              IconButton.filledTonal(
+                tooltip: l10n.syncMail,
+                onPressed: isSyncing ? null : onRefresh,
+                icon: isSyncing
+                    ? const SizedBox.square(
+                        dimension: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.sync_outlined),
+              ),
+              if (filter != MailboxFilter.all) ...[
+                const SizedBox(width: AppSpacing.small),
+                Icon(_filterIcon(), color: colorScheme.primary),
               ],
-            ),
+            ],
           ),
-          IconButton(
-            tooltip: l10n.syncMail,
-            onPressed: isSyncing ? null : onRefresh,
-            icon: isSyncing
-                ? const SizedBox.square(
-                    dimension: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Icon(Icons.sync_outlined),
-          ),
-          if (filter != MailboxFilter.all)
-            Icon(_filterIcon(), color: Theme.of(context).colorScheme.primary),
-        ],
+        ),
       ),
     );
+  }
+
+  IconData _scopeIcon() {
+    return switch (scope) {
+      UnifiedMailboxScope() => Icons.move_to_inbox_outlined,
+      GroupMailboxScope() => Icons.folder_shared_outlined,
+      AccountMailboxScope() => Icons.alternate_email,
+      FolderMailboxScope() => Icons.folder_outlined,
+    };
   }
 
   String _scopeTitle(AppLocalizations l10n) {
@@ -1271,7 +1578,11 @@ class _MailboxContentState extends ConsumerState<_MailboxContent> {
     final l10n = AppLocalizations.of(context);
 
     if (widget.isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return _PanelStateCard(
+        icon: Icons.sync_outlined,
+        title: l10n.loadingMailbox,
+        progress: true,
+      );
     }
 
     if (widget.error != null && widget.messages.isEmpty) {
@@ -1879,25 +2190,89 @@ class _AccountNavigationTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    return _NavigationTile(
-      icon: Icons.alternate_email,
-      title: account.emailAddress,
-      subtitle: '${account.provider} • ${account.imapHost}',
-      selected: selected,
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          IconButton(
-            tooltip: expanded ? l10n.collapseAccount : l10n.expandAccount,
-            onPressed: onToggleExpanded,
-            icon: Icon(
-              expanded ? Icons.keyboard_arrow_down : Icons.keyboard_arrow_right,
-            ),
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final background = selected
+        ? colorScheme.secondaryContainer
+        : colorScheme.surfaceContainerLow;
+    final foreground = selected
+        ? colorScheme.onSecondaryContainer
+        : colorScheme.onSurface;
+
+    return Material(
+      color: background,
+      borderRadius: BorderRadius.circular(AppTheme.tileRadius),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.compact,
+            AppSpacing.small,
+            AppSpacing.xsmall,
+            AppSpacing.small,
           ),
-          _AccountMenu(account: account),
-        ],
+          child: Row(
+            children: [
+              CircleAvatar(
+                radius: 18,
+                backgroundColor: selected
+                    ? colorScheme.primary
+                    : colorScheme.secondaryContainer,
+                foregroundColor: selected
+                    ? colorScheme.onPrimary
+                    : colorScheme.onSecondaryContainer,
+                child: Icon(
+                  account.syncEnabled
+                      ? Icons.alternate_email
+                      : Icons.sync_disabled_outlined,
+                  size: 19,
+                ),
+              ),
+              const SizedBox(width: AppSpacing.small),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      account.emailAddress,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: foreground,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      '${account.provider} • ${account.imapHost}',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: selected
+                            ? colorScheme.onSecondaryContainer.withValues(
+                                alpha: 0.72,
+                              )
+                            : colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              IconButton(
+                tooltip: expanded ? l10n.collapseAccount : l10n.expandAccount,
+                onPressed: onToggleExpanded,
+                icon: Icon(
+                  expanded
+                      ? Icons.keyboard_arrow_down
+                      : Icons.keyboard_arrow_right,
+                ),
+              ),
+              _AccountMenu(account: account),
+            ],
+          ),
+        ),
       ),
-      onTap: onTap,
     );
   }
 }
@@ -1908,14 +2283,12 @@ class _NavigationTile extends StatelessWidget {
     required this.title,
     required this.selected,
     required this.onTap,
-    this.subtitle,
     this.trailing,
     this.dense = false,
   });
 
   final IconData icon;
   final String title;
-  final String? subtitle;
   final bool selected;
   final Widget? trailing;
   final VoidCallback onTap;
@@ -1923,23 +2296,60 @@ class _NavigationTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final foreground = selected
+        ? colorScheme.onSecondaryContainer
+        : colorScheme.onSurface;
+
     return Material(
-      color: selected
-          ? Theme.of(context).colorScheme.secondaryContainer
-          : Colors.transparent,
-      borderRadius: BorderRadius.circular(8),
-      child: ListTile(
-        dense: dense,
-        minVerticalPadding: dense ? AppSpacing.xsmall : null,
-        leading: Icon(icon),
-        title: Text(title, maxLines: 1, overflow: TextOverflow.ellipsis),
-        subtitle: subtitle == null
-            ? null
-            : Text(subtitle!, maxLines: 1, overflow: TextOverflow.ellipsis),
-        trailing: trailing,
-        selected: selected,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      color: selected ? colorScheme.secondaryContainer : Colors.transparent,
+      borderRadius: BorderRadius.circular(AppTheme.tileRadius),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
         onTap: onTap,
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: AppSpacing.compact,
+            vertical: dense ? AppSpacing.small : AppSpacing.compact,
+          ),
+          child: Row(
+            children: [
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 160),
+                width: 4,
+                height: dense ? 20 : 28,
+                decoration: BoxDecoration(
+                  color: selected ? colorScheme.primary : Colors.transparent,
+                  borderRadius: BorderRadius.circular(999),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.small),
+              Icon(icon, size: dense ? 18 : 20, color: foreground),
+              const SizedBox(width: AppSpacing.small),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: foreground,
+                        fontWeight: selected
+                            ? FontWeight.w800
+                            : FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              ?trailing,
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -2276,15 +2686,16 @@ class _MessageTile extends StatelessWidget {
     final header = message.header;
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final selectedForeground = colorScheme.onSecondaryContainer;
     final activeColor = selected
-        ? colorScheme.primary
+        ? colorScheme.secondaryContainer
         : colorScheme.surfaceContainerLowest;
     final subjectStyle = theme.textTheme.titleMedium?.copyWith(
       fontWeight: header.isRead ? FontWeight.w600 : FontWeight.w800,
-      color: selected ? colorScheme.onPrimary : null,
+      color: selected ? selectedForeground : colorScheme.onSurface,
     );
     final secondaryColor = selected
-        ? colorScheme.onPrimary.withValues(alpha: 0.78)
+        ? selectedForeground.withValues(alpha: 0.76)
         : colorScheme.onSurfaceVariant;
 
     if (!cardStyle) {
@@ -2339,7 +2750,12 @@ class _MessageTile extends StatelessWidget {
       onSecondaryTapDown: (details) => onContextMenu(details.globalPosition),
       child: Material(
         color: activeColor,
-        borderRadius: BorderRadius.circular(8),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppTheme.cardRadius),
+          side: BorderSide(
+            color: selected ? colorScheme.primary : colorScheme.outlineVariant,
+          ),
+        ),
         clipBehavior: Clip.antiAlias,
         child: InkWell(
           onTap: _canOpenDetail(header.id) ? onTap : null,
@@ -2377,8 +2793,8 @@ class _MessageTile extends StatelessWidget {
                                       ? FontWeight.w600
                                       : FontWeight.w800,
                                   color: selected
-                                      ? colorScheme.onPrimary
-                                      : null,
+                                      ? selectedForeground
+                                      : colorScheme.onSurface,
                                 ),
                               ),
                               if (showAccountMarker) ...[
@@ -2420,16 +2836,17 @@ class _MessageTile extends StatelessWidget {
                 ),
                 if (!header.isRead)
                   Positioned(
-                    right: 0,
+                    left: 0,
                     top: 0,
+                    bottom: 0,
                     child: DecoratedBox(
                       decoration: BoxDecoration(
                         color: selected
-                            ? colorScheme.onPrimary
+                            ? colorScheme.primary
                             : colorScheme.primary,
-                        shape: BoxShape.circle,
+                        borderRadius: BorderRadius.circular(999),
                       ),
-                      child: const SizedBox.square(dimension: 10),
+                      child: const SizedBox(width: 4),
                     ),
                   ),
               ],
@@ -2644,27 +3061,16 @@ class _MailboxEmptyState extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
 
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.large),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.inbox_outlined, size: 48),
-            const SizedBox(height: AppSpacing.medium),
-            Text(
-              filtered ? l10n.noMessagesMatchFilter : l10n.noMessages,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: AppSpacing.medium),
-            FilledButton.icon(
-              onPressed: onRefresh,
-              icon: const Icon(Icons.sync_outlined),
-              label: Text(l10n.syncMail),
-            ),
-          ],
+    return _PanelStateCard(
+      icon: filtered ? Icons.filter_alt_off_outlined : Icons.inbox_outlined,
+      title: filtered ? l10n.noMessagesMatchFilter : l10n.noMessages,
+      actions: [
+        FilledButton.icon(
+          onPressed: onRefresh,
+          icon: const Icon(Icons.sync_outlined),
+          label: Text(l10n.syncMail),
         ),
-      ),
+      ],
     );
   }
 }
@@ -2677,24 +3083,16 @@ class _MailboxErrorState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.large),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.error_outline, size: 48),
-            const SizedBox(height: AppSpacing.medium),
-            Text(message, textAlign: TextAlign.center),
-            const SizedBox(height: AppSpacing.medium),
-            FilledButton.icon(
-              onPressed: onRefresh,
-              icon: const Icon(Icons.refresh_outlined),
-              label: Text(AppLocalizations.of(context).retry),
-            ),
-          ],
+    return _PanelStateCard(
+      icon: Icons.error_outline,
+      title: message,
+      actions: [
+        FilledButton.icon(
+          onPressed: onRefresh,
+          icon: const Icon(Icons.refresh_outlined),
+          label: Text(AppLocalizations.of(context).retry),
         ),
-      ),
+      ],
     );
   }
 }
@@ -2707,12 +3105,29 @@ class _InlineMailboxError extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      leading: const Icon(Icons.error_outline),
-      title: Text(message),
-      trailing: TextButton(
-        onPressed: onRefresh,
-        child: Text(AppLocalizations.of(context).retry),
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.small),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: colorScheme.errorContainer,
+          borderRadius: BorderRadius.circular(AppTheme.cardRadius),
+        ),
+        child: ListTile(
+          leading: Icon(
+            Icons.error_outline,
+            color: colorScheme.onErrorContainer,
+          ),
+          title: Text(
+            message,
+            style: TextStyle(color: colorScheme.onErrorContainer),
+          ),
+          trailing: TextButton(
+            onPressed: onRefresh,
+            child: Text(AppLocalizations.of(context).retry),
+          ),
+        ),
       ),
     );
   }
@@ -2842,29 +3257,23 @@ class _EmptyState extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
 
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.large),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.inbox_outlined, size: 56),
-            const SizedBox(height: AppSpacing.medium),
-            Text(l10n.noAccountsYet),
-            const SizedBox(height: AppSpacing.medium),
-            FilledButton.icon(
-              onPressed: onAdd,
-              icon: const Icon(Icons.add),
-              label: Text(l10n.addEmailAccount),
-            ),
-            const SizedBox(height: AppSpacing.small),
-            OutlinedButton.icon(
-              onPressed: () => context.push('/mail/detail'),
-              icon: const Icon(Icons.article_outlined),
-              label: Text(l10n.openMailDetailPreview),
-            ),
-          ],
-        ),
+    return ColoredBox(
+      color: Theme.of(context).colorScheme.surfaceContainerHighest,
+      child: _PanelStateCard(
+        icon: Icons.all_inbox_outlined,
+        title: l10n.noAccountsYet,
+        actions: [
+          FilledButton.icon(
+            onPressed: onAdd,
+            icon: const Icon(Icons.add),
+            label: Text(l10n.addEmailAccount),
+          ),
+          OutlinedButton.icon(
+            onPressed: () => context.push('/mail/detail'),
+            icon: const Icon(Icons.article_outlined),
+            label: Text(l10n.openMailDetailPreview),
+          ),
+        ],
       ),
     );
   }

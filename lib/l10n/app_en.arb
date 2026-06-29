@@ -310,6 +310,7 @@
   "fullMessageBodiesFutureNotice": "Open a message to view its cached or remotely fetched body.",
   "noMessageSelected": "No message selected",
   "messageContentsPlaceholder": "Message contents will appear here on wide desktop windows.",
+  "loadingMailbox": "Loading mailbox…",
   "accountMailbox": "Account mailbox",
   "allMessages": "All",
   "mailMessageCount": "{count} messages",

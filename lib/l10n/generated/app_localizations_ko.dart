@@ -665,6 +665,9 @@ class AppLocalizationsKo extends AppLocalizations {
       'Message contents will appear here on wide desktop windows.';
 
   @override
+  String get loadingMailbox => '메일함을 불러오는 중…';
+
+  @override
   String get accountMailbox => 'Account mailbox';
 
   @override

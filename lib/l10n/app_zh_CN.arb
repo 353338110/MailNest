@@ -247,6 +247,7 @@
   "fullMessageBodiesFutureNotice": "打开邮件后会显示已缓存或远程获取的正文。",
   "noMessageSelected": "未选择邮件",
   "messageContentsPlaceholder": "邮件内容会显示在宽屏桌面的这里。",
+  "loadingMailbox": "正在加载邮箱…",
   "accountMailbox": "账号邮箱",
   "allMessages": "全部",
   "mailMessageCount": "{count} 封邮件",

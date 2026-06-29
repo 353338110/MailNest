@@ -1,6 +1,6 @@
 # MailNest 开发进度
 
-更新时间：2026-06-26
+更新时间：2026-06-29
 
 ## 维护规则
 
@@ -59,6 +59,12 @@
 
 ### 本轮修复与增强
 
+- 本 PR：主界面 UX/UI 卡片化优化，统一主题圆角、卡片、导航、输入框和 FAB 视觉规则。
+- 本 PR：首页桌面三栏/中屏两栏改为独立卡片式工作区，左侧导航、邮件列表和详情面板层级更清晰。
+- 本 PR：移动端 AppBar 保留搜索和写信高频入口，Drawer 增加品牌区、账号分组和账号分区。
+- 本 PR：邮件列表改为卡片式列表，强化未读邮件强调、账号标识 chip、选中态和同步错误/空态/加载态。
+- 本 PR：邮件详情内容区改为阅读卡片，桌面未选中邮件时提供搜索和写信入口。
+- 本 PR：新增邮箱加载状态多语言文案，并提交 `flutter gen-l10n` 生成文件。
 - 本 PR：清理过期“后续版本/后续 PR”提示，移动端抽屉不再展示无效的文件夹未来功能入口。
 - 本 PR：邮件文件夹和账号展开/收起文案统一使用生成的 `AppLocalizations`，删除临时本地化 helper，并提交生成后的 l10n 文件。
 - 本 PR：多账号分组管理，支持首页新增、编辑、删除空分组，以及账号批量移动分组。
@@ -174,6 +180,15 @@ flutter test
 flutter test test/mail/mail_error_sanitizer_test.dart test/mail/mail_sync_repository_test.dart test/mail/gmail_mail_provider_test.dart
 ```
 
+主界面 UX/UI 优化本地已通过：
+
+```sh
+dart format --output=none --set-exit-if-changed .
+flutter analyze
+flutter test
+git diff --check
+```
+
 ## 未完成
 
 ### Gmail
@@ -186,6 +201,7 @@ flutter test test/mail/mail_error_sanitizer_test.dart test/mail/mail_sync_reposi
 建议按以下顺序继续，每项一个 PR：
 
 1. Gmail 真实账号端到端验收：验证 token 过期、刷新失败和重新授权提示。
+2. v0.1.0 发布前健康检查：确认 CI、release workflow、`pubspec.yaml` 版本和发布文档一致。
 
 ## 开放 PR
 

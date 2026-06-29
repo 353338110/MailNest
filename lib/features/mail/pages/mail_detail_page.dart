@@ -256,7 +256,7 @@ class _MailDetailBody extends StatelessWidget {
     );
 
     return ColoredBox(
-      color: colorScheme.surface,
+      color: colorScheme.surfaceContainerHighest,
       child: Column(
         children: [
           _MailActionHeader(
@@ -274,53 +274,56 @@ class _MailDetailBody extends StatelessWidget {
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(AppSpacing.large),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: LayoutBuilder(
-                      builder: (context, constraints) {
-                        final contentWidth = constraints.maxWidth > 850
-                            ? 800.0
-                            : constraints.maxWidth;
-                        return SizedBox(
-                          width: contentWidth,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              _MessageHeading(
-                                detail: detail,
-                                avatar: _SenderAvatar(
-                                  sender: detail.header.sender,
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 920),
+                  child: Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(AppSpacing.large),
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          final contentWidth = constraints.maxWidth > 850
+                              ? 800.0
+                              : constraints.maxWidth;
+                          return SizedBox(
+                            width: contentWidth,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _MessageHeading(
+                                  detail: detail,
+                                  avatar: _SenderAvatar(
+                                    sender: detail.header.sender,
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(height: AppSpacing.large),
-                              renderer.build(
-                                context,
-                                body: parsedBody,
-                                options: EmailRenderOptions(
-                                  allowRemoteImages: remoteImagesAllowed,
-                                  preferPlainText: preferPlainText,
-                                  onLoadRemoteImages: onLoadRemoteImages,
-                                ),
-                              ),
-                              if (detail.attachments.isNotEmpty) ...[
                                 const SizedBox(height: AppSpacing.large),
-                                _AttachmentSection(
-                                  attachments: detail.attachments,
-                                  subtitleBuilder: _attachmentSubtitle,
-                                  accountId: accountId,
-                                  folderId: folderId,
-                                  uid: uid,
+                                renderer.build(
+                                  context,
+                                  body: parsedBody,
+                                  options: EmailRenderOptions(
+                                    allowRemoteImages: remoteImagesAllowed,
+                                    preferPlainText: preferPlainText,
+                                    onLoadRemoteImages: onLoadRemoteImages,
+                                  ),
                                 ),
+                                if (detail.attachments.isNotEmpty) ...[
+                                  const SizedBox(height: AppSpacing.large),
+                                  _AttachmentSection(
+                                    attachments: detail.attachments,
+                                    subtitleBuilder: _attachmentSubtitle,
+                                    accountId: accountId,
+                                    folderId: folderId,
+                                    uid: uid,
+                                  ),
+                                ],
                               ],
-                            ],
-                          ),
-                        );
-                      },
+                            ),
+                          );
+                        },
+                      ),
                     ),
                   ),
-                ],
+                ),
               ),
             ),
           ),

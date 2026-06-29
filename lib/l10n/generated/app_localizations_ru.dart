@@ -665,6 +665,9 @@ class AppLocalizationsRu extends AppLocalizations {
       'Message contents will appear here on wide desktop windows.';
 
   @override
+  String get loadingMailbox => 'Загрузка почтового ящика…';
+
+  @override
   String get accountMailbox => 'Account mailbox';
 
   @override

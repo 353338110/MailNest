@@ -205,6 +205,7 @@
   "fullMessageBodiesFutureNotice": "開啟郵件後會顯示已快取或遠端取得的正文。",
   "noMessageSelected": "未選擇郵件",
   "messageContentsPlaceholder": "郵件內容會顯示在寬螢幕桌面的這裡。",
+  "loadingMailbox": "正在載入信箱…",
   "accountMailbox": "帳號信箱",
   "allMessages": "全部",
   "mailMessageCount": "{count} 封郵件",

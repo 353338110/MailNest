@@ -645,6 +645,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get messageContentsPlaceholder => '邮件内容会显示在宽屏桌面的这里。';
 
   @override
+  String get loadingMailbox => '正在加载邮箱…';
+
+  @override
   String get accountMailbox => '账号邮箱';
 
   @override
@@ -1503,6 +1506,9 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get messageContentsPlaceholder => '邮件内容会显示在宽屏桌面的这里。';
 
   @override
+  String get loadingMailbox => '正在加载邮箱…';
+
+  @override
   String get accountMailbox => '账号邮箱';
 
   @override
@@ -2251,6 +2257,9 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get messageContentsPlaceholder => '郵件內容會顯示在寬螢幕桌面的這裡。';
+
+  @override
+  String get loadingMailbox => '正在載入信箱…';
 
   @override
   String get accountMailbox => '帳號信箱';
