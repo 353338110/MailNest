@@ -20,6 +20,7 @@ class GmailOAuthService implements OAuthService {
     this.platformInfo = const PlatformInfo(),
     HttpClient? httpClient,
     String? clientId,
+    String? clientSecret,
     Uri? authorizationEndpoint,
     Uri? tokenEndpoint,
     Uri? userInfoEndpoint,
@@ -29,6 +30,9 @@ class GmailOAuthService implements OAuthService {
        _httpClient = httpClient ?? HttpClient(),
        clientId =
            clientId ?? const String.fromEnvironment('GMAIL_OAUTH_CLIENT_ID'),
+       clientSecret =
+           clientSecret ??
+           const String.fromEnvironment('GMAIL_OAUTH_CLIENT_SECRET'),
        authorizationEndpoint =
            authorizationEndpoint ?? defaultAuthorizationEndpoint,
        tokenEndpoint = tokenEndpoint ?? defaultTokenEndpoint,
@@ -72,6 +76,7 @@ class GmailOAuthService implements OAuthService {
   final PlatformInfo platformInfo;
   final HttpClient _httpClient;
   final String clientId;
+  final String clientSecret;
   final Uri authorizationEndpoint;
   final Uri tokenEndpoint;
   final Uri userInfoEndpoint;
@@ -202,12 +207,15 @@ class GmailOAuthService implements OAuthService {
         'client_id': clientId,
         'grant_type': 'refresh_token',
         'refresh_token': current.refreshToken,
+        if (_effectiveClientSecret(current.clientSecret) != null)
+          'client_secret': _effectiveClientSecret(current.clientSecret)!,
       });
       final token = OAuthToken.fromTokenEndpointJson(
         refreshed,
         fallbackRefreshToken: current.refreshToken,
         issuedAt: DateTime.now(),
         clientId: clientId,
+        clientSecret: _effectiveClientSecret(current.clientSecret),
         tokenEndpoint: tokenEndpoint.toString(),
       );
       await secureStorage.writeSecret(ref: ref, value: token.toJsonString());
@@ -245,14 +253,26 @@ class GmailOAuthService implements OAuthService {
       'code_verifier': codeVerifier,
       'grant_type': 'authorization_code',
       'redirect_uri': redirectUri.toString(),
+      if (_effectiveClientSecret() != null)
+        'client_secret': _effectiveClientSecret()!,
     });
     return OAuthToken.fromTokenEndpointJson(
       json,
       fallbackRefreshToken: '',
       issuedAt: DateTime.now(),
       clientId: clientId,
+      clientSecret: _effectiveClientSecret(),
       tokenEndpoint: tokenEndpoint.toString(),
     );
+  }
+
+  String? _effectiveClientSecret([String? savedClientSecret]) {
+    final saved = savedClientSecret?.trim();
+    if (saved != null && saved.isNotEmpty) {
+      return saved;
+    }
+    final configured = clientSecret.trim();
+    return configured.isEmpty ? null : configured;
   }
 
   Future<String> _fetchEmailAddress(String accessToken) async {
@@ -262,7 +282,11 @@ class GmailOAuthService implements OAuthService {
     final body = await utf8.decoder.bind(response).join();
     if (response.statusCode < 200 || response.statusCode >= 300) {
       throw OAuthExchangeException(
-        'Gmail userinfo failed with status ${response.statusCode}.',
+        _endpointErrorMessage(
+          endpointName: 'Gmail userinfo',
+          statusCode: response.statusCode,
+          body: body,
+        ),
       );
     }
 
@@ -295,7 +319,11 @@ class GmailOAuthService implements OAuthService {
     final body = await utf8.decoder.bind(response).join();
     if (response.statusCode < 200 || response.statusCode >= 300) {
       throw OAuthExchangeException(
-        'Gmail token endpoint failed with status ${response.statusCode}.',
+        _endpointErrorMessage(
+          endpointName: 'Gmail token endpoint',
+          statusCode: response.statusCode,
+          body: body,
+        ),
       );
     }
 
@@ -306,6 +334,40 @@ class GmailOAuthService implements OAuthService {
     throw const OAuthExchangeException(
       'Gmail token response was not an object.',
     );
+  }
+
+  String _endpointErrorMessage({
+    required String endpointName,
+    required int statusCode,
+    required String body,
+  }) {
+    final details = _oauthErrorDetails(body);
+    if (details == null) {
+      return '$endpointName failed with status $statusCode.';
+    }
+    return '$endpointName failed with status $statusCode: $details.';
+  }
+
+  String? _oauthErrorDetails(String body) {
+    try {
+      final decoded = jsonDecode(body);
+      if (decoded is! Map<String, Object?>) {
+        return null;
+      }
+      final error = decoded['error'];
+      final description = decoded['error_description'];
+      final parts = [
+        if (error is String && error.trim().isNotEmpty) error.trim(),
+        if (description is String && description.trim().isNotEmpty)
+          description.trim(),
+      ];
+      if (parts.isEmpty) {
+        return null;
+      }
+      return parts.join(' - ');
+    } on FormatException {
+      return null;
+    }
   }
 
   Uri _desktopRedirectUri() {

@@ -39,6 +39,9 @@ class _AddAccountPageState extends ConsumerState<AddAccountPage> {
   final _gmailClientIdController = TextEditingController(
     text: const String.fromEnvironment('GMAIL_OAUTH_CLIENT_ID'),
   );
+  final _gmailClientSecretController = TextEditingController(
+    text: const String.fromEnvironment('GMAIL_OAUTH_CLIENT_SECRET'),
+  );
   final _detector = const MailConfigDetector();
 
   EmailProviderType _provider = EmailProviderType.custom;
@@ -73,6 +76,7 @@ class _AddAccountPageState extends ConsumerState<AddAccountPage> {
     _smtpHostController.dispose();
     _smtpPortController.dispose();
     _gmailClientIdController.dispose();
+    _gmailClientSecretController.dispose();
     super.dispose();
   }
 
@@ -105,6 +109,7 @@ class _AddAccountPageState extends ConsumerState<AddAccountPage> {
                         _GmailOAuthSection(
                           isAuthorizing: _isAuthorizing,
                           clientIdController: _gmailClientIdController,
+                          clientSecretController: _gmailClientSecretController,
                           requiredValidator: _required,
                           onAuthorize: _authorizeGmail,
                         ),
@@ -158,6 +163,15 @@ class _AddAccountPageState extends ConsumerState<AddAccountPage> {
                               helperText: l10n.gmailOAuthClientIdHelp,
                             ),
                             validator: _required,
+                          ),
+                          const SizedBox(height: AppSpacing.medium),
+                          TextFormField(
+                            controller: _gmailClientSecretController,
+                            decoration: InputDecoration(
+                              labelText: l10n.gmailOAuthClientSecret,
+                              helperText: l10n.gmailOAuthClientSecretHelp,
+                            ),
+                            obscureText: true,
                           ),
                           const SizedBox(height: AppSpacing.medium),
                           OutlinedButton.icon(
@@ -571,7 +585,10 @@ class _AddAccountPageState extends ConsumerState<AddAccountPage> {
       final result = await ref
           .read(
             gmailOAuthServiceForClientIdProvider(
-              _gmailClientIdController.text.trim(),
+              GmailOAuthConfig(
+                clientId: _gmailClientIdController.text.trim(),
+                clientSecret: _gmailClientSecretController.text.trim(),
+              ),
             ),
           )
           .authorize();
@@ -603,6 +620,10 @@ class _AddAccountPageState extends ConsumerState<AddAccountPage> {
       _showOAuthError(l10n.gmailAuthorizationFailed(error.message));
     } on OAuthExchangeException catch (error) {
       _showOAuthError(l10n.gmailAuthorizationFailed(error.message));
+    } catch (error) {
+      _showOAuthError(
+        l10n.gmailAuthorizationFailed(_safeErrorMessage(error, l10n)),
+      );
     } finally {
       if (mounted) {
         setState(() => _isAuthorizing = false);
@@ -625,7 +646,12 @@ class _AddAccountPageState extends ConsumerState<AddAccountPage> {
     setState(() => _isAuthorizing = true);
     try {
       final service = ref.read(
-        gmailOAuthServiceForClientIdProvider(_gmailClientIdController.text),
+        gmailOAuthServiceForClientIdProvider(
+          GmailOAuthConfig(
+            clientId: _gmailClientIdController.text.trim(),
+            clientSecret: _gmailClientSecretController.text.trim(),
+          ),
+        ),
       );
       final result = await service.authorize();
       if (result.emailAddress != account.emailAddress) {
@@ -661,6 +687,10 @@ class _AddAccountPageState extends ConsumerState<AddAccountPage> {
       _showOAuthError(l10n.gmailAuthorizationFailed(error.message));
     } on OAuthExchangeException catch (error) {
       _showOAuthError(l10n.gmailAuthorizationFailed(error.message));
+    } catch (error) {
+      _showOAuthError(
+        l10n.gmailAuthorizationFailed(_safeErrorMessage(error, l10n)),
+      );
     } finally {
       if (mounted) {
         setState(() => _isAuthorizing = false);
@@ -992,12 +1022,14 @@ class _GmailOAuthSection extends StatelessWidget {
   const _GmailOAuthSection({
     required this.isAuthorizing,
     required this.clientIdController,
+    required this.clientSecretController,
     required this.requiredValidator,
     required this.onAuthorize,
   });
 
   final bool isAuthorizing;
   final TextEditingController clientIdController;
+  final TextEditingController clientSecretController;
   final FormFieldValidator<String> requiredValidator;
   final VoidCallback onAuthorize;
 
@@ -1021,6 +1053,15 @@ class _GmailOAuthSection extends StatelessWidget {
             helperText: l10n.gmailOAuthClientIdHelp,
           ),
           validator: requiredValidator,
+        ),
+        const SizedBox(height: AppSpacing.medium),
+        TextFormField(
+          controller: clientSecretController,
+          decoration: InputDecoration(
+            labelText: l10n.gmailOAuthClientSecret,
+            helperText: l10n.gmailOAuthClientSecretHelp,
+          ),
+          obscureText: true,
         ),
         const SizedBox(height: AppSpacing.medium),
         FilledButton.icon(

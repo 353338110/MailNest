@@ -214,6 +214,13 @@ class AppLocalizationsDe extends AppLocalizations {
       'Paste the OAuth Client ID from Google Cloud Console. You can also prefill it with --dart-define=GMAIL_OAUTH_CLIENT_ID=...';
 
   @override
+  String get gmailOAuthClientSecret => 'Google OAuth Client Secret';
+
+  @override
+  String get gmailOAuthClientSecretHelp =>
+      'Paste the Desktop OAuth client secret if Google requires it. It is stored only in secure storage.';
+
+  @override
   String get authorizeGmail => 'Authorize Gmail';
 
   @override

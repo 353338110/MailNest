@@ -628,7 +628,7 @@ class _MailboxNavigation extends ConsumerStatefulWidget {
 }
 
 class _MailboxNavigationState extends ConsumerState<_MailboxNavigation> {
-  final _collapsedAccountIds = <String>{};
+  final _expandedAccountIds = <String>{};
 
   List<EmailAccount> get accounts => widget.accounts;
   MailboxScope get scope => widget.scope;
@@ -638,7 +638,7 @@ class _MailboxNavigationState extends ConsumerState<_MailboxNavigation> {
   void didUpdateWidget(_MailboxNavigation oldWidget) {
     super.didUpdateWidget(oldWidget);
     final accountIds = widget.accounts.map((account) => account.id).toSet();
-    _collapsedAccountIds.removeWhere(
+    _expandedAccountIds.removeWhere(
       (accountId) => !accountIds.contains(accountId),
     );
   }
@@ -841,13 +841,13 @@ class _MailboxNavigationState extends ConsumerState<_MailboxNavigation> {
   }
 
   bool _isAccountExpanded(String accountId) {
-    return !_collapsedAccountIds.contains(accountId);
+    return _expandedAccountIds.contains(accountId);
   }
 
   void _toggleAccountExpanded(String accountId) {
     setState(() {
-      if (!_collapsedAccountIds.add(accountId)) {
-        _collapsedAccountIds.remove(accountId);
+      if (!_expandedAccountIds.add(accountId)) {
+        _expandedAccountIds.remove(accountId);
       }
     });
   }
@@ -2297,21 +2297,39 @@ class _MessageTile extends StatelessWidget {
           leading: selectionMode
               ? Checkbox(value: checked, onChanged: (_) => onTap())
               : _SenderAvatar(sender: header.sender, selected: false),
-          title: Text(
-            header.subject,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: subjectStyle,
+          title: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                header.subject,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: subjectStyle,
+              ),
+              if (showAccountMarker) ...[
+                const SizedBox(height: AppSpacing.xsmall),
+                _AccountMarker(
+                  emailAddress: message.account.emailAddress,
+                  selected: false,
+                ),
+              ],
+            ],
           ),
+          horizontalTitleGap: AppSpacing.small,
           subtitle: Text(
             _subtitle(context),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
+          isThreeLine: showAccountMarker,
           trailing: _MessageMeta(
             message: message,
             selected: false,
             compact: true,
+          ),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.medium,
           ),
         ),
       );
@@ -2363,6 +2381,13 @@ class _MessageTile extends StatelessWidget {
                                       : null,
                                 ),
                               ),
+                              if (showAccountMarker) ...[
+                                const SizedBox(height: AppSpacing.xsmall),
+                                _AccountMarker(
+                                  emailAddress: message.account.emailAddress,
+                                  selected: selected,
+                                ),
+                              ],
                               const SizedBox(height: AppSpacing.xsmall),
                               Text(
                                 header.subject,
@@ -2422,13 +2447,10 @@ class _MessageTile extends StatelessWidget {
   String _subtitle(BuildContext context) {
     final folder = _folderName(context);
     final preview = message.header.preview;
-    final account = showAccountMarker
-        ? ' • ${message.account.emailAddress}'
-        : '';
     if (preview == null || preview.trim().isEmpty) {
-      return '$folder$account';
+      return folder;
     }
-    return '$folder$account • $preview';
+    return '$folder • $preview';
   }
 
   String _senderName(String sender) {
@@ -2450,6 +2472,60 @@ class _MessageTile extends StatelessWidget {
       MailboxFolderType.junk => l10n.junk,
       MailboxFolderType.custom => message.folder.name,
     };
+  }
+}
+
+class _AccountMarker extends StatelessWidget {
+  const _AccountMarker({required this.emailAddress, required this.selected});
+
+  final String emailAddress;
+  final bool selected;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final foreground = selected
+        ? colorScheme.onPrimary
+        : colorScheme.onSecondaryContainer;
+    final background = selected
+        ? colorScheme.onPrimary.withValues(alpha: 0.16)
+        : colorScheme.secondaryContainer;
+
+    return Align(
+      alignment: AlignmentDirectional.centerStart,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: background,
+          borderRadius: BorderRadius.circular(6),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.xsmall,
+            vertical: 2,
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.alternate_email, size: 13, color: foreground),
+              const SizedBox(width: 4),
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 220),
+                child: Text(
+                  emailAddress,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: foreground,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
 

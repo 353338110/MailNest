@@ -10,9 +10,27 @@ final gmailOAuthServiceProvider = Provider<GmailOAuthService>((ref) {
 });
 
 final gmailOAuthServiceForClientIdProvider =
-    Provider.family<GmailOAuthService, String>((ref, clientId) {
+    Provider.family<GmailOAuthService, GmailOAuthConfig>((ref, config) {
       return GmailOAuthService(
         secureStorage: ref.watch(secureStorageServiceProvider),
-        clientId: clientId.trim(),
+        clientId: config.clientId.trim(),
+        clientSecret: config.clientSecret.trim(),
       );
     });
+
+class GmailOAuthConfig {
+  const GmailOAuthConfig({required this.clientId, this.clientSecret = ''});
+
+  final String clientId;
+  final String clientSecret;
+
+  @override
+  bool operator ==(Object other) {
+    return other is GmailOAuthConfig &&
+        other.clientId == clientId &&
+        other.clientSecret == clientSecret;
+  }
+
+  @override
+  int get hashCode => Object.hash(clientId, clientSecret);
+}

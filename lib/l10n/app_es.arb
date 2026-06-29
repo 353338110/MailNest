@@ -60,6 +60,8 @@
   "gmailOAuthSystemBrowserNotice": "MailNest opens Google authorization in your system browser and stores tokens only in secure storage.",
   "gmailOAuthClientId": "Google OAuth Client ID",
   "gmailOAuthClientIdHelp": "Paste the OAuth Client ID from Google Cloud Console. You can also prefill it with --dart-define=GMAIL_OAUTH_CLIENT_ID=...",
+  "gmailOAuthClientSecret": "Google OAuth Client Secret",
+  "gmailOAuthClientSecretHelp": "Paste the Desktop OAuth client secret if Google requires it. It is stored only in secure storage.",
   "authorizeGmail": "Authorize Gmail",
   "reauthorizeGmail": "Reauthorize Gmail",
   "gmailOAuthConnected": "Gmail authorization is connected.",

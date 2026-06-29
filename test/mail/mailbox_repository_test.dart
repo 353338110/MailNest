@@ -106,6 +106,70 @@ void main() {
     expect(messages.single.folder.id, '其他文件夹');
     expect(messages.single.folder.name, '其他文件夹');
   });
+
+  test(
+    'deduplicates Gmail messages copied across labels outside folder views',
+    () {
+      final repository = MailboxRepository();
+      final account = _account('user@gmail.com', provider: 'gmail');
+      final duplicateMessages = [
+        _message(
+          id: 101,
+          accountId: account.id,
+          uid: 10,
+          subject: 'Gmail label copy',
+          isRead: false,
+          receivedAt: DateTime(2026, 6, 29, 10),
+          folderName: 'CATEGORY_PERSONAL',
+          messageId: 'gmail-message-1',
+        ),
+        _message(
+          id: 102,
+          accountId: account.id,
+          uid: 10,
+          subject: 'Gmail label copy',
+          isRead: false,
+          receivedAt: DateTime(2026, 6, 29, 10),
+          folderName: 'INBOX',
+          messageId: 'gmail-message-1',
+        ),
+        _message(
+          id: 103,
+          accountId: account.id,
+          uid: 20,
+          subject: 'Second Gmail message',
+          isRead: true,
+          receivedAt: DateTime(2026, 6, 29, 9),
+          folderName: 'INBOX',
+          messageId: 'gmail-message-2',
+        ),
+      ];
+
+      final unifiedMessages = repository.messagesFor(
+        accounts: [account],
+        localMessages: duplicateMessages,
+        scope: const UnifiedMailboxScope(),
+        filter: MailboxFilter.all,
+      );
+
+      expect(unifiedMessages, hasLength(2));
+      expect(unifiedMessages.first.header.messageId, 'gmail-message-1');
+      expect(unifiedMessages.first.folder.id, 'inbox');
+
+      final labelMessages = repository.messagesFor(
+        accounts: [account],
+        localMessages: duplicateMessages,
+        scope: const FolderMailboxScope(
+          accountId: 'user@gmail.com',
+          folderId: 'category_personal',
+        ),
+        filter: MailboxFilter.all,
+      );
+
+      expect(labelMessages, hasLength(1));
+      expect(labelMessages.single.header.messageId, 'gmail-message-1');
+    },
+  );
 }
 
 List<LocalMailMessage> _messages() {
@@ -148,6 +212,7 @@ LocalMailMessage _message({
   required DateTime receivedAt,
   bool isStarred = false,
   String folderName = 'Inbox',
+  String? messageId,
 }) {
   return LocalMailMessage(
     id: id,
@@ -156,6 +221,7 @@ LocalMailMessage _message({
     uid: uid,
     sender: 'sender@example.com',
     recipients: accountId,
+    messageId: messageId,
     subject: subject,
     cachedBodyIsHtml: false,
     isRead: isRead,
@@ -166,13 +232,13 @@ LocalMailMessage _message({
   );
 }
 
-EmailAccount _account(String emailAddress) {
+EmailAccount _account(String emailAddress, {String provider = 'custom'}) {
   final now = DateTime(2026, 6, 9);
   return EmailAccount(
     id: emailAddress,
     emailAddress: emailAddress,
     groupName: 'Personal',
-    provider: 'custom',
+    provider: provider,
     username: emailAddress,
     authType: 'app_password',
     imapHost: 'imap.example.com',

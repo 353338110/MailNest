@@ -60,6 +60,8 @@
   "gmailOAuthSystemBrowserNotice": "MailNest 會在系統瀏覽器中開啟 Google 授權，Token 只儲存到安全儲存空間。",
   "gmailOAuthClientId": "Google OAuth Client ID",
   "gmailOAuthClientIdHelp": "填寫 Google Cloud Console 中的 OAuth Client ID；也可以用 --dart-define=GMAIL_OAUTH_CLIENT_ID=... 預填。",
+  "gmailOAuthClientSecret": "Google OAuth Client Secret",
+  "gmailOAuthClientSecretHelp": "如果 Google 要求，填寫桌面 OAuth 用戶端 Secret；只會儲存到安全儲存空間。",
   "authorizeGmail": "授權 Gmail",
   "reauthorizeGmail": "重新授權 Gmail",
   "gmailOAuthConnected": "Gmail 授權已連接。",

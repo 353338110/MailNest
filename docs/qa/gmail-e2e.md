@@ -1,15 +1,16 @@
 # Gmail 真实账号端到端验收
 
-更新时间：2026-06-25
+更新时间：2026-06-29
 
 ## 前置条件
 
 - 使用专用 Gmail 测试账号，不使用个人主账号。
 - Google OAuth Client 已配置 MailNest 使用的桌面 loopback redirect URI 和移动端 deeplink redirect URI。
-- 在 Gmail 添加账号页填写 Google OAuth Client ID；也可启动或构建应用时传入 `--dart-define=GMAIL_OAUTH_CLIENT_ID=<Google OAuth Client ID>` 预填。
+- 在 Gmail 添加账号页填写 Google OAuth Client ID；如果 Google 返回 `client_secret is missing`，同时填写桌面 OAuth Client Secret。
+- 也可启动或构建应用时传入 `--dart-define=GMAIL_OAUTH_CLIENT_ID=<Google OAuth Client ID>` 和 `--dart-define=GMAIL_OAUTH_CLIENT_SECRET=<Google OAuth Client Secret>` 预填。
 - 测试账号中准备至少 5 封邮件：普通纯文本、HTML 邮件、含附件邮件、已读邮件、未读邮件。
 - 测试账号中准备至少 2 个自定义 label，用于移动/同步验证。
-- 本地测试前确认 SQLite、日志和截图中不包含 access token、refresh token 或授权码。
+- 本地测试前确认 SQLite、日志和截图中不包含 access token、refresh token、client secret 或授权码。
 
 ## 必跑流程
 

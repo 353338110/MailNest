@@ -208,6 +208,13 @@ class AppLocalizationsZh extends AppLocalizations {
       '填写 Google Cloud Console 中的 OAuth Client ID；也可以用 --dart-define=GMAIL_OAUTH_CLIENT_ID=... 预填。';
 
   @override
+  String get gmailOAuthClientSecret => 'Google OAuth Client Secret';
+
+  @override
+  String get gmailOAuthClientSecretHelp =>
+      '如果 Google 要求，填写桌面 OAuth 客户端 Secret；只会保存到安全存储。';
+
+  @override
   String get authorizeGmail => '授权 Gmail';
 
   @override
@@ -1128,6 +1135,13 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
       '填写 Google Cloud Console 中的 OAuth Client ID；也可以用 --dart-define=GMAIL_OAUTH_CLIENT_ID=... 预填。';
 
   @override
+  String get gmailOAuthClientSecret => 'Google OAuth Client Secret';
+
+  @override
+  String get gmailOAuthClientSecretHelp =>
+      '如果 Google 要求，填写桌面 OAuth 客户端 Secret；只会保存到安全存储。';
+
+  @override
   String get authorizeGmail => '授权 Gmail';
 
   @override
@@ -1869,6 +1883,13 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   @override
   String get gmailOAuthClientIdHelp =>
       '填寫 Google Cloud Console 中的 OAuth Client ID；也可以用 --dart-define=GMAIL_OAUTH_CLIENT_ID=... 預填。';
+
+  @override
+  String get gmailOAuthClientSecret => 'Google OAuth Client Secret';
+
+  @override
+  String get gmailOAuthClientSecretHelp =>
+      '如果 Google 要求，填寫桌面 OAuth 用戶端 Secret；只會儲存到安全儲存空間。';
 
   @override
   String get authorizeGmail => '授權 Gmail';

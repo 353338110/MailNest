@@ -506,6 +506,18 @@ abstract class AppLocalizations {
   /// **'Paste the OAuth Client ID from Google Cloud Console. You can also prefill it with --dart-define=GMAIL_OAUTH_CLIENT_ID=...'**
   String get gmailOAuthClientIdHelp;
 
+  /// No description provided for @gmailOAuthClientSecret.
+  ///
+  /// In en, this message translates to:
+  /// **'Google OAuth Client Secret'**
+  String get gmailOAuthClientSecret;
+
+  /// No description provided for @gmailOAuthClientSecretHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste the Desktop OAuth client secret if Google requires it. It is stored only in secure storage.'**
+  String get gmailOAuthClientSecretHelp;
+
   /// No description provided for @authorizeGmail.
   ///
   /// In en, this message translates to:

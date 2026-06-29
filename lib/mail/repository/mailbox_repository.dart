@@ -1,4 +1,5 @@
 import '../../core/database/app_database.dart';
+import '../../features/accounts/models/email_provider_type.dart';
 import '../models/mail_header.dart';
 import '../models/mailbox_folder.dart';
 import '../models/mailbox_message.dart';
@@ -31,21 +32,24 @@ class MailboxRepository {
     final accountById = {
       for (final account in scopedAccounts) account.id: account,
     };
-    final messages =
-        localMessages
-            .where((message) => accountById.containsKey(message.accountId))
-            .map(
-              (message) =>
-                  _fromLocalMessage(accountById[message.accountId]!, message),
-            )
-            .where(
-              (message) => folderId == null || message.folder.id == folderId,
-            )
-            .where((message) => _matchesFilter(message, filter))
-            .toList()
-          ..sort((a, b) => b.header.receivedAt.compareTo(a.header.receivedAt));
+    final messages = localMessages
+        .where((message) => accountById.containsKey(message.accountId))
+        .map(
+          (message) =>
+              _fromLocalMessage(accountById[message.accountId]!, message),
+        )
+        .where((message) => folderId == null || message.folder.id == folderId)
+        .where((message) => _matchesFilter(message, filter))
+        .toList();
 
-    return messages;
+    final visibleMessages = folderId == null
+        ? _deduplicateGmailLabelCopies(messages)
+        : messages;
+    visibleMessages.sort(
+      (a, b) => b.header.receivedAt.compareTo(a.header.receivedAt),
+    );
+
+    return visibleMessages;
   }
 
   bool hasAnyMessages({
@@ -69,6 +73,63 @@ class MailboxRepository {
       MailboxFilter.sent => message.folder.type == MailboxFolderType.sent,
       MailboxFilter.drafts => message.folder.type == MailboxFolderType.drafts,
       MailboxFilter.trash => message.folder.type == MailboxFolderType.trash,
+    };
+  }
+
+  List<MailboxMessage> _deduplicateGmailLabelCopies(
+    List<MailboxMessage> messages,
+  ) {
+    final byGmailMessageId = <String, MailboxMessage>{};
+    final visibleMessages = <MailboxMessage>[];
+
+    for (final message in messages) {
+      final messageId = message.header.messageId;
+      if (message.account.provider != EmailProviderType.gmail.storageValue ||
+          messageId == null ||
+          messageId.isEmpty) {
+        visibleMessages.add(message);
+        continue;
+      }
+
+      final key = '${message.account.id}:$messageId';
+      final existing = byGmailMessageId[key];
+      if (existing == null) {
+        byGmailMessageId[key] = message;
+        visibleMessages.add(message);
+        continue;
+      }
+
+      final preferred = _preferredGmailLabelCopy(existing, message);
+      if (!identical(preferred, existing)) {
+        final index = visibleMessages.indexOf(existing);
+        if (index >= 0) {
+          visibleMessages[index] = preferred;
+        }
+        byGmailMessageId[key] = preferred;
+      }
+    }
+
+    return visibleMessages;
+  }
+
+  MailboxMessage _preferredGmailLabelCopy(
+    MailboxMessage current,
+    MailboxMessage candidate,
+  ) {
+    return _folderDisplayPriority(candidate.folder) <
+            _folderDisplayPriority(current.folder)
+        ? candidate
+        : current;
+  }
+
+  int _folderDisplayPriority(MailboxFolder folder) {
+    return switch (folder.type) {
+      MailboxFolderType.inbox => 0,
+      MailboxFolderType.sent => 1,
+      MailboxFolderType.drafts => 2,
+      MailboxFolderType.trash => 3,
+      MailboxFolderType.junk => 4,
+      MailboxFolderType.custom => 5,
     };
   }
 

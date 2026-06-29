@@ -139,7 +139,7 @@ void main() {
       expect(find.textContaining('b@test.com'), findsWidgets);
     });
 
-    testWidgets('account folders can be collapsed and expanded', (
+    testWidgets('account folders are collapsed by default and can expand', (
       tester,
     ) async {
       await tester.pumpHomeWithAccount(
@@ -149,12 +149,6 @@ void main() {
           _localFolder(id: 'junk', name: 'Junk', type: 'junk'),
         ],
       );
-
-      expect(find.text('Sent'), findsWidgets);
-      expect(find.text('Junk'), findsWidgets);
-
-      await tester.tap(find.byTooltip('Collapse account').first);
-      await tester.pumpAndSettle();
 
       expect(find.text('Junk'), findsNothing);
 
