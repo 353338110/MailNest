@@ -326,6 +326,54 @@ abstract class AppLocalizations {
   /// **'No email accounts yet.'**
   String get noAccountsYet;
 
+  /// No description provided for @accountSetupTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Set up your mailbox'**
+  String get accountSetupTitle;
+
+  /// No description provided for @accountSetupSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a provider, verify sign-in, and keep credentials in secure storage.'**
+  String get accountSetupSubtitle;
+
+  /// No description provided for @chooseMailProvider.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose mail provider'**
+  String get chooseMailProvider;
+
+  /// No description provided for @accountDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Account details'**
+  String get accountDetails;
+
+  /// No description provided for @accountAuthorization.
+  ///
+  /// In en, this message translates to:
+  /// **'Authorization'**
+  String get accountAuthorization;
+
+  /// No description provided for @accountCredentials.
+  ///
+  /// In en, this message translates to:
+  /// **'Credentials'**
+  String get accountCredentials;
+
+  /// No description provided for @connectionSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Connection settings'**
+  String get connectionSettings;
+
+  /// No description provided for @accountSecurityNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Secrets and OAuth tokens are stored only in secure storage.'**
+  String get accountSecurityNotice;
+
   /// No description provided for @emailAddress.
   ///
   /// In en, this message translates to:

@@ -119,6 +119,32 @@ class AppLocalizationsDe extends AppLocalizations {
   String get noAccountsYet => 'No email accounts yet.';
 
   @override
+  String get accountSetupTitle => 'Set up your mailbox';
+
+  @override
+  String get accountSetupSubtitle =>
+      'Choose a provider, verify sign-in, and keep credentials in secure storage.';
+
+  @override
+  String get chooseMailProvider => 'Choose mail provider';
+
+  @override
+  String get accountDetails => 'Account details';
+
+  @override
+  String get accountAuthorization => 'Authorization';
+
+  @override
+  String get accountCredentials => 'Credentials';
+
+  @override
+  String get connectionSettings => 'Connection settings';
+
+  @override
+  String get accountSecurityNotice =>
+      'Secrets and OAuth tokens are stored only in secure storage.';
+
+  @override
   String get emailAddress => 'Email address';
 
   @override

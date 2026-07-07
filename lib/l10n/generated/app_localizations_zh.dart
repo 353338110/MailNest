@@ -116,6 +116,30 @@ class AppLocalizationsZh extends AppLocalizations {
   String get noAccountsYet => '还没有邮箱账号。';
 
   @override
+  String get accountSetupTitle => '设置你的邮箱';
+
+  @override
+  String get accountSetupSubtitle => '选择服务商、完成登录验证，并把凭据保存到安全存储。';
+
+  @override
+  String get chooseMailProvider => '选择邮箱服务商';
+
+  @override
+  String get accountDetails => '账号信息';
+
+  @override
+  String get accountAuthorization => '授权';
+
+  @override
+  String get accountCredentials => '登录凭据';
+
+  @override
+  String get connectionSettings => '连接设置';
+
+  @override
+  String get accountSecurityNotice => '密码、授权码和 OAuth token 只会保存到安全存储。';
+
+  @override
   String get emailAddress => '邮箱地址';
 
   @override
@@ -1046,6 +1070,30 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String get noAccountsYet => '还没有邮箱账号。';
 
   @override
+  String get accountSetupTitle => '设置你的邮箱';
+
+  @override
+  String get accountSetupSubtitle => '选择服务商、完成登录验证，并把凭据保存到安全存储。';
+
+  @override
+  String get chooseMailProvider => '选择邮箱服务商';
+
+  @override
+  String get accountDetails => '账号信息';
+
+  @override
+  String get accountAuthorization => '授权';
+
+  @override
+  String get accountCredentials => '登录凭据';
+
+  @override
+  String get connectionSettings => '连接设置';
+
+  @override
+  String get accountSecurityNotice => '密码、授权码和 OAuth token 只会保存到安全存储。';
+
+  @override
   String get emailAddress => '邮箱地址';
 
   @override
@@ -1797,6 +1845,30 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get noAccountsYet => '尚無信箱帳號。';
+
+  @override
+  String get accountSetupTitle => '設定你的信箱';
+
+  @override
+  String get accountSetupSubtitle => '選擇服務商、完成登入驗證，並把憑證保存到安全儲存。';
+
+  @override
+  String get chooseMailProvider => '選擇信箱服務商';
+
+  @override
+  String get accountDetails => '帳號資訊';
+
+  @override
+  String get accountAuthorization => '授權';
+
+  @override
+  String get accountCredentials => '登入憑證';
+
+  @override
+  String get connectionSettings => '連線設定';
+
+  @override
+  String get accountSecurityNotice => '密碼、授權碼和 OAuth token 只會保存到安全儲存。';
 
   @override
   String get emailAddress => '信箱地址';

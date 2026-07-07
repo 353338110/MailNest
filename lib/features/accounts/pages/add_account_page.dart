@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/theme/app_spacing.dart';
+import '../../../app/theme/app_theme.dart';
 import '../../../core/database/app_database.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../../mail/provider/mail_connection_tester.dart';
@@ -94,231 +95,249 @@ class _AddAccountPageState extends ConsumerState<AddAccountPage> {
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : ListView(
-              padding: const EdgeInsets.all(AppSpacing.medium),
-              children: [
-                if (!_isEditing) ...[
-                  _ProviderShortcuts(onSelected: _selectProvider),
-                  const SizedBox(height: AppSpacing.medium),
-                ],
-                Form(
-                  key: _formKey,
-                  child: Column(
-                    children: [
-                      if (_isGmailOAuth && !_isEditing) ...[
-                        _GmailOAuthSection(
-                          isAuthorizing: _isAuthorizing,
-                          clientIdController: _gmailClientIdController,
-                          clientSecretController: _gmailClientSecretController,
-                          requiredValidator: _required,
-                          onAuthorize: _authorizeGmail,
-                        ),
-                      ] else ...[
-                        TextFormField(
-                          controller: _emailController,
-                          decoration: InputDecoration(
-                            labelText: l10n.emailAddress,
-                          ),
-                          keyboardType: TextInputType.emailAddress,
-                          readOnly: _isEditing,
-                          validator: _required,
-                          onChanged: _isEditing ? null : _detectFromEmail,
-                        ),
-                      ],
-                      const SizedBox(height: AppSpacing.medium),
-                      TextFormField(
-                        controller: _nameController,
-                        decoration: InputDecoration(
-                          labelText: l10n.displayName,
-                        ),
-                      ),
-                      const SizedBox(height: AppSpacing.medium),
-                      StreamBuilder<List<AccountGroup>>(
-                        stream: accountRepository.watchAccountGroups(),
-                        builder: (context, snapshot) {
-                          return _AccountGroupDropdown(
-                            controller: _groupController,
-                            groupNames: _accountGroupNames(
-                              snapshot.data,
-                              l10n.defaultAccountGroup,
+          : ColoredBox(
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
+              child: ListView(
+                padding: const EdgeInsets.all(AppSpacing.medium),
+                children: [
+                  Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 920),
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            _AccountSetupHero(
+                              isEditing: _isEditing,
+                              provider: _provider,
                             ),
-                            labelText: l10n.accountGroup,
-                            helperText: l10n.accountGroupHelp,
-                          );
-                        },
-                      ),
-                      const SizedBox(height: AppSpacing.medium),
-                      if (_isGmailOAuth) ...[
-                        if (_isEditing) ...[
-                          ListTile(
-                            contentPadding: EdgeInsets.zero,
-                            leading: const Icon(Icons.verified_user_outlined),
-                            title: Text(l10n.gmailOAuthConnected),
-                            subtitle: Text(l10n.gmailReauthorizeHelp),
-                          ),
-                          TextFormField(
-                            controller: _gmailClientIdController,
-                            decoration: InputDecoration(
-                              labelText: l10n.gmailOAuthClientId,
-                              helperText: l10n.gmailOAuthClientIdHelp,
-                            ),
-                            validator: _required,
-                          ),
-                          const SizedBox(height: AppSpacing.medium),
-                          TextFormField(
-                            controller: _gmailClientSecretController,
-                            decoration: InputDecoration(
-                              labelText: l10n.gmailOAuthClientSecret,
-                              helperText: l10n.gmailOAuthClientSecretHelp,
-                            ),
-                            obscureText: true,
-                          ),
-                          const SizedBox(height: AppSpacing.medium),
-                          OutlinedButton.icon(
-                            onPressed: _isSaving || _isAuthorizing
-                                ? null
-                                : _reauthorizeGmail,
-                            icon: _isAuthorizing
-                                ? const SizedBox(
-                                    width: 18,
-                                    height: 18,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                    ),
-                                  )
-                                : const Icon(Icons.open_in_browser_outlined),
-                            label: Text(l10n.reauthorizeGmail),
-                          ),
-                        ],
-                      ] else if (_isOutlookOAuth) ...[
-                        TextFormField(
-                          controller: _usernameController,
-                          decoration: InputDecoration(labelText: l10n.username),
-                          validator: _required,
-                        ),
-                        const SizedBox(height: AppSpacing.medium),
-                        _OutlookOAuthSection(
-                          isEditing: _isEditing,
-                          hasToken: _editingAccount?.oauthTokenRef != null,
-                          isAuthorizing: _isAuthorizing,
-                          onAuthorize: _isSaving || _isAuthorizing
-                              ? null
-                              : _authorizeAndSaveOutlook,
-                        ),
-                        const SizedBox(height: AppSpacing.large),
-                        _ServerSection(
-                          title: l10n.imapSettings,
-                          hostController: _imapHostController,
-                          portController: _imapPortController,
-                          security: _imapSecurity,
-                          onSecurityChanged: (value) =>
-                              setState(() => _imapSecurity = value),
-                        ),
-                        const SizedBox(height: AppSpacing.large),
-                        _ServerSection(
-                          title: l10n.smtpSettings,
-                          hostController: _smtpHostController,
-                          portController: _smtpPortController,
-                          security: _smtpSecurity,
-                          onSecurityChanged: (value) =>
-                              setState(() => _smtpSecurity = value),
-                        ),
-                        SwitchListTile(
-                          contentPadding: EdgeInsets.zero,
-                          title: Text(l10n.useStartTls),
-                          value: _smtpStartTls,
-                          onChanged: (value) =>
-                              setState(() => _smtpStartTls = value),
-                        ),
-                        const SizedBox(height: AppSpacing.large),
-                      ] else ...[
-                        TextFormField(
-                          controller: _usernameController,
-                          decoration: InputDecoration(labelText: l10n.username),
-                          validator: _required,
-                        ),
-                        const SizedBox(height: AppSpacing.medium),
-                        TextFormField(
-                          controller: _secretController,
-                          decoration: InputDecoration(
-                            labelText: _isEditing
-                                ? l10n.leavePasswordUnchanged
-                                : l10n.passwordOrAppPassword,
-                          ),
-                          obscureText: true,
-                          validator: _isEditing ? null : _required,
-                        ),
-                        const SizedBox(height: AppSpacing.large),
-                        _ServerSection(
-                          title: l10n.imapSettings,
-                          hostController: _imapHostController,
-                          portController: _imapPortController,
-                          security: _imapSecurity,
-                          onSecurityChanged: (value) =>
-                              setState(() => _imapSecurity = value),
-                        ),
-                        const SizedBox(height: AppSpacing.large),
-                        _ServerSection(
-                          title: l10n.smtpSettings,
-                          hostController: _smtpHostController,
-                          portController: _smtpPortController,
-                          security: _smtpSecurity,
-                          onSecurityChanged: (value) =>
-                              setState(() => _smtpSecurity = value),
-                        ),
-                        SwitchListTile(
-                          contentPadding: EdgeInsets.zero,
-                          title: Text(l10n.useStartTls),
-                          value: _smtpStartTls,
-                          onChanged: (value) =>
-                              setState(() => _smtpStartTls = value),
-                        ),
-                        const SizedBox(height: AppSpacing.large),
-                        OutlinedButton.icon(
-                          onPressed: _isSaving || _isTesting
-                              ? null
-                              : _testConnection,
-                          icon: _isTesting
-                              ? const SizedBox(
-                                  width: 18,
-                                  height: 18,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                  ),
-                                )
-                              : const Icon(Icons.wifi_tethering_outlined),
-                          label: Text(l10n.testConnection),
-                        ),
-                        const SizedBox(height: AppSpacing.medium),
-                      ],
-                      FilledButton.icon(
-                        onPressed:
-                            _isSaving ||
-                                (_isGmailOAuth && !_isEditing) ||
-                                (_isOutlookOAuth && !_isEditing)
-                            ? null
-                            : _saveAccount,
-                        icon: _isSaving || _isAuthorizing
-                            ? const SizedBox(
-                                width: 18,
-                                height: 18,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
+                            if (!_isEditing) ...[
+                              const SizedBox(height: AppSpacing.medium),
+                              _AccountFormSection(
+                                icon: Icons.apps_outlined,
+                                title: l10n.chooseMailProvider,
+                                child: _ProviderShortcuts(
+                                  selected: _provider,
+                                  onSelected: _selectProvider,
                                 ),
-                              )
-                            : const Icon(Icons.save_outlined),
-                        label: Text(
-                          _isOutlookOAuth
-                              ? l10n.authorizeOutlook
-                              : _isEditing
-                              ? l10n.updateAccount
-                              : l10n.saveAccount,
+                              ),
+                            ],
+                            const SizedBox(height: AppSpacing.medium),
+                            _AccountFormSection(
+                              icon: Icons.badge_outlined,
+                              title: l10n.accountDetails,
+                              child: LayoutBuilder(
+                                builder: (context, constraints) {
+                                  final showEmail =
+                                      !(_isGmailOAuth && !_isEditing);
+                                  final emailField = TextFormField(
+                                    controller: _emailController,
+                                    decoration: InputDecoration(
+                                      labelText: l10n.emailAddress,
+                                    ),
+                                    keyboardType: TextInputType.emailAddress,
+                                    readOnly: _isEditing,
+                                    validator: _required,
+                                    onChanged: _isEditing
+                                        ? null
+                                        : _detectFromEmail,
+                                  );
+                                  final nameField = TextFormField(
+                                    controller: _nameController,
+                                    decoration: InputDecoration(
+                                      labelText: l10n.displayName,
+                                    ),
+                                  );
+
+                                  return Column(
+                                    children: [
+                                      if (showEmail) ...[
+                                        if (constraints.maxWidth >= 640)
+                                          Row(
+                                            children: [
+                                              Expanded(child: emailField),
+                                              const SizedBox(
+                                                width: AppSpacing.medium,
+                                              ),
+                                              Expanded(child: nameField),
+                                            ],
+                                          )
+                                        else ...[
+                                          emailField,
+                                          const SizedBox(
+                                            height: AppSpacing.medium,
+                                          ),
+                                          nameField,
+                                        ],
+                                      ] else
+                                        nameField,
+                                      const SizedBox(height: AppSpacing.medium),
+                                      StreamBuilder<List<AccountGroup>>(
+                                        stream: accountRepository
+                                            .watchAccountGroups(),
+                                        builder: (context, snapshot) {
+                                          return _AccountGroupDropdown(
+                                            controller: _groupController,
+                                            groupNames: _accountGroupNames(
+                                              snapshot.data,
+                                              l10n.defaultAccountGroup,
+                                            ),
+                                            labelText: l10n.accountGroup,
+                                            helperText: l10n.accountGroupHelp,
+                                          );
+                                        },
+                                      ),
+                                    ],
+                                  );
+                                },
+                              ),
+                            ),
+                            if (_isGmailOAuth) ...[
+                              const SizedBox(height: AppSpacing.medium),
+                              _AccountFormSection(
+                                icon: Icons.verified_user_outlined,
+                                title: l10n.accountAuthorization,
+                                child: _isEditing
+                                    ? _GmailReauthorizationSection(
+                                        isAuthorizing: _isAuthorizing,
+                                        clientIdController:
+                                            _gmailClientIdController,
+                                        clientSecretController:
+                                            _gmailClientSecretController,
+                                        requiredValidator: _required,
+                                        onReauthorize:
+                                            _isSaving || _isAuthorizing
+                                            ? null
+                                            : _reauthorizeGmail,
+                                      )
+                                    : _GmailOAuthSection(
+                                        isAuthorizing: _isAuthorizing,
+                                        clientIdController:
+                                            _gmailClientIdController,
+                                        clientSecretController:
+                                            _gmailClientSecretController,
+                                        requiredValidator: _required,
+                                        onAuthorize: _authorizeGmail,
+                                      ),
+                              ),
+                            ] else if (_isOutlookOAuth) ...[
+                              const SizedBox(height: AppSpacing.medium),
+                              _AccountFormSection(
+                                icon: Icons.verified_user_outlined,
+                                title: l10n.accountAuthorization,
+                                child: Column(
+                                  children: [
+                                    TextFormField(
+                                      controller: _usernameController,
+                                      decoration: InputDecoration(
+                                        labelText: l10n.username,
+                                      ),
+                                      validator: _required,
+                                    ),
+                                    const SizedBox(height: AppSpacing.medium),
+                                    _OutlookOAuthSection(
+                                      isEditing: _isEditing,
+                                      hasToken:
+                                          _editingAccount?.oauthTokenRef !=
+                                          null,
+                                      isAuthorizing: _isAuthorizing,
+                                      onAuthorize: _isSaving || _isAuthorizing
+                                          ? null
+                                          : _authorizeAndSaveOutlook,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: AppSpacing.medium),
+                              _ConnectionSection(
+                                l10n: l10n,
+                                imapHostController: _imapHostController,
+                                imapPortController: _imapPortController,
+                                imapSecurity: _imapSecurity,
+                                onImapSecurityChanged: (value) =>
+                                    setState(() => _imapSecurity = value),
+                                smtpHostController: _smtpHostController,
+                                smtpPortController: _smtpPortController,
+                                smtpSecurity: _smtpSecurity,
+                                onSmtpSecurityChanged: (value) =>
+                                    setState(() => _smtpSecurity = value),
+                                smtpStartTls: _smtpStartTls,
+                                onSmtpStartTlsChanged: (value) =>
+                                    setState(() => _smtpStartTls = value),
+                              ),
+                            ] else ...[
+                              const SizedBox(height: AppSpacing.medium),
+                              _AccountFormSection(
+                                icon: Icons.lock_outline,
+                                title: l10n.accountCredentials,
+                                child: Column(
+                                  children: [
+                                    TextFormField(
+                                      controller: _usernameController,
+                                      decoration: InputDecoration(
+                                        labelText: l10n.username,
+                                      ),
+                                      validator: _required,
+                                    ),
+                                    const SizedBox(height: AppSpacing.medium),
+                                    TextFormField(
+                                      controller: _secretController,
+                                      decoration: InputDecoration(
+                                        labelText: _isEditing
+                                            ? l10n.leavePasswordUnchanged
+                                            : l10n.passwordOrAppPassword,
+                                      ),
+                                      obscureText: true,
+                                      validator: _isEditing ? null : _required,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: AppSpacing.medium),
+                              _ConnectionSection(
+                                l10n: l10n,
+                                imapHostController: _imapHostController,
+                                imapPortController: _imapPortController,
+                                imapSecurity: _imapSecurity,
+                                onImapSecurityChanged: (value) =>
+                                    setState(() => _imapSecurity = value),
+                                smtpHostController: _smtpHostController,
+                                smtpPortController: _smtpPortController,
+                                smtpSecurity: _smtpSecurity,
+                                onSmtpSecurityChanged: (value) =>
+                                    setState(() => _smtpSecurity = value),
+                                smtpStartTls: _smtpStartTls,
+                                onSmtpStartTlsChanged: (value) =>
+                                    setState(() => _smtpStartTls = value),
+                                onTestConnection: _isSaving || _isTesting
+                                    ? null
+                                    : _testConnection,
+                                isTesting: _isTesting,
+                              ),
+                            ],
+                            const SizedBox(height: AppSpacing.medium),
+                            _AccountFormFooter(
+                              isSaving: _isSaving,
+                              isAuthorizing: _isAuthorizing,
+                              enabled:
+                                  !_isSaving &&
+                                  !(_isGmailOAuth && !_isEditing) &&
+                                  !(_isOutlookOAuth && !_isEditing),
+                              label: _isOutlookOAuth
+                                  ? l10n.authorizeOutlook
+                                  : _isEditing
+                                  ? l10n.updateAccount
+                                  : l10n.saveAccount,
+                              onPressed: _saveAccount,
+                            ),
+                          ],
                         ),
                       ),
-                    ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
     );
   }
@@ -884,6 +903,258 @@ class _AddAccountPageState extends ConsumerState<AddAccountPage> {
   }
 }
 
+class _AccountSetupHero extends StatelessWidget {
+  const _AccountSetupHero({required this.isEditing, required this.provider});
+
+  final bool isEditing;
+  final EmailProviderType provider;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            colorScheme.primaryContainer,
+            colorScheme.secondaryContainer,
+          ],
+        ),
+        borderRadius: BorderRadius.circular(AppTheme.panelRadius),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.medium),
+        child: Row(
+          children: [
+            CircleAvatar(
+              radius: 24,
+              backgroundColor: colorScheme.primary,
+              foregroundColor: colorScheme.onPrimary,
+              child: Icon(_providerIcon(provider), size: 26),
+            ),
+            const SizedBox(width: AppSpacing.medium),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l10n.accountSetupTitle,
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      color: colorScheme.onPrimaryContainer,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.xsmall),
+                  Text(
+                    l10n.accountSetupSubtitle,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.onPrimaryContainer.withValues(
+                        alpha: 0.74,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _AccountFormSection extends StatelessWidget {
+  const _AccountFormSection({
+    required this.icon,
+    required this.title,
+    required this.child,
+  });
+
+  final IconData icon;
+  final String title;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.medium),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                CircleAvatar(
+                  radius: 18,
+                  backgroundColor: colorScheme.secondaryContainer,
+                  foregroundColor: colorScheme.onSecondaryContainer,
+                  child: Icon(icon, size: 20),
+                ),
+                const SizedBox(width: AppSpacing.small),
+                Expanded(
+                  child: Text(
+                    title,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.medium),
+            child,
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _AccountFormFooter extends StatelessWidget {
+  const _AccountFormFooter({
+    required this.isSaving,
+    required this.isAuthorizing,
+    required this.enabled,
+    required this.label,
+    required this.onPressed,
+  });
+
+  final bool isSaving;
+  final bool isAuthorizing;
+  final bool enabled;
+  final String label;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerLowest,
+        border: Border.all(color: colorScheme.outlineVariant),
+        borderRadius: BorderRadius.circular(AppTheme.cardRadius),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.medium),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                AppLocalizations.of(context).accountSecurityNotice,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ),
+            const SizedBox(width: AppSpacing.medium),
+            FilledButton.icon(
+              onPressed: enabled ? onPressed : null,
+              icon: isSaving || isAuthorizing
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.save_outlined),
+              label: Text(label),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ConnectionSection extends StatelessWidget {
+  const _ConnectionSection({
+    required this.l10n,
+    required this.imapHostController,
+    required this.imapPortController,
+    required this.imapSecurity,
+    required this.onImapSecurityChanged,
+    required this.smtpHostController,
+    required this.smtpPortController,
+    required this.smtpSecurity,
+    required this.onSmtpSecurityChanged,
+    required this.smtpStartTls,
+    required this.onSmtpStartTlsChanged,
+    this.onTestConnection,
+    this.isTesting = false,
+  });
+
+  final AppLocalizations l10n;
+  final TextEditingController imapHostController;
+  final TextEditingController imapPortController;
+  final String imapSecurity;
+  final ValueChanged<String> onImapSecurityChanged;
+  final TextEditingController smtpHostController;
+  final TextEditingController smtpPortController;
+  final String smtpSecurity;
+  final ValueChanged<String> onSmtpSecurityChanged;
+  final bool smtpStartTls;
+  final ValueChanged<bool> onSmtpStartTlsChanged;
+  final VoidCallback? onTestConnection;
+  final bool isTesting;
+
+  @override
+  Widget build(BuildContext context) {
+    return _AccountFormSection(
+      icon: Icons.dns_outlined,
+      title: l10n.connectionSettings,
+      child: Column(
+        children: [
+          _ServerSection(
+            title: l10n.imapSettings,
+            hostController: imapHostController,
+            portController: imapPortController,
+            security: imapSecurity,
+            onSecurityChanged: onImapSecurityChanged,
+          ),
+          const SizedBox(height: AppSpacing.large),
+          _ServerSection(
+            title: l10n.smtpSettings,
+            hostController: smtpHostController,
+            portController: smtpPortController,
+            security: smtpSecurity,
+            onSecurityChanged: onSmtpSecurityChanged,
+          ),
+          const SizedBox(height: AppSpacing.small),
+          SwitchListTile(
+            contentPadding: EdgeInsets.zero,
+            title: Text(l10n.useStartTls),
+            value: smtpStartTls,
+            onChanged: onSmtpStartTlsChanged,
+          ),
+          if (onTestConnection != null) ...[
+            const SizedBox(height: AppSpacing.medium),
+            Align(
+              alignment: AlignmentDirectional.centerStart,
+              child: OutlinedButton.icon(
+                onPressed: onTestConnection,
+                icon: isTesting
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.wifi_tethering_outlined),
+                label: Text(l10n.testConnection),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
 class _OutlookOAuthSection extends StatelessWidget {
   const _OutlookOAuthSection({
     required this.isEditing,
@@ -988,8 +1259,9 @@ class _AccountGroupDropdown extends StatelessWidget {
 }
 
 class _ProviderShortcuts extends StatelessWidget {
-  const _ProviderShortcuts({required this.onSelected});
+  const _ProviderShortcuts({required this.selected, required this.onSelected});
 
+  final EmailProviderType selected;
   final ValueChanged<EmailProviderType> onSelected;
 
   @override
@@ -1008,10 +1280,11 @@ class _ProviderShortcuts extends StatelessWidget {
       runSpacing: AppSpacing.small,
       children: [
         for (final provider in providers)
-          ActionChip(
-            avatar: const Icon(Icons.mail_outline, size: 18),
+          ChoiceChip(
+            avatar: Icon(_providerIcon(provider.$2), size: 18),
             label: Text(provider.$1),
-            onPressed: () => onSelected(provider.$2),
+            selected: selected == provider.$2,
+            onSelected: (_) => onSelected(provider.$2),
           ),
       ],
     );
@@ -1080,6 +1353,71 @@ class _GmailOAuthSection extends StatelessWidget {
   }
 }
 
+class _GmailReauthorizationSection extends StatelessWidget {
+  const _GmailReauthorizationSection({
+    required this.isAuthorizing,
+    required this.clientIdController,
+    required this.clientSecretController,
+    required this.requiredValidator,
+    required this.onReauthorize,
+  });
+
+  final bool isAuthorizing;
+  final TextEditingController clientIdController;
+  final TextEditingController clientSecretController;
+  final FormFieldValidator<String> requiredValidator;
+  final VoidCallback? onReauthorize;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        ListTile(
+          contentPadding: EdgeInsets.zero,
+          leading: const Icon(Icons.verified_user_outlined),
+          title: Text(l10n.gmailOAuthConnected),
+          subtitle: Text(l10n.gmailReauthorizeHelp),
+        ),
+        TextFormField(
+          controller: clientIdController,
+          decoration: InputDecoration(
+            labelText: l10n.gmailOAuthClientId,
+            helperText: l10n.gmailOAuthClientIdHelp,
+          ),
+          validator: requiredValidator,
+        ),
+        const SizedBox(height: AppSpacing.medium),
+        TextFormField(
+          controller: clientSecretController,
+          decoration: InputDecoration(
+            labelText: l10n.gmailOAuthClientSecret,
+            helperText: l10n.gmailOAuthClientSecretHelp,
+          ),
+          obscureText: true,
+        ),
+        const SizedBox(height: AppSpacing.medium),
+        Align(
+          alignment: AlignmentDirectional.centerStart,
+          child: OutlinedButton.icon(
+            onPressed: onReauthorize,
+            icon: isAuthorizing
+                ? const SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Icon(Icons.open_in_browser_outlined),
+            label: Text(l10n.reauthorizeGmail),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class _ServerSection extends StatelessWidget {
   const _ServerSection({
     required this.title,
@@ -1138,4 +1476,18 @@ class _ServerSection extends StatelessWidget {
       ],
     );
   }
+}
+
+IconData _providerIcon(EmailProviderType provider) {
+  return switch (provider) {
+    EmailProviderType.gmail => Icons.mail_outline,
+    EmailProviderType.outlook => Icons.business_center_outlined,
+    EmailProviderType.qq => Icons.alternate_email,
+    EmailProviderType.tencentEnterprise => Icons.domain_outlined,
+    EmailProviderType.aliyun => Icons.cloud_outlined,
+    EmailProviderType.netease163 ||
+    EmailProviderType.netease126 ||
+    EmailProviderType.yeah => Icons.mark_email_unread_outlined,
+    EmailProviderType.custom => Icons.tune_outlined,
+  };
 }
