@@ -504,7 +504,7 @@ class _FakeMailSyncRepository extends MailSyncRepository {
   }
 
   @override
-  Future<void> syncRecentHeaders() async {}
+  Future<void> syncRecentHeaders({Iterable<String>? accountIds}) async {}
 }
 
 class _NoopMailProvider implements MailProvider {

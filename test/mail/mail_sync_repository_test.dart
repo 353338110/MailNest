@@ -92,6 +92,31 @@ void main() {
     },
   );
 
+  test('syncRecentHeaders limits work to requested accounts', () async {
+    final database = AppDatabase(NativeDatabase.memory());
+    addTearDown(database.close);
+
+    final now = DateTime.utc(2026, 6, 24, 12);
+    await _saveAccount(database, now, accountId: 'first@example.com');
+    await _saveAccount(database, now, accountId: 'second@example.com');
+    final provider = _FakeMailProvider();
+    final repository = MailSyncRepository(
+      database: database,
+      imapProvider: provider,
+      now: () => now,
+    );
+
+    await repository.syncRecentHeaders(accountIds: ['second@example.com']);
+
+    expect(provider.folderListAccountIds, ['second@example.com']);
+    expect(provider.syncAccountIds, isNotEmpty);
+    expect(provider.syncAccountIds, everyElement(equals('second@example.com')));
+    expect(
+      await database.mailSyncStatesSnapshot(accountId: 'first@example.com'),
+      isEmpty,
+    );
+  });
+
   test(
     'decodes IMAP modified UTF-7 folders for display and syncs raw path',
     () async {
@@ -428,6 +453,8 @@ class _FakeMailProvider implements MailProvider {
   final Map<String, Object> folderFailures;
   final bool invalidateFirstCursor;
   final syncCalls = <String, int>{};
+  final folderListAccountIds = <String>[];
+  final syncAccountIds = <String>[];
   final cursorsByFolder = <String, List<SyncCursor>>{};
   SyncCursor? lastCursor;
 
@@ -450,6 +477,7 @@ class _FakeMailProvider implements MailProvider {
 
   @override
   Future<List<MailFolder>> listFolders(String accountId) async {
+    folderListAccountIds.add(accountId);
     return folders;
   }
 
@@ -512,6 +540,7 @@ class _FakeMailProvider implements MailProvider {
     required SyncCursor cursor,
   }) async {
     final folderKey = folderId.toLowerCase();
+    syncAccountIds.add(accountId);
     syncCalls[folderKey] = (syncCalls[folderKey] ?? 0) + 1;
     cursorsByFolder.putIfAbsent(folderKey, () => []).add(cursor);
     lastCursor = cursor;
@@ -546,14 +575,15 @@ Future<void> _saveAccount(
   AppDatabase database,
   DateTime now, {
   EmailProviderType provider = EmailProviderType.custom,
+  String accountId = 'user@example.com',
 }) {
   return database.saveAccount(
     EmailAccountsCompanion(
-      id: const Value('user@example.com'),
-      emailAddress: const Value('user@example.com'),
+      id: Value(accountId),
+      emailAddress: Value(accountId),
       displayName: const Value(null),
       provider: Value(provider.storageValue),
-      username: const Value('user@example.com'),
+      username: Value(accountId),
       authType: const Value('app_password'),
       imapHost: const Value('imap.example.com'),
       imapPort: const Value(993),

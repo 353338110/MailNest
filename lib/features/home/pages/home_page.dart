@@ -383,7 +383,21 @@ class _MailboxWorkspaceState extends ConsumerState<_MailboxWorkspace> {
   }
 
   Future<void> _sync() {
-    return ref.read(mailSyncRepositoryProvider).syncRecentHeaders();
+    return ref
+        .read(mailSyncRepositoryProvider)
+        .syncRecentHeaders(accountIds: _accountIdsForScope(_effectiveScope));
+  }
+
+  Iterable<String>? _accountIdsForScope(MailboxScope scope) {
+    return switch (scope) {
+      UnifiedMailboxScope() => null,
+      GroupMailboxScope(:final groupName) =>
+        widget.accounts
+            .where((account) => account.groupName == groupName)
+            .map((account) => account.id),
+      AccountMailboxScope(:final accountId) => [accountId],
+      FolderMailboxScope(:final accountId) => [accountId],
+    };
   }
 
   void _refresh() {

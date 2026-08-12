@@ -47,35 +47,47 @@ class MailSyncRepository {
     return database.watchMailSyncStates();
   }
 
-  Future<void> syncRecentHeaders() async {
+  Future<void> syncRecentHeaders({Iterable<String>? accountIds}) async {
+    final selectedAccountIds = accountIds?.toSet();
     final accounts = await database.watchableAccountsSnapshot();
-    final enabledAccounts = accounts.where((account) => account.syncEnabled);
-
+    final enabledAccounts = accounts.where(
+      (account) =>
+          account.syncEnabled &&
+          (selectedAccountIds == null ||
+              selectedAccountIds.contains(account.id)),
+    );
     for (final account in enabledAccounts) {
-      final provider = _providerFor(account);
-      if (provider == null) {
-        continue;
-      }
-      try {
-        await _syncFolders(account, provider);
-      } catch (error) {
-        await _recordSyncFailure(
-          accountId: account.id,
-          folderName: 'folders',
-          startedAt: _now(),
-          error: error,
-        );
-        continue;
-      }
+      await _syncAccount(account);
+    }
+  }
 
-      final folders = await _foldersForSync(account);
-      for (final folder in folders) {
-        await _syncFolder(
-          account: account,
-          localFolderName: folder.localFolderName,
-          remoteFolderId: folder.remoteFolderId,
-        );
-      }
+  Future<void> syncAccount(String accountId) {
+    return syncRecentHeaders(accountIds: [accountId]);
+  }
+
+  Future<void> _syncAccount(EmailAccount account) async {
+    final provider = _providerFor(account);
+    if (provider == null) {
+      return;
+    }
+    try {
+      await _syncFolders(account, provider);
+    } catch (error) {
+      await _recordSyncFailure(
+        accountId: account.id,
+        folderName: 'folders',
+        startedAt: _now(),
+        error: error,
+      );
+      return;
+    }
+    final folders = await _foldersForSync(account);
+    for (final folder in folders) {
+      await _syncFolder(
+        account: account,
+        localFolderName: folder.localFolderName,
+        remoteFolderId: folder.remoteFolderId,
+      );
     }
   }
 
