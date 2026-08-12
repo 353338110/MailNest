@@ -40,13 +40,13 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: master
+          flutter-version: 3.44.4
 
       - name: Install dependencies
         run: flutter pub get
 
       - name: Generate code
-        run: dart run build_runner build
+        run: bash .github/scripts/check-generated-code.sh
 
       - name: Check formatting
         run: dart format --output=none --set-exit-if-changed .
@@ -75,13 +75,13 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: master
+          flutter-version: 3.44.4
 
       - name: Install dependencies
         run: flutter pub get
 
       - name: Generate code
-        run: dart run build_runner build
+        run: bash .github/scripts/check-generated-code.sh
 
       - name: Build Linux
         run: flutter build linux --debug
@@ -99,13 +99,13 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: master
+          flutter-version: 3.44.4
 
       - name: Install dependencies
         run: flutter pub get
 
       - name: Generate code
-        run: dart run build_runner build
+        run: bash .github/scripts/check-generated-code.sh
 
       - name: Build Android APK
         run: flutter build apk --debug
@@ -123,13 +123,13 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: master
+          flutter-version: 3.44.4
 
       - name: Install dependencies
         run: flutter pub get
 
       - name: Generate code
-        run: dart run build_runner build
+        run: bash .github/scripts/check-generated-code.sh
 
       - name: Build Windows
         run: flutter build windows --debug
@@ -147,13 +147,13 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: master
+          flutter-version: 3.44.4
 
       - name: Install dependencies
         run: flutter pub get
 
       - name: Generate code
-        run: dart run build_runner build
+        run: bash .github/scripts/check-generated-code.sh
 
       - name: Build macOS
         run: flutter build macos --debug
@@ -171,13 +171,13 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: master
+          flutter-version: 3.44.4
 
       - name: Install dependencies
         run: flutter pub get
 
       - name: Generate code
-        run: dart run build_runner build
+        run: bash .github/scripts/check-generated-code.sh
 
       - name: Build iOS
         run: flutter build ios --debug --no-codesign

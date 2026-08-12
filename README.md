@@ -48,8 +48,9 @@ flutter pub get
 如果数据库或生成文件发生变化，运行：
 
 ```sh
-dart run build_runner build --delete-conflicting-outputs
+dart run build_runner build
 flutter gen-l10n
+git diff --exit-code -- lib/core/database/app_database.g.dart lib/l10n/generated
 ```
 
 #### 2. 启动应用
@@ -151,8 +152,9 @@ lib/
 
 ```sh
 flutter pub get
-dart run build_runner build --delete-conflicting-outputs
+dart run build_runner build
 flutter gen-l10n
+git diff --exit-code -- lib/core/database/app_database.g.dart lib/l10n/generated
 dart format --output=none --set-exit-if-changed .
 flutter analyze
 flutter test
@@ -213,7 +215,7 @@ Main goals:
 
 #### 1. Prepare the environment
 
-Install Flutter SDK and verify your target platform setup.
+Install Flutter 3.44.4 (stable) and verify your target platform setup.
 
 ```sh
 flutter doctor
@@ -223,8 +225,9 @@ flutter pub get
 When generated files need to be refreshed, run:
 
 ```sh
-dart run build_runner build --delete-conflicting-outputs
+dart run build_runner build
 flutter gen-l10n
+git diff --exit-code -- lib/core/database/app_database.g.dart lib/l10n/generated
 ```
 
 #### 2. Run the app
@@ -326,8 +329,9 @@ Common commands:
 
 ```sh
 flutter pub get
-dart run build_runner build --delete-conflicting-outputs
+dart run build_runner build
 flutter gen-l10n
+git diff --exit-code -- lib/core/database/app_database.g.dart lib/l10n/generated
 dart format --output=none --set-exit-if-changed .
 flutter analyze
 flutter test

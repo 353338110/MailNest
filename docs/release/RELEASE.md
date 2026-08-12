@@ -24,7 +24,7 @@ Run these commands before tagging:
 
 ```sh
 flutter pub get
-dart run build_runner build --delete-conflicting-outputs
+dart run build_runner build
 dart format --output=none --set-exit-if-changed .
 flutter analyze
 flutter test
