@@ -381,5 +381,75 @@
         "type": "int"
       }
     }
-  }
+  },
+  "delete": "删除",
+  "deleteMessageTitle": "删除邮件？",
+  "deleteMessageConfirmation": "要从当前文件夹删除这封邮件吗？",
+  "deleteMessagesTitle": "删除邮件？",
+  "deleteMessagesConfirmation": "要删除已选择的 {count} 封邮件吗？",
+  "@deleteMessagesConfirmation": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "openMessage": "打开邮件",
+  "markRead": "标为已读",
+  "markUnread": "标为未读",
+  "markedRead": "已标为已读。",
+  "markedUnread": "已标为未读。",
+  "starMessage": "加星标",
+  "removeStar": "取消星标",
+  "messageStarred": "已加星标。",
+  "starRemoved": "已取消星标。",
+  "moveMessage": "移动",
+  "moveToFolder": "移动到文件夹",
+  "destinationFolder": "目标文件夹",
+  "destinationFolderHint": "Archive",
+  "messageMovedTo": "邮件已移动到 {folder}。",
+  "@messageMovedTo": {
+    "placeholders": {
+      "folder": {
+        "type": "String"
+      }
+    }
+  },
+  "selectOneAccountToMove": "请只选择同一个账号的邮件进行移动。",
+  "noMoveDestinations": "没有可用的目标文件夹。",
+  "clearSelection": "清除选择",
+  "selectedMessages": "已选择 {count} 封",
+  "@selectedMessages": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "operationFailedGeneric": "操作失败。",
+  "operationFailed": "操作失败：{reason}",
+  "@operationFailed": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteFailed": "删除失败：{reason}",
+  "@deleteFailed": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "moveFailed": "移动失败：{reason}",
+  "@moveFailed": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "messageDeleted": "邮件已删除。"
 }

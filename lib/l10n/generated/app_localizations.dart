@@ -1896,6 +1896,174 @@ abstract class AppLocalizations {
   /// **'Imported {importedAccounts} account(s), skipped {skippedAccounts}. Please test imported account connections.'**
   String importConfigSucceeded(int importedAccounts, int skippedAccounts);
 
+  /// No description provided for @delete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get delete;
+
+  /// No description provided for @deleteMessageTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete message?'**
+  String get deleteMessageTitle;
+
+  /// No description provided for @deleteMessageConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this message from the current folder?'**
+  String get deleteMessageConfirmation;
+
+  /// No description provided for @deleteMessagesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete messages?'**
+  String get deleteMessagesTitle;
+
+  /// No description provided for @deleteMessagesConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete {count} selected messages?'**
+  String deleteMessagesConfirmation(int count);
+
+  /// No description provided for @openMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Open message'**
+  String get openMessage;
+
+  /// No description provided for @markRead.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as read'**
+  String get markRead;
+
+  /// No description provided for @markUnread.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as unread'**
+  String get markUnread;
+
+  /// No description provided for @markedRead.
+  ///
+  /// In en, this message translates to:
+  /// **'Marked as read.'**
+  String get markedRead;
+
+  /// No description provided for @markedUnread.
+  ///
+  /// In en, this message translates to:
+  /// **'Marked as unread.'**
+  String get markedUnread;
+
+  /// No description provided for @starMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Star'**
+  String get starMessage;
+
+  /// No description provided for @removeStar.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove star'**
+  String get removeStar;
+
+  /// No description provided for @messageStarred.
+  ///
+  /// In en, this message translates to:
+  /// **'Message starred.'**
+  String get messageStarred;
+
+  /// No description provided for @starRemoved.
+  ///
+  /// In en, this message translates to:
+  /// **'Star removed.'**
+  String get starRemoved;
+
+  /// No description provided for @moveMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Move'**
+  String get moveMessage;
+
+  /// No description provided for @moveToFolder.
+  ///
+  /// In en, this message translates to:
+  /// **'Move to folder'**
+  String get moveToFolder;
+
+  /// No description provided for @destinationFolder.
+  ///
+  /// In en, this message translates to:
+  /// **'Destination folder'**
+  String get destinationFolder;
+
+  /// No description provided for @destinationFolderHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Archive'**
+  String get destinationFolderHint;
+
+  /// No description provided for @messageMovedTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Message moved to {folder}.'**
+  String messageMovedTo(String folder);
+
+  /// No description provided for @selectOneAccountToMove.
+  ///
+  /// In en, this message translates to:
+  /// **'Select messages from one account only to move them.'**
+  String get selectOneAccountToMove;
+
+  /// No description provided for @noMoveDestinations.
+  ///
+  /// In en, this message translates to:
+  /// **'No destination folders are available.'**
+  String get noMoveDestinations;
+
+  /// No description provided for @clearSelection.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear selection'**
+  String get clearSelection;
+
+  /// No description provided for @selectedMessages.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} selected'**
+  String selectedMessages(int count);
+
+  /// No description provided for @operationFailedGeneric.
+  ///
+  /// In en, this message translates to:
+  /// **'Operation failed.'**
+  String get operationFailedGeneric;
+
+  /// No description provided for @operationFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Operation failed: {reason}'**
+  String operationFailed(String reason);
+
+  /// No description provided for @deleteFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete failed: {reason}'**
+  String deleteFailed(String reason);
+
+  /// No description provided for @moveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Move failed: {reason}'**
+  String moveFailed(String reason);
+
+  /// No description provided for @messageDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Message deleted.'**
+  String get messageDeleted;
+
   /// No description provided for @reply.
   ///
   /// In en, this message translates to:

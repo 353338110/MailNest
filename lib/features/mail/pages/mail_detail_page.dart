@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/localization/app_language.dart';
 import '../../../app/theme/app_spacing.dart';
+import '../../../app/theme/app_theme.dart';
 import '../../../l10n/generated/app_localizations.dart';
 import '../../../mail/body/email_attachment.dart';
 import '../../../mail/body/email_html_sanitizer.dart';
@@ -89,7 +90,7 @@ class MailDetailPage extends ConsumerWidget {
           uid: messageUid,
         ),
         error: (error, _) => const _DetailError(),
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const _DetailLoading(),
       ),
     );
   }
@@ -256,7 +257,7 @@ class _MailDetailBody extends StatelessWidget {
     );
 
     return ColoredBox(
-      color: colorScheme.surfaceContainerHighest,
+      color: AppTheme.workspaceBackground(colorScheme),
       child: Column(
         children: [
           _MailActionHeader(
@@ -270,16 +271,24 @@ class _MailDetailBody extends StatelessWidget {
             uid: uid,
             isRead: detail.header.isRead,
           ),
-          const Divider(height: 1),
+          Divider(height: 1, color: AppTheme.subtleBorder(colorScheme)),
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(AppSpacing.large),
               child: Center(
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 920),
-                  child: Card(
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: AppTheme.panelBackground(colorScheme),
+                      borderRadius: BorderRadius.circular(AppTheme.panelRadius),
+                      border: Border.all(
+                        color: AppTheme.subtleBorder(colorScheme),
+                      ),
+                      boxShadow: AppTheme.panelShadow(colorScheme),
+                    ),
                     child: Padding(
-                      padding: const EdgeInsets.all(AppSpacing.large),
+                      padding: const EdgeInsets.all(AppSpacing.xlarge),
                       child: LayoutBuilder(
                         builder: (context, constraints) {
                           final contentWidth = constraints.maxWidth > 850
@@ -370,12 +379,11 @@ class _MailActionHeader extends ConsumerWidget {
   Future<void> _handleDelete(BuildContext context, WidgetRef ref) async {
     final l10n = AppLocalizations.of(context);
 
-    // Show confirmation dialog
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Delete Message'),
-        content: Text('Are you sure you want to delete this message?'),
+        title: Text(l10n.deleteMessageTitle),
+        content: Text(l10n.deleteMessageConfirmation),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
@@ -383,7 +391,7 @@ class _MailActionHeader extends ConsumerWidget {
           ),
           FilledButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: Text('Delete'),
+            child: Text(l10n.delete),
           ),
         ],
       ),
@@ -399,7 +407,7 @@ class _MailActionHeader extends ConsumerWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Operation failed')));
+        ).showSnackBar(SnackBar(content: Text(l10n.operationFailedGeneric)));
       }
       return;
     }
@@ -416,18 +424,19 @@ class _MailActionHeader extends ConsumerWidget {
         Navigator.of(context).pop();
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Message deleted')));
+        ).showSnackBar(SnackBar(content: Text(l10n.messageDeleted)));
       }
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('${"Delete failed"}: $e')));
+        ).showSnackBar(SnackBar(content: Text(l10n.deleteFailed('$e'))));
       }
     }
   }
 
   Future<void> _handleToggleRead(BuildContext context, WidgetRef ref) async {
+    final l10n = AppLocalizations.of(context);
     final account = accountId;
     final folder = folderId;
     final messageUid = uid;
@@ -447,21 +456,20 @@ class _MailActionHeader extends ConsumerWidget {
 
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(isRead ? ('Marked as unread') : ('Marked as read')),
-          ),
+          SnackBar(content: Text(isRead ? l10n.markedUnread : l10n.markedRead)),
         );
       }
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('${"Operation failed"}: $e')));
+        ).showSnackBar(SnackBar(content: Text(l10n.operationFailed('$e'))));
       }
     }
   }
 
   Future<void> _handleToggleStarred(BuildContext context, WidgetRef ref) async {
+    final l10n = AppLocalizations.of(context);
     final account = accountId;
     final folder = folderId;
     final messageUid = uid;
@@ -483,7 +491,7 @@ class _MailActionHeader extends ConsumerWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              detail.header.isStarred ? 'Star removed' : 'Message starred',
+              detail.header.isStarred ? l10n.starRemoved : l10n.messageStarred,
             ),
           ),
         );
@@ -492,12 +500,13 @@ class _MailActionHeader extends ConsumerWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('${"Operation failed"}: $e')));
+        ).showSnackBar(SnackBar(content: Text(l10n.operationFailed('$e'))));
       }
     }
   }
 
   Future<void> _handleMove(BuildContext context, WidgetRef ref) async {
+    final l10n = AppLocalizations.of(context);
     final account = accountId;
     final folder = folderId;
     final messageUid = uid;
@@ -510,19 +519,19 @@ class _MailActionHeader extends ConsumerWidget {
     final destination = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Move message'),
+        title: Text(l10n.moveMessage),
         content: TextField(
           controller: controller,
           autofocus: true,
-          decoration: const InputDecoration(
-            labelText: 'Destination folder',
-            hintText: 'Archive',
+          decoration: InputDecoration(
+            labelText: l10n.destinationFolder,
+            hintText: l10n.destinationFolderHint,
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: Text(AppLocalizations.of(context).cancel),
+            child: Text(l10n.cancel),
           ),
           FilledButton(
             onPressed: () {
@@ -531,7 +540,7 @@ class _MailActionHeader extends ConsumerWidget {
                 Navigator.of(context).pop(value);
               }
             },
-            child: Text(AppLocalizations.of(context).ok),
+            child: Text(l10n.ok),
           ),
         ],
       ),
@@ -553,14 +562,14 @@ class _MailActionHeader extends ConsumerWidget {
       if (context.mounted) {
         Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Message moved to $destination')),
+          SnackBar(content: Text(l10n.messageMovedTo(destination))),
         );
       }
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('${"Move failed"}: $e')));
+        ).showSnackBar(SnackBar(content: Text(l10n.moveFailed('$e'))));
       }
     }
   }
@@ -573,14 +582,14 @@ class _MailActionHeader extends ConsumerWidget {
       IconButton(
         onPressed: hasContext ? () => _handleDelete(context, ref) : null,
         icon: const Icon(Icons.delete_outline),
-        tooltip: 'Delete',
+        tooltip: l10n.delete,
       ),
       IconButton(
         onPressed: hasContext ? () => _handleToggleStarred(context, ref) : null,
         icon: Icon(
           detail.header.isStarred ? Icons.star : Icons.star_border_outlined,
         ),
-        tooltip: detail.header.isStarred ? 'Remove star' : 'Star',
+        tooltip: detail.header.isStarred ? l10n.removeStar : l10n.starMessage,
       ),
       IconButton(
         onPressed: hasContext ? () => _handleToggleRead(context, ref) : null,
@@ -589,7 +598,7 @@ class _MailActionHeader extends ConsumerWidget {
               ? Icons.mark_email_unread_outlined
               : Icons.mark_email_read_outlined,
         ),
-        tooltip: isRead ? ('Mark as unread') : ('Mark as read'),
+        tooltip: isRead ? l10n.markUnread : l10n.markRead,
       ),
       IconButton(
         onPressed: hasContext ? () => _handleReply(context) : null,
@@ -609,7 +618,7 @@ class _MailActionHeader extends ConsumerWidget {
     ];
     final secondaryActions = [
       IconButton(
-        tooltip: 'Move',
+        tooltip: l10n.moveMessage,
         onPressed: hasContext ? () => _handleMove(context, ref) : null,
         icon: const Icon(Icons.drive_file_move_outlined),
       ),
@@ -628,27 +637,38 @@ class _MailActionHeader extends ConsumerWidget {
       IconButton(onPressed: null, icon: const Icon(Icons.more_vert)),
     ];
 
-    return Padding(
-      padding: const EdgeInsets.all(AppSpacing.medium),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          if (constraints.maxWidth < 420) {
-            return SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  ...primaryActions,
-                  const SizedBox(width: AppSpacing.medium),
-                  ...secondaryActions,
-                ],
-              ),
-            );
-          }
+    final colorScheme = Theme.of(context).colorScheme;
+    return DecoratedBox(
+      decoration: BoxDecoration(color: AppTheme.panelBackground(colorScheme)),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.medium,
+          vertical: AppSpacing.small,
+        ),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            if (constraints.maxWidth < 560) {
+              return SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    ...primaryActions,
+                    const SizedBox(width: AppSpacing.medium),
+                    ...secondaryActions,
+                  ],
+                ),
+              );
+            }
 
-          return Row(
-            children: [...primaryActions, const Spacer(), ...secondaryActions],
-          );
-        },
+            return Row(
+              children: [
+                ...primaryActions,
+                const Spacer(),
+                ...secondaryActions,
+              ],
+            );
+          },
+        ),
       ),
     );
   }
@@ -750,7 +770,10 @@ class _MessageHeading extends StatelessWidget {
             Expanded(
               child: Text(
                 detail.header.subject,
-                style: theme.textTheme.headlineSmall,
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.2,
+                ),
               ),
             ),
             const SizedBox(width: AppSpacing.medium),
@@ -977,12 +1000,12 @@ class _SenderAvatar extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     return CircleAvatar(
-      radius: 24,
-      backgroundColor: colorScheme.primaryContainer,
+      radius: 22,
+      backgroundColor: colorScheme.primary.withValues(alpha: 0.12),
       child: Text(
         _initial(sender),
         style: TextStyle(
-          color: colorScheme.onPrimaryContainer,
+          color: colorScheme.primary,
           fontWeight: FontWeight.w800,
         ),
       ),
@@ -1443,14 +1466,16 @@ class _AttachmentCardState extends ConsumerState<_AttachmentCard> {
 
     return InkWell(
       onTap: _handleTap,
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: BorderRadius.circular(AppTheme.tileRadius),
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: colorScheme.surfaceContainerHighest,
-          borderRadius: BorderRadius.circular(8),
-          border: hasError
-              ? Border.all(color: colorScheme.error, width: 1)
-              : null,
+          color: AppTheme.subtleSurface(colorScheme),
+          borderRadius: BorderRadius.circular(AppTheme.tileRadius),
+          border: Border.all(
+            color: hasError
+                ? colorScheme.error
+                : AppTheme.subtleBorder(colorScheme),
+          ),
         ),
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.medium),
@@ -1610,19 +1635,71 @@ class _DetailError extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.large),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.error_outline, size: 48),
-            const SizedBox(height: AppSpacing.medium),
-            Text(
-              AppLocalizations.of(context).messageLoadFailed,
-              style: Theme.of(context).textTheme.titleMedium,
+    return _DetailStateCard(
+      icon: Icons.error_outline,
+      title: AppLocalizations.of(context).messageLoadFailed,
+    );
+  }
+}
+
+class _DetailLoading extends StatelessWidget {
+  const _DetailLoading();
+
+  @override
+  Widget build(BuildContext context) {
+    return _DetailStateCard(
+      icon: Icons.sync_outlined,
+      title: AppLocalizations.of(context).loadingMailbox,
+      progress: true,
+    );
+  }
+}
+
+class _DetailStateCard extends StatelessWidget {
+  const _DetailStateCard({
+    required this.icon,
+    required this.title,
+    this.progress = false,
+  });
+
+  final IconData icon;
+  final String title;
+  final bool progress;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    return ColoredBox(
+      color: AppTheme.workspaceBackground(colorScheme),
+      child: Center(
+        child: Card(
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.large),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircleAvatar(
+                  radius: 26,
+                  backgroundColor: colorScheme.primary.withValues(alpha: 0.1),
+                  foregroundColor: colorScheme.primary,
+                  child: Icon(icon),
+                ),
+                const SizedBox(height: AppSpacing.medium),
+                Text(
+                  title,
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                if (progress) ...[
+                  const SizedBox(height: AppSpacing.medium),
+                  const SizedBox(width: 220, child: LinearProgressIndicator()),
+                ],
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

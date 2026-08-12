@@ -1013,6 +1013,104 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String get delete => 'Delete';
+
+  @override
+  String get deleteMessageTitle => 'Delete message?';
+
+  @override
+  String get deleteMessageConfirmation =>
+      'Delete this message from the current folder?';
+
+  @override
+  String get deleteMessagesTitle => 'Delete messages?';
+
+  @override
+  String deleteMessagesConfirmation(int count) {
+    return 'Delete $count selected messages?';
+  }
+
+  @override
+  String get openMessage => 'Open message';
+
+  @override
+  String get markRead => 'Mark as read';
+
+  @override
+  String get markUnread => 'Mark as unread';
+
+  @override
+  String get markedRead => 'Marked as read.';
+
+  @override
+  String get markedUnread => 'Marked as unread.';
+
+  @override
+  String get starMessage => 'Star';
+
+  @override
+  String get removeStar => 'Remove star';
+
+  @override
+  String get messageStarred => 'Message starred.';
+
+  @override
+  String get starRemoved => 'Star removed.';
+
+  @override
+  String get moveMessage => 'Move';
+
+  @override
+  String get moveToFolder => 'Move to folder';
+
+  @override
+  String get destinationFolder => 'Destination folder';
+
+  @override
+  String get destinationFolderHint => 'Archive';
+
+  @override
+  String messageMovedTo(String folder) {
+    return 'Message moved to $folder.';
+  }
+
+  @override
+  String get selectOneAccountToMove =>
+      'Select messages from one account only to move them.';
+
+  @override
+  String get noMoveDestinations => 'No destination folders are available.';
+
+  @override
+  String get clearSelection => 'Clear selection';
+
+  @override
+  String selectedMessages(int count) {
+    return '$count selected';
+  }
+
+  @override
+  String get operationFailedGeneric => 'Operation failed.';
+
+  @override
+  String operationFailed(String reason) {
+    return 'Operation failed: $reason';
+  }
+
+  @override
+  String deleteFailed(String reason) {
+    return 'Delete failed: $reason';
+  }
+
+  @override
+  String moveFailed(String reason) {
+    return 'Move failed: $reason';
+  }
+
+  @override
+  String get messageDeleted => 'Message deleted.';
+
+  @override
   String get reply => 'Reply';
 
   @override

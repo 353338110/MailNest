@@ -105,12 +105,36 @@ void main() {
   });
 
   group('responsive desktop home layout', () {
+    testWidgets('shows add account entry in the empty account state', (
+      tester,
+    ) async {
+      await tester.pumpHomeWithAccount(width: 1200, accounts: const []);
+
+      expect(find.text('No email accounts yet.'), findsOneWidget);
+      expect(find.text('Add email account'), findsWidgets);
+    });
+
     testWidgets('uses three panes on wide desktop windows', (tester) async {
       await tester.pumpHomeWithAccount(width: 1200);
 
       expect(find.text('Mailboxes'), findsOneWidget);
       expect(find.text('Unified inbox'), findsWidgets);
       expect(find.text('No message selected'), findsOneWidget);
+    });
+
+    testWidgets('shows message detail inside the wide desktop pane', (
+      tester,
+    ) async {
+      await tester.pumpHomeWithAccount(
+        width: 1200,
+        messages: [_cachedMessage()],
+      );
+
+      await tester.tap(find.text('Window sizing regression'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Body loaded from the local cache.'), findsOneWidget);
+      expect(find.text('No message selected'), findsNothing);
     });
 
     testWidgets('shows account markers in unified message lists', (
@@ -137,6 +161,21 @@ void main() {
 
       expect(find.textContaining('a@test.com'), findsWidgets);
       expect(find.textContaining('b@test.com'), findsWidgets);
+    });
+
+    testWidgets('hides account markers in account message lists', (
+      tester,
+    ) async {
+      await tester.pumpHomeWithAccount(
+        width: 1200,
+        messages: [_cachedMessage()],
+      );
+
+      await tester.tap(find.text(_testAccount.emailAddress).first);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Window sizing regression'), findsOneWidget);
+      expect(find.textContaining(_testAccount.emailAddress), findsOneWidget);
     });
 
     testWidgets('account folders are collapsed by default and can expand', (

@@ -137,8 +137,9 @@ class _HomeNavigationDrawer extends StatelessWidget {
           ),
           child: DecoratedBox(
             decoration: BoxDecoration(
-              color: colorScheme.primaryContainer,
+              color: AppTheme.subtleSurface(colorScheme),
               borderRadius: BorderRadius.circular(AppTheme.cardRadius),
+              border: Border.all(color: AppTheme.subtleBorder(colorScheme)),
             ),
             child: Padding(
               padding: const EdgeInsets.all(AppSpacing.medium),
@@ -157,7 +158,6 @@ class _HomeNavigationDrawer extends StatelessWidget {
                     child: Text(
                       l10n.appTitle,
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        color: colorScheme.onPrimaryContainer,
                         fontWeight: FontWeight.w800,
                       ),
                     ),
@@ -444,7 +444,7 @@ class _MailboxWorkspaceState extends ConsumerState<_MailboxWorkspace> {
 
     if (isWide) {
       return ColoredBox(
-        color: Theme.of(context).colorScheme.surfaceContainerHighest,
+        color: AppTheme.workspaceBackground(Theme.of(context).colorScheme),
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.medium),
           child: Row(
@@ -466,7 +466,7 @@ class _MailboxWorkspaceState extends ConsumerState<_MailboxWorkspace> {
 
     if (isMedium) {
       return ColoredBox(
-        color: Theme.of(context).colorScheme.surfaceContainerHighest,
+        color: AppTheme.workspaceBackground(Theme.of(context).colorScheme),
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.medium),
           child: Row(
@@ -595,16 +595,10 @@ class _WorkspacePanel extends StatelessWidget {
 
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerLowest,
+        color: AppTheme.panelBackground(colorScheme),
         borderRadius: BorderRadius.circular(AppTheme.panelRadius),
-        border: Border.all(color: colorScheme.outlineVariant),
-        boxShadow: [
-          BoxShadow(
-            color: colorScheme.shadow.withValues(alpha: 0.06),
-            blurRadius: 24,
-            offset: const Offset(0, 12),
-          ),
-        ],
+        border: Border.all(color: AppTheme.subtleBorder(colorScheme)),
+        boxShadow: AppTheme.panelShadow(colorScheme),
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(AppTheme.panelRadius),
@@ -770,9 +764,9 @@ class _PanelStateCard extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   CircleAvatar(
-                    radius: 28,
-                    backgroundColor: colorScheme.secondaryContainer,
-                    foregroundColor: colorScheme.onSecondaryContainer,
+                    radius: 26,
+                    backgroundColor: colorScheme.primary.withValues(alpha: 0.1),
+                    foregroundColor: colorScheme.primary,
                     child: Icon(icon, size: 30),
                   ),
                   const SizedBox(height: AppSpacing.medium),
@@ -1151,21 +1145,18 @@ class _NavigationBrand extends StatelessWidget {
 
     return DecoratedBox(
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            colorScheme.primaryContainer,
-            colorScheme.secondaryContainer,
-          ],
-        ),
+        color: AppTheme.sidebarBackground(colorScheme),
         borderRadius: BorderRadius.circular(AppTheme.cardRadius),
+        border: Border.all(color: AppTheme.subtleBorder(colorScheme)),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.medium),
+        padding: const EdgeInsets.all(AppSpacing.compact),
         child: Row(
           children: [
             CircleAvatar(
-              backgroundColor: colorScheme.primary,
-              foregroundColor: colorScheme.onPrimary,
+              radius: 18,
+              backgroundColor: colorScheme.primary.withValues(alpha: 0.12),
+              foregroundColor: colorScheme.primary,
               child: const Text(
                 'M',
                 style: TextStyle(fontWeight: FontWeight.w800),
@@ -1179,16 +1170,13 @@ class _NavigationBrand extends StatelessWidget {
                   Text(
                     l10n.appTitle,
                     style: theme.textTheme.titleMedium?.copyWith(
-                      color: colorScheme.onPrimaryContainer,
                       fontWeight: FontWeight.w800,
                     ),
                   ),
                   Text(
                     l10n.unifiedInbox,
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onPrimaryContainer.withValues(
-                        alpha: 0.74,
-                      ),
+                      color: colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ],
@@ -1402,21 +1390,30 @@ class _MailboxHeader extends StatelessWidget {
     final colorScheme = theme.colorScheme;
 
     return Padding(
-      padding: const EdgeInsets.all(AppSpacing.medium),
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.medium,
+        AppSpacing.medium,
+        AppSpacing.medium,
+        AppSpacing.small,
+      ),
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: colorScheme.surfaceContainerLow,
+          color: AppTheme.subtleSurface(colorScheme),
           borderRadius: BorderRadius.circular(AppTheme.cardRadius),
-          border: Border.all(color: colorScheme.outlineVariant),
+          border: Border.all(color: AppTheme.subtleBorder(colorScheme)),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.medium),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.medium,
+            vertical: AppSpacing.compact,
+          ),
           child: Row(
             children: [
               CircleAvatar(
-                backgroundColor: colorScheme.primaryContainer,
-                foregroundColor: colorScheme.onPrimaryContainer,
-                child: Icon(_scopeIcon()),
+                radius: 18,
+                backgroundColor: colorScheme.primary.withValues(alpha: 0.1),
+                foregroundColor: colorScheme.primary,
+                child: Icon(_scopeIcon(), size: 20),
               ),
               const SizedBox(width: AppSpacing.medium),
               Expanded(
@@ -1428,7 +1425,7 @@ class _MailboxHeader extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: theme.textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.w800,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                     const SizedBox(height: AppSpacing.xsmall),
@@ -1772,8 +1769,8 @@ class _MailboxContentState extends ConsumerState<_MailboxContent> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete messages'),
-        content: Text('Delete ${_selectedKeys.length} selected messages?'),
+        title: Text(l10n.deleteMessagesTitle),
+        content: Text(l10n.deleteMessagesConfirmation(_selectedKeys.length)),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
@@ -1781,7 +1778,7 @@ class _MailboxContentState extends ConsumerState<_MailboxContent> {
           ),
           FilledButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Delete'),
+            child: Text(l10n.delete),
           ),
         ],
       ),
@@ -1829,7 +1826,7 @@ class _MailboxContentState extends ConsumerState<_MailboxContent> {
     if (accountIds.length != 1) {
       _showActionMessage(
         context,
-        '\u8bf7\u53ea\u9009\u62e9\u540c\u4e00\u4e2a\u8d26\u53f7\u7684\u90ae\u4ef6\u8fdb\u884c\u79fb\u52a8\u3002',
+        AppLocalizations.of(context).selectOneAccountToMove,
       );
       return;
     }
@@ -1861,8 +1858,8 @@ class _MailboxContentState extends ConsumerState<_MailboxContent> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete message'),
-        content: const Text('Delete this message?'),
+        title: Text(l10n.deleteMessageTitle),
+        content: Text(l10n.deleteMessageConfirmation),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
@@ -1870,7 +1867,7 @@ class _MailboxContentState extends ConsumerState<_MailboxContent> {
           ),
           FilledButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Delete'),
+            child: Text(l10n.delete),
           ),
         ],
       ),
@@ -1893,15 +1890,16 @@ class _MailboxContentState extends ConsumerState<_MailboxContent> {
     MailboxMessage message,
     Offset position,
   ) async {
+    final l10n = AppLocalizations.of(context);
     final action = await showMenu<_MessageContextAction>(
       context: context,
       position: RelativeRect.fromLTRB(position.dx, position.dy, 0, 0),
       items: [
-        const PopupMenuItem(
+        PopupMenuItem(
           value: _MessageContextAction.open,
           child: ListTile(
-            leading: Icon(Icons.open_in_new),
-            title: Text('Open'),
+            leading: const Icon(Icons.open_in_new),
+            title: Text(l10n.openMessage),
           ),
         ),
         PopupMenuItem(
@@ -1912,7 +1910,9 @@ class _MailboxContentState extends ConsumerState<_MailboxContent> {
                   ? Icons.mark_email_unread_outlined
                   : Icons.mark_email_read_outlined,
             ),
-            title: Text(message.header.isRead ? 'Mark unread' : 'Mark read'),
+            title: Text(
+              message.header.isRead ? l10n.markUnread : l10n.markRead,
+            ),
           ),
         ),
         PopupMenuItem(
@@ -1923,21 +1923,23 @@ class _MailboxContentState extends ConsumerState<_MailboxContent> {
                   ? Icons.star_border_outlined
                   : Icons.star_outline,
             ),
-            title: Text(message.header.isStarred ? 'Remove star' : 'Star'),
+            title: Text(
+              message.header.isStarred ? l10n.removeStar : l10n.starMessage,
+            ),
           ),
         ),
-        const PopupMenuItem(
+        PopupMenuItem(
           value: _MessageContextAction.move,
           child: ListTile(
-            leading: Icon(Icons.drive_file_move_outlined),
-            title: Text('Move'),
+            leading: const Icon(Icons.drive_file_move_outlined),
+            title: Text(l10n.moveMessage),
           ),
         ),
-        const PopupMenuItem(
+        PopupMenuItem(
           value: _MessageContextAction.delete,
           child: ListTile(
-            leading: Icon(Icons.delete_outline),
-            title: Text('Delete'),
+            leading: const Icon(Icons.delete_outline),
+            title: Text(l10n.delete),
           ),
         ),
       ],
@@ -1995,6 +1997,7 @@ class _MailboxContentState extends ConsumerState<_MailboxContent> {
     required String accountId,
     required Set<String> excludedFolderIds,
   }) async {
+    final l10n = AppLocalizations.of(context);
     final folders = await ref
         .read(appDatabaseProvider)
         .localMailFoldersSnapshot(accountId: accountId);
@@ -2009,16 +2012,13 @@ class _MailboxContentState extends ConsumerState<_MailboxContent> {
         )
         .toList(growable: false);
     if (candidates.isEmpty) {
-      _showActionMessage(
-        context,
-        '\u6ca1\u6709\u53ef\u7528\u7684\u76ee\u6807\u6587\u4ef6\u5939\u3002',
-      );
+      _showActionMessage(context, l10n.noMoveDestinations);
       return null;
     }
     return showDialog<String>(
       context: context,
       builder: (context) => SimpleDialog(
-        title: const Text('移动到文件夹'),
+        title: Text(l10n.moveToFolder),
         children: [
           for (final folder in candidates)
             SimpleDialogOption(
@@ -2124,9 +2124,15 @@ class _BatchActionBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final colorScheme = Theme.of(context).colorScheme;
-    return Material(
-      color: colorScheme.secondaryContainer,
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: AppTheme.selectedSurface(colorScheme),
+        border: Border(
+          bottom: BorderSide(color: AppTheme.subtleBorder(colorScheme)),
+        ),
+      ),
       child: Padding(
         padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.small,
@@ -2135,33 +2141,33 @@ class _BatchActionBar extends StatelessWidget {
         child: Row(
           children: [
             IconButton(
-              tooltip: 'Clear selection',
+              tooltip: l10n.clearSelection,
               onPressed: onClear,
               icon: const Icon(Icons.close),
             ),
-            Expanded(child: Text('$selectedCount selected')),
+            Expanded(child: Text(l10n.selectedMessages(selectedCount))),
             IconButton(
-              tooltip: 'Mark as read',
+              tooltip: l10n.markRead,
               onPressed: onMarkRead,
               icon: const Icon(Icons.mark_email_read_outlined),
             ),
             IconButton(
-              tooltip: 'Mark as unread',
+              tooltip: l10n.markUnread,
               onPressed: onMarkUnread,
               icon: const Icon(Icons.mark_email_unread_outlined),
             ),
             IconButton(
-              tooltip: 'Star',
+              tooltip: l10n.starMessage,
               onPressed: onStar,
               icon: const Icon(Icons.star_border_outlined),
             ),
             IconButton(
-              tooltip: 'Move',
+              tooltip: l10n.moveMessage,
               onPressed: onMove,
               icon: const Icon(Icons.drive_file_move_outlined),
             ),
             IconButton(
-              tooltip: 'Delete',
+              tooltip: l10n.delete,
               onPressed: onDelete,
               icon: const Icon(Icons.delete_outline),
             ),
@@ -2193,11 +2199,9 @@ class _AccountNavigationTile extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final background = selected
-        ? colorScheme.secondaryContainer
-        : colorScheme.surfaceContainerLow;
-    final foreground = selected
-        ? colorScheme.onSecondaryContainer
-        : colorScheme.onSurface;
+        ? AppTheme.selectedSurface(colorScheme)
+        : Colors.transparent;
+    final foreground = selected ? colorScheme.primary : colorScheme.onSurface;
 
     return Material(
       color: background,
@@ -2215,13 +2219,13 @@ class _AccountNavigationTile extends StatelessWidget {
           child: Row(
             children: [
               CircleAvatar(
-                radius: 18,
+                radius: 17,
                 backgroundColor: selected
-                    ? colorScheme.primary
-                    : colorScheme.secondaryContainer,
+                    ? colorScheme.primary.withValues(alpha: 0.12)
+                    : AppTheme.subtleSurface(colorScheme),
                 foregroundColor: selected
-                    ? colorScheme.onPrimary
-                    : colorScheme.onSecondaryContainer,
+                    ? colorScheme.primary
+                    : colorScheme.onSurfaceVariant,
                 child: Icon(
                   account.syncEnabled
                       ? Icons.alternate_email
@@ -2250,9 +2254,7 @@ class _AccountNavigationTile extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: selected
-                            ? colorScheme.onSecondaryContainer.withValues(
-                                alpha: 0.72,
-                              )
+                            ? colorScheme.primary.withValues(alpha: 0.72)
                             : colorScheme.onSurfaceVariant,
                       ),
                     ),
@@ -2298,12 +2300,12 @@ class _NavigationTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final foreground = selected
-        ? colorScheme.onSecondaryContainer
-        : colorScheme.onSurface;
+    final foreground = selected ? colorScheme.primary : colorScheme.onSurface;
 
     return Material(
-      color: selected ? colorScheme.secondaryContainer : Colors.transparent,
+      color: selected
+          ? AppTheme.selectedSurface(colorScheme)
+          : Colors.transparent,
       borderRadius: BorderRadius.circular(AppTheme.tileRadius),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
@@ -2339,7 +2341,7 @@ class _NavigationTile extends StatelessWidget {
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: foreground,
                         fontWeight: selected
-                            ? FontWeight.w800
+                            ? FontWeight.w700
                             : FontWeight.w600,
                       ),
                     ),
@@ -2370,11 +2372,18 @@ class _FilterChipButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return FilterChip(
       avatar: Icon(icon, size: 18),
       label: Text(label),
       selected: selected,
       onSelected: (_) => onTap(),
+      showCheckmark: false,
+      selectedColor: AppTheme.selectedSurface(colorScheme),
+      side: BorderSide(color: AppTheme.subtleBorder(colorScheme)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppTheme.controlRadius),
+      ),
     );
   }
 }
@@ -2686,10 +2695,10 @@ class _MessageTile extends StatelessWidget {
     final header = message.header;
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final selectedForeground = colorScheme.onSecondaryContainer;
+    final selectedForeground = colorScheme.onSurface;
     final activeColor = selected
-        ? colorScheme.secondaryContainer
-        : colorScheme.surfaceContainerLowest;
+        ? AppTheme.selectedSurface(colorScheme)
+        : AppTheme.panelBackground(colorScheme);
     final subjectStyle = theme.textTheme.titleMedium?.copyWith(
       fontWeight: header.isRead ? FontWeight.w600 : FontWeight.w800,
       color: selected ? selectedForeground : colorScheme.onSurface,
@@ -2751,9 +2760,11 @@ class _MessageTile extends StatelessWidget {
       child: Material(
         color: activeColor,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppTheme.cardRadius),
+          borderRadius: BorderRadius.circular(AppTheme.tileRadius),
           side: BorderSide(
-            color: selected ? colorScheme.primary : colorScheme.outlineVariant,
+            color: selected
+                ? colorScheme.primary.withValues(alpha: 0.5)
+                : AppTheme.subtleBorder(colorScheme),
           ),
         ),
         clipBehavior: Clip.antiAlias,
@@ -2761,92 +2772,95 @@ class _MessageTile extends StatelessWidget {
           onTap: _canOpenDetail(header.id) ? onTap : null,
           onLongPress: onLongPress,
           child: Padding(
-            padding: const EdgeInsets.all(AppSpacing.medium),
+            padding: const EdgeInsets.all(AppSpacing.compact),
             child: Stack(
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        selectionMode
-                            ? Checkbox(
-                                value: checked,
-                                onChanged: (_) => onTap(),
-                              )
-                            : _SenderAvatar(
-                                sender: header.sender,
-                                selected: selected,
-                              ),
-                        const SizedBox(width: AppSpacing.small),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                _senderName(header.sender),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: theme.textTheme.titleSmall?.copyWith(
-                                  fontWeight: header.isRead
-                                      ? FontWeight.w600
-                                      : FontWeight.w800,
-                                  color: selected
-                                      ? selectedForeground
-                                      : colorScheme.onSurface,
-                                ),
-                              ),
-                              if (showAccountMarker) ...[
-                                const SizedBox(height: AppSpacing.xsmall),
-                                _AccountMarker(
-                                  emailAddress: message.account.emailAddress,
+                Padding(
+                  padding: EdgeInsets.only(
+                    left: header.isRead ? 0 : AppSpacing.small,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          selectionMode
+                              ? Checkbox(
+                                  value: checked,
+                                  onChanged: (_) => onTap(),
+                                )
+                              : _SenderAvatar(
+                                  sender: header.sender,
                                   selected: selected,
                                 ),
+                          const SizedBox(width: AppSpacing.small),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  _senderName(header.sender),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: theme.textTheme.titleSmall?.copyWith(
+                                    fontWeight: header.isRead
+                                        ? FontWeight.w600
+                                        : FontWeight.w800,
+                                    color: selected
+                                        ? selectedForeground
+                                        : colorScheme.onSurface,
+                                  ),
+                                ),
+                                if (showAccountMarker) ...[
+                                  const SizedBox(height: AppSpacing.xsmall),
+                                  _AccountMarker(
+                                    emailAddress: message.account.emailAddress,
+                                    selected: selected,
+                                  ),
+                                ],
+                                const SizedBox(height: AppSpacing.xsmall),
+                                Text(
+                                  header.subject,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: subjectStyle,
+                                ),
                               ],
-                              const SizedBox(height: AppSpacing.xsmall),
-                              Text(
-                                header.subject,
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                style: subjectStyle,
-                              ),
-                            ],
+                            ),
                           ),
-                        ),
-                        const SizedBox(width: AppSpacing.small),
-                        _MessageMeta(
-                          message: message,
-                          selected: selected,
-                          compact: false,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: AppSpacing.small),
-                    Text(
-                      _subtitle(context),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: secondaryColor,
-                        height: 1.35,
+                          const SizedBox(width: AppSpacing.small),
+                          _MessageMeta(
+                            message: message,
+                            selected: selected,
+                            compact: false,
+                          ),
+                        ],
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: AppSpacing.small),
+                      Text(
+                        _subtitle(context),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: secondaryColor,
+                          height: 1.35,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 if (!header.isRead)
                   Positioned(
                     left: 0,
-                    top: 0,
-                    bottom: 0,
+                    top: 6,
+                    bottom: 6,
                     child: DecoratedBox(
                       decoration: BoxDecoration(
-                        color: selected
-                            ? colorScheme.primary
-                            : colorScheme.primary,
+                        color: colorScheme.primary,
                         borderRadius: BorderRadius.circular(999),
                       ),
-                      child: const SizedBox(width: 4),
+                      child: const SizedBox(width: 3),
                     ),
                   ),
               ],
@@ -2903,11 +2917,11 @@ class _AccountMarker extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final foreground = selected
-        ? colorScheme.onPrimary
-        : colorScheme.onSecondaryContainer;
+        ? colorScheme.primary
+        : colorScheme.onSurfaceVariant;
     final background = selected
-        ? colorScheme.onPrimary.withValues(alpha: 0.16)
-        : colorScheme.secondaryContainer;
+        ? colorScheme.primary.withValues(alpha: 0.12)
+        : AppTheme.subtleSurface(colorScheme);
 
     return Align(
       alignment: AlignmentDirectional.centerStart,
@@ -2971,14 +2985,12 @@ class _SenderAvatar extends StatelessWidget {
     return CircleAvatar(
       radius: 18,
       backgroundColor: selected
-          ? colorScheme.onPrimary.withValues(alpha: 0.18)
-          : colorScheme.secondaryContainer,
+          ? colorScheme.primary.withValues(alpha: 0.12)
+          : AppTheme.subtleSurface(colorScheme),
       child: Text(
         label,
         style: TextStyle(
-          color: selected
-              ? colorScheme.onPrimary
-              : colorScheme.onSecondaryContainer,
+          color: selected ? colorScheme.primary : colorScheme.onSurfaceVariant,
           fontWeight: FontWeight.w700,
         ),
       ),
@@ -3008,9 +3020,7 @@ class _MessageMeta extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final color = selected
-        ? colorScheme.onPrimary.withValues(alpha: 0.78)
-        : colorScheme.onSurfaceVariant;
+    final color = selected ? colorScheme.primary : colorScheme.onSurfaceVariant;
     final header = message.header;
 
     return Column(
@@ -3111,18 +3121,13 @@ class _InlineMailboxError extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: AppSpacing.small),
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: colorScheme.errorContainer,
-          borderRadius: BorderRadius.circular(AppTheme.cardRadius),
+          color: AppTheme.subtleSurface(colorScheme),
+          borderRadius: BorderRadius.circular(AppTheme.tileRadius),
+          border: Border.all(color: colorScheme.error.withValues(alpha: 0.36)),
         ),
         child: ListTile(
-          leading: Icon(
-            Icons.error_outline,
-            color: colorScheme.onErrorContainer,
-          ),
-          title: Text(
-            message,
-            style: TextStyle(color: colorScheme.onErrorContainer),
-          ),
+          leading: Icon(Icons.error_outline, color: colorScheme.error),
+          title: Text(message, style: TextStyle(color: colorScheme.onSurface)),
           trailing: TextButton(
             onPressed: onRefresh,
             child: Text(AppLocalizations.of(context).retry),
@@ -3258,7 +3263,7 @@ class _EmptyState extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
 
     return ColoredBox(
-      color: Theme.of(context).colorScheme.surfaceContainerHighest,
+      color: AppTheme.workspaceBackground(Theme.of(context).colorScheme),
       child: _PanelStateCard(
         icon: Icons.all_inbox_outlined,
         title: l10n.noAccountsYet,

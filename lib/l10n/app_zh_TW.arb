@@ -339,5 +339,75 @@
         "type": "int"
       }
     }
-  }
+  },
+  "delete": "刪除",
+  "deleteMessageTitle": "刪除郵件？",
+  "deleteMessageConfirmation": "要從目前資料夾刪除這封郵件嗎？",
+  "deleteMessagesTitle": "刪除郵件？",
+  "deleteMessagesConfirmation": "要刪除已選取的 {count} 封郵件嗎？",
+  "@deleteMessagesConfirmation": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "openMessage": "開啟郵件",
+  "markRead": "標示為已讀",
+  "markUnread": "標示為未讀",
+  "markedRead": "已標示為已讀。",
+  "markedUnread": "已標示為未讀。",
+  "starMessage": "加上星號",
+  "removeStar": "移除星號",
+  "messageStarred": "已加上星號。",
+  "starRemoved": "已移除星號。",
+  "moveMessage": "移動",
+  "moveToFolder": "移動到資料夾",
+  "destinationFolder": "目標資料夾",
+  "destinationFolderHint": "Archive",
+  "messageMovedTo": "郵件已移動到 {folder}。",
+  "@messageMovedTo": {
+    "placeholders": {
+      "folder": {
+        "type": "String"
+      }
+    }
+  },
+  "selectOneAccountToMove": "請只選取同一個帳號的郵件進行移動。",
+  "noMoveDestinations": "沒有可用的目標資料夾。",
+  "clearSelection": "清除選取",
+  "selectedMessages": "已選取 {count} 封",
+  "@selectedMessages": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "operationFailedGeneric": "操作失敗。",
+  "operationFailed": "操作失敗：{reason}",
+  "@operationFailed": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteFailed": "刪除失敗：{reason}",
+  "@deleteFailed": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "moveFailed": "移動失敗：{reason}",
+  "@moveFailed": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "messageDeleted": "郵件已刪除。"
 }

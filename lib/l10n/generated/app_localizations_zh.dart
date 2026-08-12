@@ -967,6 +967,102 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get delete => '删除';
+
+  @override
+  String get deleteMessageTitle => '删除邮件？';
+
+  @override
+  String get deleteMessageConfirmation => '要从当前文件夹删除这封邮件吗？';
+
+  @override
+  String get deleteMessagesTitle => '删除邮件？';
+
+  @override
+  String deleteMessagesConfirmation(int count) {
+    return '要删除已选择的 $count 封邮件吗？';
+  }
+
+  @override
+  String get openMessage => '打开邮件';
+
+  @override
+  String get markRead => '标为已读';
+
+  @override
+  String get markUnread => '标为未读';
+
+  @override
+  String get markedRead => '已标为已读。';
+
+  @override
+  String get markedUnread => '已标为未读。';
+
+  @override
+  String get starMessage => '加星标';
+
+  @override
+  String get removeStar => '取消星标';
+
+  @override
+  String get messageStarred => '已加星标。';
+
+  @override
+  String get starRemoved => '已取消星标。';
+
+  @override
+  String get moveMessage => '移动';
+
+  @override
+  String get moveToFolder => '移动到文件夹';
+
+  @override
+  String get destinationFolder => '目标文件夹';
+
+  @override
+  String get destinationFolderHint => 'Archive';
+
+  @override
+  String messageMovedTo(String folder) {
+    return '邮件已移动到 $folder。';
+  }
+
+  @override
+  String get selectOneAccountToMove => '请只选择同一个账号的邮件进行移动。';
+
+  @override
+  String get noMoveDestinations => '没有可用的目标文件夹。';
+
+  @override
+  String get clearSelection => '清除选择';
+
+  @override
+  String selectedMessages(int count) {
+    return '已选择 $count 封';
+  }
+
+  @override
+  String get operationFailedGeneric => '操作失败。';
+
+  @override
+  String operationFailed(String reason) {
+    return '操作失败：$reason';
+  }
+
+  @override
+  String deleteFailed(String reason) {
+    return '删除失败：$reason';
+  }
+
+  @override
+  String moveFailed(String reason) {
+    return '移动失败：$reason';
+  }
+
+  @override
+  String get messageDeleted => '邮件已删除。';
+
+  @override
   String get reply => '回复';
 
   @override
@@ -1751,6 +1847,102 @@ class AppLocalizationsZhCn extends AppLocalizationsZh {
   String importConfigSucceeded(int importedAccounts, int skippedAccounts) {
     return '已导入 $importedAccounts 个账号，跳过 $skippedAccounts 个。请测试导入账号的连接。';
   }
+
+  @override
+  String get delete => '删除';
+
+  @override
+  String get deleteMessageTitle => '删除邮件？';
+
+  @override
+  String get deleteMessageConfirmation => '要从当前文件夹删除这封邮件吗？';
+
+  @override
+  String get deleteMessagesTitle => '删除邮件？';
+
+  @override
+  String deleteMessagesConfirmation(int count) {
+    return '要删除已选择的 $count 封邮件吗？';
+  }
+
+  @override
+  String get openMessage => '打开邮件';
+
+  @override
+  String get markRead => '标为已读';
+
+  @override
+  String get markUnread => '标为未读';
+
+  @override
+  String get markedRead => '已标为已读。';
+
+  @override
+  String get markedUnread => '已标为未读。';
+
+  @override
+  String get starMessage => '加星标';
+
+  @override
+  String get removeStar => '取消星标';
+
+  @override
+  String get messageStarred => '已加星标。';
+
+  @override
+  String get starRemoved => '已取消星标。';
+
+  @override
+  String get moveMessage => '移动';
+
+  @override
+  String get moveToFolder => '移动到文件夹';
+
+  @override
+  String get destinationFolder => '目标文件夹';
+
+  @override
+  String get destinationFolderHint => 'Archive';
+
+  @override
+  String messageMovedTo(String folder) {
+    return '邮件已移动到 $folder。';
+  }
+
+  @override
+  String get selectOneAccountToMove => '请只选择同一个账号的邮件进行移动。';
+
+  @override
+  String get noMoveDestinations => '没有可用的目标文件夹。';
+
+  @override
+  String get clearSelection => '清除选择';
+
+  @override
+  String selectedMessages(int count) {
+    return '已选择 $count 封';
+  }
+
+  @override
+  String get operationFailedGeneric => '操作失败。';
+
+  @override
+  String operationFailed(String reason) {
+    return '操作失败：$reason';
+  }
+
+  @override
+  String deleteFailed(String reason) {
+    return '删除失败：$reason';
+  }
+
+  @override
+  String moveFailed(String reason) {
+    return '移动失败：$reason';
+  }
+
+  @override
+  String get messageDeleted => '邮件已删除。';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -2528,4 +2720,100 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String importConfigSucceeded(int importedAccounts, int skippedAccounts) {
     return '已匯入 $importedAccounts 個帳號，略過 $skippedAccounts 個。請測試匯入帳號的連線。';
   }
+
+  @override
+  String get delete => '刪除';
+
+  @override
+  String get deleteMessageTitle => '刪除郵件？';
+
+  @override
+  String get deleteMessageConfirmation => '要從目前資料夾刪除這封郵件嗎？';
+
+  @override
+  String get deleteMessagesTitle => '刪除郵件？';
+
+  @override
+  String deleteMessagesConfirmation(int count) {
+    return '要刪除已選取的 $count 封郵件嗎？';
+  }
+
+  @override
+  String get openMessage => '開啟郵件';
+
+  @override
+  String get markRead => '標示為已讀';
+
+  @override
+  String get markUnread => '標示為未讀';
+
+  @override
+  String get markedRead => '已標示為已讀。';
+
+  @override
+  String get markedUnread => '已標示為未讀。';
+
+  @override
+  String get starMessage => '加上星號';
+
+  @override
+  String get removeStar => '移除星號';
+
+  @override
+  String get messageStarred => '已加上星號。';
+
+  @override
+  String get starRemoved => '已移除星號。';
+
+  @override
+  String get moveMessage => '移動';
+
+  @override
+  String get moveToFolder => '移動到資料夾';
+
+  @override
+  String get destinationFolder => '目標資料夾';
+
+  @override
+  String get destinationFolderHint => 'Archive';
+
+  @override
+  String messageMovedTo(String folder) {
+    return '郵件已移動到 $folder。';
+  }
+
+  @override
+  String get selectOneAccountToMove => '請只選取同一個帳號的郵件進行移動。';
+
+  @override
+  String get noMoveDestinations => '沒有可用的目標資料夾。';
+
+  @override
+  String get clearSelection => '清除選取';
+
+  @override
+  String selectedMessages(int count) {
+    return '已選取 $count 封';
+  }
+
+  @override
+  String get operationFailedGeneric => '操作失敗。';
+
+  @override
+  String operationFailed(String reason) {
+    return '操作失敗：$reason';
+  }
+
+  @override
+  String deleteFailed(String reason) {
+    return '刪除失敗：$reason';
+  }
+
+  @override
+  String moveFailed(String reason) {
+    return '移動失敗：$reason';
+  }
+
+  @override
+  String get messageDeleted => '郵件已刪除。';
 }

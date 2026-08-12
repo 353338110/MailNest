@@ -96,7 +96,9 @@ class _AddAccountPageState extends ConsumerState<AddAccountPage> {
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : ColoredBox(
-              color: Theme.of(context).colorScheme.surfaceContainerHighest,
+              color: AppTheme.workspaceBackground(
+                Theme.of(context).colorScheme,
+              ),
               child: ListView(
                 padding: const EdgeInsets.all(AppSpacing.medium),
                 children: [
@@ -917,13 +919,10 @@ class _AccountSetupHero extends StatelessWidget {
 
     return DecoratedBox(
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            colorScheme.primaryContainer,
-            colorScheme.secondaryContainer,
-          ],
-        ),
+        color: AppTheme.panelBackground(colorScheme),
         borderRadius: BorderRadius.circular(AppTheme.panelRadius),
+        border: Border.all(color: AppTheme.subtleBorder(colorScheme)),
+        boxShadow: AppTheme.panelShadow(colorScheme),
       ),
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.medium),
@@ -931,8 +930,8 @@ class _AccountSetupHero extends StatelessWidget {
           children: [
             CircleAvatar(
               radius: 24,
-              backgroundColor: colorScheme.primary,
-              foregroundColor: colorScheme.onPrimary,
+              backgroundColor: colorScheme.primary.withValues(alpha: 0.12),
+              foregroundColor: colorScheme.primary,
               child: Icon(_providerIcon(provider), size: 26),
             ),
             const SizedBox(width: AppSpacing.medium),
@@ -943,7 +942,6 @@ class _AccountSetupHero extends StatelessWidget {
                   Text(
                     l10n.accountSetupTitle,
                     style: theme.textTheme.titleLarge?.copyWith(
-                      color: colorScheme.onPrimaryContainer,
                       fontWeight: FontWeight.w800,
                     ),
                   ),
@@ -951,9 +949,7 @@ class _AccountSetupHero extends StatelessWidget {
                   Text(
                     l10n.accountSetupSubtitle,
                     style: theme.textTheme.bodyMedium?.copyWith(
-                      color: colorScheme.onPrimaryContainer.withValues(
-                        alpha: 0.74,
-                      ),
+                      color: colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ],
@@ -992,8 +988,8 @@ class _AccountFormSection extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 18,
-                  backgroundColor: colorScheme.secondaryContainer,
-                  foregroundColor: colorScheme.onSecondaryContainer,
+                  backgroundColor: colorScheme.primary.withValues(alpha: 0.1),
+                  foregroundColor: colorScheme.primary,
                   child: Icon(icon, size: 20),
                 ),
                 const SizedBox(width: AppSpacing.small),
@@ -1037,9 +1033,10 @@ class _AccountFormFooter extends StatelessWidget {
 
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerLowest,
-        border: Border.all(color: colorScheme.outlineVariant),
+        color: AppTheme.panelBackground(colorScheme),
+        border: Border.all(color: AppTheme.subtleBorder(colorScheme)),
         borderRadius: BorderRadius.circular(AppTheme.cardRadius),
+        boxShadow: AppTheme.panelShadow(colorScheme),
       ),
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.medium),
@@ -1174,8 +1171,11 @@ class _OutlookOAuthSection extends StatelessWidget {
 
     return DecoratedBox(
       decoration: BoxDecoration(
-        border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
-        borderRadius: BorderRadius.circular(8),
+        color: AppTheme.subtleSurface(Theme.of(context).colorScheme),
+        border: Border.all(
+          color: AppTheme.subtleBorder(Theme.of(context).colorScheme),
+        ),
+        borderRadius: BorderRadius.circular(AppTheme.cardRadius),
       ),
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.medium),
@@ -1267,6 +1267,7 @@ class _ProviderShortcuts extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final colorScheme = Theme.of(context).colorScheme;
     final providers = [
       (l10n.qqMail, EmailProviderType.qq),
       (l10n.neteaseMail, EmailProviderType.netease163),
@@ -1285,6 +1286,12 @@ class _ProviderShortcuts extends StatelessWidget {
             label: Text(provider.$1),
             selected: selected == provider.$2,
             onSelected: (_) => onSelected(provider.$2),
+            showCheckmark: false,
+            selectedColor: AppTheme.selectedSurface(colorScheme),
+            side: BorderSide(color: AppTheme.subtleBorder(colorScheme)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppTheme.controlRadius),
+            ),
           ),
       ],
     );

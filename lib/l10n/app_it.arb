@@ -312,5 +312,75 @@
         "type": "int"
       }
     }
-  }
+  },
+  "delete": "Delete",
+  "deleteMessageTitle": "Delete message?",
+  "deleteMessageConfirmation": "Delete this message from the current folder?",
+  "deleteMessagesTitle": "Delete messages?",
+  "deleteMessagesConfirmation": "Delete {count} selected messages?",
+  "@deleteMessagesConfirmation": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "openMessage": "Open message",
+  "markRead": "Mark as read",
+  "markUnread": "Mark as unread",
+  "markedRead": "Marked as read.",
+  "markedUnread": "Marked as unread.",
+  "starMessage": "Star",
+  "removeStar": "Remove star",
+  "messageStarred": "Message starred.",
+  "starRemoved": "Star removed.",
+  "moveMessage": "Move",
+  "moveToFolder": "Move to folder",
+  "destinationFolder": "Destination folder",
+  "destinationFolderHint": "Archive",
+  "messageMovedTo": "Message moved to {folder}.",
+  "@messageMovedTo": {
+    "placeholders": {
+      "folder": {
+        "type": "String"
+      }
+    }
+  },
+  "selectOneAccountToMove": "Select messages from one account only to move them.",
+  "noMoveDestinations": "No destination folders are available.",
+  "clearSelection": "Clear selection",
+  "selectedMessages": "{count} selected",
+  "@selectedMessages": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "operationFailedGeneric": "Operation failed.",
+  "operationFailed": "Operation failed: {reason}",
+  "@operationFailed": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteFailed": "Delete failed: {reason}",
+  "@deleteFailed": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "moveFailed": "Move failed: {reason}",
+  "@moveFailed": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "messageDeleted": "Message deleted."
 }
